@@ -36,19 +36,24 @@ public sealed partial class VoxArena
         Vector3 aim=(point-shooter.root.position).normalized;
         return Quaternion.Euler(0,Mathf.Sin(shooter.aiClock*2.7f)*(difficulty==0?8:difficulty==1?4:1.7f),0)*aim;
     }
-    void EnemyAI(float dt)
+    // Legacy entry point for smoke tests and the current one-rival mode.
+    void EnemyAI(float dt) => EnemyAI(enemy,player,dt);
+
+    // Explicit actor/target pairing is independent of player/enemy field swaps.
+    void EnemyAI(Fighter f,Fighter target,float dt)
     {
-        Fighter f=enemy; f.aiClock+=dt; f.aiReaction-=dt; f.orbitTime-=dt;
-        f.smoothedTargetVelocity=Vector3.Lerp(f.smoothedTargetVelocity,player.velocity,1-Mathf.Exp(-5*dt));
-        Vector3 toward=(player.root.position-f.root.position).normalized;
-        float distance=Vector3.Distance(player.root.position,f.root.position);
+        if(!IsHostile(f,target)) return;
+        f.aiClock+=dt; f.aiReaction-=dt; f.orbitTime-=dt;
+        f.smoothedTargetVelocity=Vector3.Lerp(f.smoothedTargetVelocity,target.velocity,1-Mathf.Exp(-5*dt));
+        Vector3 toward=(target.root.position-f.root.position).normalized;
+        float distance=Vector3.Distance(target.root.position,f.root.position);
         float preferred=Mathf.Clamp(f.spec.range*.42f,11,32);
         if(f.orbitTime<=0) { f.orbitTime=2.4f; f.orbitSign=-f.orbitSign; }
         if(f.velocity.magnitude<.6f && f.aiMove.sqrMagnitude>.1f) f.stuckTime+=dt; else f.stuckTime=0;
         if(f.aiReaction<=0)
         {
             f.aiReaction=difficulty==0?.60f:difficulty==1?.34f:.23f;
-            bool obscured=ObstacleOnSegment(f.root.position,player.root.position,.2f,out _);
+            bool obscured=ObstacleOnSegment(f.root.position,target.root.position,.2f,out _);
             Vector3 strafe=Vector3.Cross(toward,Vector3.up)*f.orbitSign;
             Vector3 goal=distance>preferred+4?toward+strafe*.3f:distance<preferred-5?-toward+strafe*.8f:strafe;
             if(obscured) goal=toward*.6f+strafe;
@@ -61,7 +66,7 @@ public sealed partial class VoxArena
                 Vector3 end=f.root.position+candidate*f.spec.speed*.5f;
                 if(ObstacleOnSegment(f.root.position,end,f.Radius+.1f,out _)) continue;
                 float score=Vector3.Dot(candidate,goal.normalized)*6;
-                float newDistance=Vector3.Distance(end,player.root.position);
+                float newDistance=Vector3.Distance(end,target.root.position);
                 score-=Mathf.Abs(newDistance-preferred)*.12f;
                 score-=ThreatAt(f,candidate*f.spec.boostSpeed,.75f)*(difficulty==0?.08f:difficulty==1?.32f:.62f);
                 // Favor clear exits instead of retreating straight into a nearby rock.
@@ -82,17 +87,17 @@ public sealed partial class VoxArena
         }
         Vector3 movement=f.aiMove;
         // Practice rivals pause between maneuvers, while still escaping blocked routes.
-        if(difficulty==0 && f.aiClock%3.2f>2.1f && !ObstacleOnSegment(f.root.position,player.root.position,.2f,out _)) movement*=.18f;
-        Move(f,movement,dt); FaceOpponent(f,player);
+        if(difficulty==0 && f.aiClock%3.2f>2.1f && !ObstacleOnSegment(f.root.position,target.root.position,.2f,out _)) movement*=.18f;
+        Move(f,movement,dt); FaceOpponent(f,target);
         if(f.aiClock<(difficulty==0?2.8f:1.3f)) return;
-        bool lineClear=!ObstacleOnSegment(f.root.position,player.root.position,.2f,out _);
-        Vector3 aim=AimLead(f,player);
+        bool lineClear=!ObstacleOnSegment(f.root.position,target.root.position,.2f,out _);
+        Vector3 aim=AimLead(f,target);
         if(!smoke) f.weaponSlot=1;
         if(!smoke&&f.magazine<=0&&f.reloadTime<=0) f.reloadTime=1.65f;
         float attackRange=smoke?f.spec.range:82;
         if(lineClear && distance<attackRange && f.weaponTimer<=0 && (smoke||f.reloadTime<=0))
         {
-            Attack(f,player,aim);
+            Attack(f,target,aim);
             if(f.weaponTimer>0) f.weaponTimer*=difficulty==0?1.65f:difficulty==1?1.2f:1;
         }
         if(smoke)
@@ -108,7 +113,7 @@ public sealed partial class VoxArena
                 default: useSpecial=lineClear&&distance>12&&distance<65&&ThreatAt(f,Vector3.zero,.8f)<8; break;
             }
             if(useSpecial&&f.aiClock>(difficulty==0?7:3)&&f.specialTimer<=0)
-            { Special(f,player,aim); f.specialTimer*=difficulty==0?1.6f:difficulty==1?1.2f:1; }
+            { Special(f,target,aim); f.specialTimer*=difficulty==0?1.6f:difficulty==1?1.2f:1; }
         }
     }
 }
