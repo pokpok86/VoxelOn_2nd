@@ -224,7 +224,7 @@ public sealed partial class VoxArena : MonoBehaviour
         float y=(Input.GetKey(KeyCode.W)?1:0)-(Input.GetKey(KeyCode.S)?1:0);
         Vector3 move=Vector3.ClampMagnitude(right*x+forward*y,1);
         player.boostHeld=Input.GetKey(KeyCode.LeftShift)||Input.GetKey(KeyCode.RightShift);
-        if(Input.GetKeyDown(KeyCode.Space)&&player.jumpHeight<=.02f) player.jumpVelocity=8.5f;
+        if(Input.GetKeyDown(KeyCode.Space)&&player.jumpHeight<=.02f) player.jumpVelocity=10.41f;
         if(Input.GetMouseButtonDown(1)) targetLock=true;
         if(Input.GetMouseButtonUp(1)) targetLock=false;
         if(!targetLock)
