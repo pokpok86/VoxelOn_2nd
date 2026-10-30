@@ -6,7 +6,9 @@ using UnityEngine;
 public sealed partial class VoxArena : MonoBehaviour
 {
     public Shader hullShader;
-    public float boostRecovery = 32, recoveryDelay = .6f;
+    public float boostRecovery = 40, recoveryDelay = .6f;
+    [Header("Jump and vertical boost")]
+    public float jumpSpeed = 10.41f, jumpGravity = 24f, jumpThrust = 34f, jumpBoostDrain = 24f;
     public float gunHalfAngle = 65, shieldRecoveryDelay = 3, shieldFullRecoveryTime = 6;
     [Header("Weapon tuning (all frames)")]
     [Range(.5f,2)] public float bulletSpeedScale=1;
@@ -27,7 +29,7 @@ public sealed partial class VoxArena : MonoBehaviour
         public Vector3 aiMove,lastPosition,smoothedTargetVelocity;
         public int orbitSign=1;
         public float jumpHeight,jumpVelocity;
-        public bool boostHeld,wasBoostHeld,boostLocked,boosting,rushHit;
+        public bool boostHeld,wasBoostHeld,boostLocked,boosting,rushHit,jumpHeld;
         public string aiState="APPROACH";
         public float Radius=>CraftRadius*spec.size;
     }
@@ -128,7 +130,7 @@ public sealed partial class VoxArena : MonoBehaviour
             f.weaponSlot=1; f.magazine=30; f.reloadTime=0;
             f.pulseTime=f.lockTime=f.rushTime=f.aiClock=f.aiReaction=f.stuckTime=f.orbitTime=0;
             f.velocity=f.aiMove=f.smoothedTargetVelocity=Vector3.zero;
-            f.boostHeld=f.wasBoostHeld=f.boostLocked=f.boosting=f.rushHit=false;
+            f.boostHeld=f.wasBoostHeld=f.boostLocked=f.boosting=f.rushHit=f.jumpHeld=false;
             f.jumpHeight=f.jumpVelocity=0;
             f.orbitSign=1;
         }
@@ -224,7 +226,8 @@ public sealed partial class VoxArena : MonoBehaviour
         float y=(Input.GetKey(KeyCode.W)?1:0)-(Input.GetKey(KeyCode.S)?1:0);
         Vector3 move=Vector3.ClampMagnitude(right*x+forward*y,1);
         player.boostHeld=Input.GetKey(KeyCode.LeftShift)||Input.GetKey(KeyCode.RightShift);
-        if(Input.GetKeyDown(KeyCode.Space)&&player.jumpHeight<=.02f) player.jumpVelocity=10.41f;
+        player.jumpHeld=Input.GetKey(KeyCode.Space);
+        if(Input.GetKeyDown(KeyCode.Space)&&player.jumpHeight<=.02f) player.jumpVelocity=jumpSpeed;
         if(Input.GetMouseButtonDown(1)) targetLock=true;
         if(Input.GetMouseButtonUp(1)) targetLock=false;
         if(!targetLock)
@@ -275,7 +278,8 @@ public sealed partial class VoxArena : MonoBehaviour
         float recovery=Mathf.Max(0,dt-f.shieldRecoveryTime);
         f.shieldRecoveryTime=Mathf.Max(0,f.shieldRecoveryTime-dt);
         f.shieldEnergy=Mathf.Min(f.spec.ShieldMax,f.shieldEnergy+f.spec.ShieldMax/shieldFullRecoveryTime*recovery);
-        if(!f.boostHeld) f.boostLocked=false;
+        // Release both boost controls before rearming an exhausted shared gauge.
+        if(!f.boostHeld && !f.jumpHeld) f.boostLocked=false;
         bool wasBoosting=f.boosting;
         if(f.spec.boost==BoostKind.Pulse && f.boostHeld && !f.wasBoostHeld && f.lockTime<=0 &&
             f.boostEnergy>=f.spec.boostDrain*f.spec.pulseDuration && direction.sqrMagnitude>.01f)
@@ -295,7 +299,20 @@ public sealed partial class VoxArena : MonoBehaviour
             if(f.boostEnergy<=0) { f.boostLocked=true; f.boosting=false; }
             if(!wasBoosting) PlaySound(SoundKind.Boost,f.root.position,.45f);
         }
-        else
+        // Vertical thrust shares fuel with horizontal boost; larger/heavier frames cost more.
+        bool airborne=f==player && (f.jumpHeight>0 || f.jumpVelocity>0);
+        bool verticalBoost=airborne && f.jumpHeld && !f.boostLocked && f.boostEnergy>0;
+        if(verticalBoost)
+        {
+            float weightFactor=1f+Mathf.Max(0,f.spec.size-1f)*.5f+f.spec.armor*.5f;
+            float drain=jumpBoostDrain*weightFactor*dt;
+            float fraction=drain>0?Mathf.Min(1,f.boostEnergy/drain):1;
+            f.jumpVelocity+=jumpThrust/weightFactor*fraction*dt;
+            f.boostEnergy=Mathf.Max(0,f.boostEnergy-drain);
+            f.recoveryTime=recoveryDelay;
+            if(f.boostEnergy<=0) f.boostLocked=true;
+        }
+        if(!f.boosting && !verticalBoost)
         {
             float t=Mathf.Max(0,dt-f.recoveryTime); f.recoveryTime=Mathf.Max(0,f.recoveryTime-dt);
             f.boostEnergy=Mathf.Min(f.spec.boostCapacity,f.boostEnergy+boostRecovery*t);
@@ -303,7 +320,8 @@ public sealed partial class VoxArena : MonoBehaviour
         f.pulseTime=Mathf.Max(0,f.pulseTime-dt);
         if(f==player)
         {
-            f.jumpVelocity-=24*dt; f.jumpHeight=Mathf.Max(0,f.jumpHeight+f.jumpVelocity*dt);
+            f.jumpVelocity-=jumpGravity*dt;
+            f.jumpHeight=Mathf.Max(0,f.jumpHeight+f.jumpVelocity*dt);
             if(f.jumpHeight<=0) f.jumpVelocity=0;
         }
         Vector3 desired=motion*speed;
