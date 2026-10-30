@@ -22,7 +22,7 @@ public sealed class CraftSpec
     {
         this.name=name; this.role=role; this.description=description; this.color=color;
         health=hp; this.armor=armor; this.speed=speed; this.boostSpeed=boostSpeed;
-        boostCapacity=capacity; boostDrain=drain; this.size=size; this.boost=boost; this.pulseDuration=pulseDuration;
+        boostCapacity=capacity*1.5f; boostDrain=drain; this.size=size; this.boost=boost; this.pulseDuration=pulseDuration;
         this.primary=primary; this.weaponName=weaponName; this.damage=damage; weaponCooldown=cooldown;
         this.range=range; this.projectileSpeed=projectileSpeed; projectileRadius=radius;
         this.special=special; this.specialName=specialName; this.specialCooldown=specialCooldown;
