@@ -80,6 +80,18 @@ public sealed partial class VoxArena
         bool validRandom=true;
         for(int roll=0;roll<32;roll++) { int candidate=ResolveRival(); validRandom&=candidate>=0&&candidate<8; }
         Check(validRandom,"random rival remains valid");
+        // Engine foundation regressions: team-aware roster and explicit AI actor.
+        TestSetup();
+        Check(fighterRoster.Count==2 && Opponent(player)==enemy && Opponent(enemy)==player,
+            "roster preserves current 1v1 opponents");
+        int savedRivalTeam=enemy.teamId;
+        enemy.teamId=player.teamId;
+        Check(Opponent(player)==null && Opponent(enemy)==null,"same-team fighters are not opponents");
+        enemy.teamId=savedRivalTeam;
+        Fighter originalPilot=player,originalRival=enemy;
+        EnemyAI(player,enemy,.04f);
+        Check(player==originalPilot && enemy==originalRival && player.aiClock>0 && enemy.aiClock==0,
+            "AI can control pilot without swapping global fighter identities");
         var primaryKinds=new HashSet<PrimaryKind>(); var specialKinds=new HashSet<SpecialKind>(); var boostKinds=new HashSet<BoostKind>();
         int[] initial={2,1,1,2,7,1,1,1},total={3,1,6,2,7,1,3,1};
         for(int i=0;i<8;i++)
