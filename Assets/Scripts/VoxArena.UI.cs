@@ -11,6 +11,46 @@ public sealed partial class VoxArena
         Panel(new Rect(x, y, w * Mathf.Clamp01(fraction), 8), color);
     }
 
+    // Visual-only lock feedback: combat targeting remains authoritative.
+    float lockVisual;
+    Vector2 lockScreenPosition;
+    bool lockVisualInitialized;
+    void DrawLockReticle()
+    {
+        if(spectatorMode || Finished || paused || view==null || enemy==null) return;
+        Vector3 projected=view.WorldToScreenPoint(enemy.root.position+Vector3.up*(1.3f+enemy.jumpHeight));
+        bool onScreen=projected.z>0 && projected.x>=0 && projected.x<=Screen.width &&
+            projected.y>=0 && projected.y<=Screen.height;
+        float target=targetLock && onScreen?1f:0f;
+        lockVisual=Mathf.MoveTowards(lockVisual,target,Time.unscaledDeltaTime*(target>lockVisual?5.5f:2.8f));
+        if(lockVisual<=.001f) { lockVisualInitialized=false; return; }
+        Vector2 screenPos=new Vector2(projected.x*1280f/Screen.width,(Screen.height-projected.y)*720f/Screen.height);
+        if(onScreen)
+        {
+            if(!lockVisualInitialized) { lockScreenPosition=screenPos; lockVisualInitialized=true; }
+            lockScreenPosition=Vector2.Lerp(lockScreenPosition,screenPos,1-Mathf.Exp(-15f*Time.unscaledDeltaTime));
+        }
+        float eased=lockVisual*lockVisual*(3-2*lockVisual);
+        float size=Mathf.Lerp(108f,48f,eased);
+        float alpha=Mathf.Lerp(.04f,.94f,eased);
+        Color color=Color.Lerp(new Color(.45f,.72f,.84f,alpha),new Color(.2f,1f,.94f,alpha),eased);
+        color.a=alpha;
+        float x=lockScreenPosition.x-size*.5f,y=lockScreenPosition.y-size*.5f;
+        float corner=Mathf.Lerp(10f,15f,eased),thickness=2f;
+        // Four open corners remain readable without covering the opponent.
+        for(int i=0;i<4;i++)
+        {
+            float cx=x+(i%2==0?0:size),cy=y+(i<2?0:size);
+            Panel(new Rect(cx-(i%2==0?0:corner),cy,corner,thickness),color);
+            Panel(new Rect(cx,cy-(i<2?0:corner),thickness,corner),color);
+        }
+        if(eased>.8f)
+        {
+            Color center=color; center.a*=.55f;
+            Panel(new Rect(lockScreenPosition.x-2,lockScreenPosition.y-2,4,4),center);
+        }
+    }
+
     void OnGUI()
     {
         if (player == null) return;
@@ -51,6 +91,7 @@ public sealed partial class VoxArena
             Text(405, 574, 650, player.lockTime>0?"SPECIAL FIRING / MOVEMENT LOCKED":player.rushTime>0?"SABER RUSH":player.boostLocked ? "BOOST EMPTY / RELEASE SHIFT TO REARM" : AimStatus(), small);
         DrawCombatFeedback();
         DrawRadar();
+        DrawLockReticle();
         if (Finished || paused)
         {
             Panel(new Rect(385, 245, 510, 205), new Color(.025f, .045f, .075f, .96f));
