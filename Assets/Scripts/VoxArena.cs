@@ -14,6 +14,10 @@ public sealed partial class VoxArena : MonoBehaviour
     [Range(.5f,2)] public float bulletSpeedScale=1;
     [Range(.5f,2)] public float bulletSizeScale=1;
     [Range(.5f,2)] public float weaponCooldownScale=1;
+    [Header("Double-tap dash (future part tuning)")]
+    public float dashSpeed=34f, dashDistance=9f, dashFuelCost=30f, dashCooldown=.7f;
+    [Range(.12f,.45f)] public float doubleTapWindow=.28f;
+    readonly float[] lastDirectionTap={-10f,-10f,-10f,-10f};
     const float CraftRadius=1.15f;
 
     sealed class Fighter
@@ -29,6 +33,10 @@ public sealed partial class VoxArena : MonoBehaviour
         public Vector3 aiMove,lastPosition,smoothedTargetVelocity;
         public int orbitSign=1;
         public float jumpHeight,jumpVelocity;
+        public Vector3 dashDirection;
+        public float dashRemaining,dashCooldownLeft;
+        // Part modifiers: replace with equipped leg/booster stats when assembly is implemented.
+        public float dashSpeedFactor=1f,dashDistanceFactor=1f,dashCostFactor=1f;
         public bool boostHeld,wasBoostHeld,boostLocked,boosting,rushHit,jumpHeld;
         public string aiState="APPROACH";
         public float Radius=>CraftRadius*spec.size;
@@ -132,6 +140,11 @@ public sealed partial class VoxArena : MonoBehaviour
             f.velocity=f.aiMove=f.smoothedTargetVelocity=Vector3.zero;
             f.boostHeld=f.wasBoostHeld=f.boostLocked=f.boosting=f.rushHit=f.jumpHeld=false;
             f.jumpHeight=f.jumpVelocity=0;
+            f.dashRemaining=f.dashCooldownLeft=0;
+            f.dashDirection=Vector3.zero;
+            f.dashSpeedFactor=Mathf.Clamp(f.spec.speed/13f,.7f,1.25f);
+            f.dashDistanceFactor=Mathf.Clamp(f.spec.speed/13f,.75f,1.2f);
+            f.dashCostFactor=1f+Mathf.Max(0,f.spec.size-1f)*.35f+f.spec.armor*.5f;
             f.orbitSign=1;
         }
         player.root.position=new Vector3(-15,1.1f,-15); enemy.root.position=new Vector3(15,1.1f,15);
@@ -226,6 +239,15 @@ public sealed partial class VoxArena : MonoBehaviour
         float y=(Input.GetKey(KeyCode.W)?1:0)-(Input.GetKey(KeyCode.S)?1:0);
         Vector3 move=Vector3.ClampMagnitude(right*x+forward*y,1);
         player.boostHeld=Input.GetKey(KeyCode.LeftShift)||Input.GetKey(KeyCode.RightShift);
+        // A second press of the same movement key within the window starts a fixed-distance dash.
+        KeyCode[] keys={KeyCode.W,KeyCode.A,KeyCode.S,KeyCode.D};
+        Vector3[] axes={forward,-right,-forward,right};
+        for(int i=0;i<keys.Length;i++)
+        {
+            if(!Input.GetKeyDown(keys[i])) continue;
+            if(Time.time-lastDirectionTap[i]<=doubleTapWindow) TryDash(player,axes[i]);
+            lastDirectionTap[i]=Time.time;
+        }
         player.jumpHeld=Input.GetKey(KeyCode.Space);
         if(Input.GetKeyDown(KeyCode.Space)&&player.jumpHeight<=.02f) player.jumpVelocity=jumpSpeed;
         if(Input.GetMouseButtonDown(1)) targetLock=true;
@@ -264,6 +286,19 @@ public sealed partial class VoxArena : MonoBehaviour
         Vector3 d=Vector3.ProjectOnPlane(target.root.position-f.root.position,Vector3.up);
         if(d.sqrMagnitude>.001f) f.facing=d.normalized;
     }
+    bool TryDash(Fighter f,Vector3 direction)
+    {
+        if(direction.sqrMagnitude<.01f || f.dashRemaining>0 || f.dashCooldownLeft>0 || f.boostLocked || f.lockTime>0) return false;
+        float cost=dashFuelCost*f.dashCostFactor;
+        if(f.boostEnergy<cost) return false;
+        f.boostEnergy-=cost;
+        f.recoveryTime=recoveryDelay;
+        f.dashDirection=direction.normalized;
+        f.dashRemaining=Mathf.Max(.01f,dashDistance*f.dashDistanceFactor);
+        f.dashCooldownLeft=dashCooldown;
+        PlaySound(SoundKind.Boost,f.root.position,.6f);
+        return true;
+    }
     float BoostDirectionFactor(Fighter f,Vector3 direction)
     {
         Vector3 toward=(Opponent(f).root.position-f.root.position).normalized;
@@ -274,6 +309,7 @@ public sealed partial class VoxArena : MonoBehaviour
     {
         if(f.reloadTime>0) { f.reloadTime=Mathf.Max(0,f.reloadTime-dt); if(f.reloadTime<=0) f.magazine=30; }
         f.weaponTimer=Mathf.Max(0,f.weaponTimer-dt); f.specialTimer=Mathf.Max(0,f.specialTimer-dt);
+        f.dashCooldownLeft=Mathf.Max(0,f.dashCooldownLeft-dt);
         f.shieldFlash=Mathf.Max(0,f.shieldFlash-dt); f.hitFlash=Mathf.Max(0,f.hitFlash-dt);
         float recovery=Mathf.Max(0,dt-f.shieldRecoveryTime);
         f.shieldRecoveryTime=Mathf.Max(0,f.shieldRecoveryTime-dt);
@@ -285,7 +321,8 @@ public sealed partial class VoxArena : MonoBehaviour
             f.boostEnergy>=f.spec.boostDrain*f.spec.pulseDuration && direction.sqrMagnitude>.01f)
         { f.pulseTime=f.spec.pulseDuration; f.pulseDirection=direction.normalized; }
         f.wasBoostHeld=f.boostHeld;
-        bool wants=f.boostHeld&&direction.sqrMagnitude>.01f;
+        bool dashing=f.dashRemaining>0;
+        bool wants=!dashing&&f.boostHeld&&direction.sqrMagnitude>.01f;
         f.boosting=wants&&!f.boostLocked&&f.lockTime<=0;
         Vector3 motion=Vector3.ClampMagnitude(direction,1);
         float speed=f.spec.speed;
@@ -312,7 +349,7 @@ public sealed partial class VoxArena : MonoBehaviour
             f.recoveryTime=recoveryDelay;
             if(f.boostEnergy<=0) f.boostLocked=true;
         }
-        if(!f.boosting && !verticalBoost)
+        if(!f.boosting && !verticalBoost && !dashing)
         {
             float t=Mathf.Max(0,dt-f.recoveryTime); f.recoveryTime=Mathf.Max(0,f.recoveryTime-dt);
             f.boostEnergy=Mathf.Min(f.spec.boostCapacity,f.boostEnergy+boostRecovery*t);
@@ -325,7 +362,12 @@ public sealed partial class VoxArena : MonoBehaviour
             if(f.jumpHeight<=0) f.jumpVelocity=0;
         }
         Vector3 desired=motion*speed;
-        if(f.spec.boost==BoostKind.Glide) desired=Vector3.Lerp(f.velocity,desired,1-Mathf.Exp(-10*dt));
+        if(dashing)
+        {
+            float dashStep=Mathf.Min(f.dashRemaining,Mathf.Max(.01f,dashSpeed*f.dashSpeedFactor)*dt);
+            desired=f.dashDirection*(dashStep/Mathf.Max(dt,.0001f));
+        }
+        if(f.spec.boost==BoostKind.Glide && !dashing) desired=Vector3.Lerp(f.velocity,desired,1-Mathf.Exp(-10*dt));
         if(f.lockTime>0) { desired=Vector3.zero; f.lockTime=Mathf.Max(0,f.lockTime-dt); }
         if(f.rushTime>0)
         {
@@ -333,7 +375,14 @@ public sealed partial class VoxArena : MonoBehaviour
             f.boosting=true; f.saber.gameObject.SetActive(true);
         }
         Vector3 before=f.root.position; MoveWithObstacles(f,desired*dt);
+        float actualDistance=Vector3.Distance(f.root.position,before);
         f.velocity=(f.root.position-before)/Mathf.Max(.0001f,dt);
+        if(dashing)
+        {
+            f.dashRemaining=Mathf.Max(0,f.dashRemaining-actualDistance);
+            // End dash on collision instead of pushing against a wall indefinitely.
+            if(actualDistance<desired.magnitude*dt*.5f) f.dashRemaining=0;
+        }
         if(f.rushTime>0 || f.saber.gameObject.activeSelf) CheckSaber(f,before,f.root.position);
         if(f.rushTime<=0) f.saber.gameObject.SetActive(false);
     }
