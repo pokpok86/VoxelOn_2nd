@@ -63,5 +63,7 @@ WEAPON TUNING에서 탄속·탄 크기·발사 간격을 조절하고 SOUND EFFE
 
 야간 작업 전 실행 가능한 백업은 로컬 `Backups/prototype-v6/Windows`, 단계별 소스는 로컬 `Backups/night-*/Scripts`에 보관했습니다. 야간 작업 후 Git을 도입했으며 [클라우드 작업 안내](docs/CLOUD_WORK.md)에 연결 상태를 기록합니다. 빌드·로그·백업은 GitHub에 포함하지 않으므로 새로 내려받은 프로젝트에서는 Unity로 빌드해야 합니다.
 
+## 원격 개발환경 연결 기록
 
-
+- 규칙: 원격 개발환경에서 GitHub를 연결하거나 다시 연결한 날짜와 상태를 기록합니다.
+- 2026-10-30: 원격 개발환경에서 GitHub 연결을 확인했습니다.
