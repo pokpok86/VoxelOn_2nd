@@ -24,6 +24,8 @@ public sealed partial class VoxArena : MonoBehaviour
     {
         public Transform root,body,gun,fist,shield,leftArm,rightArm,leftLeg,rightLeg,thruster,saber;
         public Transform headPart,corePart,armsPart,legsPart,weaponPart,backPart,shadow;
+        // Stable team identity; multiple fighters can share a team in future modes.
+        public int teamId;
         public int frameIndex; public float hitFlash;
         public int weaponSlot=1,magazine=30; public float reloadTime;
         public CraftSpec spec=CraftCatalog.All[0];
@@ -57,8 +59,15 @@ public sealed partial class VoxArena : MonoBehaviour
     GUIStyle label,small,title;
     static readonly Color Cyan=new Color(.18f,.88f,.96f), Orange=new Color(1,.38f,.19f);
     bool Finished=>player.hp<=0 || enemy.hp<=0;
-    Fighter Opponent(Fighter f)=>f==player?enemy:player;
-    Color TeamColor(Fighter f)=>f==player?Cyan:Orange;
+    // Centralized hostility and team identity, so weapons and AI can later target
+    // any enemy in a 3v3 roster instead of assuming exactly one opponent.
+    bool IsHostile(Fighter a,Fighter b)=>a!=null && b!=null && a!=b && a.teamId!=b.teamId;
+    Fighter Opponent(Fighter f)
+    {
+        Fighter candidate=f==player?enemy:player;
+        return IsHostile(f,candidate)?candidate:null;
+    }
+    Color TeamColor(Fighter f)=>f.teamId==0?Cyan:Orange;
 
     void Start()
     {
@@ -131,6 +140,8 @@ public sealed partial class VoxArena : MonoBehaviour
         ClearCombat();
         foreach(Spark s in sparks) Destroy(s.visual.gameObject);
         sparks.Clear();
+        player.teamId=0;
+        enemy.teamId=1;
         foreach(Fighter f in new[]{player,enemy})
         {
             f.hp=f.spec.health; f.boostEnergy=f.spec.boostCapacity; f.shieldEnergy=f.spec.ShieldMax;
