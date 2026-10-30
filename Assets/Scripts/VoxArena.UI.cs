@@ -45,7 +45,7 @@ public sealed partial class VoxArena
         Bar(422, 675, 220, 1-player.weaponTimer/.105f, new Color(1,.70f,.30f));
         Text(740, 620, 500, spectatorMode?"AI SPECTATOR / 360 ORBIT":"PRIMARY WEAPON / RAPID GUN", small);
         Bar(742,643,220,player.magazine/30f,new Color(.8f,.45f,1));
-        Text(740, 658, 520, "WASD MOVE / HOLD SHIFT TO BOOST   SPACE JUMP", small);
+        Text(740, 658, 520, "WASD MOVE / SHIFT BOOST / HOLD SPACE TO CLIMB", small);
         Text(740, 682, 520, "ESC PAUSE   V SOUND "+(muted?"OFF":"ON")+"   AI: "+DifficultyName+"   F1 HELP", small);
         if (!Finished && !paused)
             Text(405, 574, 650, player.lockTime>0?"SPECIAL FIRING / MOVEMENT LOCKED":player.rushTime>0?"SABER RUSH":player.boostLocked ? "BOOST EMPTY / RELEASE SHIFT TO REARM" : AimStatus(), small);
