@@ -45,6 +45,8 @@ public sealed partial class VoxArena : MonoBehaviour
     }
     sealed class Spark { public Transform visual; public Vector3 velocity; public float life; }
     Fighter player,enemy;
+    // Active match participants; portrait-only preview robots are not registered.
+    readonly List<Fighter> fighterRoster=new List<Fighter>();
     Camera view;
     Transform aimMarker;
     readonly List<Spark> sparks=new List<Spark>();
@@ -59,13 +61,26 @@ public sealed partial class VoxArena : MonoBehaviour
     GUIStyle label,small,title;
     static readonly Color Cyan=new Color(.18f,.88f,.96f), Orange=new Color(1,.38f,.19f);
     bool Finished=>player.hp<=0 || enemy.hp<=0;
-    // Centralized hostility and team identity, so weapons and AI can later target
-    // any enemy in a 3v3 roster instead of assuming exactly one opponent.
+    // Shared roster/hostility queries are the first step toward multi-fighter matches.
+    // Existing 1v1 modes still register exactly the pilot and rival.
     bool IsHostile(Fighter a,Fighter b)=>a!=null && b!=null && a!=b && a.teamId!=b.teamId;
+    void RegisterFighter(Fighter f)
+    {
+        if(f!=null && !fighterRoster.Contains(f)) fighterRoster.Add(f);
+    }
+    void UnregisterFighter(Fighter f) { fighterRoster.Remove(f); }
     Fighter Opponent(Fighter f)
     {
-        Fighter candidate=f==player?enemy:player;
-        return IsHostile(f,candidate)?candidate:null;
+        if(f==null) return null;
+        Fighter nearest=null;
+        float bestDistance=float.PositiveInfinity;
+        foreach(Fighter candidate in fighterRoster)
+        {
+            if(!IsHostile(f,candidate)) continue;
+            float distance=(candidate.root.position-f.root.position).sqrMagnitude;
+            if(distance<bestDistance) { nearest=candidate; bestDistance=distance; }
+        }
+        return nearest;
     }
     Color TeamColor(Fighter f)=>f.teamId==0?Cyan:Orange;
 
@@ -142,7 +157,10 @@ public sealed partial class VoxArena : MonoBehaviour
         sparks.Clear();
         player.teamId=0;
         enemy.teamId=1;
-        foreach(Fighter f in new[]{player,enemy})
+        fighterRoster.Clear();
+        RegisterFighter(player);
+        RegisterFighter(enemy);
+        foreach(Fighter f in fighterRoster)
         {
             f.hp=f.spec.health; f.boostEnergy=f.spec.boostCapacity; f.shieldEnergy=f.spec.ShieldMax;
             f.weaponTimer=f.specialTimer=f.recoveryTime=f.shieldRecoveryTime=f.shieldFlash=f.hitFlash=0;
@@ -184,13 +202,8 @@ public sealed partial class VoxArena : MonoBehaviour
         float dt=Mathf.Min(Time.deltaTime,.05f);
         roundTime+=dt; hitConfirmTime=Mathf.Max(0,hitConfirmTime-dt); UpdateObstacles(dt);
         if(!spectatorMode) PlayerInput(dt);
-        EnemyAI(dt);
-        if(spectatorMode)
-        {
-            Fighter swap=player; player=enemy; enemy=swap;
-            EnemyAI(dt);
-            swap=player; player=enemy; enemy=swap;
-        }
+        EnemyAI(enemy,player,dt);
+        if(spectatorMode) EnemyAI(player,enemy,dt);
         if(targetLock) FaceOpponent(player,enemy);
         FaceOpponent(enemy,player);
         UpdateCombat(dt); UpdateSparks(dt); Animate(player); Animate(enemy);
@@ -312,7 +325,9 @@ public sealed partial class VoxArena : MonoBehaviour
     }
     float BoostDirectionFactor(Fighter f,Vector3 direction)
     {
-        Vector3 toward=(Opponent(f).root.position-f.root.position).normalized;
+        Fighter target=Opponent(f);
+        if(target==null) return 1f;
+        Vector3 toward=(target.root.position-f.root.position).normalized;
         float dot=Vector3.Dot(direction.normalized,toward);
         return dot>=0?1+.18f*dot:1+.12f*dot;
     }
