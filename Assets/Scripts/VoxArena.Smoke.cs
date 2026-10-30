@@ -203,6 +203,26 @@ public sealed partial class VoxArena
         Check(player.boostLocked&&!player.boosting,"boost exhaustion");
         player.boostHeld=false; Move(player,Vector3.zero,1.5f);
         Check(!player.boostLocked&&player.boostEnergy>0,"boost release and recovery");
+        // Variable-height jump and shared horizontal/vertical boost regression.
+        TestSetup(0);
+        Check(Mathf.Abs(player.spec.boostCapacity-240f)<.01f,"boost capacity increased by 50 percent");
+        player.jumpVelocity=jumpSpeed; player.jumpHeld=false;
+        for(int i=0;i<20;i++) Move(player,Vector3.zero,.025f);
+        float tapHeight=player.jumpHeight;
+        TestSetup(0);
+        player.jumpVelocity=jumpSpeed; player.jumpHeld=true;
+        float jumpFuel=player.boostEnergy;
+        for(int i=0;i<20;i++) Move(player,Vector3.zero,.025f);
+        Check(player.jumpHeight>tapHeight && player.boostEnergy<jumpFuel,"held jump climbs higher and consumes fuel");
+        TestSetup(0);
+        player.jumpVelocity=jumpSpeed; player.jumpHeld=true; player.boostHeld=true;
+        float combinedFuel=player.boostEnergy;
+        Move(player,Vector3.forward,.1f);
+        Check(player.boostEnergy<combinedFuel-(player.spec.boostDrain*.1f),"horizontal and vertical boost share fuel");
+        player.jumpHeld=false; player.boostHeld=false;
+        float airborneHeight=player.jumpHeight;
+        for(int i=0;i<160;i++) Move(player,Vector3.zero,.025f);
+        Check(player.jumpHeight<airborneHeight || player.jumpHeight==0,"released jump falls under gravity");
         TestSetup(3); before=player.root.position; Move(player,Vector3.right,1);
         Check(player.root.position.x>100,"open space has no square boundary");
         Vector3 rockBefore=obstacles[0].center; UpdateObstacles(3);
