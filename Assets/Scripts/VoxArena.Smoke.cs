@@ -88,6 +88,15 @@ public sealed partial class VoxArena
         enemy.teamId=player.teamId;
         Check(Opponent(player)==null && Opponent(enemy)==null,"same-team fighters are not opponents");
         enemy.teamId=savedRivalTeam;
+        // A third fighter can join the roster without becoming the fixed rival.
+        Fighter extraHostile=new Fighter { teamId=1,root=new GameObject("Roster probe").transform };
+        extraHostile.root.position=player.root.position+Vector3.right*2;
+        RegisterFighter(extraHostile);
+        Check(fighterRoster.Count==3 && Opponent(player)==extraHostile,
+            "nearest hostile is selected from a multi-fighter roster");
+        UnregisterFighter(extraHostile);
+        Destroy(extraHostile.root.gameObject);
+        Check(fighterRoster.Count==2 && Opponent(player)==enemy,"unregister restores 1v1 roster");
         Fighter originalPilot=player,originalRival=enemy;
         EnemyAI(player,enemy,.04f);
         Check(player==originalPilot && enemy==originalRival && player.aiClock>0 && enemy.aiClock==0,
