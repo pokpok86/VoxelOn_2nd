@@ -1,0 +1,40 @@
+# Unity-generated data and local builds
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Bb]ackups/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+# IDE-generated files
+.vs/
+.idea/
+*.csproj
+*.sln
+*.slnx
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.log
+.vsconfig
+.DS_Store
+Thumbs.db
+
+# Local credentials and tool state
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+*.key
+*.pem
+.codex/
+.aws/
+
+# Keep Assets and all Unity .meta files under version control.
