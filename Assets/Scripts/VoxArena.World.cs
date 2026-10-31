@@ -59,14 +59,14 @@ public sealed partial class VoxArena
         for(int i=0;i<7;i++)
         {
             float height=.36f*(i+1);
-            AddTerrainBlock("West access ramp "+i,new Vector3(-24+i*2.5f,-1.1f+height*.5f,20),
+            AddTerrainBlock("West access ramp "+i,new Vector3(-24+i*2.5f,1.1f+height*.5f,20),
                 new Vector3(2.6f,height,8),stone);
         }
-        AddTerrainBlock("West raised deck",new Vector3(-3,-1.1f+1.4f,20),new Vector3(13,2.8f,11),edge);
+        AddTerrainBlock("West raised deck",new Vector3(-3,1.1f+1.4f,20),new Vector3(13,2.8f,11),edge);
         for(int i=0;i<4;i++)
         {
             float height=1.7f*(i+1);
-            AddTerrainBlock("East jump ledge "+i,new Vector3(20+i*5f,-1.1f+height*.5f,-14),
+            AddTerrainBlock("East jump ledge "+i,new Vector3(20+i*5f,1.1f+height*.5f,-14),
                 new Vector3(4.5f,height,7),stone);
         }
     }
