@@ -35,6 +35,7 @@ public sealed partial class VoxArena
         Color trim=new Color(.15f,.21f,.27f);
         Color warning=new Color(.95f,.60f,.19f);
         Color lamp=new Color(.27f,.73f,1f);
+        Color darkVent=new Color(.09f,.14f,.18f);
 
         // Distant industrial skyline, each tower assembled from numeric data.
         for(int i=0;i<skylineSites.Length;i++)
@@ -49,6 +50,21 @@ public sealed partial class VoxArena
                 new Vector3(width+1.8f,1.4f,width*.78f+1.8f),trim);
             VisualBox("Roof antenna",tower,new Vector3(0,height+4.3f,0),
                 new Vector3(.3f,4.2f,.3f),panel);
+            // Paired roof ventilation units add an industrial silhouette without
+            // placing new obstacles or changing any combat collision bounds.
+            for(int ventSide=-1;ventSide<=1;ventSide+=2)
+            {
+                float ventX=ventSide*width*.28f;
+                VisualBox("Roof ventilation housing",tower,
+                    new Vector3(ventX,height+3.15f,0),
+                    new Vector3(width*.22f,1.4f,width*.24f),trim);
+                VisualBox("Roof ventilation cap",tower,
+                    new Vector3(ventX,height+3.92f,0),
+                    new Vector3(width*.27f,.18f,width*.29f),panel);
+                VisualBox("Roof ventilation grille",tower,
+                    new Vector3(ventX,height+3.14f,width*.125f),
+                    new Vector3(width*.15f,.54f,.06f),darkVent);
+            }
             // Layered exterior plates give distant towers readable industrial
             // depth. They are non-colliding, numeric, and use the tower's local
             // coordinates so changing the site data moves every detail.
