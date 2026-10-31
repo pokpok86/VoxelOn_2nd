@@ -141,7 +141,7 @@ public sealed partial class VoxArena : MonoBehaviour
     }
     void ApplyCharacter(Fighter f,int index)
     {
-        f.spec=CraftCatalog.All[index].RuntimeCopy(); f.frameIndex=index; BuildRobot(f); f.body.localScale=Vector3.one*f.spec.size;
+        f.spec=CraftCatalog.All[index].RuntimeCopy(); f.frameIndex=index; ResetAllocations(f); BuildRobot(f); f.body.localScale=Vector3.one*f.spec.size;
         foreach(Renderer r in f.body.GetComponentsInChildren<Renderer>())
             if(r.name.StartsWith("Armor") || r.name=="Visor") r.sharedMaterial=r.name=="Visor"?Glow(f.spec.color):Mat(f.spec.color);
         // Weapon silhouettes are built separately from arm modules.
@@ -444,9 +444,12 @@ public sealed partial class VoxArena : MonoBehaviour
         {
             Vector3 facing=Vector3.ProjectOnPlane(f.facing,Vector3.up).normalized;
             float forward=Vector3.Dot(motion,facing);
-            float sideways=Mathf.Sqrt(Mathf.Max(0,motion.sqrMagnitude-forward*forward));
+            float lateral=Vector3.Dot(motion,Vector3.Cross(Vector3.up,facing));
+            float sideways=Mathf.Abs(lateral);
             float ratio=Mathf.Max(0,forward)*f.spec.forwardSpeedFactor+
-                Mathf.Max(0,-forward)*f.spec.reverseSpeedFactor+sideways*f.spec.strafeSpeedFactor;
+                Mathf.Max(0,-forward)*f.spec.reverseSpeedFactor+
+                Mathf.Max(0,lateral)*f.spec.rightSpeedFactor+
+                Mathf.Max(0,-lateral)*f.spec.leftSpeedFactor;
             desired=motion.normalized*speed*ratio;
         }
         if(f.crouching) desired*=.4f;
