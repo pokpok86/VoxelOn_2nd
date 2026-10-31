@@ -241,6 +241,29 @@ public sealed partial class VoxArena
                 Plate("01 backpack exhaust guard",f.backPart,
                     new Vector3(side*.38f,-.31f,-.35f),
                     new Vector3(.29f,.20f,.13f),steel);
+                // Rear-facing stacked nozzle trim: follows the backpack module,
+                // and is decorative only (existing boost logic is untouched).
+                for(int ring=0;ring<3;ring++)
+                {
+                    float width=.34f-ring*.055f;
+                    Plate("01 booster nozzle collar",f.backPart,
+                        new Vector3(side*.38f,-.50f-ring*.065f,-.16f),
+                        new Vector3(width,.045f,width),ring==1?highlight:steel);
+                }
+                Plate("01 booster exhaust core",f.backPart,
+                    new Vector3(side*.38f,-.68f,-.16f),
+                    new Vector3(.12f,.025f,.12f),new Color(.28f,.77f,.95f));
+                // Side-mounted knee actuator and mechanical inset stay attached
+                // to the leg module so movement does not leave parts behind.
+                Plate("01 knee side actuator",leg,
+                    new Vector3(side*.235f,-.59f,-.045f),
+                    new Vector3(.085f,.19f,.20f),steel);
+                Plate("01 knee actuator pin",leg,
+                    new Vector3(side*.29f,-.59f,-.045f),
+                    new Vector3(.035f,.09f,.09f),highlight);
+                Plate("01 shoulder hinge cover",arm,
+                    new Vector3(side*.37f,-.02f,-.02f),
+                    new Vector3(.085f,.24f,.29f),steel);
             }
         }
         AddFrameIdentity(f,armor,hull,dark,edge);
