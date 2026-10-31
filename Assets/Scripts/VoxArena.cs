@@ -141,7 +141,7 @@ public sealed partial class VoxArena : MonoBehaviour
     }
     void ApplyCharacter(Fighter f,int index)
     {
-        f.spec=CraftCatalog.All[index]; f.frameIndex=index; BuildRobot(f); f.body.localScale=Vector3.one*f.spec.size;
+        f.spec=CraftCatalog.All[index].RuntimeCopy(); f.frameIndex=index; BuildRobot(f); f.body.localScale=Vector3.one*f.spec.size;
         foreach(Renderer r in f.body.GetComponentsInChildren<Renderer>())
             if(r.name.StartsWith("Armor") || r.name=="Visor") r.sharedMaterial=r.name=="Visor"?Glow(f.spec.color):Mat(f.spec.color);
         // Weapon silhouettes are built separately from arm modules.
@@ -195,6 +195,8 @@ public sealed partial class VoxArena : MonoBehaviour
     {
         if(player==null || enemy==null) return;
         if(Input.GetKeyDown(KeyCode.F1)) { ToggleGuide(); return; }
+        if(Input.GetKeyDown(KeyCode.F2) && !inMenu && !smoke) { testLabOpen=!testLabOpen; SetTestCursor(); }
+        if(testLabOpen) { UpdateTestLabFrame(); return; }
         if(showGuide) { if(Input.GetKeyDown(KeyCode.Escape)) CloseGuide(); return; }
         if(Input.GetKeyDown(KeyCode.V)) ToggleMute();
         if(inMenu) { if(Input.GetKeyDown(KeyCode.Escape)) showTuning=false; if(Input.GetKeyDown(KeyCode.Return)&&!showTuning) BeginMatch(); return; }
@@ -210,7 +212,7 @@ public sealed partial class VoxArena : MonoBehaviour
         float dt=Mathf.Min(Time.deltaTime,.05f);
         roundTime+=dt; hitConfirmTime=Mathf.Max(0,hitConfirmTime-dt); UpdateObstacles(dt);
         if(!spectatorMode) PlayerInput(dt);
-        EnemyAI(enemy,player,dt);
+        if(!testLabEnabled || aiMoveEnabled || aiAttackEnabled || aiJumpEnabled) EnemyAI(enemy,player,dt);
         if(spectatorMode) EnemyAI(player,enemy,dt);
         if(targetLock) FaceOpponent(player,enemy);
         FaceOpponent(enemy,player);
