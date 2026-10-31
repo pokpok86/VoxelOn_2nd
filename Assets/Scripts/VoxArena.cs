@@ -429,7 +429,7 @@ public sealed partial class VoxArena : MonoBehaviour
             desired=motion.normalized*speed*ratio;
         }
         if(f.crouching) desired*=.4f;
-        if(f.spec.boost==BoostKind.Glide && !dashing) desired=Vector3.Lerp(f.velocity,desired,1-Mathf.Exp(-10*dt));
+        if(f.spec.boost==BoostKind.Glide && !dashing) desired=Vector3.Lerp(Vector3.ProjectOnPlane(f.velocity,Vector3.up),desired,1-Mathf.Exp(-10*dt));
         if(f.lockTime>0) { desired=Vector3.zero; f.lockTime=Mathf.Max(0,f.lockTime-dt); }
         if(f.knockdownTime>0) { desired=Vector3.zero; f.boosting=false; }
         if(f.rushTime>0)
@@ -440,7 +440,7 @@ public sealed partial class VoxArena : MonoBehaviour
         Vector3 before=f.root.position; MoveWithObstacles(f,desired*dt+Vector3.up*f.jumpVelocity*dt);
         f.jumpHeight=Mathf.Max(0,f.root.position.y-LandingHeight(f.root.position,f.Radius,f.root.position.y));
         if(f.jumpHeight<=.001f && f.jumpVelocity<0) f.jumpVelocity=0;
-        float actualDistance=Vector3.Distance(f.root.position,before);
+        float actualDistance=Vector3.Distance(Vector3.ProjectOnPlane(f.root.position,Vector3.up),Vector3.ProjectOnPlane(before,Vector3.up));
         f.velocity=(f.root.position-before)/Mathf.Max(.0001f,dt);
         if(dashing)
         {
