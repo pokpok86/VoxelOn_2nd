@@ -38,7 +38,7 @@ public sealed class CraftSpec
         this.primary=primary; this.weaponName=weaponName; this.damage=damage; weaponCooldown=cooldown;
         this.range=range; this.projectileSpeed=projectileSpeed; projectileRadius=radius;
         this.special=special; this.specialName=specialName; this.specialCooldown=specialCooldown;
-        fallGravityFactor=Mathf.Clamp(size*(1f+armor*.35f),.8f,1.8f);
+        fallGravityFactor=1f; // Leg-specific value; not derived from frame mass.
     }
 }
 public static class CraftCatalog
