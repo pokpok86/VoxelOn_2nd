@@ -43,6 +43,7 @@ public sealed partial class VoxArena
     void EnemyAI(Fighter f,Fighter target,float dt)
     {
         if(!IsHostile(f,target)) return;
+        bool testRival=testLabEnabled && f==enemy && !smoke;
         f.aiClock+=dt; f.aiReaction-=dt; f.orbitTime-=dt;
         f.smoothedTargetVelocity=Vector3.Lerp(f.smoothedTargetVelocity,target.velocity,1-Mathf.Exp(-5*dt));
         Vector3 toward=(target.root.position-f.root.position).normalized;
@@ -93,12 +94,15 @@ public sealed partial class VoxArena
         bool threatened=ThreatAt(f,Vector3.zero,.55f)>14f;
         float jumpCycle=1.7f+personality*1.6f;
         bool jumpWindow=(f.aiClock+personality*2f)%jumpCycle<(.38f+personality*.25f);
-        f.jumpHeld=(obstacleAhead || (threatened && jumpWindow)) && f.boostEnergy>f.spec.boostCapacity*.18f;
+        f.jumpHeld=(!testRival || aiJumpEnabled) && (obstacleAhead || (threatened && jumpWindow)) && f.boostEnergy>f.spec.boostCapacity*.18f;
         if(f.jumpHeld && f.jumpHeight<=.02f && f.jumpVelocity<=0) f.jumpVelocity=jumpSpeed;
         Vector3 movement=f.aiMove;
         // Practice rivals pause between maneuvers, while still escaping blocked routes.
         if(difficulty==0 && f.aiClock%3.2f>2.1f && !ObstacleOnSegment(f.root.position,target.root.position,.2f,out _)) movement*=.18f;
+        if(testRival && !aiMoveEnabled) { movement=Vector3.zero; f.dashRemaining=0; }
+        if(testRival && !aiBoostEnabled) { f.boostHeld=false; f.pulseTime=0; }
         Move(f,movement,dt); FaceOpponent(f,target);
+        if(testRival && !aiAttackEnabled) return;
         if(f.aiClock<(difficulty==0?2.8f:1.3f)) return;
         bool lineClear=!ObstacleOnSegment(f.root.position,target.root.position,.2f,out _);
         Vector3 aim=AimLead(f,target);
