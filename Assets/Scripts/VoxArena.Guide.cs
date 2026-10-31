@@ -33,9 +33,9 @@ public sealed partial class VoxArena
         GUI.Label(new Rect(207,110,850,45),koreanGuide?"첫 출격 가이드":"FIRST SORTIE / HOW TO PLAY",guideHeading);
         string[] rows=koreanGuide?new[]{
             "처음에는 AI: PRACTICE와 AIM ASSIST: ON으로 시작하세요.",
-            "WASD는 카메라 기준 이동입니다. 마우스로 시야를 돌리고 우클릭 유지 중 상대를 바라봅니다.",
+            "WASD는 카메라 기준 이동입니다. 우클릭 락온을 풀면 이동 방향으로 몸이 회전합니다.",
             "상대가 화면 밖이나 장애물 뒤로 가면 락온이 풀립니다. 왼쪽 버튼으로 공격합니다.",
-            "1번 슬롯: 30발 고속탄 총   /   자동 재장전   /   R: 조기 재장전   /   Space: 점프",
+            "1번 슬롯: 30발 고속탄 총   /   자동 재장전   /   R: 조기 재장전   /   Space: 점프, 길게 눌러 추가 상승",
             "Shift를 누르고 이동하면 부스터가 작동합니다. Shift를 놓으면 기본 속도로 돌아옵니다.",
             "실드는 WISP·LANCER만 있습니다. 부스터 연료와는 별개입니다.",
             "R: 재경기   /   M: 기체 선택   /   Esc: 일시정지   /   V: 음소거",
@@ -43,9 +43,9 @@ public sealed partial class VoxArena
             "RIVAL에서 연습 상대를 고르고, WEAPON TUNING에서 탄속·소리를 조정하세요."
         }:new[]{
             "Start with AI: PRACTICE and AIM ASSIST: ON.",
-            "WASD moves relative to the camera. Mouse rotates the view; hold right mouse to face the rival.",
+            "WASD moves relative to the camera. After releasing right-mouse lock, the body turns toward movement.",
             "Lock breaks when the rival is hidden or leaves the view. Left mouse attacks.",
-            "Slot 1: 30-round rapid gun   /   Auto-reload on empty; R reloads early   /   Space: jump.",
+            "Slot 1: 30-round rapid gun   /   Auto-reload on empty; R reloads early   /   Space: jump; hold for extra lift.",
             "Hold Shift while moving to boost; release Shift to return to normal speed.",
             "Only WISP and LANCER have shields. Boost fuel is separate.",
             "R: rematch. M: hangar. Esc: pause. V: mute.",

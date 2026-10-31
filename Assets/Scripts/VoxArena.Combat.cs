@@ -64,9 +64,11 @@ public sealed partial class VoxArena
             if(Finished||owner.lockTime>0||owner.rushTime>0) return;
             if(owner.weaponSlot!=1) return;
             if(owner.reloadTime>0||owner.magazine<=0||owner.weaponTimer>0||!InArc(owner,direction)) return;
-            owner.weaponTimer=.105f*weaponCooldownScale; owner.magazine--;
+            owner.weaponTimer=.105f*weaponCooldownScale/Mathf.Max(.2f,owner.spec.rightArmHandling); owner.magazine--;
             PlaySound(SoundKind.Fire,owner.root.position,.32f,1.45f);
-            Fire(owner,direction,7,132,.24f,82);
+            float spread=owner.spec.aimSpreadDegrees/Mathf.Max(.2f,owner.spec.rightArmStability);
+            Vector3 fired=Quaternion.Euler(0,UnityEngine.Random.Range(-spread,spread),0)*direction;
+            Fire(owner,fired,7,132,.24f,82);
             if(owner.magazine<=0) owner.reloadTime=1.65f;
             return;
         }
@@ -115,7 +117,7 @@ public sealed partial class VoxArena
     {
         if(Finished||owner.specialTimer>0||owner.lockTime>0||owner.rushTime>0) return;
         Vector3 d=InArc(owner,aim)?aim.normalized:owner.facing;
-        owner.specialTimer=owner.spec.specialCooldown;
+        owner.specialTimer=owner.spec.specialCooldown/Mathf.Max(.2f,owner.spec.leftArmHandling);
         PlaySound(SoundKind.Special,owner.root.position,.7f);
         switch(owner.spec.special)
         {

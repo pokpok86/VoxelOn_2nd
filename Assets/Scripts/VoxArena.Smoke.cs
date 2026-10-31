@@ -74,12 +74,42 @@ public sealed partial class VoxArena
         for(int rival=0;rival<8;rival++)
         {
             rivalSelection=rival; BeginMatch();
-            Check(enemyCraft==rival&&enemy.spec==CraftCatalog.All[rival],"fixed practice rival "+rival);
+            Check(enemyCraft==rival&&enemy.spec!=CraftCatalog.All[rival]&&
+                enemy.spec.name==CraftCatalog.All[rival].name,"fixed practice rival "+rival);
         }
         rivalSelection=-1;
         bool validRandom=true;
         for(int roll=0;roll<32;roll++) { int candidate=ResolveRival(); validRandom&=candidate>=0&&candidate<8; }
         Check(validRandom,"random rival remains valid");
+        // Engine foundation regressions: team-aware roster and explicit AI actor.
+        TestSetup();
+        Check(fighterRoster.Count==2 && Opponent(player)==enemy && Opponent(enemy)==player,
+            "roster preserves current 1v1 opponents");
+        float farthestCover=0; int nearbyCover=0;
+        foreach(Debris piece in debris)
+        {
+            float radius=new Vector2(piece.origin.x,piece.origin.z).magnitude;
+            farthestCover=Mathf.Max(farthestCover,radius);
+            if(radius<50) nearbyCover++;
+        }
+        Check(debris.Count>=24&&farthestCover>180&&nearbyCover<=6,"ground cover is distributed beyond the central combat pad");
+        int savedRivalTeam=enemy.teamId;
+        enemy.teamId=player.teamId;
+        Check(Opponent(player)==null && Opponent(enemy)==null,"same-team fighters are not opponents");
+        enemy.teamId=savedRivalTeam;
+        // A third fighter can join the roster without becoming the fixed rival.
+        Fighter extraHostile=new Fighter { teamId=1,root=new GameObject("Roster probe").transform };
+        extraHostile.root.position=player.root.position+Vector3.right*2;
+        RegisterFighter(extraHostile);
+        Check(fighterRoster.Count==3 && Opponent(player)==extraHostile,
+            "nearest hostile is selected from a multi-fighter roster");
+        UnregisterFighter(extraHostile);
+        Destroy(extraHostile.root.gameObject);
+        Check(fighterRoster.Count==2 && Opponent(player)==enemy,"unregister restores 1v1 roster");
+        Fighter originalPilot=player,originalRival=enemy;
+        EnemyAI(player,enemy,.04f);
+        Check(player==originalPilot && enemy==originalRival && player.aiClock>0 && enemy.aiClock==0,
+            "AI can control pilot without swapping global fighter identities");
         var primaryKinds=new HashSet<PrimaryKind>(); var specialKinds=new HashSet<SpecialKind>(); var boostKinds=new HashSet<BoostKind>();
         int[] initial={2,1,1,2,7,1,1,1},total={3,1,6,2,7,1,3,1};
         for(int i=0;i<8;i++)
@@ -185,12 +215,12 @@ public sealed partial class VoxArena
         Check(approach>retreat&&approach>player.spec.boostSpeed*.1f,"approach boost faster than retreat");
         float energy=player.boostEnergy; player.boostHeld=false; before=player.root.position;
         Move(player,Vector3.forward,.1f);
-        Check(Mathf.Abs(Vector3.Distance(before,player.root.position)-player.spec.speed*.1f)<.01f&&player.boostEnergy==energy,"cruise release restores normal speed");
+        Check(Mathf.Abs(Vector3.Distance(before,player.root.position)-player.spec.speed*player.spec.forwardSpeedFactor*.1f)<.01f&&player.boostEnergy==energy,"cruise release restores normal directional speed");
         TestSetup(2); player.boostHeld=true; before=player.root.position; float pulseEnergy=player.boostEnergy;
         Move(player,Vector3.forward,.1f);
         Check(player.boosting&&Vector3.Distance(before,player.root.position)>player.spec.speed*.1f&&player.boostEnergy<pulseEnergy,"held boost accelerates and drains fuel");
         player.boostHeld=false; before=player.root.position; Move(player,Vector3.forward,.1f);
-        Check(!player.boosting&&Mathf.Abs(Vector3.Distance(before,player.root.position)-player.spec.speed*.1f)<.01f,"releasing boost returns to normal speed");
+        Check(!player.boosting&&Mathf.Abs(Vector3.Distance(before,player.root.position)-player.spec.speed*player.spec.forwardSpeedFactor*.1f)<.01f,"releasing boost returns to normal directional speed");
         TestSetup(0); player.boostHeld=true; Move(player,Vector3.right,.1f);
         float firstSpeed=player.velocity.magnitude;
         Move(player,Vector3.right,.1f);
@@ -209,11 +239,18 @@ public sealed partial class VoxArena
         player.jumpVelocity=jumpSpeed; player.jumpHeld=false;
         for(int i=0;i<20;i++) Move(player,Vector3.zero,.025f);
         float tapHeight=player.jumpHeight;
+        Check(tapHeight>1.7f&&tapHeight<2.6f,"a single jump clears low cover without an excessive leap");
         TestSetup(0);
-        player.jumpVelocity=jumpSpeed; player.jumpHeld=true;
+        player.jumpOriginY=player.root.position.y; player.jumpVelocity=jumpSpeed; player.jumpHeld=true;
         float jumpFuel=player.boostEnergy;
-        for(int i=0;i<20;i++) Move(player,Vector3.zero,.025f);
-        Check(player.jumpHeight>tapHeight && player.boostEnergy<jumpFuel,"held jump climbs higher and consumes fuel");
+        float heldMaxHeight=0, fuelAtHeldMax=jumpFuel;
+        for(int i=0;i<240;i++)
+        {
+            Move(player,Vector3.zero,.025f);
+            if(player.jumpHeight>heldMaxHeight) { heldMaxHeight=player.jumpHeight; fuelAtHeldMax=player.boostEnergy; }
+        }
+        Check(heldMaxHeight>tapHeight && heldMaxHeight<=jumpMaxHeight+.02f && fuelAtHeldMax<jumpFuel,
+            "held jump climbs higher, spends fuel, and stays below the height cap");
         TestSetup(0);
         player.jumpVelocity=jumpSpeed; player.jumpHeld=true; player.boostHeld=true;
         float combinedFuel=player.boostEnergy;
@@ -223,6 +260,20 @@ public sealed partial class VoxArena
         float airborneHeight=player.jumpHeight;
         for(int i=0;i<160;i++) Move(player,Vector3.zero,.025f);
         Check(player.jumpHeight<airborneHeight || player.jumpHeight==0,"released jump falls under gravity");
+        TestSetup(0);
+        Bounds cornerTest=new Bounds(new Vector3(100,2.6f,100),new Vector3(4,3,4)); obstacles.Add(cornerTest);
+        Check(!Occupied(new Vector3(102.9f,2,102.9f),player.Radius),"rounded collision footprint does not snag diagonal corner gaps");
+        obstacles.RemoveAt(obstacles.Count-1);
+        TestSetup(0); player.root.position=new Vector3(100,3.1f,100); player.jumpOriginY=1.1f;
+        player.jumpHeight=2; player.jumpVelocity=0; player.jumpHeld=false;
+        int landingTicks=0;
+        while(player.root.position.y>1.101f && landingTicks<100) { Move(player,Vector3.zero,.02f); landingTicks++; }
+        Check(landingTicks<=22,"falling jump lands quickly under stronger gravity");
+        TestSetup(0); player.jumpOriginY=player.root.position.y; player.jumpVelocity=jumpSpeed; player.jumpHeld=true;
+        Move(player,Vector3.zero,.04f); Animate(player);
+        Check(player.thruster.gameObject.activeSelf&&player.jumpFlame.gameObject.activeSelf,
+            "ascending Space jump shows a bright downward booster exhaust");
+        player.jumpHeld=false;
         TestSetup(3); before=player.root.position; Move(player,Vector3.right,1);
         Check(player.root.position.x>100,"open space has no square boundary");
         Vector3 rockBefore=obstacles[0].center; UpdateObstacles(3);
@@ -239,6 +290,38 @@ public sealed partial class VoxArena
         targetShield=(enemy.hp+enemy.shieldEnergy); UpdateCombat(.5f);
         Check((enemy.hp+enemy.shieldEnergy)==targetShield&&shots.Count==0,"asteroid blocks projectile before opponent");
         obstacles.RemoveAt(added);
+        // Heavy frames should climb the deliberately low access ramp, and a
+        // landed fighter must remain on a rooftop instead of being ejected.
+        TestSetup(1); player.root.position=new Vector3(-28,1.1f,20); player.facing=Vector3.right;
+        float highestRampPosition=player.root.position.y;
+        for(int tick=0;tick<120;tick++)
+        {
+            Move(player,Vector3.right,.025f);
+            highestRampPosition=Mathf.Max(highestRampPosition,player.root.position.y);
+        }
+        Check(highestRampPosition>3.0f&&player.root.position.x>3.5f,
+            "heavy frame climbs the ramp and crosses the raised deck without sticking");
+        TestSetup(0);
+        Bounds testRoof=new Bounds(new Vector3(100,2.6f,108),new Vector3(6,3,6));
+        obstacles.Add(testRoof); player.root.position=new Vector3(100,1.1f,103.5f); player.jumpOriginY=player.root.position.y; player.jumpHeld=true; player.jumpVelocity=jumpSpeed;
+        for(int tick=0;tick<60;tick++)
+            Move(player,player.root.position.z<108?Vector3.forward:Vector3.zero,.02f);
+        player.velocity=Vector3.zero;
+        player.jumpHeld=false;
+        for(int tick=0;tick<180;tick++) Move(player,Vector3.zero,.02f);
+        Vector3 landed=player.root.position;
+        Check(Mathf.Abs(landed.y-testRoof.max.y)<.12f&&landed.x>testRoof.min.x+player.Radius&&
+            landed.x<testRoof.max.x-player.Radius&&landed.z>testRoof.min.z+player.Radius&&
+            landed.z<testRoof.max.z-player.Radius&&!Occupied(landed,player.Radius),"fighter can land and stay on an obstacle roof");
+        obstacles.RemoveAt(obstacles.Count-1); TestSetup();
+        // Put the practice rival at a blocked corner and verify it finds an open route.
+        difficulty=0; TestSetup(0,1); enemy.root.position=new Vector3(100,1.1f,98); player.root.position=new Vector3(100,1.1f,130);
+        obstacles.Add(new Bounds(new Vector3(100,2.6f,103),new Vector3(12,3,4)));
+        obstacles.Add(new Bounds(new Vector3(106,2.6f,100),new Vector3(4,3,12)));
+        Vector3 aiStart=enemy.root.position;
+        for(int tick=0;tick<240;tick++) EnemyAI(enemy,player,.025f);
+        Check(Vector3.Distance(aiStart,enemy.root.position)>12&&enemy.aiMove.sqrMagnitude>.1f,"practice AI keeps moving and escapes a blocked corner");
+        obstacles.RemoveRange(obstacles.Count-2,2); TestSetup();
         TestSetup();
         enemy.root.position=new Vector3(38,1.1f,38); player.root.position=new Vector3(32,1.1f,32);
         float traveled=0;
@@ -248,6 +331,11 @@ public sealed partial class VoxArena
             traveled+=Vector3.Distance(p,enemy.root.position);
         }
         Check(traveled>20&&Mathf.Abs(enemy.root.position.x)+Mathf.Abs(enemy.root.position.z)>50,"AI keeps moving near former map corner");
+        TestSetup(); player.facing=Vector3.forward;
+        for(int i=0;i<12;i++) FaceMovement(player,Vector3.right,.025f);
+        Animate(player);
+        Check(Vector3.Angle(player.facing,Vector3.right)<1&&Vector3.Angle(player.root.forward,Vector3.right)<1,
+            "body turns toward camera-relative movement after lock-on is released");
         difficulty=2;
         TestSetup();
         player.velocity=Vector3.right*12; enemy.smoothedTargetVelocity=player.velocity;
@@ -439,7 +527,7 @@ public sealed partial class VoxArena
             Special(enemy,player,(player.root.position-enemy.root.position).normalized);
             ReturnToHangar(); yield return null;
             repeatedRestarts&=shots.Count==0&&pending.Count==0&&beams.Count==0&&rings.Count==0&&flashes.Count==0&&sparks.Count==0;
-            repeatedRestarts&=player.root.childCount==1&&enemy.root.childCount==1;
+            repeatedRestarts&=player.root.childCount==2&&enemy.root.childCount==2;
         }
         Check(repeatedRestarts,"repeated hangar cycles leave no attacks or old robot roots");
         rivalSelection=-1;
@@ -448,6 +536,8 @@ public sealed partial class VoxArena
         player.root.position=new Vector3(-8,1.1f,-8); enemy.root.position=new Vector3(8,1.1f,10);
         FaceOpponent(player,enemy); FaceOpponent(enemy,player);
         player.boostHeld=true; Move(player,Vector3.right,.12f);
+        player.boostHeld=false; player.velocity=Vector3.zero; player.jumpOriginY=player.root.position.y;
+        player.jumpVelocity=jumpSpeed; Move(player,Vector3.zero,.06f);
         Special(enemy,player,(player.root.position-enemy.root.position).normalized);
         Attack(player,enemy,(enemy.root.position-player.root.position).normalized);
         UpdateCombat(.12f); Animate(player); Animate(enemy); UpdateCamera(10);
@@ -477,5 +567,4 @@ public sealed partial class VoxArena
         yield return new WaitForSeconds(.3f); Application.Quit(passed?0:2);
     }
 }
-
 

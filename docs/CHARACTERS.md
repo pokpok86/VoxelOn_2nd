@@ -36,4 +36,3 @@ BASTION과 LANCER는 특수 무기 충전 및 발사 중 이동이 제한된다.
 기본 데이터는 `Assets/Scripts/CraftCatalog.cs`에 있다.
 
 다음 단계는 실전 플레이로 명중률, 회피 여유, 무기 쿨타임과 교전 시간을 조정하는 것이다.
-

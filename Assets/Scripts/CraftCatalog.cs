@@ -9,11 +9,24 @@ public sealed class CraftSpec
     public string name, role, description, weaponName, specialName;
     public Color color;
     public float health, armor, speed, boostSpeed, boostCapacity, boostDrain, pulseDuration;
+    // Future leg-part values. 4:3:2 forward/strafe/reverse movement ratio.
+    public float forwardSpeedFactor=1f, strafeSpeedFactor=.75f, reverseSpeedFactor=.5f;
+    public float leftSpeedFactor=.6f,rightSpeedFactor=.6f;
+    public float fallGravityFactor=1f, knockdownResistance=1f, recoverySpeed=1f;
+    // Future head-part lock sensor and aim stability values.
+    public float lockRange=80f, aimSpreadDegrees=0.6f;
+    // Head sensor memory: lose occluded lock only after this time; distance still hard-limits lock.
+    public float occludedLockSeconds=1.5f, occludedLockRange=65f;
+    // Leg assembly parameters; step-up height is deliberately below tall jump-only platforms.
+    public float stepHeight=.45f, slopeLimitDegrees=32f;
+    public float leftArmHandling=1f,leftArmStability=1f,rightArmHandling=1f,rightArmStability=1f;
     public float damage, weaponCooldown, range, projectileSpeed, projectileRadius, size, specialCooldown;
     public PrimaryKind primary;
     public SpecialKind special;
     public BoostKind boost;
     public float ShieldMax => health <= 300 ? health * .15f : 0;
+    // Per-fighter runtime copy so tuning the rival never mutates the player's catalog preset.
+    public CraftSpec RuntimeCopy() => (CraftSpec)MemberwiseClone();
     public CraftSpec(string name, string role, string description, Color color,
         float hp, float armor, float speed, float boostSpeed, float capacity, float drain, float size,
         BoostKind boost, float pulseDuration, PrimaryKind primary, string weaponName,
@@ -26,6 +39,7 @@ public sealed class CraftSpec
         this.primary=primary; this.weaponName=weaponName; this.damage=damage; weaponCooldown=cooldown;
         this.range=range; this.projectileSpeed=projectileSpeed; projectileRadius=radius;
         this.special=special; this.specialName=specialName; this.specialCooldown=specialCooldown;
+        fallGravityFactor=1f; // Leg-specific value; not derived from frame mass.
     }
 }
 public static class CraftCatalog
@@ -56,5 +70,17 @@ public static class CraftCatalog
             430,.22f,10.5f,21.5f,200,11,1.28f,BoostKind.Cruise,0,
             PrimaryKind.Grenade,"BLAST SHELL",26,2.0f,52,56,.65f,SpecialKind.Minefield,"MINEFIELD",12)
     };
+    static CraftCatalog()
+    {
+        // Example head profiles until head parts are independently selectable.
+        // Long-range sensor frames keep an occluded lock longer; heavy frames are shorter range.
+        for(int i=0;i<All.Length;i++)
+        {
+            CraftSpec f=All[i];
+            f.occludedLockSeconds= i==5 || i==6 ? 3.5f : i==1 || i==7 ? 1.1f : 2f;
+            f.occludedLockRange= i==5 || i==6 ? 88f : i==1 || i==7 ? 58f : 70f;
+            f.lockRange=Mathf.Max(f.lockRange,f.occludedLockRange);
+            f.stepHeight= i==1 || i==7 ? .52f : .58f;
+        }
+    }
 }
-

@@ -18,7 +18,7 @@ public sealed partial class VoxArena
     void DrawLockReticle()
     {
         if(spectatorMode || Finished || paused || view==null || enemy==null) return;
-        Vector3 projected=view.WorldToScreenPoint(enemy.root.position+Vector3.up*(1.3f+enemy.jumpHeight));
+        Vector3 projected=view.WorldToScreenPoint(enemy.root.position+Vector3.up*1.3f);
         bool onScreen=projected.z>0 && projected.x>=0 && projected.x<=Screen.width &&
             projected.y>=0 && projected.y<=Screen.height;
         float target=targetLock && onScreen?1f:0f;
@@ -61,6 +61,7 @@ public sealed partial class VoxArena
             title = new GUIStyle(label) { fontSize = 28 };
         }
         GUI.matrix = Matrix4x4.Scale(new Vector3(Screen.width / 1280f, Screen.height / 720f, 1));
+        if(testLabOpen) { DrawTestLab(); return; }
         if(showGuide) { DrawGuide(); return; }
         if (inMenu) { GUI.enabled=!showTuning; DrawHangar(); GUI.enabled=true; if(showTuning) DrawTuning(); return; }
         Panel(new Rect(0, 0, 1280, 94), new Color(.025f, .045f, .075f, .96f));
@@ -77,16 +78,22 @@ public sealed partial class VoxArena
         Text(1010, 18, 250, $"{(int)roundTime / 60:00}:{(int)roundTime % 60:00}     W {wins} / L {losses}", label);
         Panel(new Rect(0, 616, 1280, 104), new Color(.025f, .045f, .075f, .96f));
         Text(28, 626, 360, player.spec.name + " / " + player.spec.role, label);
-        Text(28, 658, 360, "LMB  RAPID GUN / "+player.magazine+" / 30", small);
-        Text(28, 682, 360, player.reloadTime>0?"RELOADING  "+player.reloadTime.ToString("0.0")+"s":"RMB HOLD  FACE RIVAL", small);
+        Text(28, 658, 360, (player.weaponSlot==3?"[3] SALVAGE / MELEE":player.weaponSlot==1?"[1] RIGHT HAND / RAPID GUN":"[2] LEFT HAND / SPECIAL") , small);
+        Text(28, 682, 360, player.weaponSlot==3?(heldSalvage==null?"EMPTY HAND / F PICKUP":heldSalvage.kind.ToString().ToUpper()+" / "+(heldSalvage.kind==SalvageKind.Shield?shieldRemaining.ToString("0")+" HP":"LMB USE")):player.weaponSlot==1?(player.reloadTime>0?"RELOADING  "+player.reloadTime.ToString("0.0")+"s":"AMMO  "+player.magazine+" / 30"):("SPECIAL  "+(player.specialTimer>0?player.specialTimer.ToString("0.0")+"s":"READY")), small);
         Text(420, 620, 300, "BOOST / "+player.spec.boost+"  "+Mathf.CeilToInt(player.boostEnergy), small);
         Bar(422, 643, 220, player.boostEnergy / player.spec.boostCapacity, Cyan);
-        Text(420, 652, 300, player.weaponTimer > 0 ? "PRIMARY  " + player.weaponTimer.ToString("0.0") + "s" : "PRIMARY READY", small);
-        Bar(422, 675, 220, 1-player.weaponTimer/.105f, new Color(1,.70f,.30f));
-        Text(740, 620, 500, spectatorMode?"AI SPECTATOR / 360 ORBIT":"PRIMARY WEAPON / RAPID GUN", small);
-        Bar(742,643,220,player.magazine/30f,new Color(.8f,.45f,1));
-        Text(740, 658, 520, "WASD MOVE / SHIFT BOOST / HOLD SPACE TO CLIMB", small);
-        Text(740, 682, 520, "ESC PAUSE   V SOUND "+(muted?"OFF":"ON")+"   AI: "+DifficultyName+"   F1 HELP", small);
+        Text(420, 652, 300, player.weaponSlot==1?"PRIMARY / "+player.magazine+" / 30":"SPECIAL / "+player.spec.specialName, small);
+        Bar(422, 675, 220, player.weaponSlot==1?1-player.weaponTimer/.105f:1-player.specialTimer/Mathf.Max(.01f,player.spec.specialCooldown), new Color(1,.70f,.30f));
+        Text(740, 620, 500, spectatorMode?"AI SPECTATOR / 360 ORBIT":(player.weaponSlot==1?"RIGHT HAND  /  PRIMARY":"LEFT HAND  /  SPECIAL"), small);
+        Bar(742,643,220,player.weaponSlot==1?player.magazine/30f:1-player.specialTimer/Mathf.Max(.01f,player.spec.specialCooldown),new Color(.8f,.45f,1));
+        if(player.failedFireFlash>0 && Mathf.Repeat(Time.unscaledTime*12f,1f)<.5f)
+        {
+            Color warning=new Color(1f,.28f,.15f);
+            Panel(new Rect(737,637,230,2),warning); Panel(new Rect(737,650,230,2),warning);
+            Panel(new Rect(737,637,2,15),warning); Panel(new Rect(965,637,2,15),warning);
+        }
+        Text(740, 658, 520, "WASD MOVE / SHIFT BOOST / SPACE JUMP / F CROUCH", small);
+        Text(740, 682, 520, "1/2 GUN / 3 SALVAGE / F PICKUP / F2 TEST LAB", small);
         if (!Finished && !paused)
             Text(405, 574, 650, player.lockTime>0?"SPECIAL FIRING / MOVEMENT LOCKED":player.rushTime>0?"SABER RUSH":player.boostLocked ? "BOOST EMPTY / RELEASE SHIFT TO REARM" : AimStatus(), small);
         DrawCombatFeedback();

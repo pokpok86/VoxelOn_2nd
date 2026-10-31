@@ -119,7 +119,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &143077559
+--- !u!1 &546613987
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -127,8 +127,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 143077561}
-  - component: {fileID: 143077560}
+  - component: {fileID: 546613989}
+  - component: {fileID: 546613988}
   m_Layer: 0
   m_Name: VoxSky Arena
   m_TagString: Untagged
@@ -136,13 +136,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &143077560
+--- !u!114 &546613988
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 143077559}
+  m_GameObject: {fileID: 546613987}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bc40df9eb99992e41b1777f8dffe7f04, type: 3}
@@ -151,22 +151,40 @@ MonoBehaviour:
   difficulty: 0
   aimAssist: 1
   effectsVolume: 0.7
+  pickupRadius: 3.6
+  thrownSpeed: 27
+  thrownDamage: 22
+  meleeRange: 4.1
+  meleeDamage: 24
+  meleeCooldown: 0.7
+  shieldDurability: 75
   hullShader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
-  boostRecovery: 32
+  boostRecovery: 40
   recoveryDelay: 0.6
+  jumpSpeed: 10.6
+  jumpGravity: 24
+  jumpThrust: 34
+  jumpBoostDrain: 24
+  jumpMaxHeight: 3.2
+  fallGravityMultiplier: 1.8
   gunHalfAngle: 65
   shieldRecoveryDelay: 3
   shieldFullRecoveryTime: 6
   bulletSpeedScale: 1
   bulletSizeScale: 1
   weaponCooldownScale: 1
---- !u!4 &143077561
+  dashSpeed: 34
+  dashDistance: 9
+  dashFuelCost: 30
+  dashCooldown: 0.7
+  doubleTapWindow: 0.28
+--- !u!4 &546613989
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 143077559}
+  m_GameObject: {fileID: 546613987}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -179,4 +197,4 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 143077561}
+  - {fileID: 546613989}
