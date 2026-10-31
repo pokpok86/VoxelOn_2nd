@@ -181,7 +181,7 @@ public sealed partial class VoxArena : MonoBehaviour
             f.dashDirection=Vector3.zero;
             f.dashSpeedFactor=Mathf.Clamp(f.spec.speed/13f,.7f,1.25f);
             f.dashDistanceFactor=Mathf.Clamp(f.spec.speed/13f,.75f,1.2f);
-            f.dashCostFactor=1f+Mathf.Max(0,f.spec.size-1f)*.35f+f.spec.armor*.5f;
+            f.dashCostFactor=1f; // No mass-derived mobility modifiers in test baseline.
             f.orbitSign=1;
         }
         player.root.position=new Vector3(-15,1.1f,-15); enemy.root.position=new Vector3(15,1.1f,15);
@@ -410,7 +410,7 @@ public sealed partial class VoxArena : MonoBehaviour
         bool verticalBoost=airborne && f.jumpHeld && !f.boostLocked && f.boostEnergy>0;
         if(verticalBoost)
         {
-            float weightFactor=1f+Mathf.Max(0,f.spec.size-1f)*.5f+f.spec.armor*.5f;
+            float weightFactor=1f; // Explicit thrust tuning; not inferred from mass/armor/size.
             float drain=jumpBoostDrain*weightFactor*dt;
             float fraction=drain>0?Mathf.Min(1,f.boostEnergy/drain):1;
             f.jumpVelocity+=jumpThrust/weightFactor*fraction*dt;
