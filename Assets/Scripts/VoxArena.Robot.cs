@@ -241,6 +241,21 @@ public sealed partial class VoxArena
                 Plate("01 backpack exhaust guard",f.backPart,
                     new Vector3(side*.38f,-.31f,-.35f),
                     new Vector3(.29f,.20f,.13f),steel);
+                // Frame 01 rear heat exchanger: shallow recessed fins, kept
+                // behind the core to avoid changing the forward silhouette.
+                for(int fin=0;fin<4;fin++)
+                {
+                    Plate("01 rear radiator fin",f.backPart,
+                        new Vector3(side*.38f,.12f-fin*.105f,-.355f),
+                        new Vector3(.23f,.038f,.045f),fin==0?highlight:steel);
+                }
+                // Mechanical shoulder identification stripes follow arm animation.
+                for(int stripe=0;stripe<2;stripe++)
+                {
+                    Plate("01 shoulder hazard stripe",arm,
+                        new Vector3(side*.13f,.33f-stripe*.065f,.445f),
+                        new Vector3(.19f,.028f,.025f),stripe==0?highlight:steel);
+                }
                 // Rear-facing stacked nozzle trim: follows the backpack module,
                 // and is decorative only (existing boost logic is untouched).
                 for(int ring=0;ring<3;ring++)
