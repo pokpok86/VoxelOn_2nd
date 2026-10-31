@@ -7,6 +7,8 @@ public sealed partial class VoxArena
     readonly List<Bounds> obstacles=new List<Bounds>();
     readonly List<Debris> debris=new List<Debris>();
     Transform starRoot;
+    // Terrain blocks share the obstacle model so navigation, shots and landing agree.
+    readonly List<Bounds> terrainSteps=new List<Bounds>();
     float spaceClock;
 
     void BuildWorld()
@@ -34,12 +36,39 @@ public sealed partial class VoxArena
         AddDebris(new Vector3(23,1.1f,-37),new Vector3(7,3.0f,5),4.4f);
         AddDebris(new Vector3(-39,1.1f,-8),new Vector3(5,4.0f,7),5.5f);
         AddDebris(new Vector3(40,1.1f,0),new Vector3(8,2.4f,5),6.6f);
+        BuildElevationCourse();
         for(int side=-1;side<=1;side+=2) for(int i=0;i<5;i++)
             obstacles.Add(new Bounds(new Vector3(side*(48+i*14),2,45+i%2*16),new Vector3(10,9+i%3*3,13)));
         player=MakeFighter("Pilot frame",Cyan); enemy=MakeFighter("Rival frame",Orange);
         aimMarker=new GameObject("Aim reticle").transform;
         Shape(PrimitiveType.Cube,"Aim cross",aimMarker,Vector3.zero,new Vector3(.8f,.06f,.07f),Cyan,true);
         Shape(PrimitiveType.Cube,"Aim cross",aimMarker,Vector3.zero,new Vector3(.07f,.06f,.8f),Cyan,true);
+    }
+    void AddTerrainBlock(string name,Vector3 center,Vector3 size,Color color)
+    {
+        Box(name,null,center,size,color);
+        Bounds bounds=new Bounds(center,size);
+        obstacles.Add(bounds);
+        terrainSteps.Add(bounds);
+    }
+    void BuildElevationCourse()
+    {
+        // Low, closely spaced terraces read as a gentle stepped ramp.
+        // Taller isolated ledges demand a jump rather than automatic stepping.
+        Color stone=new Color(.21f,.31f,.37f),edge=new Color(.35f,.45f,.50f);
+        for(int i=0;i<7;i++)
+        {
+            float height=.36f*(i+1);
+            AddTerrainBlock("West access ramp "+i,new Vector3(-24+i*2.5f,-1.1f+height*.5f,20),
+                new Vector3(2.6f,height,8),stone);
+        }
+        AddTerrainBlock("West raised deck",new Vector3(-3,-1.1f+1.4f,20),new Vector3(13,2.8f,11),edge);
+        for(int i=0;i<4;i++)
+        {
+            float height=1.7f*(i+1);
+            AddTerrainBlock("East jump ledge "+i,new Vector3(20+i*5f,-1.1f+height*.5f,-14),
+                new Vector3(4.5f,height,7),stone);
+        }
     }
     Fighter MakeFighter(string name,Color accent)
     {
@@ -126,6 +155,24 @@ public sealed partial class VoxArena
         }
         return nearest<=length;
     }
+    bool TryStepUp(Fighter f,Vector3 p,Vector3 horizontal,out Vector3 stepped)
+    {
+        stepped=p;
+        if(horizontal.sqrMagnitude<.00001f || f.jumpVelocity>1f) return false;
+        float maxStep=Mathf.Max(0,f.spec.stepHeight);
+        foreach(Bounds b in terrainSteps)
+        {
+            Bounds expanded=b; expanded.Expand(new Vector3(f.Radius*2,0,f.Radius*2));
+            Vector3 ahead=p+horizontal;
+            if(ahead.x<expanded.min.x || ahead.x>expanded.max.x ||
+               ahead.z<expanded.min.z || ahead.z>expanded.max.z) continue;
+            float rise=b.max.y-p.y;
+            if(rise<=.01f || rise>maxStep) continue;
+            Vector3 candidate=new Vector3(ahead.x,b.max.y+.01f,ahead.z);
+            if(!Occupied(candidate,f.Radius)) { stepped=candidate; return true; }
+        }
+        return false;
+    }
     void MoveWithObstacles(Fighter f,Vector3 displacement)
     {
         ResolveOverlap(f);
@@ -135,6 +182,7 @@ public sealed partial class VoxArena
         {
             Vector3 horizontal=new Vector3(step.x,0,step.z);
             if(!Occupied(p+horizontal,f.Radius)) p+=horizontal;
+            else if(TryStepUp(f,p,horizontal,out Vector3 stepped)) p=stepped;
             else
             {
                 Vector3 x=p+Vector3.right*step.x;
