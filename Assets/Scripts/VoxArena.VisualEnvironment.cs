@@ -65,6 +65,17 @@ public sealed partial class VoxArena
                     new Vector3(ventX,height+3.14f,width*.125f),
                     new Vector3(width*.15f,.54f,.06f),darkVent);
             }
+            // Sparse roof navigation beacons make the skyline legible at night.
+            // Mesh-only accents: no light components, colliders or gameplay changes.
+            for(int beaconSide=-1;beaconSide<=1;beaconSide+=2)
+            {
+                VisualBox("Roof beacon pedestal",tower,
+                    new Vector3(beaconSide*width*.40f,height+2.65f,0),
+                    new Vector3(.30f,.32f,.30f),trim);
+                VisualBox("Roof navigation beacon",tower,
+                    new Vector3(beaconSide*width*.40f,height+2.88f,0),
+                    new Vector3(.20f,.16f,.20f),warning,true);
+            }
             // Layered exterior plates give distant towers readable industrial
             // depth. They are non-colliding, numeric, and use the tower's local
             // coordinates so changing the site data moves every detail.
