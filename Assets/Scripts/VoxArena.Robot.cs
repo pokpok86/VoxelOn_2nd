@@ -240,6 +240,22 @@ public sealed partial class VoxArena
                     new Vector3(px,.88f,depth),
                     new Vector3(.145f,.13f,.105f),x%3==0?steel:ceramic,-12);
             }
+            // 01 torso shoulder-root fairings: segmented floating armor over
+            // the fixed core, leaving the moving arm sockets unobstructed.
+            // These are purely visual; collision and CraftSpec are unchanged.
+            for(int side=-1;side<=1;side+=2)
+            {
+                BeveledPlate("01 upper chest shoulder fairing",f.corePart,
+                    new Vector3(side*.43f,.89f,.31f),
+                    new Vector3(.28f,.19f,.35f),ceramic,-14,.12f,.86f);
+                Plate("01 fairing dark undercut",f.corePart,
+                    new Vector3(side*.45f,.76f,.48f),
+                    new Vector3(.23f,.055f,.045f),steel,-14);
+                for(int rib=0;rib<2;rib++)
+                    Plate("01 collar vent rib",f.corePart,
+                        new Vector3(side*(.27f+rib*.11f),1.045f,.23f),
+                        new Vector3(.055f,.035f,.19f),rib==0?steel:highlight);
+            }
             for(int side=-1;side<=1;side+=2)
             {
                 Transform arm=side<0?f.leftArm:f.rightArm;
