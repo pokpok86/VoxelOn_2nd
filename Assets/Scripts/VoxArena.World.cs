@@ -82,18 +82,36 @@ public sealed partial class VoxArena
     }
     void ResolveOverlap(Fighter f)
     {
+        // Only eject a fighter when its collision center is actually inside a solid.
+        // Preserve height: resetting Y here previously prevented rooftop traversal.
         for(int iteration=0;iteration<4;iteration++)
         foreach(Bounds b in obstacles)
         {
             Bounds e=b; e.Expand(new Vector3(f.Radius*2+.04f,0,f.Radius*2+.04f));
             Vector3 p=f.root.position;
             if(!e.Contains(p)) continue;
-            Vector3[] exits={new Vector3(e.min.x-.04f,1.1f,p.z),new Vector3(e.max.x+.04f,1.1f,p.z),
-                new Vector3(p.x,1.1f,e.min.z-.04f),new Vector3(p.x,1.1f,e.max.z+.04f)};
+            Vector3[] exits={
+                new Vector3(e.min.x-.04f,p.y,p.z),new Vector3(e.max.x+.04f,p.y,p.z),
+                new Vector3(p.x,p.y,e.min.z-.04f),new Vector3(p.x,p.y,e.max.z+.04f)};
             float best=float.PositiveInfinity; Vector3 chosen=p;
-            foreach(Vector3 exit in exits) if(!Occupied(exit,f.Radius) && (exit-p).sqrMagnitude<best) { best=(exit-p).sqrMagnitude; chosen=exit; }
+            foreach(Vector3 exit in exits)
+                if(!Occupied(exit,f.Radius) && (exit-p).sqrMagnitude<best)
+                { best=(exit-p).sqrMagnitude; chosen=exit; }
             f.root.position=chosen;
         }
+    }
+    float LandingHeight(Vector3 p,float radius,float previousY)
+    {
+        float ground=1.1f;
+        foreach(Bounds b in obstacles)
+        {
+            Bounds e=b; e.Expand(new Vector3(radius*2,0,radius*2));
+            // A rooftop is a landing surface only if approached from above.
+            if(p.x>=e.min.x && p.x<=e.max.x && p.z>=e.min.z && p.z<=e.max.z &&
+                previousY>=e.max.y-.03f)
+                ground=Mathf.Max(ground,e.max.y);
+        }
+        return ground;
     }
     bool ObstacleOnSegment(Vector3 from,Vector3 to,float radius,out float nearest)
     {
@@ -111,16 +129,38 @@ public sealed partial class VoxArena
     void MoveWithObstacles(Fighter f,Vector3 displacement)
     {
         ResolveOverlap(f);
-        int count=Mathf.Max(1,Mathf.CeilToInt(displacement.magnitude/.25f)); Vector3 step=displacement/count,p=f.root.position;
+        int count=Mathf.Max(1,Mathf.CeilToInt(displacement.magnitude/.25f));
+        Vector3 step=displacement/count,p=f.root.position;
         for(int i=0;i<count;i++)
         {
-            if(!Occupied(p+step,f.Radius)) p+=step;
+            Vector3 horizontal=new Vector3(step.x,0,step.z);
+            if(!Occupied(p+horizontal,f.Radius)) p+=horizontal;
             else
             {
-                Vector3 x=p+Vector3.right*step.x; if(!Occupied(x,f.Radius)) p=x;
-                Vector3 z=p+Vector3.forward*step.z; if(!Occupied(z,f.Radius)) p=z;
+                Vector3 x=p+Vector3.right*step.x;
+                if(!Occupied(x,f.Radius)) p=x;
+                Vector3 z=p+Vector3.forward*step.z;
+                if(!Occupied(z,f.Radius)) p=z;
             }
+            float previousY=p.y;
+            Vector3 next=p+Vector3.up*step.y;
+            if(step.y>0)
+            {
+                if(!Occupied(next,f.Radius)) p=next;
+                else f.jumpVelocity=Mathf.Min(0,f.jumpVelocity);
+            }
+            else if(step.y<0)
+            {
+                float floor=LandingHeight(p,f.Radius,previousY);
+                if(next.y<=floor)
+                {
+                    p.y=floor;
+                    f.jumpVelocity=0;
+                }
+                else if(!Occupied(next,f.Radius)) p=next;
+            }
+            p.y=Mathf.Max(1.1f,p.y);
         }
-        f.root.position=new Vector3(p.x,1.1f,p.z);
+        f.root.position=p;
     }
 }

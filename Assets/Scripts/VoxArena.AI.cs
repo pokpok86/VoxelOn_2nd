@@ -47,16 +47,18 @@ public sealed partial class VoxArena
         f.smoothedTargetVelocity=Vector3.Lerp(f.smoothedTargetVelocity,target.velocity,1-Mathf.Exp(-5*dt));
         Vector3 toward=(target.root.position-f.root.position).normalized;
         float distance=Vector3.Distance(target.root.position,f.root.position);
-        float preferred=Mathf.Clamp(f.spec.range*.42f,11,32);
-        if(f.orbitTime<=0) { f.orbitTime=2.4f; f.orbitSign=-f.orbitSign; }
+        float personality=(f.frameIndex*0.618f+f.teamId*.37f)%1f;
+        float preferred=Mathf.Clamp(f.spec.range*(.31f+personality*.24f),10,38);
+        if(f.orbitTime<=0) { f.orbitTime=1.5f+personality*2.8f; f.orbitSign=-f.orbitSign; }
         if(f.velocity.magnitude<.6f && f.aiMove.sqrMagnitude>.1f) f.stuckTime+=dt; else f.stuckTime=0;
         if(f.aiReaction<=0)
         {
-            f.aiReaction=difficulty==0?.60f:difficulty==1?.34f:.23f;
+            f.aiReaction=(difficulty==0?.60f:difficulty==1?.34f:.23f)*(.85f+personality*.5f);
             bool obscured=ObstacleOnSegment(f.root.position,target.root.position,.2f,out _);
             Vector3 strafe=Vector3.Cross(toward,Vector3.up)*f.orbitSign;
             Vector3 goal=distance>preferred+4?toward+strafe*.3f:distance<preferred-5?-toward+strafe*.8f:strafe;
             if(obscured) goal=toward*.6f+strafe;
+            goal+=strafe*(personality-.5f)*.6f;
             if(f.stuckTime>.65f) { goal=strafe; f.orbitSign=-f.orbitSign; f.stuckTime=0; }
             float currentThreat=ThreatAt(f,Vector3.zero,.75f),bestScore=float.NegativeInfinity;
             Vector3 best=Vector3.zero;
@@ -85,6 +87,14 @@ public sealed partial class VoxArena
             if(f.spec.boost==BoostKind.Pulse) f.boostHeld&=(f.aiClock%1.4f)<.5f;
             if(f.boostLocked) f.boostHeld=false;
         }
+        // Use aerial thrust to cross obstacles or dodge projectiles. Pilot timing differs by frame.
+        bool obstacleAhead=ObstacleOnSegment(f.root.position+Vector3.up*.2f,
+            f.root.position+f.aiMove.normalized*4f+Vector3.up*.2f,f.Radius*.65f,out _);
+        bool threatened=ThreatAt(f,Vector3.zero,.55f)>14f;
+        float jumpCycle=1.7f+personality*1.6f;
+        bool jumpWindow=(f.aiClock+personality*2f)%jumpCycle<(.38f+personality*.25f);
+        f.jumpHeld=(obstacleAhead || (threatened && jumpWindow)) && f.boostEnergy>f.spec.boostCapacity*.18f;
+        if(f.jumpHeld && f.jumpHeight<=.02f && f.jumpVelocity<=0) f.jumpVelocity=jumpSpeed;
         Vector3 movement=f.aiMove;
         // Practice rivals pause between maneuvers, while still escaping blocked routes.
         if(difficulty==0 && f.aiClock%3.2f>2.1f && !ObstacleOnSegment(f.root.position,target.root.position,.2f,out _)) movement*=.18f;
