@@ -427,7 +427,7 @@ public sealed partial class VoxArena : MonoBehaviour
             f.boosting=true; f.saber.gameObject.SetActive(true);
         }
         Vector3 before=f.root.position; MoveWithObstacles(f,desired*dt+Vector3.up*f.jumpVelocity*dt);
-        f.jumpHeight=Mathf.Max(0,f.root.position.y-1.1f);
+        f.jumpHeight=Mathf.Max(0,f.root.position.y-LandingHeight(f.root.position,f.Radius,f.root.position.y));
         if(f.jumpHeight<=.001f && f.jumpVelocity<0) f.jumpVelocity=0;
         float actualDistance=Vector3.Distance(f.root.position,before);
         f.velocity=(f.root.position-before)/Mathf.Max(.0001f,dt);
