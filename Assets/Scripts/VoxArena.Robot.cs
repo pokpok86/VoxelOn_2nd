@@ -125,6 +125,23 @@ public sealed partial class VoxArena
             BeveledPlate("Toe armor",leg,new Vector3(0,-1.24f,.38f),new Vector3(heavy?.57f:.39f,.12f,.30f),armor,-10);
             Plate("Backpack booster",f.backPart,new Vector3(side*.38f,0,-.10f),new Vector3(.31f,.90f,.43f),edge);
             Shape(PrimitiveType.Cube,"Backpack nozzle",f.backPart,new Vector3(side*.38f,-.48f,-.14f),new Vector3(.23f,.09f,.27f),armor,true);
+            // Frame 01 only: recessed armored thruster cassette and service detailing.
+            // These decorative pieces remain parented to the existing backpack socket.
+            if(f.frameIndex==0)
+            {
+                Plate("Thruster outer rail",f.backPart,new Vector3(side*.58f,.04f,-.13f),
+                    new Vector3(.075f,.83f,.42f),dark);
+                Plate("Thruster upper service cap",f.backPart,new Vector3(side*.38f,.49f,-.13f),
+                    new Vector3(.40f,.10f,.49f),hull);
+                Plate("Thruster lower guard",f.backPart,new Vector3(side*.38f,-.38f,-.38f),
+                    new Vector3(.39f,.12f,.11f),dark);
+                for(int rib=0;rib<3;rib++)
+                    Plate("Thruster heat rib "+rib,f.backPart,
+                        new Vector3(side*.38f,.22f-rib*.19f,-.365f),
+                        new Vector3(.30f,.055f,.09f),hull);
+                Plate("Thruster status lamp",f.backPart,new Vector3(side*.38f,.37f,-.375f),
+                    new Vector3(.14f,.07f,.04f),armor);
+            }
             if(f.frameIndex==0||f.frameIndex==6)
             {
                 Transform wing=Plate("Stabilizer",f.backPart,new Vector3(side*.69f,.21f,-.2f),new Vector3(.17f,.9f,.30f),armor,-20);
