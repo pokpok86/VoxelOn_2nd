@@ -9,6 +9,11 @@ public sealed class CraftSpec
     public string name, role, description, weaponName, specialName;
     public Color color;
     public float health, armor, speed, boostSpeed, boostCapacity, boostDrain, pulseDuration;
+    // Future leg-part values. 4:3:2 forward/strafe/reverse movement ratio.
+    public float forwardSpeedFactor=1f, strafeSpeedFactor=.75f, reverseSpeedFactor=.5f;
+    public float fallGravityFactor=1f, knockdownResistance=1f, recoverySpeed=1f;
+    // Future head-part lock sensor and aim stability values.
+    public float lockRange=80f, aimSpreadDegrees=0.6f;
     public float damage, weaponCooldown, range, projectileSpeed, projectileRadius, size, specialCooldown;
     public PrimaryKind primary;
     public SpecialKind special;
@@ -26,6 +31,7 @@ public sealed class CraftSpec
         this.primary=primary; this.weaponName=weaponName; this.damage=damage; weaponCooldown=cooldown;
         this.range=range; this.projectileSpeed=projectileSpeed; projectileRadius=radius;
         this.special=special; this.specialName=specialName; this.specialCooldown=specialCooldown;
+        fallGravityFactor=Mathf.Clamp(size*(1f+armor*.35f),.8f,1.8f);
     }
 }
 public static class CraftCatalog
