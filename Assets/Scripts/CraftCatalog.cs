@@ -11,6 +11,7 @@ public sealed class CraftSpec
     public float health, armor, speed, boostSpeed, boostCapacity, boostDrain, pulseDuration;
     // Future leg-part values. 4:3:2 forward/strafe/reverse movement ratio.
     public float forwardSpeedFactor=1f, strafeSpeedFactor=.75f, reverseSpeedFactor=.5f;
+    public float leftSpeedFactor=.6f,rightSpeedFactor=.6f;
     public float fallGravityFactor=1f, knockdownResistance=1f, recoverySpeed=1f;
     // Future head-part lock sensor and aim stability values.
     public float lockRange=80f, aimSpreadDegrees=0.6f;
