@@ -49,6 +49,25 @@ public sealed partial class VoxArena
                 new Vector3(width+1.8f,1.4f,width*.78f+1.8f),trim);
             VisualBox("Roof antenna",tower,new Vector3(0,height+4.3f,0),
                 new Vector3(.3f,4.2f,.3f),panel);
+            // Layered exterior plates give distant towers readable industrial
+            // depth. They are non-colliding, numeric, and use the tower's local
+            // coordinates so changing the site data moves every detail.
+            for(int side=-1;side<=1;side+=2)
+            {
+                VisualBox("Facade support rail",tower,
+                    new Vector3(side*width*.37f,height*.48f+1.1f,width*.39f+.10f),
+                    new Vector3(.28f,height*.80f,.24f),panel);
+                VisualBox("Side service duct",tower,
+                    new Vector3(side*(width*.5f+.24f),height*.42f+1.1f,0),
+                    new Vector3(.48f,height*.62f,width*.22f),trim);
+            }
+            for(int band=0;band<4;band++)
+            {
+                float y=3.5f+band*(height-5f)/4f;
+                VisualBox("Facade maintenance panel",tower,
+                    new Vector3(0,y,width*.39f+.13f),
+                    new Vector3(width*.38f,.75f,.15f),band%2==0?panel:trim);
+            }
             for(int level=0;level<3;level++)
             {
                 float y=5+level*(height-7)/3f;
