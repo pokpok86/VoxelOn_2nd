@@ -14,6 +14,10 @@ public sealed class CraftSpec
     public float fallGravityFactor=1f, knockdownResistance=1f, recoverySpeed=1f;
     // Future head-part lock sensor and aim stability values.
     public float lockRange=80f, aimSpreadDegrees=0.6f;
+    // Head sensor memory: lose occluded lock only after this time; distance still hard-limits lock.
+    public float occludedLockSeconds=1.5f, occludedLockRange=65f;
+    // Leg assembly parameters; step-up height is deliberately below tall jump-only platforms.
+    public float stepHeight=.45f, slopeLimitDegrees=32f;
     public float damage, weaponCooldown, range, projectileSpeed, projectileRadius, size, specialCooldown;
     public PrimaryKind primary;
     public SpecialKind special;
