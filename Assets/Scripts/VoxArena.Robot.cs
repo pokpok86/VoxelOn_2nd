@@ -18,8 +18,9 @@ public sealed partial class VoxArena
         f.body=Module("Modular robot",f.root,Vector3.zero);
         f.corePart=Module("Core module",f.body,Vector3.zero);
         f.headPart=Module("Head module",f.body,new Vector3(0,1.34f,.02f));
-        f.armsPart=Module("Arms module",f.body,Vector3.zero);
-        f.legsPart=Module("Legs module",f.body,Vector3.zero);
+        f.armsPart=Module("Arm mounting frame (separate left and right sockets)",f.body,Vector3.zero);
+        f.legsPart=Module("Legs and pelvis module",f.body,Vector3.zero);
+        f.pelvisPart=Module("Pelvis socket",f.legsPart,Vector3.zero);
         f.backPart=Module("Backpack module",f.corePart,new Vector3(0,.42f,-.52f));
         Color armor=f.spec.color, hull=new Color(.55f,.62f,.68f), dark=new Color(.065f,.09f,.12f);
         Color edge=new Color(.28f,.35f,.40f), light=new Color(.85f,.9f,.91f);
@@ -35,10 +36,11 @@ public sealed partial class VoxArena
         {
             Plate("Chest trim",f.corePart,new Vector3(side*.45f,.78f,.55f),new Vector3(.18f,.08f,.06f),light);
             for(int vent=0;vent<3;vent++) Plate("Cooling vent",f.corePart,new Vector3(side*.36f,.34f+vent*.08f,.36f),new Vector3(.24f,.025f,.04f),dark);
-            Plate("Armor hip skirt",f.corePart,new Vector3(side*.45f,-.42f,.20f),new Vector3(.28f,.46f,.43f),armor,-16);
+            Plate("Armor hip skirt",f.pelvisPart,new Vector3(side*.45f,-.42f,.20f),new Vector3(.28f,.46f,.43f),armor,-16);
         }
         Plate("Waist coupling",f.corePart,new Vector3(0,-.09f,0),new Vector3(.5f,.35f,.43f),dark);
-        Plate("Pelvis",f.corePart,new Vector3(0,-.39f,0),new Vector3(.70f,.29f,.55f),edge);
+        Plate("Waist rotary bearing",f.pelvisPart,new Vector3(0,-.21f,0),new Vector3(.54f,.10f,.49f),hull);
+        Plate("Pelvis",f.pelvisPart,new Vector3(0,-.39f,0),new Vector3(.70f,.29f,.55f),edge);
         // Heads intentionally use different profiles, while sharing the same socket origin.
         Plate("Helmet",f.headPart,Vector3.zero,new Vector3(heavy?.7f:.54f,.47f,.50f),hull);
         Plate("Helmet crown",f.headPart,new Vector3(0,.25f,-.04f),new Vector3(.34f,.13f,.41f),armor,-10);
@@ -61,6 +63,9 @@ public sealed partial class VoxArena
             Plate("Upper arm",arm,new Vector3(0,-.37f,0),new Vector3(.30f,.42f,.33f),edge);
             Shape(PrimitiveType.Sphere,"Elbow joint",arm,new Vector3(0,-.58f,.08f),Vector3.one*.29f,dark);
             Plate("Armor forearm",arm,new Vector3(0,-.75f,.24f),new Vector3(.42f,.45f,.64f),hull,-12);
+            for(int vent=0;vent<2;vent++)
+                Plate("Forearm heat slit",arm,new Vector3(side*.224f,-.64f-vent*.13f,.25f),new Vector3(.025f,.045f,.30f),dark);
+            Plate("Elbow servo cover",arm,new Vector3(0,-.56f,-.12f),new Vector3(.24f,.16f,.12f),armor);
             Plate("Wrist trim",arm,new Vector3(0,-.79f,.52f),new Vector3(.45f,.13f,.14f),armor);
             Plate("Manipulator",arm,new Vector3(0,-.83f,.64f),new Vector3(.28f,.28f,.28f),dark);
             if(side>0) f.fist=Plate("Punch gauntlet",arm,new Vector3(0,-.83f,.82f),new Vector3(.42f,.34f,.42f),armor);
@@ -69,6 +74,8 @@ public sealed partial class VoxArena
             Plate("Knee coupling",leg,new Vector3(0,-.59f,0),new Vector3(.31f,.22f,.34f),dark);
             Plate("Armor knee",leg,new Vector3(0,-.60f,.25f),new Vector3(.39f,.29f,.18f),armor,-18);
             Plate("Shin",leg,new Vector3(0,-.94f,-.02f),new Vector3(heavy?.57f:.38f,.64f,.46f),hull,-7);
+            Plate("Knee piston",leg,new Vector3(0,-.75f,-.25f),new Vector3(.10f,.42f,.10f),edge);
+            Plate("Shin side trim",leg,new Vector3(side*.24f,-.98f,.08f),new Vector3(.07f,.42f,.29f),armor);
             Plate("Calf booster",leg,new Vector3(0,-.85f,-.35f),new Vector3(.27f,.46f,.28f),dark,15);
             Shape(PrimitiveType.Cube,"Calf nozzle",leg,new Vector3(0,-1.1f,-.40f),new Vector3(.16f,.08f,.12f),armor,true);
             Plate("Foot",leg,new Vector3(0,-1.34f,.15f),new Vector3(heavy?.61f:.42f,.22f,.76f),dark);

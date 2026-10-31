@@ -14,6 +14,10 @@ public sealed class CraftSpec
     public float fallGravityFactor=1f, knockdownResistance=1f, recoverySpeed=1f;
     // Future head-part lock sensor and aim stability values.
     public float lockRange=80f, aimSpreadDegrees=0.6f;
+    // Head sensor memory: lose occluded lock only after this time; distance still hard-limits lock.
+    public float occludedLockSeconds=1.5f, occludedLockRange=65f;
+    // Leg assembly parameters; step-up height is deliberately below tall jump-only platforms.
+    public float stepHeight=.45f, slopeLimitDegrees=32f;
     public float damage, weaponCooldown, range, projectileSpeed, projectileRadius, size, specialCooldown;
     public PrimaryKind primary;
     public SpecialKind special;
@@ -62,5 +66,18 @@ public static class CraftCatalog
             430,.22f,10.5f,21.5f,200,11,1.28f,BoostKind.Cruise,0,
             PrimaryKind.Grenade,"BLAST SHELL",26,2.0f,52,56,.65f,SpecialKind.Minefield,"MINEFIELD",12)
     };
+    static CraftCatalog()
+    {
+        // Example head profiles until head parts are independently selectable.
+        // Long-range sensor frames keep an occluded lock longer; heavy frames are shorter range.
+        for(int i=0;i<All.Length;i++)
+        {
+            CraftSpec f=All[i];
+            f.occludedLockSeconds= i==5 || i==6 ? 3.5f : i==1 || i==7 ? 1.1f : 2f;
+            f.occludedLockRange= i==5 || i==6 ? 88f : i==1 || i==7 ? 58f : 70f;
+            f.lockRange=Mathf.Max(f.lockRange,f.occludedLockRange);
+            f.stepHeight= i==1 || i==7 ? .32f : .48f;
+        }
+    }
 }
 

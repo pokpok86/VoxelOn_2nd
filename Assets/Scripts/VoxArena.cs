@@ -24,6 +24,8 @@ public sealed partial class VoxArena : MonoBehaviour
     {
         public Transform root,body,gun,fist,shield,leftArm,rightArm,leftLeg,rightLeg,thruster,saber;
         public Transform headPart,corePart,armsPart,legsPart,weaponPart,backPart,shadow;
+        // Independent arm sockets; pelvis belongs to the leg module.
+        public Transform pelvisPart;
         // Stable team identity; multiple fighters can share a team in future modes.
         public int teamId;
         public int frameIndex; public float hitFlash;
@@ -59,6 +61,7 @@ public sealed partial class VoxArena : MonoBehaviour
     bool spectatorMode;
     float cameraShakeTime,cameraShakeStrength;
     bool targetLock;
+    float occludedLockTimer;
     float cameraYaw=0,cameraPitch=12,mouseSensitivity=2.4f;
     int selectedCraft,enemyCraft,wins,losses;
     float roundTime;
@@ -154,7 +157,7 @@ public sealed partial class VoxArena : MonoBehaviour
     }
     void ResetRound()
     {
-        finishCleaned=false; targetLock=false; StopSounds(); aimMarker.gameObject.SetActive(true);
+        finishCleaned=false; targetLock=false; occludedLockTimer=0; StopSounds(); aimMarker.gameObject.SetActive(true);
         ResetFeedback();
         ClearCombat();
         foreach(Spark s in sparks) Destroy(s.visual.gameObject);
@@ -286,7 +289,10 @@ public sealed partial class VoxArena : MonoBehaviour
         }
         player.jumpHeld=Input.GetKey(KeyCode.Space);
         if(Input.GetKeyDown(KeyCode.Space)&&player.jumpHeight<=.02f) player.jumpVelocity=jumpSpeed;
-        if(Input.GetMouseButtonDown(1) && Vector3.Distance(player.root.position,enemy.root.position)<=player.spec.lockRange) targetLock=true;
+        if(Input.GetMouseButtonDown(1) && Vector3.Distance(player.root.position,enemy.root.position)<=player.spec.lockRange)
+        {
+            targetLock=true; occludedLockTimer=player.spec.occludedLockSeconds;
+        }
         if(Input.GetMouseButtonUp(1) || Vector3.Distance(player.root.position,enemy.root.position)>player.spec.lockRange) targetLock=false;
         if(!targetLock)
         {
@@ -299,7 +305,13 @@ public sealed partial class VoxArena : MonoBehaviour
             Vector3 viewport=view.WorldToViewportPoint(enemy.root.position+Vector3.up*1.2f);
             bool visible=viewport.z>0&&viewport.x>0&&viewport.x<1&&viewport.y>0&&viewport.y<1&&
                 !ObstacleOnSegment(player.root.position+Vector3.up*1.5f,enemy.root.position+Vector3.up*1.2f,.15f,out _);
-            if(!visible) targetLock=false;
+            if(visible) occludedLockTimer=player.spec.occludedLockSeconds;
+            else
+            {
+                occludedLockTimer-=dt;
+                if(Vector3.Distance(player.root.position,enemy.root.position)>player.spec.occludedLockRange || occludedLockTimer<=0)
+                    targetLock=false;
+            }
         }
         Vector3 cameraForward=Quaternion.Euler(0,cameraYaw,0)*Vector3.forward;
         if(targetLock) FaceOpponent(player,enemy);
@@ -497,8 +509,12 @@ public sealed partial class VoxArena : MonoBehaviour
         if(f.shadow!=null) { f.shadow.position=new Vector3(f.root.position.x,-1.08f,f.root.position.z); f.shadow.localScale=new Vector3(2.7f*f.spec.size,.012f,2.1f*f.spec.size); }
         Vector3 localVelocity=f.root.InverseTransformDirection(f.velocity);
         f.body.localRotation=f.knockdownTime>0?Quaternion.Euler(68,0,0):Quaternion.Euler(Mathf.Clamp(localVelocity.z*.65f,-16,16),0,Mathf.Clamp(-localVelocity.x*.5f,-12,12));
-        f.leftLeg.localRotation=Quaternion.Euler(12+Mathf.Sin(roundTime*2)*4,0,-5);
-        f.rightLeg.localRotation=Quaternion.Euler(18-Mathf.Sin(roundTime*2)*4,0,5);
+        float stride=Mathf.Clamp01(Vector3.ProjectOnPlane(f.velocity,Vector3.up).magnitude/Mathf.Max(1f,f.spec.speed));
+        float gait=Mathf.Sin(roundTime*(7f+stride*9f))*stride;
+        f.leftLeg.localRotation=Quaternion.Euler(gait*25f,0,-5);
+        f.rightLeg.localRotation=Quaternion.Euler(-gait*25f,0,5);
+        f.leftArm.localRotation=Quaternion.Euler(-gait*13f,0,0);
+        f.rightArm.localRotation=Quaternion.Euler(gait*13f,0,0);
         f.gun.gameObject.SetActive(true);
         f.shield.gameObject.SetActive(f.shieldFlash>0&&!Finished&&!inMenu);
         f.thruster.gameObject.SetActive(f.boosting&&f.velocity.sqrMagnitude>1&&!inMenu&&!Finished);
