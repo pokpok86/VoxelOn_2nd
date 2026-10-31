@@ -34,6 +34,7 @@ public sealed partial class VoxArena
         view.backgroundColor=new Color(.009f,.014f,.04f); view.clearFlags=CameraClearFlags.SolidColor;
         view.gameObject.AddComponent<AudioListener>();
         BuildGround();
+        BuildVisualEnvironment();
         BuildSalvage();
         AddDebris(new Vector3(-16,1.1f,3),new Vector3(5,4.2f,5),0);
         AddDebris(new Vector3(20,1.1f,38),new Vector3(6,3.4f,5),1.4f);
