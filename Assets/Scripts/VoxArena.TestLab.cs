@@ -103,6 +103,15 @@ public sealed partial class VoxArena
             { testCategory=i; testScroll=Vector2.zero; }
         }
         Fighter selected=TestFighter;
+        if(testCategory==5)
+        {
+            if(GUI.Button(new Rect(199,313,210,25),"PRIMARY: "+selected.spec.primary))
+                selected.spec.primary=(PrimaryKind)(((int)selected.spec.primary+1)%Enum.GetValues(typeof(PrimaryKind)).Length);
+            if(GUI.Button(new Rect(417,313,210,25),"SPECIAL: "+selected.spec.special))
+                selected.spec.special=(SpecialKind)(((int)selected.spec.special+1)%Enum.GetValues(typeof(SpecialKind)).Length);
+        }
+        if(testCategory==1 && GUI.Button(new Rect(199,313,210,25),"BOOST: "+selected.spec.boost))
+            selected.spec.boost=(BoostKind)(((int)selected.spec.boost+1)%Enum.GetValues(typeof(BoostKind)).Length);
         GUI.BeginGroup(new Rect(199,333,865,310));
         testScroll=GUI.BeginScrollView(new Rect(0,0,865,310),testScroll,new Rect(0,0,836,testFields[testCategory].Length*53+15));
         string[] fields=testFields[testCategory];
