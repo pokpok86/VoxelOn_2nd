@@ -16,7 +16,7 @@ public sealed partial class VoxArena
     // Mesh is built in normalized local space; Box handles existing materials.
     // Visual mesh only: collision and gameplay use the original arena logic.
     Transform BeveledPlate(string name,Transform parent,Vector3 p,Vector3 size,
-        Color color,float bevel=.16f,float taper=.88f,float tilt=0)
+        Color color,float tilt=0,float bevel=.16f,float taper=.88f)
     {
         Transform t=Plate(name,parent,p,size,color,tilt);
         MeshFilter filter=t.GetComponent<MeshFilter>();
@@ -199,6 +199,50 @@ public sealed partial class VoxArena
             new Vector3(heavy?.62f:.48f,.055f,.09f),armor,-8);
         Plate("Chin guard",f.headPart,new Vector3(0,-.245f,.305f),
             new Vector3(.21f,.065f,.095f),dark);
+        // Prototype the 01 standard unit's higher-resolution voxel skin.
+        // Keep the existing modular skeleton, joints and gameplay hit volumes.
+        if(f.frameIndex==0)
+        {
+            Color ceramic=new Color(.81f,.82f,.78f);
+            Color steel=new Color(.19f,.25f,.34f);
+            Color highlight=new Color(.94f,.89f,.76f);
+            // Staggered small plates form a layered visor brow and chest shell.
+            for(int x=-3;x<=3;x++)
+            {
+                float px=x*.155f;
+                float height=.09f+(3-Mathf.Abs(x))*.022f;
+                Plate("01 stepped helmet brow",f.headPart,
+                    new Vector3(px,.20f+height*.25f,.29f),
+                    new Vector3(.146f,height,.17f),x%2==0?ceramic:highlight);
+            }
+            for(int x=-3;x<=3;x++)
+            {
+                float px=x*.155f;
+                float depth=.60f-Mathf.Abs(x)*.027f;
+                Plate("01 segmented breastplate",f.corePart,
+                    new Vector3(px,.88f,depth),
+                    new Vector3(.145f,.13f,.105f),x%3==0?steel:ceramic,-12);
+            }
+            for(int side=-1;side<=1;side+=2)
+            {
+                Transform arm=side<0?f.leftArm:f.rightArm;
+                Transform leg=side<0?f.leftLeg:f.rightLeg;
+                for(int row=0;row<3;row++)
+                {
+                    Plate("01 shoulder armor tile",arm,
+                        new Vector3(side*.13f,.27f-row*.14f,.38f),
+                        new Vector3(.42f-row*.035f,.12f,.095f),
+                        row==1?steel:ceramic);
+                    Plate("01 shin layered armor",leg,
+                        new Vector3(0,-.76f-row*.19f,.235f),
+                        new Vector3(.34f-row*.025f,.17f,.10f),
+                        row==1?steel:ceramic,-7);
+                }
+                Plate("01 backpack exhaust guard",f.backPart,
+                    new Vector3(side*.38f,-.31f,-.35f),
+                    new Vector3(.29f,.20f,.13f),steel);
+            }
+        }
         AddFrameIdentity(f,armor,hull,dark,edge);
     }
     RenderTexture[] framePortraits;
