@@ -309,6 +309,27 @@ public sealed partial class VoxArena
                 Plate("01 knee actuator pin",leg,
                     new Vector3(side*.29f,-.59f,-.045f),
                     new Vector3(.035f,.09f,.09f),highlight);
+                // 01 ankle articulation: shallow guards, exposed hinge blocks
+                // and a toe-side maintenance seam. Parent to the existing leg
+                // module, not the root, so animation and collision stay intact.
+                Plate("01 ankle flexible gaiter",leg,
+                    new Vector3(0,-1.185f,-.015f),
+                    new Vector3(.29f,.085f,.36f),steel);
+                for(int ankleSide=-1;ankleSide<=1;ankleSide+=2)
+                {
+                    Plate("01 ankle pivot bracket",leg,
+                        new Vector3(ankleSide*.235f,-1.225f,.045f),
+                        new Vector3(.075f,.19f,.24f),ceramic);
+                    Plate("01 ankle hinge pin",leg,
+                        new Vector3(ankleSide*.28f,-1.225f,.065f),
+                        new Vector3(.035f,.075f,.085f),highlight);
+                    Plate("01 toe outer guard",leg,
+                        new Vector3(ankleSide*.215f,-1.275f,.425f),
+                        new Vector3(.09f,.10f,.25f),ceramic,-10);
+                }
+                Plate("01 toe maintenance seam",leg,
+                    new Vector3(0,-1.169f,.525f),
+                    new Vector3(.25f,.018f,.035f),steel,-10);
                 Plate("01 shoulder hinge cover",arm,
                     new Vector3(side*.37f,-.02f,-.02f),
                     new Vector3(.085f,.24f,.29f),steel);
