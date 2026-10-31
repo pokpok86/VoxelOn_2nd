@@ -18,6 +18,16 @@ public sealed partial class VoxArena
         Light light=new GameObject("Distant sun").AddComponent<Light>();
         light.type=LightType.Directional; light.intensity=1.05f; light.shadows=LightShadows.Soft; light.shadowStrength=.65f;
         light.transform.rotation=Quaternion.Euler(40,-30,0);
+        // Warm key and cool rim give the voxel armor readable depth without
+        // adding dynamic shadows or touching physics / gameplay systems.
+        light.color=new Color(1f,.94f,.85f);
+        Light rim=new GameObject("Cool mech rim light").AddComponent<Light>();
+        rim.type=LightType.Directional;
+        rim.color=new Color(.42f,.69f,1f);
+        rim.intensity=.34f;
+        rim.shadows=LightShadows.None;
+        rim.transform.rotation=Quaternion.Euler(28,145,0);
+        RenderSettings.ambientLight=new Color(.39f,.45f,.54f);
         view=new GameObject("Quarter view camera").AddComponent<Camera>(); view.tag="MainCamera";
         view.transform.position=new Vector3(46,58,-46); view.transform.LookAt(Vector3.zero);
         view.cullingMask=~(1<<8); view.orthographic=true; view.orthographicSize=24; view.farClipPlane=600;
