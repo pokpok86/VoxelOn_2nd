@@ -68,6 +68,12 @@ public sealed partial class VoxArena
         if(field=="fallGravityFactor" || field=="recoverySpeed" || field=="knockdownResistance") return .2f;
         return .05f;
     }
+    void DrawSalvageSlider(string name,ref float value,float min,float max,ref float y)
+    {
+        GUI.Label(new Rect(209,y,350,24),name+"  "+value.ToString("0.0"));
+        value=GUI.HorizontalSlider(new Rect(555,y+6,480,22),value,min,max);
+        y+=40;
+    }
     void DrawTestLab()
     {
         if(!testLabOpen || inMenu || testSide<0 || player==null || enemy==null) return;
@@ -95,6 +101,11 @@ public sealed partial class VoxArena
         aiJumpEnabled=GUI.Toggle(new Rect(500,181,150,28),aiJumpEnabled,"JUMP");
         aiBoostEnabled=GUI.Toggle(new Rect(650,181,150,28),aiBoostEnabled,"BOOST");
         Text(200,213,750,"Changes are runtime-only. No mass or weight parameters are used by this lab.",small);
+        if(testCategory==5)
+        {
+            GUI.Label(new Rect(910,154,170,24),"SALVAGE TEST");
+            if(GUI.Button(new Rect(904,180,170,25),"REFILL OBJECTS")) ResetSalvage();
+        }
         for(int i=0;i<testCategories.Length;i++)
         {
             int row=i/4,col=i%4;
@@ -112,6 +123,18 @@ public sealed partial class VoxArena
         }
         if(testCategory==1 && GUI.Button(new Rect(199,313,210,25),"BOOST: "+selected.spec.boost))
             selected.spec.boost=(BoostKind)(((int)selected.spec.boost+1)%Enum.GetValues(typeof(BoostKind)).Length);
+        if(testCategory==5)
+        {
+            float y=338;
+            DrawSalvageSlider("PICKUP RADIUS",ref pickupRadius,1f,8f,ref y);
+            DrawSalvageSlider("THROW SPEED",ref thrownSpeed,5f,65f,ref y);
+            DrawSalvageSlider("THROW DAMAGE",ref thrownDamage,1f,120f,ref y);
+            DrawSalvageSlider("MELEE RANGE",ref meleeRange,1f,9f,ref y);
+            DrawSalvageSlider("MELEE DAMAGE",ref meleeDamage,1f,120f,ref y);
+            DrawSalvageSlider("MELEE COOLDOWN",ref meleeCooldown,.1f,3f,ref y);
+            DrawSalvageSlider("SHIELD DURABILITY",ref shieldDurability,10f,300f,ref y);
+            return;
+        }
         GUI.BeginGroup(new Rect(199,333,865,310));
         testScroll=GUI.BeginScrollView(new Rect(0,0,865,310),testScroll,new Rect(0,0,836,testFields[testCategory].Length*53+15));
         string[] fields=testFields[testCategory];
