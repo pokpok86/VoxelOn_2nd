@@ -23,6 +23,8 @@ public sealed class CraftSpec
     public SpecialKind special;
     public BoostKind boost;
     public float ShieldMax => health <= 300 ? health * .15f : 0;
+    // Per-fighter runtime copy so tuning the rival never mutates the player's catalog preset.
+    public CraftSpec RuntimeCopy() => (CraftSpec)MemberwiseClone();
     public CraftSpec(string name, string role, string description, Color color,
         float hp, float armor, float speed, float boostSpeed, float capacity, float drain, float size,
         BoostKind boost, float pulseDuration, PrimaryKind primary, string weaponName,
