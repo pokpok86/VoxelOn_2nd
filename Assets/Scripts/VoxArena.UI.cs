@@ -61,6 +61,7 @@ public sealed partial class VoxArena
             title = new GUIStyle(label) { fontSize = 28 };
         }
         GUI.matrix = Matrix4x4.Scale(new Vector3(Screen.width / 1280f, Screen.height / 720f, 1));
+        if(testLabOpen) { DrawTestLab(); return; }
         if(showGuide) { DrawGuide(); return; }
         if (inMenu) { GUI.enabled=!showTuning; DrawHangar(); GUI.enabled=true; if(showTuning) DrawTuning(); return; }
         Panel(new Rect(0, 0, 1280, 94), new Color(.025f, .045f, .075f, .96f));
@@ -92,7 +93,7 @@ public sealed partial class VoxArena
             Panel(new Rect(737,637,2,15),warning); Panel(new Rect(965,637,2,15),warning);
         }
         Text(740, 658, 520, "WASD MOVE / SHIFT BOOST / SPACE JUMP / F CROUCH", small);
-        Text(740, 682, 520, "1/2 WEAPON  /  RMB LOCK  /  ESC PAUSE  /  F1 HELP", small);
+        Text(740, 682, 520, "1/2 WEAPON / RMB LOCK / F1 HELP / F2 TEST LAB", small);
         if (!Finished && !paused)
             Text(405, 574, 650, player.lockTime>0?"SPECIAL FIRING / MOVEMENT LOCKED":player.rushTime>0?"SABER RUSH":player.boostLocked ? "BOOST EMPTY / RELEASE SHIFT TO REARM" : AimStatus(), small);
         DrawCombatFeedback();

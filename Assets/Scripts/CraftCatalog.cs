@@ -18,11 +18,14 @@ public sealed class CraftSpec
     public float occludedLockSeconds=1.5f, occludedLockRange=65f;
     // Leg assembly parameters; step-up height is deliberately below tall jump-only platforms.
     public float stepHeight=.45f, slopeLimitDegrees=32f;
+    public float leftArmHandling=1f,leftArmStability=1f,rightArmHandling=1f,rightArmStability=1f;
     public float damage, weaponCooldown, range, projectileSpeed, projectileRadius, size, specialCooldown;
     public PrimaryKind primary;
     public SpecialKind special;
     public BoostKind boost;
     public float ShieldMax => health <= 300 ? health * .15f : 0;
+    // Per-fighter runtime copy so tuning the rival never mutates the player's catalog preset.
+    public CraftSpec RuntimeCopy() => (CraftSpec)MemberwiseClone();
     public CraftSpec(string name, string role, string description, Color color,
         float hp, float armor, float speed, float boostSpeed, float capacity, float drain, float size,
         BoostKind boost, float pulseDuration, PrimaryKind primary, string weaponName,
@@ -35,7 +38,7 @@ public sealed class CraftSpec
         this.primary=primary; this.weaponName=weaponName; this.damage=damage; weaponCooldown=cooldown;
         this.range=range; this.projectileSpeed=projectileSpeed; projectileRadius=radius;
         this.special=special; this.specialName=specialName; this.specialCooldown=specialCooldown;
-        fallGravityFactor=Mathf.Clamp(size*(1f+armor*.35f),.8f,1.8f);
+        fallGravityFactor=1f; // Leg-specific value; not derived from frame mass.
     }
 }
 public static class CraftCatalog

@@ -141,7 +141,7 @@ public sealed partial class VoxArena : MonoBehaviour
     }
     void ApplyCharacter(Fighter f,int index)
     {
-        f.spec=CraftCatalog.All[index]; f.frameIndex=index; BuildRobot(f); f.body.localScale=Vector3.one*f.spec.size;
+        f.spec=CraftCatalog.All[index].RuntimeCopy(); f.frameIndex=index; BuildRobot(f); f.body.localScale=Vector3.one*f.spec.size;
         foreach(Renderer r in f.body.GetComponentsInChildren<Renderer>())
             if(r.name.StartsWith("Armor") || r.name=="Visor") r.sharedMaterial=r.name=="Visor"?Glow(f.spec.color):Mat(f.spec.color);
         // Weapon silhouettes are built separately from arm modules.
@@ -181,7 +181,7 @@ public sealed partial class VoxArena : MonoBehaviour
             f.dashDirection=Vector3.zero;
             f.dashSpeedFactor=Mathf.Clamp(f.spec.speed/13f,.7f,1.25f);
             f.dashDistanceFactor=Mathf.Clamp(f.spec.speed/13f,.75f,1.2f);
-            f.dashCostFactor=1f+Mathf.Max(0,f.spec.size-1f)*.35f+f.spec.armor*.5f;
+            f.dashCostFactor=1f; // No mass-derived mobility modifiers in test baseline.
             f.orbitSign=1;
         }
         player.root.position=new Vector3(-15,1.1f,-15); enemy.root.position=new Vector3(15,1.1f,15);
@@ -195,6 +195,8 @@ public sealed partial class VoxArena : MonoBehaviour
     {
         if(player==null || enemy==null) return;
         if(Input.GetKeyDown(KeyCode.F1)) { ToggleGuide(); return; }
+        if(Input.GetKeyDown(KeyCode.F2) && !inMenu && !smoke) { testLabOpen=!testLabOpen; SetTestCursor(); }
+        if(testLabOpen) { UpdateTestLabFrame(); return; }
         if(showGuide) { if(Input.GetKeyDown(KeyCode.Escape)) CloseGuide(); return; }
         if(Input.GetKeyDown(KeyCode.V)) ToggleMute();
         if(inMenu) { if(Input.GetKeyDown(KeyCode.Escape)) showTuning=false; if(Input.GetKeyDown(KeyCode.Return)&&!showTuning) BeginMatch(); return; }
@@ -210,7 +212,7 @@ public sealed partial class VoxArena : MonoBehaviour
         float dt=Mathf.Min(Time.deltaTime,.05f);
         roundTime+=dt; hitConfirmTime=Mathf.Max(0,hitConfirmTime-dt); UpdateObstacles(dt);
         if(!spectatorMode) PlayerInput(dt);
-        EnemyAI(enemy,player,dt);
+        if(!testLabEnabled || aiMoveEnabled || aiAttackEnabled || aiJumpEnabled) EnemyAI(enemy,player,dt);
         if(spectatorMode) EnemyAI(player,enemy,dt);
         if(targetLock) FaceOpponent(player,enemy);
         FaceOpponent(enemy,player);
@@ -408,7 +410,7 @@ public sealed partial class VoxArena : MonoBehaviour
         bool verticalBoost=airborne && f.jumpHeld && !f.boostLocked && f.boostEnergy>0;
         if(verticalBoost)
         {
-            float weightFactor=1f+Mathf.Max(0,f.spec.size-1f)*.5f+f.spec.armor*.5f;
+            float weightFactor=1f; // Explicit thrust tuning; not inferred from mass/armor/size.
             float drain=jumpBoostDrain*weightFactor*dt;
             float fraction=drain>0?Mathf.Min(1,f.boostEnergy/drain):1;
             f.jumpVelocity+=jumpThrust/weightFactor*fraction*dt;
