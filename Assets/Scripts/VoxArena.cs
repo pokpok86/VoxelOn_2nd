@@ -37,6 +37,7 @@ public sealed partial class VoxArena : MonoBehaviour
         public float jumpHeight,jumpVelocity;
         public bool crouching;
         public float failedFireFlash;
+        public float knockdownTime,invulnerableTime;
         public Vector3 dashDirection;
         public float dashRemaining,dashCooldownLeft;
         // Part modifiers: replace with equipped leg/booster stats when assembly is implemented.
@@ -56,6 +57,7 @@ public sealed partial class VoxArena : MonoBehaviour
     Vector3 aimDirection;
     bool canShoot,paused,smoke,inMenu=true;
     bool spectatorMode;
+    float cameraShakeTime,cameraShakeStrength;
     bool targetLock;
     float cameraYaw=0,cameraPitch=12,mouseSensitivity=2.4f;
     int selectedCraft,enemyCraft,wins,losses;
@@ -171,6 +173,7 @@ public sealed partial class VoxArena : MonoBehaviour
             f.velocity=f.aiMove=f.smoothedTargetVelocity=Vector3.zero;
             f.boostHeld=f.wasBoostHeld=f.boostLocked=f.boosting=f.rushHit=f.jumpHeld=false;
             f.jumpHeight=f.jumpVelocity=0; f.crouching=false; f.failedFireFlash=0;
+            f.knockdownTime=f.invulnerableTime=0;
             f.dashRemaining=f.dashCooldownLeft=0;
             f.dashDirection=Vector3.zero;
             f.dashSpeedFactor=Mathf.Clamp(f.spec.speed/13f,.7f,1.25f);
@@ -182,7 +185,7 @@ public sealed partial class VoxArena : MonoBehaviour
         FaceOpponent(player,enemy); FaceOpponent(enemy,player);
         cameraYaw=Mathf.Atan2(player.facing.x,player.facing.z)*Mathf.Rad2Deg; targetLock=false;
         player.lastPosition=player.root.position; enemy.lastPosition=enemy.root.position;
-        roundTime=0; paused=false; spaceClock=0; UpdateObstacles(0);
+        roundTime=0; paused=false; spaceClock=0; cameraShakeTime=cameraShakeStrength=0; UpdateObstacles(0);
         Animate(player); Animate(enemy); UpdateCamera(10);
     }
     void Update()
@@ -245,6 +248,11 @@ public sealed partial class VoxArena : MonoBehaviour
                 desired=focus+(desired-focus).normalized*Mathf.Max(2.2f,obstruction-.35f);
             float followBlend=1-Mathf.Exp(-12*dt);
             view.transform.position=Vector3.Lerp(view.transform.position,desired,followBlend);
+            if(cameraShakeTime>0)
+            {
+                cameraShakeTime=Mathf.Max(0,cameraShakeTime-dt);
+                view.transform.position+=new Vector3(Mathf.Sin(Time.time*83f),Mathf.Cos(Time.time*109f),0)*cameraShakeStrength*(cameraShakeTime/.3f);
+            }
             view.transform.rotation=Quaternion.Slerp(view.transform.rotation,rotation,followBlend);
             return;
         }
@@ -356,6 +364,8 @@ public sealed partial class VoxArena : MonoBehaviour
         f.dashCooldownLeft=Mathf.Max(0,f.dashCooldownLeft-dt);
         f.shieldFlash=Mathf.Max(0,f.shieldFlash-dt); f.hitFlash=Mathf.Max(0,f.hitFlash-dt);
         f.failedFireFlash=Mathf.Max(0,f.failedFireFlash-dt);
+        f.knockdownTime=Mathf.Max(0,f.knockdownTime-dt);
+        f.invulnerableTime=Mathf.Max(0,f.invulnerableTime-dt);
         float recovery=Mathf.Max(0,dt-f.shieldRecoveryTime);
         f.shieldRecoveryTime=Mathf.Max(0,f.shieldRecoveryTime-dt);
         f.shieldEnergy=Mathf.Min(f.spec.ShieldMax,f.shieldEnergy+f.spec.ShieldMax/shieldFullRecoveryTime*recovery);
@@ -421,6 +431,7 @@ public sealed partial class VoxArena : MonoBehaviour
         if(f.crouching) desired*=.4f;
         if(f.spec.boost==BoostKind.Glide && !dashing) desired=Vector3.Lerp(f.velocity,desired,1-Mathf.Exp(-10*dt));
         if(f.lockTime>0) { desired=Vector3.zero; f.lockTime=Mathf.Max(0,f.lockTime-dt); }
+        if(f.knockdownTime>0) { desired=Vector3.zero; f.boosting=false; }
         if(f.rushTime>0)
         {
             desired=f.rushDirection*34; f.rushTime=Mathf.Max(0,f.rushTime-dt);
@@ -442,11 +453,22 @@ public sealed partial class VoxArena : MonoBehaviour
     }
     void Hit(Fighter target,Vector3 source,float damage)
     {
-        if(Finished) return;
+        if(Finished || target.invulnerableTime>0) return;
         float before=target.hp+target.shieldEnergy;
         float incoming=damage*(1-target.spec.armor), absorbed=Mathf.Min(target.shieldEnergy,incoming);
         target.shieldEnergy-=absorbed; target.hp=Mathf.Max(0,target.hp-incoming+absorbed);
-        RecordDamage(target,before-target.hp-target.shieldEnergy,absorbed>0);
+        float actualDamage=before-target.hp-target.shieldEnergy;
+        RecordDamage(target,actualDamage,absorbed>0);
+        if(target==player && actualDamage>0)
+        {
+            cameraShakeTime=.3f;
+            cameraShakeStrength=Mathf.Clamp(actualDamage/110f,.04f,.32f);
+        }
+        if(actualDamage>32f*target.spec.knockdownResistance && target.hp>0)
+        {
+            target.knockdownTime=.75f/Mathf.Max(.2f,target.spec.recoverySpeed);
+            target.invulnerableTime=target.knockdownTime+.3f;
+        }
         target.hitFlash=.14f; target.shieldRecoveryTime=shieldRecoveryDelay; target.shieldFlash=absorbed>0?.12f:0;
         Burst(target.root.position,absorbed>0?Cyan:Orange,6);
         Flash(target.root.position,absorbed>0?Cyan:new Color(1,.65f,.22f),.85f,.12f);
@@ -471,10 +493,10 @@ public sealed partial class VoxArena : MonoBehaviour
     void Animate(Fighter f)
     {
         f.root.rotation=Quaternion.LookRotation(f.facing);
-        f.body.localPosition=Vector3.up*(f.crouching?-.22f:.40f)+Vector3.up*Mathf.Sin(roundTime*2.4f)*.06f;
+        f.body.localPosition=Vector3.up*(f.knockdownTime>0?-.38f:f.crouching?-.22f:.40f)+Vector3.up*Mathf.Sin(roundTime*2.4f)*.06f;
         if(f.shadow!=null) { f.shadow.position=new Vector3(f.root.position.x,-1.08f,f.root.position.z); f.shadow.localScale=new Vector3(2.7f*f.spec.size,.012f,2.1f*f.spec.size); }
         Vector3 localVelocity=f.root.InverseTransformDirection(f.velocity);
-        f.body.localRotation=Quaternion.Euler(Mathf.Clamp(localVelocity.z*.65f,-16,16),0,Mathf.Clamp(-localVelocity.x*.5f,-12,12));
+        f.body.localRotation=f.knockdownTime>0?Quaternion.Euler(68,0,0):Quaternion.Euler(Mathf.Clamp(localVelocity.z*.65f,-16,16),0,Mathf.Clamp(-localVelocity.x*.5f,-12,12));
         f.leftLeg.localRotation=Quaternion.Euler(12+Mathf.Sin(roundTime*2)*4,0,-5);
         f.rightLeg.localRotation=Quaternion.Euler(18-Mathf.Sin(roundTime*2)*4,0,5);
         f.gun.gameObject.SetActive(true);
