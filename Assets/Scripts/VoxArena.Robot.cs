@@ -122,6 +122,40 @@ public sealed partial class VoxArena
             field.transform.localRotation=axis==0?Quaternion.identity:Quaternion.Euler(axis==1?90:0,0,axis==2?90:0);
         }
         f.shield.gameObject.SetActive(false);
+        // Visual-only model-kit pass: raised seams, colored vents, and readable
+        // silhouette accents. No colliders or combat parameters are changed.
+        Color seam=new Color(.12f,.17f,.21f);
+        Color lamp=Color.Lerp(armor,Color.white,.55f);
+        Plate("Chest armor split",f.corePart,new Vector3(0,.79f,.548f),new Vector3(.045f,.32f,.045f),seam,-12);
+        Plate("Lower chest seam",f.corePart,new Vector3(0,.47f,.49f),new Vector3(.71f,.035f,.05f),seam);
+        Plate("Core status indicator",f.corePart,new Vector3(0,.64f,.665f),new Vector3(.10f,.05f,.025f),lamp);
+        for(int side=-1;side<=1;side+=2)
+        {
+            Plate("Chest shoulder gasket",f.corePart,new Vector3(side*.65f,.81f,.03f),
+                new Vector3(.12f,.37f,.46f),dark,side*8);
+            Plate("Hip armor accent",f.pelvisPart,new Vector3(side*.46f,-.35f,.43f),
+                new Vector3(.19f,.045f,.035f),light);
+            Transform arm=side<0?f.leftArm:f.rightArm;
+            Transform leg=side<0?f.leftLeg:f.rightLeg;
+            Plate("Shoulder inset seam",arm,new Vector3(side*.13f,.12f,.367f),
+                new Vector3(heavy?.60f:.39f,.035f,.025f),seam);
+            Plate("Shoulder unit marking",arm,new Vector3(side*.12f,.23f,.375f),
+                new Vector3(.16f,.055f,.025f),lamp);
+            Plate("Forearm armor seam",arm,new Vector3(0,-.72f,.565f),
+                new Vector3(.29f,.035f,.025f),seam);
+            Plate("Knee running light",leg,new Vector3(0,-.59f,.356f),
+                new Vector3(.19f,.045f,.025f),lamp);
+            Plate("Shin center ridge",leg,new Vector3(0,-.96f,.223f),
+                new Vector3(.055f,.40f,.035f),armor,-7);
+            Plate("Toe split line",leg,new Vector3(0,-1.175f,.54f),
+                new Vector3(.03f,.035f,.20f),seam);
+            Plate("Backpack caution stripe",f.backPart,new Vector3(side*.38f,.27f,-.325f),
+                new Vector3(.19f,.06f,.035f),lamp);
+        }
+        Plate("Helmet eyebrow",f.headPart,new Vector3(0,.13f,.32f),
+            new Vector3(heavy?.62f:.48f,.055f,.09f),armor,-8);
+        Plate("Chin guard",f.headPart,new Vector3(0,-.245f,.305f),
+            new Vector3(.21f,.065f,.095f),dark);
         AddFrameIdentity(f,armor,hull,dark,edge);
     }
     RenderTexture[] framePortraits;
