@@ -12,6 +12,49 @@ public sealed partial class VoxArena
     {
         Transform t=Box(name,parent,p,size,color); t.localRotation=Quaternion.Euler(tilt,0,0); return t;
     }
+    // Eight-sided silhouette with a recessed top and bottom edge.
+    // Mesh is built in normalized local space; Box handles existing materials.
+    // Visual mesh only: collision and gameplay use the original arena logic.
+    Transform BeveledPlate(string name,Transform parent,Vector3 p,Vector3 size,
+        Color color,float bevel=.16f,float taper=.88f,float tilt=0)
+    {
+        Transform t=Plate(name,parent,p,size,color,tilt);
+        MeshFilter filter=t.GetComponent<MeshFilter>();
+        if(filter==null) return t;
+        Mesh mesh=new Mesh();
+        float[] heights={-.5f,-.5f+bevel,.5f-bevel,.5f};
+        float[] widths={taper,1f,1f,taper};
+        Vector3[] vertices=new Vector3[16];
+        for(int ring=0;ring<4;ring++)
+        {
+            float half=widths[ring]*.5f;
+            vertices[ring*4+0]=new Vector3(-half,heights[ring],-half);
+            vertices[ring*4+1]=new Vector3( half,heights[ring],-half);
+            vertices[ring*4+2]=new Vector3( half,heights[ring], half);
+            vertices[ring*4+3]=new Vector3(-half,heights[ring], half);
+        }
+        int[] triangles=new int[84];
+        int n=0;
+        // Winding is outward-facing when viewed from outside the plate.
+        for(int ring=0;ring<3;ring++)
+            for(int side=0;side<4;side++)
+            {
+                int a=ring*4+side,b=ring*4+(side+1)%4;
+                int c=(ring+1)*4+side,d=(ring+1)*4+(side+1)%4;
+                triangles[n++]=a;triangles[n++]=c;triangles[n++]=b;
+                triangles[n++]=b;triangles[n++]=c;triangles[n++]=d;
+            }
+        triangles[n++]=0;triangles[n++]=1;triangles[n++]=2;
+        triangles[n++]=0;triangles[n++]=2;triangles[n++]=3;
+        triangles[n++]=12;triangles[n++]=14;triangles[n++]=13;
+        triangles[n++]=12;triangles[n++]=15;triangles[n++]=14;
+        mesh.vertices=vertices;
+        mesh.triangles=triangles;
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+        filter.sharedMesh=mesh;
+        return t;
+    }
     void BuildRobot(Fighter f)
     {
         if(f.body!=null) { f.body.gameObject.SetActive(false); Destroy(f.body.gameObject); }
@@ -28,7 +71,7 @@ public sealed partial class VoxArena
         bool lightFrame=f.frameIndex==2||f.frameIndex==5;
         float shoulder=heavy?1.04f:lightFrame?.74f:.87f;
         Plate("Core inner frame",f.corePart,new Vector3(0,.45f,0),new Vector3(.82f,.95f,.62f),dark);
-        Plate("Armor chest",f.corePart,new Vector3(0,.70f,.23f),new Vector3(heavy?1.45f:1.10f,.54f,.60f),armor,-12);
+        BeveledPlate("Armor chest",f.corePart,new Vector3(0,.70f,.23f),new Vector3(heavy?1.45f:1.10f,.54f,.60f),armor,-12);
         Plate("Chest collar",f.corePart,new Vector3(0,1.03f,.03f),new Vector3(.85f,.18f,.55f),hull);
         Plate("Reactor glass",f.corePart,new Vector3(0,.62f,.58f),new Vector3(.27f,.22f,.06f),dark);
         Shape(PrimitiveType.Cube,"Reactor light",f.corePart,new Vector3(0,.62f,.62f),new Vector3(.14f,.07f,.025f),armor,true);
@@ -36,13 +79,13 @@ public sealed partial class VoxArena
         {
             Plate("Chest trim",f.corePart,new Vector3(side*.45f,.78f,.55f),new Vector3(.18f,.08f,.06f),light);
             for(int vent=0;vent<3;vent++) Plate("Cooling vent",f.corePart,new Vector3(side*.36f,.34f+vent*.08f,.36f),new Vector3(.24f,.025f,.04f),dark);
-            Plate("Armor hip skirt",f.pelvisPart,new Vector3(side*.45f,-.42f,.20f),new Vector3(.28f,.46f,.43f),armor,-16);
+            BeveledPlate("Armor hip skirt",f.pelvisPart,new Vector3(side*.45f,-.42f,.20f),new Vector3(.28f,.46f,.43f),armor,-16);
         }
         Plate("Waist coupling",f.corePart,new Vector3(0,-.09f,0),new Vector3(.5f,.35f,.43f),dark);
         Plate("Waist rotary bearing",f.pelvisPart,new Vector3(0,-.21f,0),new Vector3(.54f,.10f,.49f),hull);
         Plate("Pelvis",f.pelvisPart,new Vector3(0,-.39f,0),new Vector3(.70f,.29f,.55f),edge);
         // Heads intentionally use different profiles, while sharing the same socket origin.
-        Plate("Helmet",f.headPart,Vector3.zero,new Vector3(heavy?.7f:.54f,.47f,.50f),hull);
+        BeveledPlate("Helmet",f.headPart,Vector3.zero,new Vector3(heavy?.7f:.54f,.47f,.50f),hull);
         Plate("Helmet crown",f.headPart,new Vector3(0,.25f,-.04f),new Vector3(.34f,.13f,.41f),armor,-10);
         Plate("Face mask",f.headPart,new Vector3(0,-.12f,.26f),new Vector3(.28f,.22f,.10f),edge);
         Plate("Sensor housing",f.headPart,new Vector3(0,.02f,.27f),new Vector3(.49f,.15f,.08f),dark);
@@ -58,11 +101,11 @@ public sealed partial class VoxArena
         {
             Transform arm=Module(side<0?"Left arm socket":"Right arm socket",f.armsPart,new Vector3(side*shoulder,.74f,0));
             Plate("Shoulder hinge",arm,Vector3.zero,new Vector3(.28f,.36f,.42f),dark);
-            Plate("Armor shoulder",arm,new Vector3(side*.12f,.08f,0),new Vector3(heavy?.88f:.58f,heavy?.62f:.45f,.72f),armor,-8);
+            BeveledPlate("Armor shoulder",arm,new Vector3(side*.12f,.08f,0),new Vector3(heavy?.88f:.58f,heavy?.62f:.45f,.72f),armor,-8);
             Plate("Shoulder cap",arm,new Vector3(side*.13f,.36f,0),new Vector3(heavy?.83f:.52f,.07f,.60f),hull);
             Plate("Upper arm",arm,new Vector3(0,-.37f,0),new Vector3(.30f,.42f,.33f),edge);
             Shape(PrimitiveType.Sphere,"Elbow joint",arm,new Vector3(0,-.58f,.08f),Vector3.one*.29f,dark);
-            Plate("Armor forearm",arm,new Vector3(0,-.75f,.24f),new Vector3(.42f,.45f,.64f),hull,-12);
+            BeveledPlate("Armor forearm",arm,new Vector3(0,-.75f,.24f),new Vector3(.42f,.45f,.64f),hull,-12);
             for(int vent=0;vent<2;vent++)
                 Plate("Forearm heat slit",arm,new Vector3(side*.224f,-.64f-vent*.13f,.25f),new Vector3(.025f,.045f,.30f),dark);
             Plate("Elbow servo cover",arm,new Vector3(0,-.56f,-.12f),new Vector3(.24f,.16f,.12f),armor);
@@ -70,16 +113,16 @@ public sealed partial class VoxArena
             Plate("Manipulator",arm,new Vector3(0,-.83f,.64f),new Vector3(.28f,.28f,.28f),dark);
             if(side>0) f.fist=Plate("Punch gauntlet",arm,new Vector3(0,-.83f,.82f),new Vector3(.42f,.34f,.42f),armor);
             Transform leg=Module(side<0?"Left leg socket":"Right leg socket",f.legsPart,new Vector3(side*.30f,-.56f,0));
-            Plate("Thigh",leg,new Vector3(0,-.26f,0),new Vector3(heavy?.53f:.37f,.52f,.43f),hull);
+            BeveledPlate("Thigh",leg,new Vector3(0,-.26f,0),new Vector3(heavy?.53f:.37f,.52f,.43f),hull);
             Plate("Knee coupling",leg,new Vector3(0,-.59f,0),new Vector3(.31f,.22f,.34f),dark);
             Plate("Armor knee",leg,new Vector3(0,-.60f,.25f),new Vector3(.39f,.29f,.18f),armor,-18);
-            Plate("Shin",leg,new Vector3(0,-.94f,-.02f),new Vector3(heavy?.57f:.38f,.64f,.46f),hull,-7);
+            BeveledPlate("Shin",leg,new Vector3(0,-.94f,-.02f),new Vector3(heavy?.57f:.38f,.64f,.46f),hull,-7);
             Plate("Knee piston",leg,new Vector3(0,-.75f,-.25f),new Vector3(.10f,.42f,.10f),edge);
             Plate("Shin side trim",leg,new Vector3(side*.24f,-.98f,.08f),new Vector3(.07f,.42f,.29f),armor);
             Plate("Calf booster",leg,new Vector3(0,-.85f,-.35f),new Vector3(.27f,.46f,.28f),dark,15);
             Shape(PrimitiveType.Cube,"Calf nozzle",leg,new Vector3(0,-1.1f,-.40f),new Vector3(.16f,.08f,.12f),armor,true);
             Plate("Foot",leg,new Vector3(0,-1.34f,.15f),new Vector3(heavy?.61f:.42f,.22f,.76f),dark);
-            Plate("Toe armor",leg,new Vector3(0,-1.24f,.38f),new Vector3(heavy?.57f:.39f,.12f,.30f),armor,-10);
+            BeveledPlate("Toe armor",leg,new Vector3(0,-1.24f,.38f),new Vector3(heavy?.57f:.39f,.12f,.30f),armor,-10);
             Plate("Backpack booster",f.backPart,new Vector3(side*.38f,0,-.10f),new Vector3(.31f,.90f,.43f),edge);
             Shape(PrimitiveType.Cube,"Backpack nozzle",f.backPart,new Vector3(side*.38f,-.48f,-.14f),new Vector3(.23f,.09f,.27f),armor,true);
             if(f.frameIndex==0||f.frameIndex==6)
