@@ -159,6 +159,7 @@ public sealed partial class VoxArena : MonoBehaviour
     {
         finishCleaned=false; targetLock=false; occludedLockTimer=0; StopSounds(); aimMarker.gameObject.SetActive(true);
         ResetFeedback();
+        ResetSalvage();
         ClearCombat();
         foreach(Spark s in sparks) Destroy(s.visual.gameObject);
         sparks.Clear();
@@ -216,7 +217,7 @@ public sealed partial class VoxArena : MonoBehaviour
         if(spectatorMode) EnemyAI(player,enemy,dt);
         if(targetLock) FaceOpponent(player,enemy);
         FaceOpponent(enemy,player);
-        UpdateCombat(dt); UpdateSparks(dt); Animate(player); Animate(enemy);
+        UpdateCombat(dt); UpdateSalvage(dt); UpdateSparks(dt); Animate(player); Animate(enemy);
         if(Finished) FinishPresentation();
     }
     void LateUpdate() { if(player!=null && enemy!=null) UpdateCamera(Time.deltaTime); }
@@ -273,7 +274,9 @@ public sealed partial class VoxArena : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.Alpha1)) player.weaponSlot=1;
         if(Input.GetKeyDown(KeyCode.Alpha2)) player.weaponSlot=2;
+        if(Input.GetKeyDown(KeyCode.Alpha3)) player.weaponSlot=3;
         player.crouching=Input.GetKey(KeyCode.F);
+        if(Input.GetKeyDown(KeyCode.F)) TryPickupSalvage();
         Vector3 forward=Vector3.ProjectOnPlane(view.transform.forward,Vector3.up).normalized;
         Vector3 right=Vector3.ProjectOnPlane(view.transform.right,Vector3.up).normalized;
         float x=(Input.GetKey(KeyCode.D)?1:0)-(Input.GetKey(KeyCode.A)?1:0);
@@ -335,6 +338,10 @@ public sealed partial class VoxArena : MonoBehaviour
             {
                 if(player.magazine<=0 || player.reloadTime>0) player.failedFireFlash=.2f;
                 Attack(player,enemy,aimDirection);
+            }
+            else if(player.weaponSlot==3)
+            {
+                if(Input.GetMouseButtonDown(0)) UseSalvage(aimDirection);
             }
             else if(player.weaponSlot==2)
             {
@@ -468,6 +475,7 @@ public sealed partial class VoxArena : MonoBehaviour
     void Hit(Fighter target,Vector3 source,float damage)
     {
         if(Finished || target.invulnerableTime>0) return;
+        if(AbsorbSalvageShield(target,damage)) return;
         float before=target.hp+target.shieldEnergy;
         float incoming=damage*(1-target.spec.armor), absorbed=Mathf.Min(target.shieldEnergy,incoming);
         target.shieldEnergy-=absorbed; target.hp=Mathf.Max(0,target.hp-incoming+absorbed);
