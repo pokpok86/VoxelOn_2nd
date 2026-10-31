@@ -119,6 +119,21 @@ public sealed partial class VoxArena
             BeveledPlate("Shin",leg,new Vector3(0,-.94f,-.02f),new Vector3(heavy?.57f:.38f,.64f,.46f),hull,-7);
             Plate("Knee piston",leg,new Vector3(0,-.75f,-.25f),new Vector3(.10f,.42f,.10f),edge);
             Plate("Shin side trim",leg,new Vector3(side*.24f,-.98f,.08f),new Vector3(.07f,.42f,.29f),armor);
+            // Frame 01: a recessed shin intake and two floating armor lips.
+            // Attached to the existing leg socket; animation and hitboxes are untouched.
+            if(f.frameIndex==0)
+            {
+                Plate("Shin intake recess",leg,new Vector3(0,-1.00f,.228f),
+                    new Vector3(.22f,.28f,.025f),dark);
+                for(int slit=0;slit<3;slit++)
+                    Plate("Shin intake grille "+slit,leg,
+                        new Vector3(0,-.90f-slit*.075f,.248f),
+                        new Vector3(.17f,.022f,.018f),edge);
+                BeveledPlate("Shin upper guard",leg,new Vector3(0,-.70f,.235f),
+                    new Vector3(.34f,.12f,.13f),armor,-8);
+                Plate("Shin lower guard",leg,new Vector3(0,-1.20f,.22f),
+                    new Vector3(.32f,.075f,.12f),hull);
+            }
             Plate("Calf booster",leg,new Vector3(0,-.85f,-.35f),new Vector3(.27f,.46f,.28f),dark,15);
             Shape(PrimitiveType.Cube,"Calf nozzle",leg,new Vector3(0,-1.1f,-.40f),new Vector3(.16f,.08f,.12f),armor,true);
             Plate("Foot",leg,new Vector3(0,-1.34f,.15f),new Vector3(heavy?.61f:.42f,.22f,.76f),dark);
