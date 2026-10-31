@@ -18,6 +18,7 @@ public sealed class CraftSpec
     public float occludedLockSeconds=1.5f, occludedLockRange=65f;
     // Leg assembly parameters; step-up height is deliberately below tall jump-only platforms.
     public float stepHeight=.45f, slopeLimitDegrees=32f;
+    public float leftArmHandling=1f,leftArmStability=1f,rightArmHandling=1f,rightArmStability=1f;
     public float damage, weaponCooldown, range, projectileSpeed, projectileRadius, size, specialCooldown;
     public PrimaryKind primary;
     public SpecialKind special;
