@@ -482,6 +482,14 @@ public sealed partial class VoxArena : MonoBehaviour
                 Mathf.Max(0,-lateral)*leftFactor;
             desired=motion.normalized*speed*ratio;
         }
+        // Tank prototype favors forward travel; lateral/reverse movement remains possible.
+        // No visual track or independent turret is implied by this movement-only tuning.
+        if(f.spec.mobility==MobilityKind.Tank && desired.sqrMagnitude>.001f)
+        {
+            Vector3 heading=Vector3.ProjectOnPlane(f.facing,Vector3.up).normalized;
+            float forward=Vector3.Dot(desired.normalized,heading);
+            desired*=forward>.5f?1.3f:forward<-.5f?.55f:.7f;
+        }
         if(f.crouching) desired*=.4f;
         if(f.spec.boost==BoostKind.Glide && !dashing) desired=Vector3.Lerp(Vector3.ProjectOnPlane(f.velocity,Vector3.up),desired,1-Mathf.Exp(-10*dt));
         if(f.lockTime>0) { desired=Vector3.zero; f.lockTime=Mathf.Max(0,f.lockTime-dt); }
