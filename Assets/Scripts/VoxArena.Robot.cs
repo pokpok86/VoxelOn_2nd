@@ -147,6 +147,29 @@ public sealed partial class VoxArena
                 new Vector3(heavy?.61f:kestrelSd?.64f:.42f,kestrelSd?.25f:.22f,kestrelSd?.92f:.76f),dark);
             BeveledPlate("Toe armor",leg,new Vector3(0,kestrelSd?-1.21f:-1.24f,kestrelSd?.43f:.38f),
                 new Vector3(heavy?.57f:kestrelSd?.59f:.39f,kestrelSd?.14f:.12f,kestrelSd?.40f:.30f),armor,-10);
+            // Mobility prototype silhouettes: attached to existing animated sockets,
+            // with no gameplay collider or change to weapon/boost statistics.
+            if(f.spec.mobility==MobilityKind.Runner)
+            {
+                // Readable swept-back sprinting profile, not loose rods.
+                BeveledPlate("Runner calf aero shell",leg,new Vector3(side*.17f,-.95f,-.31f),
+                    new Vector3(.25f,.76f,.48f),armor,-18,.20f,.65f);
+                BeveledPlate("Runner heel spur",leg,new Vector3(0,-1.34f,-.25f),
+                    new Vector3(.32f,.15f,.50f),hull,-12,.18f,.70f);
+            }
+            else if(f.spec.mobility==MobilityKind.Tank)
+            {
+                // Heavy tread-inspired greaves are a visual handling cue; this is
+                // still a biped prototype, not a functional tracked vehicle.
+                BeveledPlate("Tank outer greave",leg,new Vector3(side*.32f,-.91f,-.06f),
+                    new Vector3(.27f,.98f,.82f),dark,0,.12f,.92f);
+                BeveledPlate("Tank greave armor",leg,new Vector3(side*.48f,-.91f,.06f),
+                    new Vector3(.12f,.77f,.67f),armor,0,.17f,.78f);
+                for(int tread=0;tread<4;tread++)
+                    Plate("Tank tread relief "+tread,leg,
+                        new Vector3(side*.555f,-1.20f+tread*.18f,.06f),
+                        new Vector3(.035f,.055f,.54f),edge);
+            }
             Plate("Backpack booster",f.backPart,new Vector3(side*.38f,0,-.10f),new Vector3(.31f,.90f,.43f),edge);
             Shape(PrimitiveType.Cube,"Backpack nozzle",f.backPart,new Vector3(side*.38f,-.48f,-.14f),new Vector3(.23f,.09f,.27f),armor,true);
             // Frame 01 only: recessed armored thruster cassette and service detailing.
