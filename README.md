@@ -58,6 +58,7 @@ WEAPON TUNING에서 탄속·탄 크기·발사 간격을 조절하고 SOUND EFFE
 - [기체별 수치](docs/CHARACTERS.md)
 - [파츠 조합 설계와 아머드 코어 공식 자료 조사](docs/ASSEMBLY_DESIGN.md)
 - [원격으로 이어서 작업하기](docs/REMOTE_WORK.md)
+- [GitHub 작업 전달 시스템](docs/CodexTasks/README.md)
 - [개발 계획](PLAN.md)
 - [검증 기록](docs/PROTOTYPE.md)
 - [아침 플레이 안내와 야간 변경 사항](docs/MORNING_PLAYTEST.md)

@@ -1,0 +1,11 @@
+{
+  "Repository": "pokpok86/VoxelOn_2nd",
+  "RemoteName": "voxelon",
+  "QueueBranch": "codex/task-queue",
+  "QueueDirectory": "docs/CodexTasks",
+  "ReportBranch": "codex/task-reports",
+  "ReportDirectory": "docs/CodexTaskReports",
+  "SourceBranch": "feature/visual-polish-20261031",
+  "MaximumTaskBytes": 32768,
+  "MaximumRuntimeMinutes": 45
+}

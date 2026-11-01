@@ -36,5 +36,6 @@ Thumbs.db
 *.pem
 .codex/
 .aws/
+/Scripts/CodexTaskRunner.settings.json
 
 # Keep Assets and all Unity .meta files under version control.
