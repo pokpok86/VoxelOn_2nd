@@ -7,6 +7,7 @@ $ErrorActionPreference = 'Stop'
 $ProjectRoot = if ($ProjectRootOverride) { (Resolve-Path $ProjectRootOverride).Path } else { (Resolve-Path (Join-Path $PSScriptRoot '..')).Path }
 $SettingsPath = Join-Path $PSScriptRoot 'CodexTaskRunner.settings.json'
 $Settings = Get-Content -LiteralPath $SettingsPath -Raw -Encoding UTF8 | ConvertFrom-Json -AsHashtable
+$GitExecutable = if($Settings.GitExecutable -and (Test-Path -LiteralPath $Settings.GitExecutable)){$Settings.GitExecutable}else{(Get-Command git.exe -ErrorAction Stop).Source}
 $StateRoot = Join-Path $ProjectRoot 'UserSettings\CodexTaskRunner\State'
 $StatePath = Join-Path $StateRoot 'state.json'
 $LogPath = Join-Path $StateRoot 'runner.log'
@@ -17,7 +18,7 @@ function Write-RunnerLog([string]$Message) {
 }
 
 function Invoke-Git([string[]]$Arguments, [switch]$AllowFailure) {
-    $output = @(& git -C $ProjectRoot @Arguments 2>&1)
+    $output = @(& $GitExecutable -C $ProjectRoot @Arguments 2>&1)
     $code = $LASTEXITCODE
     if ($code -ne 0 -and -not $AllowFailure) {
         throw "git $($Arguments -join ' ') failed ($code): $($output -join [Environment]::NewLine)"
@@ -51,7 +52,7 @@ function Fetch-Branch([string]$Branch) {
 }
 
 function Get-TaskMetadata([string]$Content) {
-    $match=[regex]::Match($Content,'\A---\r?\n(?<meta>.*?)\r?\n---\r?\n(?<body>[\s\S]*)\z')
+    $match=[regex]::Match($Content,'\A---\r?\n(?<meta>[\s\S]*?)\r?\n---\r?\n(?<body>[\s\S]*)\z')
     if (-not $match.Success) { throw 'Task requires YAML front matter between --- lines.' }
     $fields=@{}
     foreach ($line in ($match.Groups['meta'].Value -split '\r?\n')) {
@@ -84,17 +85,24 @@ $Body
 }
 
 function Invoke-CodexTask([string]$Id,[string]$Mode,[string]$Body,[string]$Worktree) {
-    $codex=Get-Command codex -ErrorAction Stop
+    $codexPath=if($Settings.CodexExecutable -and (Test-Path -LiteralPath $Settings.CodexExecutable)){$Settings.CodexExecutable}else{(Get-Command codex.exe -ErrorAction Stop).Source}
+    $execHelp=(& $codexPath exec --help 2>&1 | Out-String)
+    if($execHelp -match '--ask-for-approval'){
+        $executionPolicy=@('--sandbox',$(if($Mode -eq 'check'){'read-only'}else{'workspace-write'}),'--ask-for-approval','never')
+    }elseif($execHelp -match '--approve-for-me'){
+        # This CLI option supplies workspace-write itself and cannot be combined with --sandbox.
+        # Read-only tasks need no approval path, so keep the stricter explicit sandbox there.
+        $executionPolicy=if($Mode -eq 'check'){@('--sandbox','read-only')}else{@('--approve-for-me')}
+    }else{throw 'This Codex CLI has no supported non-interactive execution policy.'}
     $lastMessage=Join-Path $StateRoot "$Id-last-message.md"
     $stdoutPath=Join-Path $StateRoot "$Id-codex.stdout.log"
     $stderrPath=Join-Path $StateRoot "$Id-codex.stderr.log"
-    $sandbox=if($Mode -eq 'check'){'read-only'}else{'workspace-write'}
     $psi=[Diagnostics.ProcessStartInfo]::new()
-    $psi.FileName=$codex.Source; $psi.WorkingDirectory=$ProjectRoot
+    $psi.FileName=$codexPath; $psi.WorkingDirectory=$ProjectRoot
     $psi.UseShellExecute=$false; $psi.CreateNoWindow=$true
     $psi.RedirectStandardInput=$true; $psi.RedirectStandardOutput=$true; $psi.RedirectStandardError=$true
-    foreach($arg in @('exec','--ephemeral','--sandbox',$sandbox,'--ask-for-approval','never',
-                      '--output-last-message',$lastMessage,'--cd',$Worktree,'-')) { [void]$psi.ArgumentList.Add($arg) }
+    foreach($arg in (@('exec','--ephemeral')+$executionPolicy+
+                      @('--output-last-message',$lastMessage,'--cd',$Worktree,'-'))) { [void]$psi.ArgumentList.Add($arg) }
     $proc=[Diagnostics.Process]::new(); $proc.StartInfo=$psi
     if(-not $proc.Start()){throw 'Could not start Codex CLI.'}
     $stdoutTask=$proc.StandardOutput.ReadToEndAsync(); $stderrTask=$proc.StandardError.ReadToEndAsync()
@@ -122,10 +130,11 @@ function Publish-PendingReports($State) {
     if($State.PendingReports.Count -eq 0){return}
     $reportsRef=Fetch-Branch $Settings.ReportBranch
     $reportRoot=Join-Path $StateRoot 'report-worktree'
+    $localReportBranch='codex/task-reports-runner'
     if(-not (Test-Path -LiteralPath $reportRoot)){
-        $check=Invoke-Git @('show-ref','--verify','--quiet',"refs/heads/$($Settings.ReportBranch)") -AllowFailure
-        if($check.ExitCode -eq 0){$null=Invoke-Git @('worktree','add',$reportRoot,$Settings.ReportBranch)}
-        else{$null=Invoke-Git @('worktree','add','-b',$Settings.ReportBranch,$reportRoot,$reportsRef)}
+        $check=Invoke-Git @('show-ref','--verify','--quiet',"refs/heads/$localReportBranch") -AllowFailure
+        if($check.ExitCode -eq 0){$null=Invoke-Git @('worktree','add',$reportRoot,$localReportBranch)}
+        else{$null=Invoke-Git @('worktree','add','--track','-b',$localReportBranch,$reportRoot,$reportsRef)}
     }
     $null=Invoke-Git @('-C',$reportRoot,'pull','--ff-only',$Settings.RemoteName,$Settings.ReportBranch)
     foreach($id in @($State.PendingReports.Keys)){
@@ -191,7 +200,9 @@ function Repair-InterruptedTasks($State) {
 }
 
 function Process-OneTask($State,[string]$QueueRef) {
-    $listing=Invoke-Git @('ls-tree','-r','--name-only',$QueueRef,'--',$Settings.QueueDirectory)
+    # Enumerate the full tree before filtering so the Windows-insensitive Docs/docs spelling
+    # still works when the remote Git tree has a different case.
+    $listing=Invoke-Git @('ls-tree','-r','--name-only',$QueueRef)
     $paths=@($listing.Output -split '\r?\n'|Where-Object{$_})
     $ready=@()
     foreach($path in $paths){
