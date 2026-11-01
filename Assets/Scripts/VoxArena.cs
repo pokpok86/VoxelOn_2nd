@@ -299,7 +299,11 @@ public sealed partial class VoxArena : MonoBehaviour
             lastDirectionTap[i]=Time.time;
         }
         player.jumpHeld=Input.GetKey(KeyCode.Space);
-        if(Input.GetKeyDown(KeyCode.Space)&&player.jumpHeight<=.02f) { player.jumpOriginY=player.root.position.y; player.jumpVelocity=jumpSpeed/Mathf.Sqrt(Mathf.Max(.5f,player.spec.jumpWeightFactor)); }
+        if(Input.GetKeyDown(KeyCode.Space)&&player.jumpHeight<=.02f && player.knockdownTime<=0f && player.lockTime<=0f)
+        {
+            player.jumpOriginY=player.root.position.y;
+            player.jumpVelocity=jumpSpeed/Mathf.Sqrt(Mathf.Max(.5f,player.spec.jumpWeightFactor));
+        }
         if(Input.GetMouseButtonDown(1) && Vector3.Distance(player.root.position,enemy.root.position)<=player.spec.lockRange)
         {
             targetLock=true; occludedLockTimer=player.spec.occludedLockSeconds;
