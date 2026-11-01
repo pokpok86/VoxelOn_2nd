@@ -314,7 +314,7 @@ public sealed partial class VoxArena : MonoBehaviour
             cameraYaw+=Input.GetAxis("Mouse X")*mouseSensitivity;
             cameraPitch=Mathf.Clamp(cameraPitch-Input.GetAxis("Mouse Y")*mouseSensitivity,-5,45);
         }
-        if(targetLock) FaceOpponent(player,enemy);
+        if(targetLock) FaceOpponent(player,enemy,dt);
         else FaceMovement(player,move,dt);
         Move(player,move,dt);
         if(targetLock)
