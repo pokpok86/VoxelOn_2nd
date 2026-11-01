@@ -10,7 +10,7 @@ public sealed partial class VoxArena : MonoBehaviour
     [Header("Jump and vertical boost")]
     public float jumpSpeed = 10.6f, jumpGravity = 24f, jumpThrust = 34f, jumpBoostDrain = 24f;
     [Tooltip("Maximum vertical rise from takeoff, including held Space thrust.")]
-    public float jumpMaxHeight = 3.2f;
+    public float jumpMaxHeight = 6.4f;
     [Tooltip("Extra gravity while descending so landings feel quicker.")]
     public float fallGravityMultiplier = 1.8f;
     public float gunHalfAngle = 65, shieldRecoveryDelay = 3, shieldFullRecoveryTime = 6;
@@ -299,7 +299,7 @@ public sealed partial class VoxArena : MonoBehaviour
             lastDirectionTap[i]=Time.time;
         }
         player.jumpHeld=Input.GetKey(KeyCode.Space);
-        if(Input.GetKeyDown(KeyCode.Space)&&player.jumpHeight<=.02f) { player.jumpOriginY=player.root.position.y; player.jumpVelocity=jumpSpeed; }
+        if(Input.GetKeyDown(KeyCode.Space)&&player.jumpHeight<=.02f) { player.jumpOriginY=player.root.position.y; player.jumpVelocity=jumpSpeed/Mathf.Sqrt(Mathf.Max(.5f,player.spec.jumpWeightFactor)); }
         if(Input.GetMouseButtonDown(1) && Vector3.Distance(player.root.position,enemy.root.position)<=player.spec.lockRange)
         {
             targetLock=true; occludedLockTimer=player.spec.occludedLockSeconds;
@@ -435,7 +435,7 @@ public sealed partial class VoxArena : MonoBehaviour
         bool verticalBoost=airborne && f.jumpHeight<jumpMaxHeight && f.jumpHeld && !f.boostLocked && f.boostEnergy>0;
         if(verticalBoost)
         {
-            float weightFactor=1f; // Explicit thrust tuning; not inferred from mass/armor/size.
+            float weightFactor=Mathf.Max(.5f,f.spec.jumpWeightFactor); // Explicit per-frame tuning, independent of armor and visual scale.
             float drain=jumpBoostDrain*weightFactor*dt;
             float fraction=drain>0?Mathf.Min(1,f.boostEnergy/drain):1;
             f.jumpVelocity+=jumpThrust/weightFactor*fraction*dt;
