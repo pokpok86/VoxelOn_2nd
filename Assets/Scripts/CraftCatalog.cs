@@ -3,6 +3,8 @@ using UnityEngine;
 public enum PrimaryKind { SplitCenter, Plasma, Gatling, Missiles, Scatter, Rail, Wave, Grenade }
 public enum SpecialKind { SweepBeam, SiegeBeam, SaberRush, MissileFan, Nova, RailLance, HomingMines, Minefield }
 public enum BoostKind { Glide, Cruise, Pulse }
+// Movement archetypes are gameplay metadata; visuals are implemented separately.
+public enum MobilityKind { StandardBiped, Runner, Tank, Quadruped }
 
 public sealed class CraftSpec
 {
@@ -26,6 +28,7 @@ public sealed class CraftSpec
     public PrimaryKind primary;
     public SpecialKind special;
     public BoostKind boost;
+    public MobilityKind mobility=MobilityKind.StandardBiped;
     public float ShieldMax => health <= 300 ? health * .15f : 0;
     // Per-fighter runtime copy so tuning the rival never mutates the player's catalog preset.
     public CraftSpec RuntimeCopy() => (CraftSpec)MemberwiseClone();
@@ -84,6 +87,8 @@ public static class CraftCatalog
             f.lockRange=Mathf.Max(f.lockRange,f.occludedLockRange);
             f.stepHeight= i==1 || i==7 ? .52f : .58f;
             f.jumpWeightFactor= i==1 || i==7 ? 1.3f : i==2 || i==5 ? .85f : 1f;
+            // WISP is the runner prototype. Tank/quadruped remain opt-in until their models exist.
+            if(i==2) f.mobility=MobilityKind.Runner;
         }
     }
 }
