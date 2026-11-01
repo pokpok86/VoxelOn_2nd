@@ -221,8 +221,8 @@ public sealed partial class VoxArena : MonoBehaviour
         if(!spectatorMode) PlayerInput(dt);
         if(!testLabEnabled || aiMoveEnabled || aiAttackEnabled || aiJumpEnabled) EnemyAI(enemy,player,dt);
         if(spectatorMode) EnemyAI(player,enemy,dt);
-        if(targetLock) FaceOpponent(player,enemy);
-        FaceOpponent(enemy,player);
+        if(targetLock) FaceOpponent(player,enemy,dt);
+        FaceOpponent(enemy,player,dt);
         UpdateCombat(dt); UpdateSalvage(dt); UpdateSparks(dt); Animate(player); Animate(enemy);
         if(Finished) FinishPresentation();
     }
@@ -357,10 +357,15 @@ public sealed partial class VoxArena : MonoBehaviour
         }
     }
     bool RequiresHomingLock(SpecialKind kind)=>kind==SpecialKind.MissileFan || kind==SpecialKind.HomingMines;
-    void FaceOpponent(Fighter f,Fighter target)
+    void FaceOpponent(Fighter f,Fighter target,float dt=0f)
     {
         Vector3 d=Vector3.ProjectOnPlane(target.root.position-f.root.position,Vector3.up);
-        if(d.sqrMagnitude>.001f) f.facing=d.normalized;
+        if(d.sqrMagnitude<=.001f) return; // Keep the previous heading at close pass-through.
+        Vector3 desired=d.normalized;
+        Vector3 current=Vector3.ProjectOnPlane(f.facing,Vector3.up);
+        // Reset/setup calls deliberately snap; gameplay calls turn smoothly without changing velocity.
+        if(dt<=0f || current.sqrMagnitude<=.001f) { f.facing=desired; return; }
+        f.facing=Vector3.RotateTowards(current.normalized,desired,8f*dt,0f).normalized;
     }
     void FaceMovement(Fighter f,Vector3 move,float dt)
     {
