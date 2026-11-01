@@ -449,8 +449,11 @@ public sealed partial class VoxArena : MonoBehaviour
         }
         if(!f.boosting && !verticalBoost && !dashing)
         {
-            float t=Mathf.Max(0,dt-f.recoveryTime); f.recoveryTime=Mathf.Max(0,f.recoveryTime-dt);
-            f.boostEnergy=Mathf.Min(f.spec.boostCapacity,f.boostEnergy+boostRecovery*t);
+            // Airborne fuel regeneration enables repeated climbs without landing.
+            // Keep the recovery delay ticking in flight, but refill only on support.
+            float t=Mathf.Max(0,dt-f.recoveryTime);
+            f.recoveryTime=Mathf.Max(0,f.recoveryTime-dt);
+            if(!airborne) f.boostEnergy=Mathf.Min(f.spec.boostCapacity,f.boostEnergy+boostRecovery*t);
         }
         f.pulseTime=Mathf.Max(0,f.pulseTime-dt);
         // Holding Space adds fuel-powered lift, capped at a readable obstacle-clearing height.
