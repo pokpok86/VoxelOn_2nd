@@ -13,6 +13,8 @@ public sealed class CraftSpec
     public float forwardSpeedFactor=1f, strafeSpeedFactor=.75f, reverseSpeedFactor=.5f;
     public float leftSpeedFactor=.6f,rightSpeedFactor=.6f;
     public float fallGravityFactor=1f, knockdownResistance=1f, recoverySpeed=1f;
+    // Explicit gameplay weight multiplier for jump and vertical boost; not inferred from armor or mesh size.
+    public float jumpWeightFactor=1f;
     // Future head-part lock sensor and aim stability values.
     public float lockRange=80f, aimSpreadDegrees=0.6f;
     // Head sensor memory: lose occluded lock only after this time; distance still hard-limits lock.
@@ -81,6 +83,7 @@ public static class CraftCatalog
             f.occludedLockRange= i==5 || i==6 ? 88f : i==1 || i==7 ? 58f : 70f;
             f.lockRange=Mathf.Max(f.lockRange,f.occludedLockRange);
             f.stepHeight= i==1 || i==7 ? .52f : .58f;
+            f.jumpWeightFactor= i==1 || i==7 ? 1.3f : i==2 || i==5 ? .85f : 1f;
         }
     }
 }
