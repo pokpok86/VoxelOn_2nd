@@ -89,6 +89,8 @@ public static class CraftCatalog
             f.jumpWeightFactor= i==1 || i==7 ? 1.3f : i==2 || i==5 ? .85f : 1f;
             // WISP is the runner prototype. Tank/quadruped remain opt-in until their models exist.
             if(i==2) f.mobility=MobilityKind.Runner;
+            // Temporary tank-handling test rig; BASTION mesh remains bipedal.
+            if(i==1) f.mobility=MobilityKind.Tank;
         }
     }
 }
