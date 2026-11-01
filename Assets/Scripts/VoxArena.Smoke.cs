@@ -338,8 +338,11 @@ public sealed partial class VoxArena
         player.jumpHeld=false;
         TestSetup(3); before=player.root.position; Move(player,Vector3.right,1);
         Check(player.root.position.x>100,"open space has no square boundary");
-        Vector3 rockBefore=obstacles[0].center; UpdateObstacles(3);
-        Check(Vector3.Distance(rockBefore,obstacles[0].center)<.001f&&obstacles[0].center==debris[0].visual.position,"ground cover stays fixed with matching collision bounds");
+        Vector3 rockBefore=debris[0].visual.position; UpdateObstacles(3);
+        Check(Vector3.Distance(rockBefore,debris[0].visual.position)<.001f&&
+            Mathf.Abs(obstacles[0].min.y-GroundSurfaceY)<.01f&&
+            Mathf.Abs(obstacles[0].max.y-(debris[0].origin.y+debris[0].size.y*.5f))<.01f,
+            "ground cover base and collision bounds match the visible floor and roof");
         player.root.position=obstacles[0].center; ResolveOverlap(player);
         Check(!Occupied(player.root.position,player.Radius),"drifting asteroid overlap has an escape");
         TestSetup(3);
@@ -364,15 +367,15 @@ public sealed partial class VoxArena
         Check(highestRampPosition>3.0f&&player.root.position.x>3.5f,
             "heavy frame climbs the ramp and crosses the raised deck without sticking");
         TestSetup(0);
-        Bounds testRoof=new Bounds(new Vector3(100,2.6f,108),new Vector3(6,3,6));
+        Bounds testRoof=new Bounds(new Vector3(100,.4f,108),new Vector3(6,3,6));
         obstacles.Add(testRoof); player.root.position=new Vector3(100,1.1f,103.5f); player.jumpOriginY=player.root.position.y; player.jumpHeld=true; player.jumpVelocity=jumpSpeed;
         for(int tick=0;tick<60;tick++)
-            Move(player,player.root.position.z<108?Vector3.forward:Vector3.zero,.02f);
+            Move(player,player.root.position.z<107.5f?Vector3.forward:Vector3.zero,.02f);
         player.velocity=Vector3.zero;
         player.jumpHeld=false;
         for(int tick=0;tick<180;tick++) Move(player,Vector3.zero,.02f);
         Vector3 landed=player.root.position;
-        Check(Mathf.Abs(landed.y-testRoof.max.y)<.12f&&landed.x>testRoof.min.x+player.Radius&&
+        Check(Mathf.Abs(landed.y-(testRoof.max.y+FighterSupportOffset))<.12f&&landed.x>testRoof.min.x+player.Radius&&
             landed.x<testRoof.max.x-player.Radius&&landed.z>testRoof.min.z+player.Radius&&
             landed.z<testRoof.max.z-player.Radius&&!Occupied(landed,player.Radius),"fighter can land and stay on an obstacle roof");
         obstacles.RemoveAt(obstacles.Count-1); TestSetup();
@@ -432,6 +435,16 @@ public sealed partial class VoxArena
             if(player.spec.ShieldMax>0) { protectedFrames++; Check(player.spec.health<=300,"shield reserved for fragile frame"); }
             Check(player.headPart.parent==player.body&&player.corePart.parent==player.body&&player.armsPart.parent==player.body&&player.legsPart.parent==player.body&&player.weaponPart.parent==player.rightArm,"detachable module hierarchy "+i);
             Check(framePortraits[i]!=null && framePortraits[i].IsCreated(),"frame portrait rendered "+i);
+            if(i==0)
+            {
+                Transform head=player.headPart.Find("Helmet"),chest=player.corePart.Find("Armor chest");
+                Transform shoulder=player.rightArm.Find("Armor shoulder"),foot=player.leftLeg.Find("Foot");
+                Check(head!=null&&head.localScale.x>=.75f&&head.localScale.y>=.63f&&
+                    chest!=null&&chest.localScale.x>=1.35f&&
+                    shoulder!=null&&shoulder.localScale.x>=.77f&&
+                    foot!=null&&foot.localScale.x>=.63f&&foot.localScale.z>=.91f,
+                    "Kestrel SD silhouette enlarges head, torso, shoulders and feet");
+            }
         }
         Check(protectedFrames==2,"only two light frames retain shield");
         TestSetup(); SetPaused(false); ToggleGuide();

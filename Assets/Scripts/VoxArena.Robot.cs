@@ -69,9 +69,11 @@ public sealed partial class VoxArena
         Color edge=new Color(.28f,.35f,.40f), light=new Color(.85f,.9f,.91f);
         bool heavy=f.frameIndex==1||f.frameIndex==7;
         bool lightFrame=f.frameIndex==2||f.frameIndex==5;
-        float shoulder=heavy?1.04f:lightFrame?.74f:.87f;
-        Plate("Core inner frame",f.corePart,new Vector3(0,.45f,0),new Vector3(.82f,.95f,.62f),dark);
-        BeveledPlate("Armor chest",f.corePart,new Vector3(0,.70f,.23f),new Vector3(heavy?1.45f:1.10f,.54f,.60f),armor,-12);
+        bool kestrelSd=f.frameIndex==0;
+        float shoulder=kestrelSd?1.00f:heavy?1.04f:lightFrame?.74f:.87f;
+        Plate("Core inner frame",f.corePart,new Vector3(0,.45f,0),new Vector3(kestrelSd?.94f:.82f,.95f,kestrelSd?.70f:.62f),dark);
+        BeveledPlate("Armor chest",f.corePart,new Vector3(0,.70f,.23f),
+            new Vector3(heavy?1.45f:kestrelSd?1.36f:1.10f,kestrelSd?.64f:.54f,kestrelSd?.68f:.60f),armor,-12);
         Plate("Chest collar",f.corePart,new Vector3(0,1.03f,.03f),new Vector3(.85f,.18f,.55f),hull);
         Plate("Reactor glass",f.corePart,new Vector3(0,.62f,.58f),new Vector3(.27f,.22f,.06f),dark);
         Shape(PrimitiveType.Cube,"Reactor light",f.corePart,new Vector3(0,.62f,.62f),new Vector3(.14f,.07f,.025f),armor,true);
@@ -79,17 +81,20 @@ public sealed partial class VoxArena
         {
             Plate("Chest trim",f.corePart,new Vector3(side*.45f,.78f,.55f),new Vector3(.18f,.08f,.06f),light);
             for(int vent=0;vent<3;vent++) Plate("Cooling vent",f.corePart,new Vector3(side*.36f,.34f+vent*.08f,.36f),new Vector3(.24f,.025f,.04f),dark);
-            BeveledPlate("Armor hip skirt",f.pelvisPart,new Vector3(side*.45f,-.42f,.20f),new Vector3(.28f,.46f,.43f),armor,-16);
+            BeveledPlate("Armor hip skirt",f.pelvisPart,new Vector3(side*(kestrelSd?.50f:.45f),-.42f,.20f),
+                new Vector3(kestrelSd?.34f:.28f,kestrelSd?.50f:.46f,kestrelSd?.47f:.43f),armor,-16);
         }
         Plate("Waist coupling",f.corePart,new Vector3(0,-.09f,0),new Vector3(.5f,.35f,.43f),dark);
         Plate("Waist rotary bearing",f.pelvisPart,new Vector3(0,-.21f,0),new Vector3(.54f,.10f,.49f),hull);
-        Plate("Pelvis",f.pelvisPart,new Vector3(0,-.39f,0),new Vector3(.70f,.29f,.55f),edge);
+        Plate("Pelvis",f.pelvisPart,new Vector3(0,-.39f,0),new Vector3(kestrelSd?.82f:.70f,kestrelSd?.32f:.29f,kestrelSd?.61f:.55f),edge);
         // Heads intentionally use different profiles, while sharing the same socket origin.
-        BeveledPlate("Helmet",f.headPart,Vector3.zero,new Vector3(heavy?.7f:.54f,.47f,.50f),hull);
-        Plate("Helmet crown",f.headPart,new Vector3(0,.25f,-.04f),new Vector3(.34f,.13f,.41f),armor,-10);
-        Plate("Face mask",f.headPart,new Vector3(0,-.12f,.26f),new Vector3(.28f,.22f,.10f),edge);
-        Plate("Sensor housing",f.headPart,new Vector3(0,.02f,.27f),new Vector3(.49f,.15f,.08f),dark);
-        Shape(PrimitiveType.Cube,"Visor",f.headPart,new Vector3(0,.03f,.32f),new Vector3(f.frameIndex==5?.16f:.40f,.065f,.025f),armor,true);
+        BeveledPlate("Helmet",f.headPart,Vector3.zero,
+            new Vector3(kestrelSd?.76f:heavy?.7f:.54f,kestrelSd?.64f:.47f,kestrelSd?.61f:.50f),hull);
+        Plate("Helmet crown",f.headPart,new Vector3(0,kestrelSd?.32f:.25f,-.04f),
+            new Vector3(kestrelSd?.48f:.34f,kestrelSd?.16f:.13f,kestrelSd?.49f:.41f),armor,-10);
+        Plate("Face mask",f.headPart,new Vector3(0,-.12f,.29f),new Vector3(kestrelSd?.39f:.28f,.22f,.12f),edge);
+        Plate("Sensor housing",f.headPart,new Vector3(0,.02f,.30f),new Vector3(kestrelSd?.62f:.49f,kestrelSd?.17f:.15f,.08f),dark);
+        Shape(PrimitiveType.Cube,"Visor",f.headPart,new Vector3(0,.03f,.35f),new Vector3(f.frameIndex==5?.16f:kestrelSd?.52f:.40f,kestrelSd?.075f:.065f,.025f),armor,true);
         if(f.frameIndex==5) Plate("Range finder",f.headPart,new Vector3(.31f,.1f,.20f),new Vector3(.17f,.19f,.50f),dark);
         if(!heavy)
             for(int side=-1;side<=1;side+=2)
@@ -101,8 +106,10 @@ public sealed partial class VoxArena
         {
             Transform arm=Module(side<0?"Left arm socket":"Right arm socket",f.armsPart,new Vector3(side*shoulder,.74f,0));
             Plate("Shoulder hinge",arm,Vector3.zero,new Vector3(.28f,.36f,.42f),dark);
-            BeveledPlate("Armor shoulder",arm,new Vector3(side*.12f,.08f,0),new Vector3(heavy?.88f:.58f,heavy?.62f:.45f,.72f),armor,-8);
-            Plate("Shoulder cap",arm,new Vector3(side*.13f,.36f,0),new Vector3(heavy?.83f:.52f,.07f,.60f),hull);
+            BeveledPlate("Armor shoulder",arm,new Vector3(side*(kestrelSd?.16f:.12f),.08f,0),
+                new Vector3(heavy?.88f:kestrelSd?.78f:.58f,heavy?.62f:kestrelSd?.58f:.45f,kestrelSd?.78f:.72f),armor,-8);
+            Plate("Shoulder cap",arm,new Vector3(side*(kestrelSd?.16f:.13f),.36f,0),
+                new Vector3(heavy?.83f:kestrelSd?.73f:.52f,.07f,kestrelSd?.68f:.60f),hull);
             Plate("Upper arm",arm,new Vector3(0,-.37f,0),new Vector3(.30f,.42f,.33f),edge);
             Shape(PrimitiveType.Sphere,"Elbow joint",arm,new Vector3(0,-.58f,.08f),Vector3.one*.29f,dark);
             BeveledPlate("Armor forearm",arm,new Vector3(0,-.75f,.24f),new Vector3(.42f,.45f,.64f),hull,-12);
@@ -136,8 +143,10 @@ public sealed partial class VoxArena
             }
             Plate("Calf booster",leg,new Vector3(0,-.85f,-.35f),new Vector3(.27f,.46f,.28f),dark,15);
             Shape(PrimitiveType.Cube,"Calf nozzle",leg,new Vector3(0,-1.1f,-.40f),new Vector3(.16f,.08f,.12f),armor,true);
-            Plate("Foot",leg,new Vector3(0,-1.34f,.15f),new Vector3(heavy?.61f:.42f,.22f,.76f),dark);
-            BeveledPlate("Toe armor",leg,new Vector3(0,-1.24f,.38f),new Vector3(heavy?.57f:.39f,.12f,.30f),armor,-10);
+            Plate("Foot",leg,new Vector3(0,-1.34f,kestrelSd?.18f:.15f),
+                new Vector3(heavy?.61f:kestrelSd?.64f:.42f,kestrelSd?.25f:.22f,kestrelSd?.92f:.76f),dark);
+            BeveledPlate("Toe armor",leg,new Vector3(0,kestrelSd?-1.21f:-1.24f,kestrelSd?.43f:.38f),
+                new Vector3(heavy?.57f:kestrelSd?.59f:.39f,kestrelSd?.14f:.12f,kestrelSd?.40f:.30f),armor,-10);
             Plate("Backpack booster",f.backPart,new Vector3(side*.38f,0,-.10f),new Vector3(.31f,.90f,.43f),edge);
             Shape(PrimitiveType.Cube,"Backpack nozzle",f.backPart,new Vector3(side*.38f,-.48f,-.14f),new Vector3(.23f,.09f,.27f),armor,true);
             // Frame 01 only: recessed armored thruster cassette and service detailing.

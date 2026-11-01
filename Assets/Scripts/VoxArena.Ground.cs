@@ -6,25 +6,25 @@ public sealed partial class VoxArena
     {
         // Repeating grid follows the camera in whole-cell increments. No hard arena walls.
         starRoot=new GameObject("Ground tile field").transform;
-        Box("Endless ground",starRoot,new Vector3(0,-1.28f,0),new Vector3(900,.25f,900),new Color(.16f,.205f,.22f));
+        Box("Endless ground",starRoot,new Vector3(0,GroundSurfaceY-.125f,0),new Vector3(900,.25f,900),new Color(.16f,.205f,.22f));
         Color seam=new Color(.20f,.25f,.26f),paint=new Color(.31f,.39f,.39f);
         for(int i=-16;i<=16;i++)
         {
-            Box("Tile seam",starRoot,new Vector3(i*10,-1.145f,0),new Vector3(.055f,.012f,320),seam);
-            Box("Tile seam",starRoot,new Vector3(0,-1.145f,i*10),new Vector3(320,.012f,.055f),seam);
+            Box("Tile seam",starRoot,new Vector3(i*10,GroundSurfaceY+.006f,0),new Vector3(.055f,.012f,320),seam);
+            Box("Tile seam",starRoot,new Vector3(0,GroundSurfaceY+.006f,i*10),new Vector3(320,.012f,.055f),seam);
         }
         Transform yard=new GameObject("Orbital foundry training yard").transform;
-        Box("Runway center",yard,new Vector3(0,-1.13f,0),new Vector3(14,.025f,100),new Color(.125f,.17f,.19f));
+        Box("Runway center",yard,new Vector3(0,GroundSurfaceY+.025f,0),new Vector3(14,.025f,100),new Color(.125f,.17f,.19f));
         for(int i=-9;i<=9;i++)
         {
-            Box("Lane dash",yard,new Vector3(0,-1.10f,i*5),new Vector3(.16f,.018f,2.1f),paint);
+            Box("Lane dash",yard,new Vector3(0,GroundSurfaceY+.064f,i*5),new Vector3(.16f,.018f,2.1f),paint);
             for(int side=-1;side<=1;side+=2)
-                Box("Lane edge",yard,new Vector3(side*6.6f,-1.10f,i*5),new Vector3(.13f,.018f,3.3f),paint);
+                Box("Lane edge",yard,new Vector3(side*6.6f,GroundSurfaceY+.064f,i*5),new Vector3(.13f,.018f,3.3f),paint);
         }
         var pad=Line("Training perimeter paint",new Color(.24f,.43f,.45f),.10f);
-        Circle(pad,new Vector3(0,-1.09f,0),38);
+        Circle(pad,new Vector3(0,GroundSurfaceY+.065f,0),38);
         var center=Line("Landing pad paint",new Color(.34f,.47f,.47f),.16f);
-        Circle(center,new Vector3(0,-1.08f,0),9);
+        Circle(center,new Vector3(0,GroundSurfaceY+.075f,0),9);
         for(int side=-1;side<=1;side+=2)
         for(int i=0;i<5;i++)
         {
@@ -38,7 +38,7 @@ public sealed partial class VoxArena
     void BuildGroundCover(Transform root,Vector3 size,int kind)
     {
         Color metal=new Color(.27f,.34f,.36f),dark=new Color(.10f,.15f,.18f),yellow=new Color(.70f,.48f,.17f);
-        float bottom=-2.22f,top=size.y*.5f;
+        float bottom=GroundSurfaceY-root.position.y,top=size.y*.5f;
         // Painted footprint makes the collision silhouette readable from the quarter camera.
         Color marking=new Color(.38f,.42f,.39f);
         for(int side=-1;side<=1;side+=2)

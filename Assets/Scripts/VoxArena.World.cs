@@ -3,6 +3,11 @@ using UnityEngine;
 
 public sealed partial class VoxArena
 {
+    // The fighter root is centered near the chest while grounded. Keep the
+    // visible floor and obstacle collision bottoms aligned to the same plane.
+    const float GroundSurfaceY=-.91f;
+    const float FighterSupportOffset=2.01f;
+    const float FighterGroundY=GroundSurfaceY+FighterSupportOffset;
     sealed class Debris { public Transform visual; public Vector3 origin,size; public float phase; }
     readonly List<Bounds> obstacles=new List<Bounds>();
     readonly List<Debris> debris=new List<Debris>();
@@ -85,25 +90,25 @@ public sealed partial class VoxArena
         for(int i=0;i<7;i++)
         {
             float height=.36f*(i+1);
-            AddTerrainBlock("West access ramp "+i,new Vector3(-24+i*2.5f,1.1f+height*.5f,20),
+            AddTerrainBlock("West access ramp "+i,new Vector3(-24+i*2.5f,GroundSurfaceY+height*.5f,20),
                 new Vector3(2.6f,height,8),stone);
         }
         // Match the final stair top so the deck does not form a taller hidden
         // collision wall across the last step.
-        const float deckTop=1.1f+.36f*7;
-        float deckHeight=deckTop-1.1f;
-        AddTerrainBlock("West raised deck",new Vector3(-3,1.1f+deckHeight*.5f,20),new Vector3(13,deckHeight,11),edge);
+        const float deckTop=GroundSurfaceY+.36f*7;
+        float deckHeight=deckTop-GroundSurfaceY;
+        AddTerrainBlock("West raised deck",new Vector3(-3,GroundSurfaceY+deckHeight*.5f,20),new Vector3(13,deckHeight,11),edge);
         for(int i=0;i<4;i++)
         {
             float height=1.7f*(i+1);
-            AddTerrainBlock("East jump ledge "+i,new Vector3(20+i*5f,1.1f+height*.5f,-14),
+            AddTerrainBlock("East jump ledge "+i,new Vector3(20+i*5f,GroundSurfaceY+height*.5f,-14),
                 new Vector3(4.5f,height,7),stone);
         }
     }
     Fighter MakeFighter(string name,Color accent)
     {
         Fighter f=new Fighter(); f.root=new GameObject(name).transform;
-        f.shadow=Shape(PrimitiveType.Cylinder,"Contact shadow",null,new Vector3(0,-1.08f,0),new Vector3(2.7f,.012f,2.1f),new Color(.075f,.105f,.12f));
+        f.shadow=Shape(PrimitiveType.Cylinder,"Contact shadow",null,new Vector3(0,GroundSurfaceY+.06f,0),new Vector3(2.7f,.012f,2.1f),new Color(.075f,.105f,.12f));
         f.jumpFlame=Shape(PrimitiveType.Capsule,"Jump exhaust flare",f.root,new Vector3(0,-.1f,-1.4f),
             new Vector3(.48f,.65f,.48f),new Color(.66f,.94f,1),true);
         f.jumpFlame.GetComponent<Renderer>().shadowCastingMode=UnityEngine.Rendering.ShadowCastingMode.Off;
@@ -124,7 +129,14 @@ public sealed partial class VoxArena
         root.position=origin;
         BuildGroundCover(root,size,debris.Count);
         debris.Add(new Debris{visual=root,origin=origin,size=size,phase=phase});
-        obstacles.Add(new Bounds(origin,size));
+        obstacles.Add(DebrisBounds(origin,size));
+    }
+    Bounds DebrisBounds(Vector3 center,Vector3 size)
+    {
+        float top=center.y+size.y*.5f;
+        float height=Mathf.Max(.01f,top-GroundSurfaceY);
+        return new Bounds(new Vector3(center.x,(top+GroundSurfaceY)*.5f,center.z),
+            new Vector3(size.x,height,size.z));
     }
     void UpdateObstacles(float dt)
     {
@@ -135,7 +147,7 @@ public sealed partial class VoxArena
             Vector3 p=d.origin; // Ground cover stays fixed so players can learn reliable escape routes.
             d.visual.position=p;
             // Collision bounds and the visual translate together.
-            obstacles[i]=new Bounds(p,d.size);
+            obstacles[i]=DebrisBounds(p,d.size);
         }
         if(player!=null) { ResolveOverlap(player); ResolveOverlap(enemy); }
     }
@@ -183,13 +195,13 @@ public sealed partial class VoxArena
     }
     float LandingHeight(Vector3 p,float radius,float previousY)
     {
-        float ground=1.1f;
+        float ground=FighterGroundY;
         foreach(Bounds b in obstacles)
         {
             // A rooftop is a landing surface only if approached from above.
             if(OverlapsFootprint(b,p,radius) &&
                 previousY>=b.max.y-.03f)
-                ground=Mathf.Max(ground,b.max.y);
+                ground=Mathf.Max(ground,b.max.y+FighterSupportOffset);
         }
         return ground;
     }
@@ -220,9 +232,10 @@ public sealed partial class VoxArena
         {
             Vector3 ahead=p+horizontal;
             if(!OverlapsFootprint(b,ahead,f.Radius)) continue;
-            float rise=b.max.y-p.y;
+            float landingY=b.max.y+FighterSupportOffset;
+            float rise=landingY-p.y;
             if(rise<=.01f || rise>maxStep) continue;
-            Vector3 candidate=new Vector3(ahead.x,b.max.y+.01f,ahead.z);
+            Vector3 candidate=new Vector3(ahead.x,landingY+.01f,ahead.z);
             bool blocked=Occupied(candidate,f.Radius);
             if(!blocked) { stepped=candidate; return true; }
         }
@@ -264,7 +277,7 @@ public sealed partial class VoxArena
                 }
                 else if(!Occupied(next,f.Radius)) p=next;
             }
-            p.y=Mathf.Max(1.1f,p.y);
+            p.y=Mathf.Max(FighterGroundY,p.y);
         }
         f.root.position=p;
     }
