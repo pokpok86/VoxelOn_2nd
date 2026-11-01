@@ -4,8 +4,11 @@
   "QueueBranch": "codex/task-queue",
   "QueueDirectory": "docs/CodexTasks",
   "ReportBranch": "codex/task-reports",
-  "ReportDirectory": "docs/CodexTaskReports",
+  "ReportDirectory": "Docs/CodexTaskReports",
   "SourceBranch": "feature/visual-polish-20261031",
   "MaximumTaskBytes": 32768,
-  "MaximumRuntimeMinutes": 45
+  "MaximumRuntimeMinutes": 45,
+  "MaximumValidationMinutes": 30,
+  "MaximumPollMinutes": 110,
+  "UnityExecutable": "C:\\Program Files\\Unity\\Hub\\Editor\\6000.6.7f1\\Editor\\Unity.exe"
 }

@@ -6,12 +6,14 @@
 
 1. `TEMPLATE.md`를 복사합니다.
 2. 파일명과 `id`에 새 ID를 지정합니다. 예: `TASK-20261101-MECH-002.md`.
-3. `mode`를 `check` 또는 `change`로 정하고 `status: ready`를 설정합니다.
+3. `mode`를 `check` 또는 `change`로 정하고 `status: ready`를 설정합니다. `priority`는 1–100이며 큰 숫자가 먼저 처리됩니다. 생략하면 50입니다.
 4. `codex/task-queue` 브랜치에 커밋합니다. 같은 ID는 성공·실패와 관계없이 PC에서 다시 실행하지 않습니다.
 
-`check`는 읽기 전용입니다. `change`는 설정된 소스 브랜치에서 격리된 로컬 worktree를 만들고 그 안에서만 파일을 수정합니다. 어느 모드도 프로젝트 코드를 커밋/푸시하거나 병합하지 않고, `main`도 수정하지 않습니다.
+`check`는 읽기 전용입니다. `change`는 설정된 소스 브랜치에서 격리된 로컬 worktree를 만들고 그 안에서만 파일을 수정합니다. `change` 결과는 Unity Windows 빌드와 플레이어 스모크 검사가 통과한 경우에만 러너가 `codex/implementation/<작업ID>` 후보 브랜치로 커밋·푸시합니다. `main` 수정·병합·강제 푸시는 하지 않습니다.
 
-결과와 작업 오류는 `codex/task-reports` 브랜치의 `docs/CodexTaskReports/<ID>.md`에 보고합니다. `change` 결과의 코드 수정은 PC의 별도 로컬 브랜치에 남겨 직접 검토할 수 있습니다. 보고서 브랜치 외에는 자동 푸시하지 않습니다.
+시작·진행·검증·완료 상태는 `codex/task-reports` 브랜치의 `Docs/CodexTaskReports/Status/<ID>.md`에 추가 기록합니다. 최종 결과와 오류는 `Docs/CodexTaskReports/<ID>.md`에 보고합니다. 후보 브랜치 URL, 커밋 SHA, 빌드 로그와 스모크 검사 수, 캡처한 스크린샷 경로를 보고서에 포함합니다.
+
+각 실행은 큐의 승인된 `ready` 작업을 우선순위 순서로 연속 처리합니다. 큐가 비거나 실행 한도에 도달하면 종료하며, 10분 주기 다음 실행이 새 작업부터 이어받습니다. 중복 ID와 동시 러너는 건너뜁니다.
 
 ## 테스트 및 관리
 

@@ -10,12 +10,20 @@ $projectRoot=if($ProjectRootOverride){(Resolve-Path $ProjectRootOverride).Path}e
 $runnerHome=Join-Path $projectRoot 'UserSettings\CodexTaskRunner'
 New-Item -ItemType Directory -Path $runnerHome -Force|Out-Null
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'CodexTaskRunner.ps1') -Destination (Join-Path $runnerHome 'CodexTaskRunner.ps1') -Force
-Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'CodexTaskRunner.settings.json') -Destination (Join-Path $runnerHome 'CodexTaskRunner.settings.json') -Force
 Copy-Item -LiteralPath $PSCommandPath -Destination (Join-Path $runnerHome 'Install-CodexTaskScheduler.ps1') -Force
 $settingsPath=Join-Path $runnerHome 'CodexTaskRunner.settings.json'
+if(-not(Test-Path -LiteralPath $settingsPath)){
+    $template=Join-Path $PSScriptRoot 'CodexTaskRunner.settings.example.json'
+    if(-not(Test-Path -LiteralPath $template)){throw "Settings template missing: $template"}
+    Copy-Item -LiteralPath $template -Destination $settingsPath
+}
 $localSettings=Get-Content -LiteralPath $settingsPath -Raw -Encoding UTF8|ConvertFrom-Json -AsHashtable
 $localSettings.GitExecutable=(Get-Command git.exe -ErrorAction Stop).Source
 $localSettings.CodexExecutable=(Get-Command codex.exe -ErrorAction Stop).Source
+if(-not $localSettings.MaximumValidationMinutes){$localSettings.MaximumValidationMinutes=30}
+if(-not $localSettings.MaximumPollMinutes){$localSettings.MaximumPollMinutes=110}
+if(-not $localSettings.UnityExecutable){$localSettings.UnityExecutable='C:\Program Files\Unity\Hub\Editor\6000.6.7f1\Editor\Unity.exe'}
+$localSettings.ReportDirectory='Docs/CodexTaskReports'
 [IO.File]::WriteAllText($settingsPath,(ConvertTo-Json -InputObject $localSettings -Depth 8),[Text.UTF8Encoding]::new($false))
 $runner=Join-Path $runnerHome 'CodexTaskRunner.ps1'
 $powerShell=(Get-Command pwsh.exe -ErrorAction Stop).Source

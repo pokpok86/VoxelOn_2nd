@@ -3,6 +3,7 @@ id: TASK-YYYYMMDD-AREA-001
 mode: check
 status: draft
 title: Short task title
+priority: 50
 ---
 
 ## Goal
@@ -17,4 +18,5 @@ Describe one bounded result.
 ## Constraints
 
 - Keep the task within the VoxelOn project.
-- Do not request credentials, external messages, commits, pushes, merges, or changes to `main`.
+- Priority is 1–100; higher numbers are processed first. If omitted, the runner uses 50.
+- Do not request credentials, external messages, direct commits, pushes, merges, or changes to `main`. The runner publishes validated changes on a separate review branch.
