@@ -381,10 +381,13 @@ public sealed partial class VoxArena : MonoBehaviour
     bool TryDash(Fighter f,Vector3 direction)
     {
         if(direction.sqrMagnitude<.01f || f.dashRemaining>0 || f.dashCooldownLeft>0 || f.boostLocked || f.lockTime>0) return false;
-        float cost=dashFuelCost*f.dashCostFactor;
+        // Runner ground dodges use cooldown/distance, not boost fuel.
+        // Airborne dodges still consume the shared gauge.
+        bool freeGroundDash=f.spec.mobility==MobilityKind.Runner && f.jumpHeight<=.02f && f.jumpVelocity<=0f;
+        float cost=freeGroundDash?0f:dashFuelCost*f.dashCostFactor;
         if(f.boostEnergy<cost) return false;
         f.boostEnergy-=cost;
-        f.recoveryTime=recoveryDelay;
+        if(cost>0f) f.recoveryTime=recoveryDelay;
         f.dashDirection=direction.normalized;
         f.dashRemaining=Mathf.Max(.01f,dashDistance*f.dashDistanceFactor);
         f.dashCooldownLeft=dashCooldown;
