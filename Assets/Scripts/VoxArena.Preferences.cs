@@ -5,6 +5,7 @@ public sealed partial class VoxArena
     int rivalSelection=-1;
     const string PreferencePrefix="VoxSky.Pilot.";
     static float ValidTuning(float value)=>float.IsNaN(value)||float.IsInfinity(value)?1:Mathf.Clamp(value,.5f,2);
+    static float ValidVolume(float value)=>float.IsNaN(value)||float.IsInfinity(value)?.7f:Mathf.Clamp01(value);
     int ResolveRival()=>rivalSelection<0?UnityEngine.Random.Range(0,CraftCatalog.All.Length):Mathf.Clamp(rivalSelection,0,CraftCatalog.All.Length-1);
     void LoadPreferences(string scope=PreferencePrefix)
     {
@@ -13,7 +14,7 @@ public sealed partial class VoxArena
         aimAssist=PlayerPrefs.GetInt(scope+"AimAssist",1)!=0;
         muted=PlayerPrefs.GetInt(scope+"Muted",0)!=0;
         float storedVolume=PlayerPrefs.GetFloat(scope+"Volume",.7f);
-        effectsVolume=float.IsNaN(storedVolume)||float.IsInfinity(storedVolume)?.7f:Mathf.Clamp01(storedVolume);
+        effectsVolume=ValidVolume(storedVolume);
         selectedCraft=Mathf.Clamp(PlayerPrefs.GetInt(scope+"Frame",0),0,CraftCatalog.All.Length-1);
         rivalSelection=Mathf.Clamp(PlayerPrefs.GetInt(scope+"Rival",-1),-1,CraftCatalog.All.Length-1);
         bulletSpeedScale=ValidTuning(PlayerPrefs.GetFloat(scope+"BulletSpeed",1));
@@ -26,7 +27,7 @@ public sealed partial class VoxArena
         PlayerPrefs.SetInt(scope+"Difficulty",difficulty);
         PlayerPrefs.SetInt(scope+"AimAssist",aimAssist?1:0);
         PlayerPrefs.SetInt(scope+"Muted",muted?1:0);
-        PlayerPrefs.SetFloat(scope+"Volume",Mathf.Clamp01(effectsVolume));
+        PlayerPrefs.SetFloat(scope+"Volume",ValidVolume(effectsVolume));
         PlayerPrefs.SetInt(scope+"Frame",selectedCraft);
         PlayerPrefs.SetInt(scope+"Rival",rivalSelection);
         PlayerPrefs.SetFloat(scope+"BulletSpeed",ValidTuning(bulletSpeedScale));
