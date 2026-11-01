@@ -1,0 +1,51 @@
+# VoxelOn local Codex task report: TASK-20261101-CONTINUOUS-VISUAL-019
+
+- Status: **completed**
+- Mode: check
+- Priority: 14
+- Source commit: f808e5952fee
+- Local work branch: detached/read-only
+- Review branch: (not published)
+- Review commit: (none)
+- Validation: (not run)
+- Started: 2026-11-01T14:59:58.3222102Z
+- Finished: 2026-11-01T15:02:17.0930089Z
+
+## Summary
+
+읽기 전용 점검을 마쳤습니다. **변경 파일은 없습니다.**
+
+시각 개선 백로그는 다음 순서로 제안합니다. 모두 기준 SHA와 기존 완료 내역 확인 후 착수할 조건부 후보입니다.
+
+1. **BASTION 머리 비율:** 기존 헬멧 본체의 폭만 소폭 조정해 넓은 어깨 사이에서 머리가 읽히는지 비교.
+2. **TEMPEST 골반 형태:** 기존 골반 본체의 폭을 조정해 가슴–허리–골반 구분 확인.
+3. **관절 가독성:** 이동·착지 자세에서 어깨·무릎 장갑 간섭을 확인하고 한 부위씩 개선.
+
+Kestrel의 기존 어깨·정강이 작업과 ANVIL의 종아리·발 보강은 중복 후보에서 제외했습니다. 원본 콘셉트 일치 여부는 판정하지 않았습니다.
+
+시간별 PM 재사용 체크리스트:
+
+- [ ] 검증된 기준 브랜치와 전체 SHA 기록, 완료 작업 중복 확인
+- [ ] 후보 하나와 변경 파일 범위 확정
+- [ ] 동일 카메라·포즈·조명·스케일의 전후 캡처 보존
+- [ ] Unity 빌드의 `VOXSKY_BUILD_PASS` 및 오류 확인
+- [ ] 빌드 플레이어 스모크 실행, 기존 검사 유지 및 캡처 검토
+- [ ] Kestrel·지면·기본 조작 회귀 확인, 실패는 해결 전까지 명시
+
+실제 확인: 필수 문서와 로봇 형태·스모크 소스 정적 검토, Unity 버전 `6000.6.7f1`, 워크트리 내 실행 빌드 부재 확인.
+
+차단 사항: Git·Unity 명령을 찾지 못해 브랜치/SHA 및 빌드·플레이 검증을 완료하지 못했습니다. 문서의 한글 출력에도 인코딩 문제가 있었습니다. 파일 작성 금지에 따라 `codex/task-reports` 보고서는 생성하지 않았습니다.
+
+## Changed files
+
+- (none)
+
+## Screenshots
+
+- (none generated)
+
+## Error
+
+None.
+
+> Change-mode code is committed and pushed only to its unique codex/implementation/<task-id> review branch after the Windows build and player smoke test pass. The runner never writes to main, merges, or force-pushes. Task reports go to the separate report branch.
