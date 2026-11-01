@@ -481,10 +481,20 @@ public sealed partial class VoxArena : MonoBehaviour
             desired=f.rushDirection*34; f.rushTime=Mathf.Max(0,f.rushTime-dt);
             f.boosting=true; f.saber.gameObject.SetActive(true);
         }
+        float preLandingHeight=f.jumpHeight;
+        float preLandingFallSpeed=-f.jumpVelocity;
         Vector3 before=f.root.position; MoveWithObstacles(f,desired*dt+Vector3.up*f.jumpVelocity*dt);
         float jumpCeiling=f.jumpOriginY+jumpMaxHeight;
         if(f.root.position.y>jumpCeiling) { f.root.position=new Vector3(f.root.position.x,jumpCeiling,f.root.position.z); f.jumpVelocity=0; }
         f.jumpHeight=Mathf.Max(0,f.root.position.y-LandingHeight(f.root.position,f.Radius,f.root.position.y));
+        // High-speed landing briefly staggers the legs; unlike weapon knockdown it grants no invulnerability.
+        if(preLandingHeight>.05f && f.jumpHeight<=.001f && preLandingFallSpeed>15f)
+        {
+            float severity=Mathf.Clamp01((preLandingFallSpeed-15f)/20f);
+            float recovery=Mathf.Max(.2f,f.spec.recoverySpeed);
+            f.knockdownTime=Mathf.Max(f.knockdownTime,(.2f+.55f*severity)/recovery);
+            f.dashRemaining=0;
+        }
         if(f.jumpHeight<=.001f && f.jumpVelocity<0) f.jumpVelocity=0;
         float actualDistance=Vector3.Distance(Vector3.ProjectOnPlane(f.root.position,Vector3.up),Vector3.ProjectOnPlane(before,Vector3.up));
         f.velocity=(f.root.position-before)/Mathf.Max(.0001f,dt);
