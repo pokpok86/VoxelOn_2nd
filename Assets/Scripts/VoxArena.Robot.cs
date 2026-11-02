@@ -55,6 +55,31 @@ public sealed partial class VoxArena
         filter.sharedMesh=mesh;
         return t;
     }
+    // First-pass procedural articulation: obvious pose differences are intentional.
+    // Neutral-pose geometry stays unchanged; only the child pivots rotate.
+    void AnimateLegJoints(Fighter f,float stride,float gait)
+    {
+        bool airborne=f.jumpHeight>.08f || f.jumpVelocity>1f;
+        bool landing=f.knockdownTime>0f;
+        bool heavy=f.spec.mobility==MobilityKind.Tank;
+        bool runner=f.spec.mobility==MobilityKind.Runner;
+        float phase=roundTime*(heavy?7f:runner?16f:11f);
+        for(int side=-1;side<=1;side+=2)
+        {
+            Transform hip=side<0?f.leftLeg:f.rightLeg;
+            if(hip==null) continue;
+            Transform knee=hip.Find(side<0?"Left knee pivot":"Right knee pivot");
+            if(knee==null) continue;
+            Transform ankle=knee.Find(side<0?"Left ankle pivot":"Right ankle pivot");
+            float cycle=Mathf.Sin(phase+(side<0?0f:Mathf.PI));
+            float lift=Mathf.Max(0f,cycle)*stride;
+            float bend=airborne?(runner?37f:heavy?18f:29f):
+                landing?52f:(heavy?16f:runner?43f:30f)*lift;
+            float anklePitch=airborne?-18f:landing?-24f:-bend*.58f+cycle*stride*6f;
+            knee.localRotation=Quaternion.Euler(bend,0,0);
+            if(ankle!=null) ankle.localRotation=Quaternion.Euler(anklePitch,0,0);
+        }
+    }
     void BuildRobot(Fighter f)
     {
         if(f.body!=null) { f.body.gameObject.SetActive(false); Destroy(f.body.gameObject); }
