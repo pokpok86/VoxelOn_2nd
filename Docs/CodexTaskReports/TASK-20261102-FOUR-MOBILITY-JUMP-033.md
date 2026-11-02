@@ -21,3 +21,11 @@ Compare identical input durations in cardinal directions, transition 90/180 degr
 
 ## Handoff
 When implementing, record source SHA, chosen tuning values and WHY, affected files, invariants (existing 8 frames not silently remapped), test evidence, and remaining gaps in this report.
+
+## Remote implementation checkpoint — 2026-11-02
+
+- `work` commit `23457858019824f626100d179312465ea8241b09`: new opt-in prototype movement fields in `CraftCatalog.cs`. WISP forward/reverse/left/right = 1/.4/.6/.6; BASTION turn acceleration = 4 speed units per second relative to base speed, jump impulse x.55, vertical thrust x.55, landing stagger x1.35. These are provisional tunings.
+- `work` commit `da66d79bb20c7c43c2ef4a4de936e34b4fd7560f`: apply jump impulse, vertical boost permission/scale, BASTION direction-change acceleration, and landing penalty. Disable old BASTION directional multiplier when prototype movement is active to avoid double penalties.
+- **Not done:** replacing universal horizontal boost with the requested per-frame booster behaviors; selecting playable TARANTULA and HOUND rigs; their exact speed/jump rules; visual gait and animations. WISP/BASTION still have legacy boost logic. Do not treat this task as complete.
+- **Unity validation:** NOT RUN (home PC offline). Verify build and directional speed ratios, and specifically that BASTION direction-change acceleration is not overwritten by Glide smoothing; test all existing eight frames for regressions.
+- **Design rationale:** explicit per-spec flags permit gradual integration without silently changing every catalog entry. No new input bindings yet. Preserve previous weapon request and main branch.
