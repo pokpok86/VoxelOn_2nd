@@ -295,7 +295,7 @@ public sealed partial class VoxArena : MonoBehaviour
         for(int i=0;i<keys.Length;i++)
         {
             if(!Input.GetKeyDown(keys[i])) continue;
-            if(Time.time-lastDirectionTap[i]<=doubleTapWindow) TryDash(player,axes[i]);
+            if(!player.spec.usePrototypeMovement && Time.time-lastDirectionTap[i]<=doubleTapWindow) TryDash(player,axes[i]);
             lastDirectionTap[i]=Time.time;
         }
         player.jumpHeld=Input.GetKey(KeyCode.Space);
