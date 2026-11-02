@@ -38,6 +38,8 @@ public sealed partial class VoxArena : MonoBehaviour
         public Transform[] quadrupedLegs,quadrupedKnees,quadrupedAnkles;
         public Transform[][] treadLinks;
         public float treadPhase,treadPerimeter;
+        public float[] treadSidePhases;
+        public Vector3 previousTreadHeading=Vector3.forward;
         public int weaponSlot=1,magazine=30; public float reloadTime;
         public CraftSpec spec=CraftCatalog.Selectable[0];
         public Vector3 facing=Vector3.forward,velocity,pulseDirection,rushDirection;
