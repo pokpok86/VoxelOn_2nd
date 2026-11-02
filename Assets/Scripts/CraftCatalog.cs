@@ -100,7 +100,8 @@ public static class CraftCatalog
             // Temporary tank-handling test rig; BASTION mesh remains bipedal.
             if(i==1) { f.mobility=MobilityKind.Tank; f.usePrototypeMovement=true;
                 f.turnAcceleration=4f; f.jumpImpulseScale=.55f;
-                f.verticalBoostScale=.55f; f.landingStaggerScale=1.35f; }
+                f.verticalBoostScale=.55f; f.landingStaggerScale=1.35f;
+                f.fallGravityFactor=1.35f; }
         }
     }
 }
