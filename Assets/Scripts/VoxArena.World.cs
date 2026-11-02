@@ -304,6 +304,7 @@ public sealed partial class VoxArena
             d.hp-=Mathf.Max(0,damage);
             if(d.hp>0) return;
             d.destroyed=true;
+            PlaySound(SoundKind.CoverBreak,impact,.95f);
             ScatterCoverFragments(d,impact);
             if(d.visual!=null) Destroy(d.visual.gameObject);
             // Keep list indices stable for UpdateObstacles.
@@ -432,6 +433,9 @@ public sealed partial class VoxArena
                 float floor=LandingHeight(p,f.Radius,previousY);
                 if(next.y<=floor)
                 {
+                    if(f.jumpVelocity < -7f)
+                        PlaySound(f.spec.mobility==MobilityKind.Tank?SoundKind.HeavyLanding:SoundKind.Landing,
+                            p,Mathf.Clamp01(Mathf.Abs(f.jumpVelocity)/22f));
                     if(f.jumpVelocity < -9f && floor>FighterGroundY+.3f)
                         DamageDestructibleCover(new Vector3(p.x,floor-FighterSupportOffset,p.z),
                             (Mathf.Abs(f.jumpVelocity)-9f)*17f);
