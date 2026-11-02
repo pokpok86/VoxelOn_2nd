@@ -8,7 +8,7 @@ public sealed partial class VoxArena
     public enum ArenaMapKind { IndoorFactory, OutdoorCanyon }
     [Header("Arena map (select before Play)")]
     public ArenaMapKind arenaMap=ArenaMapKind.IndoorFactory;
-    const float ArenaHalfWidth=95f;
+    const float ArenaHalfWidth=140f;
     const float GroundSurfaceY=-.91f;
     const float FighterSupportOffset=2.01f;
     const float FighterGroundY=GroundSurfaceY+FighterSupportOffset;
@@ -93,11 +93,11 @@ public sealed partial class VoxArena
         float height=arenaMap==ArenaMapKind.IndoorFactory?65f:24f;
         if(arenaMap==ArenaMapKind.IndoorFactory)
             Box("High hangar ceiling",null,new Vector3(0,GroundSurfaceY+69f,0),
-                new Vector3(200,2,200),new Color(.11f,.15f,.19f));
+                new Vector3(290,2,290),new Color(.11f,.15f,.19f));
         for(int axis=0;axis<2;axis++)
         for(int side=-1;side<=1;side+=2)
         {
-            Vector3 size=axis==0?new Vector3(5,height,200):new Vector3(200,height,5);
+            Vector3 size=axis==0?new Vector3(5,height,290):new Vector3(290,height,5);
             Vector3 pos=axis==0?new Vector3(side*(ArenaHalfWidth+2.5f),GroundSurfaceY+height*.5f,0):
                 new Vector3(0,GroundSurfaceY+height*.5f,side*(ArenaHalfWidth+2.5f));
             Box(arenaMap==ArenaMapKind.IndoorFactory?"Hangar boundary wall":"Canyon cliff boundary",
@@ -105,9 +105,9 @@ public sealed partial class VoxArena
             if(arenaMap==ArenaMapKind.OutdoorCanyon)
             {
                 // Layered blocky rock strata; the cliff is a perimeter, not a pit.
-                for(int j=0;j<12;j++)
+                for(int j=0;j<18;j++)
                 {
-                    float along=-84+j*15.3f;
+                    float along=-130+j*15.3f;
                     float rockHeight=9f+Mathf.PerlinNoise(j*.31f,axis+side+2)*13f;
                     Vector3 rockPos=axis==0?
                         new Vector3(side*(ArenaHalfWidth-3f),GroundSurfaceY+rockHeight*.5f,along):
