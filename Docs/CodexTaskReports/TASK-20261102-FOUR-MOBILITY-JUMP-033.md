@@ -29,3 +29,10 @@ When implementing, record source SHA, chosen tuning values and WHY, affected fil
 - **Not done:** replacing universal horizontal boost with the requested per-frame booster behaviors; selecting playable TARANTULA and HOUND rigs; their exact speed/jump rules; visual gait and animations. WISP/BASTION still have legacy boost logic. Do not treat this task as complete.
 - **Unity validation:** NOT RUN (home PC offline). Verify build and directional speed ratios, and specifically that BASTION direction-change acceleration is not overwritten by Glide smoothing; test all existing eight frames for regressions.
 - **Design rationale:** explicit per-spec flags permit gradual integration without silently changing every catalog entry. No new input bindings yet. Preserve previous weapon request and main branch.
+
+## Remote checkpoint 2 — input conflict and WISP low-hop dash
+- `work` commit `a4e214b51c89dd8a541c81c4dbc465a3807b351f`: opt-in movement prototypes no longer trigger legacy double-tap dash; existing standard frames retain it.
+- `work` commit `bb6bbcac733027012b31798d27cb401cdb955203`: WISP Shift key-down with sideways/backward camera-relative movement triggers the existing distance-based dash and a small jump impulse (0.23x common jump speed). Forward Shift remains the legacy boosted run as a provisional implementation.
+- **Intent:** Make directional booster behavior testable without changing existing combat input or all frames at once. Reuse dash collision/cooldown instead of introducing a parallel collision path.
+- **Limitations:** Shift dash currently inherits the existing dash fuel check/cost and distance, which need tuning; forward run is still legacy boost; airborne/held Shift and other rigs still need dedicated rules. Unity compilation and runtime NOT tested.
+- **Local tests:** WISP Shift+W vs Shift+A/S/D, diagonal forward threshold, pressing Shift while airborne, collision termination, repeated Shift after cooldown, fuel exhaustion, other frame double-tap behavior. Record any unexpected extra horizontal boost immediately after dash.
