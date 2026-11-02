@@ -318,7 +318,7 @@ public sealed partial class VoxArena : MonoBehaviour
             bool canCharge=grounded && player.knockdownTime<=0f && player.lockTime<=0f;
             // Shift cancels an ongoing charge, and cancellation remains latched
             // until Space is released so a held key cannot silently restart it.
-            if(boostPressed && player.jumpHeld && player.jumpHoldElapsed>0f)
+            if(boostPressed && player.jumpHeld)
             {
                 player.jumpHoldElapsed=0f;
                 player.jumpChargeCanceled=true;
