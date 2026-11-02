@@ -193,6 +193,10 @@ public sealed partial class VoxArena
             if(f.spec.mobility==MobilityKind.Runner)
             {
                 // Readable swept-back sprinting profile, not loose rods.
+                // The upper-leg fairing makes the runner's thigh a single readable
+                // aerodynamic mass, without changing the hip/knee pivots or colliders.
+                BeveledPlate("Runner thigh fairing",leg,new Vector3(side*.11f,-.25f,.10f),
+                    new Vector3(.45f,.50f,.53f),armor,-9,.17f,.79f);
                 BeveledPlate("Runner calf aero shell",knee,new Vector3(side*.17f,-0.360f,-.31f),
                     new Vector3(.25f,.76f,.48f),armor,-18,.20f,.65f);
                 BeveledPlate("Runner heel spur",ankle,new Vector3(0,0.000f,-.25f),
