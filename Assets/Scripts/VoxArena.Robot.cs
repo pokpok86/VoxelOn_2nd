@@ -104,25 +104,50 @@ public sealed partial class VoxArena
         if(f.rightLeg!=null) f.rightLeg.gameObject.SetActive(false);
         bool spider=f.spec.name=="TARANTULA";
         f.quadrupedLegs=new Transform[4]; f.quadrupedKnees=new Transform[4]; f.quadrupedAnkles=new Transform[4];
+        // A wide, low chassis makes the four-legged silhouette read before its small details.
         Plate(spider?"Tarantula abdomen armor":"Hound ribcage armor",f.legsPart,
-            new Vector3(0,-.57f,-.08f),spider?new Vector3(1.08f,.36f,1.26f):new Vector3(.92f,.38f,1.48f),armor);
+            new Vector3(0,spider?-.40f:-.34f,spider?-.12f:-.06f),
+            spider?new Vector3(1.42f,.43f,1.50f):new Vector3(1.08f,.47f,1.72f),armor);
+        if(spider)
+        {
+            BeveledPlate("Tarantula front thorax",f.legsPart,new Vector3(0,-.20f,.48f),
+                new Vector3(.93f,.34f,.72f),edge,0,.14f,.72f);
+            BeveledPlate("Tarantula rear abdomen shell",f.legsPart,new Vector3(0,-.31f,-.48f),
+                new Vector3(1.12f,.37f,.72f),armor,0,.16f,.82f);
+            Plate("Tarantula dorsal seam",f.legsPart,new Vector3(0,-.095f,-.38f),
+                new Vector3(.055f,.025f,.60f),edge);
+            for(int side=-1;side<=1;side+=2)
+                for(int spot=0;spot<3;spot++)
+                    Shape(PrimitiveType.Sphere,"Tarantula dorsal sensor",f.legsPart,
+                        new Vector3(side*(.30f+spot*.18f),-.08f,-.53f+spot*.16f),
+                        Vector3.one*.10f,edge,true);
+        }
         for(int i=0;i<4;i++)
         {
             int side=(i%2==0)?-1:1; bool front=i<2;
-            float x=side*(front?(spider?.48f:.38f):(spider?.78f:.78f)), z=front?.48f:-.52f;
-            Transform hip=Module((spider?"Spider":"Hound")+" leg root "+i,f.legsPart,new Vector3(x,-.67f,z));
+            float x=side*(front?(spider?.62f:.46f):(spider?.82f:.48f)), z=front?.57f:-.68f;
+            Transform hip=Module((spider?"Spider":"Hound")+" leg root "+i,
+                f.legsPart,new Vector3(x,spider?-.51f:-.48f,z));
             f.quadrupedLegs[i]=hip;
-            Shape(PrimitiveType.Sphere,"Hip rotary joint",hip,Vector3.zero,Vector3.one*(spider?.25f:.30f),dark);
-            float upperLength=spider?.55f:.43f;
-            BeveledPlate("Upper leg armor",hip,new Vector3(side*(spider?.20f:.09f),-.20f,front?.08f:-.08f),
-                new Vector3(spider?.25f:.36f,upperLength,.30f),edge,0,.10f,.82f);
-            Transform knee=Module("Knee articulation",hip,new Vector3(side*(spider?.39f:.14f),-.43f,front?.13f:-.13f));
+            float upperLength=spider?.62f:.52f;
+            Shape(PrimitiveType.Sphere,"Hip rotary joint",hip,Vector3.zero,
+                Vector3.one*(spider?.23f:.25f),dark);
+            Transform upper=BeveledPlate("Upper leg armor",hip,
+                new Vector3(side*(spider?.30f:.12f),-.20f,front?.10f:-.10f),
+                new Vector3(spider?.28f:.30f,upperLength,spider?.34f:.35f),edge,0,.13f,.76f);
+            upper.localRotation=Quaternion.Euler(front?10f:-10f,0,side*(spider?34f:12f));
+            Transform knee=Module("Knee articulation",hip,
+                new Vector3(side*(spider?.51f:.16f),-.40f,front?.16f:-.16f));
             f.quadrupedKnees[i]=knee;
-            Shape(PrimitiveType.Sphere,"Knee joint",knee,Vector3.zero,Vector3.one*(spider?.19f:.22f),dark);
-            float lower=spider?.63f:.50f;
-            BeveledPlate("Lower leg armor",knee,new Vector3(side*(spider?.16f:.04f),-.25f,front?.06f:-.06f),
-                new Vector3(spider?.20f:.30f,lower,.24f),armor,0,.09f,.78f);
-            Transform ankle=Module("Ankle articulation",knee,new Vector3(side*(spider?.31f:.08f),-.50f,front?.08f:-.08f));
+            Shape(PrimitiveType.Sphere,"Knee joint",knee,Vector3.zero,
+                Vector3.one*(spider?.20f:.19f),dark);
+            float lower=spider?.72f:.61f;
+            Transform lowerPlate=BeveledPlate("Lower leg armor",knee,
+                new Vector3(side*(spider?.20f:.04f),-.28f,front?.08f:-.08f),
+                new Vector3(spider?.23f:.25f,lower,spider?.27f:.28f),armor,0,.12f,.74f);
+            lowerPlate.localRotation=Quaternion.Euler(front?-8f:8f,0,side*(spider?20f:4f));
+            Transform ankle=Module("Ankle articulation",knee,
+                new Vector3(side*(spider?.36f:.08f),-.55f,front?.09f:-.09f));
             f.quadrupedAnkles[i]=ankle;
             Plate(spider?"Tarsal foot":"Padded paw",ankle,new Vector3(0,-.035f,.08f),
                 spider?new Vector3(.28f,.14f,.38f):new Vector3(.38f,.20f,.45f),dark);
@@ -135,22 +160,46 @@ public sealed partial class VoxArena
             foreach(string name in new[]{"Helmet","Helmet crown","Face mask","Sensor housing","Visor","Sensor fin"})
                 for(int i=0;i<f.headPart.childCount;i++)
                     if(f.headPart.GetChild(i).name==name) f.headPart.GetChild(i).gameObject.SetActive(false);
-            BeveledPlate("Hound compact skull",f.headPart,Vector3.zero,new Vector3(.54f,.39f,.56f),armor,0,.13f,.82f);
-            BeveledPlate("Hound muzzle",f.headPart,new Vector3(0,-.09f,.34f),new Vector3(.34f,.20f,.48f),armor,0,.07f,.78f);
-            Plate("Hound nose",f.headPart,new Vector3(0,-.08f,.59f),new Vector3(.16f,.10f,.09f),dark);
+            BeveledPlate("Hound compact skull",f.headPart,Vector3.zero,
+                new Vector3(.63f,.43f,.64f),armor,0,.15f,.80f);
+            BeveledPlate("Hound cheek armor",f.headPart,new Vector3(0,-.13f,.12f),
+                new Vector3(.66f,.25f,.49f),edge,0,.10f,.83f);
+            BeveledPlate("Hound muzzle",f.headPart,new Vector3(0,-.10f,.51f),
+                new Vector3(.43f,.25f,.83f),armor,0,.11f,.65f);
+            Plate("Hound nose bridge",f.headPart,new Vector3(0,-.025f,.84f),
+                new Vector3(.24f,.12f,.24f),edge,-8);
+            Plate("Hound nose",f.headPart,new Vector3(0,-.065f,.98f),
+                new Vector3(.22f,.15f,.11f),dark);
+            Plate("Hound jaw",f.headPart,new Vector3(0,-.25f,.54f),
+                new Vector3(.37f,.09f,.62f),dark,-4);
+            Plate("Hound jaw guard",f.headPart,new Vector3(0,-.20f,.76f),
+                new Vector3(.34f,.075f,.18f),armor);
+            for(int side=-1;side<=1;side+=2)
+                Shape(PrimitiveType.Cube,"Hound muzzle vent",f.headPart,
+                    new Vector3(side*.09f,-.08f,.84f),new Vector3(.035f,.05f,.035f),edge,true);
             for(int side=-1;side<=1;side+=2)
             {
-                Shape(PrimitiveType.Cube,"Hound optical eye",f.headPart,new Vector3(side*.18f,.04f,.285f),
-                    new Vector3(.075f,.07f,.04f),new Color(1,.72f,.25f),true);
-                BeveledPlate("Hound ear",f.headPart,new Vector3(side*.22f,.28f,-.03f),
-                    new Vector3(.15f,.34f,.16f),armor,side*-12,.11f,.70f);
+                Shape(PrimitiveType.Sphere,"Hound optical eye",f.headPart,new Vector3(side*.21f,.045f,.35f),
+                    new Vector3(.105f,.10f,.07f),new Color(1,.72f,.25f),true);
+                BeveledPlate("Hound brow",f.headPart,new Vector3(side*.20f,.14f,.35f),
+                    new Vector3(.24f,.075f,.15f),edge,side*8,.035f,.72f);
+                Transform ear=BeveledPlate("Hound upright ear",f.headPart,
+                    new Vector3(side*.24f,.32f,-.07f),new Vector3(.18f,.42f,.20f),armor,
+                    side*-10,.12f,.66f);
+                ear.localRotation=Quaternion.Euler(-12,0,side*-12);
+                Shape(PrimitiveType.Sphere,"Hound shoulder bearing",f.legsPart,
+                    new Vector3(side*.43f,-.37f,.46f),Vector3.one*.24f,edge);
+                Shape(PrimitiveType.Sphere,"Hound hip bearing",f.legsPart,
+                    new Vector3(side*.43f,-.38f,-.53f),Vector3.one*.23f,edge);
             }
-            BeveledPlate("Hound neck bridge",f.legsPart,new Vector3(0,-.24f,.53f),
-                new Vector3(.46f,.25f,.55f),edge,0,.08f,.82f);
-            BeveledPlate("Hound tail root",f.legsPart,new Vector3(0,-.34f,-.77f),
-                new Vector3(.20f,.20f,.34f),edge,18,.07f,.78f);
-            BeveledPlate("Hound tail tip",f.legsPart,new Vector3(0,-.16f,-1.00f),
-                new Vector3(.14f,.18f,.24f),armor,28,.06f,.70f);
+            BeveledPlate("Hound neck bridge",f.legsPart,new Vector3(0,-.27f,.59f),
+                new Vector3(.52f,.32f,.60f),edge,-12,.11f,.78f);
+            BeveledPlate("Hound tail root",f.legsPart,new Vector3(0,-.17f,-.86f),
+                new Vector3(.22f,.22f,.43f),edge,26,.08f,.78f);
+            BeveledPlate("Hound tail mid",f.legsPart,new Vector3(0,.01f,-1.12f),
+                new Vector3(.18f,.19f,.34f),armor,35,.07f,.72f);
+            BeveledPlate("Hound tail tip",f.legsPart,new Vector3(0,.18f,-1.32f),
+                new Vector3(.15f,.18f,.25f),edge,42,.06f,.68f);
         }
         else
         {
@@ -160,8 +209,9 @@ public sealed partial class VoxArena
             BeveledPlate("Tarantula sensor carapace",f.headPart,Vector3.zero,new Vector3(.58f,.28f,.48f),armor,0,.10f,.78f);
             for(int side=-1;side<=1;side+=2)
                 for(int row=0;row<2;row++)
-                    Shape(PrimitiveType.Cube,"Tarantula optic array",f.headPart,
-                        new Vector3(side*(.16f+row*.075f),-.02f-row*.075f,.245f),new Vector3(.07f,.06f,.035f),edge,true);
+                    Shape(PrimitiveType.Sphere,"Tarantula optic array",f.headPart,
+                        new Vector3(side*(.16f+row*.075f),-.02f-row*.075f,.245f),
+                        Vector3.one*(row==0?.085f:.065f),new Color(1,.18f,.38f),true);
         }
         // These archetypes are chassis-first quadrupeds; the inherited biped
         // chest and shoulder rig obscured the four-leg silhouette. Keep their
@@ -174,16 +224,22 @@ public sealed partial class VoxArena
         f.pelvisPart.gameObject.SetActive(false);
         if(f.leftLeg!=null) f.leftLeg.gameObject.SetActive(false);
         if(f.rightLeg!=null) f.rightLeg.gameObject.SetActive(false);
-        Plate("BASTION low tank hull",f.legsPart,new Vector3(0,-.68f,-.02f),new Vector3(1.42f,.58f,1.36f),armor);
-        Plate("Tank front glacis",f.legsPart,new Vector3(0,-.60f,.66f),new Vector3(1.12f,.42f,.18f),edge,-12);
+        Plate("BASTION low tank hull",f.legsPart,new Vector3(0,-.69f,-.02f),
+            new Vector3(1.62f,.60f,1.50f),armor);
+        BeveledPlate("Tank front glacis",f.legsPart,new Vector3(0,-.57f,.68f),
+            new Vector3(1.34f,.42f,.28f),edge,-12,.15f,.82f);
+        Plate("Tank upper deck",f.legsPart,new Vector3(0,-.32f,-.04f),
+            new Vector3(1.15f,.20f,1.03f),dark);
+        Plate("Tank armor prow",f.legsPart,new Vector3(0,-.47f,.68f),
+            new Vector3(.76f,.10f,.15f),armor,-12);
         f.treadLinks=new Transform[2][]; f.treadPerimeter=2.8f;
-        float radius=.34f, halfStraight=.38f;
+        float radius=.39f, halfStraight=.43f;
         f.treadPerimeter=4f*halfStraight+2f*Mathf.PI*radius;
         for(int side=0;side<2;side++)
         {
-            float x=side==0?-.76f:.76f;
-            Transform track=Module("Continuous tank track "+side,f.legsPart,new Vector3(x,-.89f,0));
-            float width=.50f;
+            float x=side==0?-.83f:.83f;
+            Transform track=Module("Continuous tank track "+side,f.legsPart,new Vector3(x,-.91f,0));
+            float width=.60f;
             // Individual shoes form the visible continuous run; omit the solid
             // outer sidewall that hid the links in the first capture.
             f.treadLinks[side]=new Transform[28];
@@ -193,12 +249,46 @@ public sealed partial class VoxArena
                     new Vector3(width,.105f,.15f),i%2==0?edge:dark);
                 f.treadLinks[side][i]=link;
             }
-            for(int wheel=0;wheel<3;wheel++)
+            for(int wheel=0;wheel<4;wheel++)
             {
-                float z=-.40f+wheel*.40f;
+                float z=-.48f+wheel*.32f;
                 Transform roller=Shape(PrimitiveType.Cylinder,"Road roller",track,new Vector3(0,-.06f,z),
-                    new Vector3(.26f,.13f,.26f),edge);
+                    new Vector3(.27f,.14f,.27f),edge);
                 roller.localRotation=Quaternion.Euler(0,0,90);
+            }
+        }
+        // Twin elevated command pods replace the conventional helmet silhouette.
+        foreach(Transform child in f.headPart) child.gameObject.SetActive(false);
+        for(int side=-1;side<=1;side+=2)
+        {
+            BeveledPlate("Bastion square sensor turret",f.corePart,
+                new Vector3(side*.43f,1.22f,-.07f),new Vector3(.53f,.48f,.49f),armor,
+                side*-5,.12f,.86f);
+            Plate("Bastion sensor grille",f.corePart,new Vector3(side*.43f,1.20f,.205f),
+                new Vector3(.34f,.31f,.055f),dark);
+            for(int lens=0;lens<2;lens++)
+                Shape(PrimitiveType.Sphere,"Bastion amber optic",f.corePart,
+                    new Vector3(side*.43f+(lens==0?-.105f:.105f),1.22f+(lens==0?.07f:-.07f),.245f),
+                    Vector3.one*.095f,new Color(1,.48f,.08f),true);
+            Plate("Bastion pod crown",f.corePart,new Vector3(side*.43f,1.49f,-.07f),
+                new Vector3(.60f,.08f,.54f),edge);
+        }
+        Plate("Bastion turret bridge",f.corePart,new Vector3(0,1.17f,-.10f),
+            new Vector3(.34f,.23f,.34f),dark);
+        // Paired shoulder missile trays echo the heavy twin-weapon concept art.
+        for(int side=-1;side<=1;side+=2)
+        {
+            Transform arm=side<0?f.leftArm:f.rightArm;
+            BeveledPlate("Bastion shoulder missile tray",arm,
+                new Vector3(side*.18f,.50f,-.03f),new Vector3(.76f,.29f,.82f),dark,0,.09f,.85f);
+            for(int cell=0;cell<4;cell++)
+            {
+                float x=(cell%2==0?-.16f:.16f), z=cell<2?.18f:-.15f;
+                Plate("Bastion missile cell",arm,new Vector3(side*.18f+x,.67f,z),
+                    new Vector3(.18f,.07f,.18f),edge);
+                Shape(PrimitiveType.Sphere,"Bastion missile status lamp",arm,
+                    new Vector3(side*.18f+x,.715f,z),Vector3.one*.055f,
+                    new Color(1,.45f,.10f),true);
             }
         }
         AnimateTreads(f,0f);
@@ -225,7 +315,7 @@ public sealed partial class VoxArena
         for(int side=0;side<f.treadLinks.Length;side++)
             for(int i=0;i<f.treadLinks[side].Length;i++)
                 PlaceTreadLink(f.treadLinks[side][i],f.treadPhase+i*f.treadPerimeter/f.treadLinks[side].Length,
-                    f.treadPerimeter,0,.34f,.38f);
+                    f.treadPerimeter,0,.39f,.43f);
     }
     void BuildRobot(Fighter f)
     {
@@ -269,6 +359,15 @@ public sealed partial class VoxArena
         Plate("Face mask",f.headPart,new Vector3(0,-.12f,.29f),new Vector3(kestrelSd?.39f:.28f,.22f,.12f),edge);
         Plate("Sensor housing",f.headPart,new Vector3(0,.02f,.30f),new Vector3(kestrelSd?.62f:.49f,kestrelSd?.17f:.15f,.08f),dark);
         Shape(PrimitiveType.Cube,"Visor",f.headPart,new Vector3(0,.03f,.35f),new Vector3(f.frameIndex==5?.16f:kestrelSd?.52f:.40f,kestrelSd?.075f:.065f,.025f),armor,true);
+        if(f.spec.mobility==MobilityKind.Runner)
+            for(int side=-1;side<=1;side+=2)
+            {
+                Shape(PrimitiveType.Sphere,"Wisp cyan optical lens",f.headPart,
+                    new Vector3(side*.145f,.025f,.385f),new Vector3(.10f,.085f,.06f),
+                    new Color(.12f,.85f,1f),true);
+                Plate("Wisp lower face guard",f.headPart,
+                    new Vector3(side*.12f,-.16f,.35f),new Vector3(.18f,.08f,.06f),edge,-8);
+            }
         if(f.frameIndex==5) Plate("Range finder",f.headPart,new Vector3(.31f,.1f,.20f),new Vector3(.17f,.19f,.50f),dark);
         if(!heavy)
             for(int side=-1;side<=1;side+=2)
@@ -416,10 +515,25 @@ public sealed partial class VoxArena
         }
         if(f.spec.mobility==MobilityKind.Runner)
         {
-            f.headPart.localScale=Vector3.one*1.85f;
-            f.headPart.localPosition=new Vector3(0,1.20f,.02f);
-            f.armsPart.localScale=new Vector3(1f,.68f,1f);
-            f.legsPart.localScale=new Vector3(1f,.60f,1f);
+            // Push WISP toward a true super-deformed read: head dominates, torso
+            // and limbs stay compact, and broad feet keep the tiny frame grounded.
+            f.headPart.localScale=Vector3.one*2.02f;
+            f.headPart.localPosition=new Vector3(0,1.16f,.02f);
+            f.corePart.localScale=new Vector3(.91f,.90f,.92f);
+            f.armsPart.localScale=new Vector3(.88f,.74f,.88f);
+            f.legsPart.localScale=new Vector3(1f,.50f,1f);
+            BeveledPlate("Wisp cheek guard L",f.headPart,new Vector3(-.32f,-.12f,.24f),
+                new Vector3(.20f,.20f,.20f),armor,0,.06f,.78f);
+            BeveledPlate("Wisp cheek guard R",f.headPart,new Vector3(.32f,-.12f,.24f),
+                new Vector3(.20f,.20f,.20f),armor,0,.06f,.78f);
+            for(int side=-1;side<=1;side+=2)
+            {
+                Transform antenna=Plate("Wisp swept antenna",f.headPart,
+                    new Vector3(side*.30f,.37f,-.04f),new Vector3(.075f,.38f,.10f),edge);
+                antenna.localRotation=Quaternion.Euler(0,0,side*-24f);
+                Shape(PrimitiveType.Sphere,"Wisp antenna lamp",f.headPart,
+                    new Vector3(side*.38f,.53f,-.04f),Vector3.one*.09f,armor,true);
+            }
         }
         else if(f.spec.mobility==MobilityKind.Tank) BuildTankTracks(f,armor,dark,edge);
         else if(f.spec.mobility==MobilityKind.Quadruped)
@@ -429,9 +543,16 @@ public sealed partial class VoxArena
             f.corePart.localScale=new Vector3(spider?.90f:.88f,spider?.72f:.78f,.88f);
             f.armsPart.localPosition=new Vector3(0,-.22f,0);
             f.armsPart.localScale=new Vector3(.82f,.68f,.82f);
-            f.headPart.localPosition=new Vector3(0,spider?.04f:-.04f,spider?.65f:.84f);
-            f.headPart.localScale=Vector3.one*(spider?.88f:1f);
+            f.headPart.localPosition=new Vector3(0,spider?.04f:-.04f,spider?.65f:1.00f);
+            f.headPart.localScale=spider?Vector3.one*.78f:new Vector3(1.12f,1.10f,1.34f);
+            f.legsPart.localScale=new Vector3(spider?1.12f:1.08f,1f,spider?1.05f:1.08f);
             BuildFourLegs(f,armor,dark,edge);
+        }
+        else if(f.spec.mobility==MobilityKind.Tank)
+        {
+            // A heavier, wider shoulder line balances the new true track base.
+            f.corePart.localScale=new Vector3(1.08f,1.02f,1.04f);
+            f.armsPart.localScale=new Vector3(1.05f,.96f,1.04f);
         }
         f.weaponPart=Module("Right weapon socket",f.rightArm,new Vector3(0,-.75f,.70f));
         if(f.spec.mobility==MobilityKind.Quadruped)

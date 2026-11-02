@@ -184,10 +184,14 @@ public sealed partial class VoxArena
             CraftCatalog.Selectable[2].name=="TARANTULA" && CraftCatalog.Selectable[3].name=="HOUND",
             "hangar roster is limited to four current prototypes");
         TestSetupSelectable(0,1);
-        Check(player.headPart.localScale.x>1.3f && player.legsPart.localScale.y<.8f,
-            "WISP has oversized head and shortened limb silhouette");
+        Check(player.headPart.localScale.x>1.8f && player.legsPart.localScale.y<.6f &&
+            player.corePart.localScale.x<1f && player.headPart.localScale.x/player.corePart.localScale.x>2f,
+            "WISP has oversized head, compact torso and short SD limbs");
         Check(enemy.treadLinks!=null && enemy.treadLinks.Length==2 && enemy.treadLinks[0].Length>=20,
             "BASTION has two continuous animated track runs");
+        Check(enemy.corePart.Find("Bastion square sensor turret")!=null &&
+            enemy.leftArm.Find("Bastion shoulder missile tray")!=null && enemy.pelvisPart.gameObject.activeSelf==false,
+            "BASTION reads as a tracked siege chassis with twin command pods and missile trays");
         Vector3 firstTread=enemy.treadLinks[0][0].localPosition;
         enemy.velocity=Vector3.forward*4f; AnimateTreads(enemy,.1f);
         Check((enemy.treadLinks[0][0].localPosition-firstTread).sqrMagnitude>.01f,
@@ -198,8 +202,16 @@ public sealed partial class VoxArena
             "TARANTULA four-leg rig and raised jump ceiling");
         Check(player.armsPart!=null&&!player.armsPart.gameObject.activeSelf&&player.weaponPart.parent==player.legsPart&&player.gun.gameObject.activeInHierarchy,
             "TARANTULA keeps its gun on a visible chassis mount");
+        Check(player.legsPart.Find("Tarantula rear abdomen shell")!=null &&
+            player.headPart.Find("Tarantula optic array")!=null &&
+            player.quadrupedLegs[0].Find("Upper leg armor").localRotation!=Quaternion.identity,
+            "TARANTULA has a low spider carapace, sensor cluster and splayed limbs");
         Check(enemy.quadrupedLegs!=null && enemy.quadrupedLegs.Length==4 && enemy.spec.name=="HOUND",
             "HOUND canine four-leg rig");
+        Check(enemy.headPart.Find("Hound muzzle")!=null && enemy.headPart.Find("Hound upright ear")!=null &&
+            enemy.legsPart.Find("Hound tail tip")!=null &&
+            enemy.quadrupedLegs[0].Find("Knee articulation/Ankle articulation/Padded paw")!=null,
+            "HOUND has canine muzzle, upright ears, segmented tail and paws");
         Vector3 jumpStart=new Vector3(0,FighterGroundY,0);
         bool clearJumpPath=!ObstacleOnSegment(jumpStart,jumpStart+Vector3.up*9f,player.Radius,out _);
         for(int radius=10;radius<=120&&!clearJumpPath;radius+=10)

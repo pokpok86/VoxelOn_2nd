@@ -10,9 +10,14 @@ These reference images define the visual direction; none is a screenshot of the 
 
 ## Current prototype status
 
-Unity models are procedural block meshes, so they cannot reproduce the illustration's exact surface finish. This pass focuses on silhouette and structure before surface detailing: WISP proportions, a moving linked-track BASTION base, four-joint leg rigs for TARANTULA and HOUND, and each frame's jump ceiling. Existing combat, hit volumes, and controls remain shared.
+Unity models are procedural block meshes, so they cannot reproduce the illustration's exact surface finish. The 2026-11-02 modeling pass reshaped the playable silhouettes and kept combat, hit volumes, and controls shared:
 
-The comparison set is `Implemented/`: 16 actual Unity-build screenshots, four directions per selectable robot. Review them beside the concept before evaluating proportions. Runtime smoke checks confirm the BASTION links scroll under forward movement and TARANTULA reaches a higher jump arc. These are prototype checkpoints, not final art approval.
+- WISP: larger head, compact torso, shorter legs, cyan paired lenses, cheek plates and swept antennas.
+- BASTION: two wider moving track loops with four rollers per side, low armored hull, twin amber sensor pods, and paired shoulder missile trays.
+- TARANTULA: lower split carapace, red multi-eye sensor cluster, and four independently animated outward-splayed articulated legs.
+- HOUND: longer horizontal ribcage, larger forward muzzle and nose, upright ears, visible shoulder/hip bearings, four paws, and a segmented tail.
+
+The comparison set is `Implemented/`: 16 actual Windows-build screenshots, four directions per selectable robot, captured after this pass. Runtime smoke checks cover the modeled features and the existing movement/weapon loop. The latest Windows build completed successfully and the game-player smoke suite passed 217 checks. The shapes remain deliberately voxel-procedural and the official visual target is still not matched in material finish or fine detail; these are intermediate models, not final art approval.
 
 - WISP: `Implemented/01-wisp-front.png` and the matching `right`, `rear`, and `left` files.
 - BASTION: `Implemented/02-bastion-front.png` and the matching four views.
