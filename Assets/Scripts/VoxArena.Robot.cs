@@ -147,8 +147,8 @@ public sealed partial class VoxArena
                 Plate("Shin intake recess",knee,new Vector3(0,-0.410f,.228f),
                     new Vector3(.22f,.28f,.025f),dark);
                 for(int slit=0;slit<3;slit++)
-                    Plate("Shin intake grille "+slit,leg,
-                        new Vector3(0,-.90f-slit*.075f,.248f),
+                    Plate("Shin intake grille "+slit,knee,
+                        new Vector3(0,-.31f-slit*.075f,.248f),
                         new Vector3(.17f,.022f,.018f),edge);
                 BeveledPlate("Shin upper guard",knee,new Vector3(0,-0.110f,.235f),
                     new Vector3(.34f,.12f,.13f),armor,-8);
@@ -156,10 +156,10 @@ public sealed partial class VoxArena
                     new Vector3(.32f,.075f,.12f),hull);
             }
             Plate("Calf booster",knee,new Vector3(0,-0.260f,-.35f),new Vector3(.27f,.46f,.28f),dark,15);
-            Shape(PrimitiveType.Cube,"Calf nozzle",leg,new Vector3(0,-1.1f,-.40f),new Vector3(.16f,.08f,.12f),armor,true);
+            Shape(PrimitiveType.Cube,"Calf nozzle",knee,new Vector3(0,-.51f,-.40f),new Vector3(.16f,.08f,.12f),armor,true);
             Plate("Foot",ankle,new Vector3(0,0.000f,kestrelSd?.18f:.15f),
                 new Vector3(heavy?.61f:kestrelSd?.64f:.42f,kestrelSd?.25f:.22f,kestrelSd?.92f:.76f),dark);
-            BeveledPlate("Toe armor",leg,new Vector3(0,kestrelSd?-1.21f:-1.24f,kestrelSd?.43f:.38f),
+            BeveledPlate("Toe armor",ankle,new Vector3(0,kestrelSd?.13f:.10f,kestrelSd?.43f:.38f),
                 new Vector3(heavy?.57f:kestrelSd?.59f:.39f,kestrelSd?.14f:.12f,kestrelSd?.40f:.30f),armor,-10);
             // Mobility prototype silhouettes: attached to existing animated sockets,
             // with no gameplay collider or change to weapon/boost statistics.
@@ -180,8 +180,8 @@ public sealed partial class VoxArena
                 BeveledPlate("Tank greave armor",knee,new Vector3(side*.48f,-0.320f,.06f),
                     new Vector3(.12f,.77f,.67f),armor,0,.17f,.78f);
                 for(int tread=0;tread<4;tread++)
-                    Plate("Tank tread relief "+tread,leg,
-                        new Vector3(side*.555f,-1.20f+tread*.18f,.06f),
+                    Plate("Tank tread relief "+tread,knee,
+                        new Vector3(side*.555f,-.61f+tread*.18f,.06f),
                         new Vector3(.035f,.055f,.54f),edge);
             }
             Plate("Backpack booster",f.backPart,new Vector3(side*.38f,0,-.10f),new Vector3(.31f,.90f,.43f),edge);
