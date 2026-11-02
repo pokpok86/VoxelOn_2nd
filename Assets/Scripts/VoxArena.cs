@@ -709,6 +709,16 @@ public sealed partial class VoxArena : MonoBehaviour
         if(f.shadow!=null) { f.shadow.position=new Vector3(f.root.position.x,GroundSurfaceY+.06f,f.root.position.z); f.shadow.localScale=new Vector3(2.7f*f.spec.size,.012f,2.1f*f.spec.size); }
         Vector3 localVelocity=f.root.InverseTransformDirection(f.velocity);
         f.body.localRotation=f.knockdownTime>0?Quaternion.Euler(68,0,0):Quaternion.Euler(Mathf.Clamp(localVelocity.z*.65f,-16,16)+jumpChargePose*28f,0,Mathf.Clamp(-localVelocity.x*.5f,-12,12));
+        // BASTION's tracks follow the chassis yaw, while the root/core/weapon
+        // continue to follow the independently aimed facing vector.
+        // Use the body's world rotation so lean/knockdown cannot tilt the track deck.
+        if(f.spec.mobility==MobilityKind.Tank && f.legsPart!=null)
+        {
+            Vector3 chassis=Vector3.ProjectOnPlane(f.chassisForward,Vector3.up);
+            if(chassis.sqrMagnitude>.0001f)
+                f.legsPart.localRotation=Quaternion.Inverse(f.body.rotation)*Quaternion.LookRotation(chassis.normalized,Vector3.up);
+        }
+        else if(f.legsPart!=null) f.legsPart.localRotation=Quaternion.identity;
         float stride=Mathf.Clamp01(Vector3.ProjectOnPlane(f.velocity,Vector3.up).magnitude/Mathf.Max(1f,f.spec.speed));
         float gait=Mathf.Sin(roundTime*(7f+stride*9f))*stride;
         f.leftLeg.localRotation=Quaternion.Euler(gait*25f,0,-5);
