@@ -91,6 +91,9 @@ public sealed partial class VoxArena
         Color wall=arenaMap==ArenaMapKind.IndoorFactory?
             new Color(.16f,.20f,.24f):new Color(.29f,.26f,.22f);
         float height=arenaMap==ArenaMapKind.IndoorFactory?65f:24f;
+        if(arenaMap==ArenaMapKind.IndoorFactory)
+            Box("High hangar ceiling",null,new Vector3(0,GroundSurfaceY+69f,0),
+                new Vector3(200,2,200),new Color(.11f,.15f,.19f));
         for(int axis=0;axis<2;axis++)
         for(int side=-1;side<=1;side+=2)
         {
