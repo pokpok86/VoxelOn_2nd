@@ -23,6 +23,8 @@ public sealed class CraftSpec
     public float jumpHeightScale=1f;
     // Future head-part lock sensor and aim stability values.
     public float lockRange=80f, aimSpreadDegrees=0.6f;
+    // Frame-specific control rule from the official four-archetype concept sheet.
+    public bool supportsLockOn=true;
     // Head sensor memory: lose occluded lock only after this time; distance still hard-limits lock.
     public float occludedLockSeconds=1.5f, occludedLockRange=65f;
     // Leg assembly parameters; step-up height is deliberately below tall jump-only platforms.
@@ -105,14 +107,17 @@ public static class CraftCatalog
         CraftSpec hound=All[6].RuntimeCopy();
         runner.color=new Color(.78f,.84f,.91f);
         runner.role="SD RUNNER";
+        runner.supportsLockOn=false;
         tank.color=new Color(.38f,.47f,.27f);
         tank.role="TRACKED SIEGE FRAME";
+        tank.supportsLockOn=true;
         tank.forwardSpeedFactor=1f; tank.reverseSpeedFactor=.4f;
         tank.leftSpeedFactor=tank.rightSpeedFactor=.6f;
         tank.jumpHeightScale=.72f;
         spider.name="TARANTULA"; spider.mobility=MobilityKind.Quadruped;
         spider.color=new Color(.61f,.31f,.83f);
         spider.role="SPIDER QUADRUPED";
+        spider.supportsLockOn=true;
         spider.usePrototypeMovement=true;
         spider.prototypeBaseSpeed=13.8f;
         spider.forwardSpeedFactor=spider.reverseSpeedFactor=1f;
@@ -124,6 +129,7 @@ public static class CraftCatalog
         hound.name="HOUND"; hound.mobility=MobilityKind.Quadruped;
         hound.color=new Color(.76f,.62f,.42f);
         hound.role="CANINE QUADRUPED";
+        hound.supportsLockOn=false;
         hound.usePrototypeMovement=true;
         hound.prototypeBaseSpeed=13f;
         hound.forwardSpeedFactor=1f; hound.reverseSpeedFactor=1f/3f;

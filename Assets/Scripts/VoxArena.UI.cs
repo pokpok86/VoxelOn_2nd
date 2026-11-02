@@ -93,7 +93,8 @@ public sealed partial class VoxArena
             Panel(new Rect(737,637,2,15),warning); Panel(new Rect(965,637,2,15),warning);
         }
         Text(740, 658, 520, "WASD MOVE / SHIFT BOOST / SPACE JUMP / F CROUCH", small);
-        Text(740, 682, 520, "1/2 GUN / 3 SALVAGE / F PICKUP / F2 TEST LAB", small);
+        Text(740, 682, 520, (player.spec.supportsLockOn?"RMB LOCK-ON":"RMB FREE AIM")+
+            " / LMB FIRE / R RELOAD / SPACE JUMP", small);
         if (!Finished && !paused)
             Text(405, 574, 650, player.lockTime>0?"SPECIAL FIRING / MOVEMENT LOCKED":player.rushTime>0?"SABER RUSH":player.boostLocked ? "BOOST EMPTY / RELEASE SHIFT TO REARM" : AimStatus(), small);
         DrawCombatFeedback();
@@ -141,7 +142,8 @@ public sealed partial class VoxArena
         GUI.color = Color.white;
         Text(50, 558, 1150,"MODULES: HEAD / CORE / ARMS / LEGS / WEAPON  -  ASSEMBLY COMING LATER",small);
         Text(50, 533, 1150, $"ARMOR {chosen.armor*100:0}%   SHIELD {chosen.ShieldMax:0}   MOVE {chosen.speed:0.#} / BOOST {chosen.boostSpeed:0.#}   STORED CONCEPT: {chosen.description}", small);
-        Text(34, 618, 850, "WASD move / mouse look / RMB lock / LMB fire", label);
+        Text(34, 618, 850, "WASD move / mouse look / RMB "+
+            (chosen.supportsLockOn?"lock-on":"no lock-on")+" / LMB fire", label);
         Text(34, 654, 850, "Hold Shift to boost. Space jumps. Empty magazines reload automatically; R reloads early.", small);
         if(GUI.Button(new Rect(210,686,220,25),"AI: "+DifficultyName)) difficulty=(difficulty+1)%3;
         if(GUI.Button(new Rect(450,686,220,25),"AIM ASSIST: "+(aimAssist?"ON":"OFF"))) aimAssist=!aimAssist;

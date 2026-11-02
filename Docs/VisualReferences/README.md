@@ -3,6 +3,7 @@
 These reference images define the visual direction; none is a screenshot of the current build:
 
 - `VoxelOn-four-robot-target-v2.png` — newly generated, higher-finish concept board derived from the producer's references. It is a visual target, not an in-game model or screenshot.
+- `four-robot-lockon-weapons-target.png` — producer's four-frame equipment/gameplay target. It explicitly marks WISP and HOUND as no-lock-on, with BASTION and TARANTULA lock-on capable.
 
 - `four-robot-visual-target.png` — target silhouettes and material direction for WISP, BASTION, TARANTULA, and HOUND. BASTION must use a real tracked lower chassis; TARANTULA must have four articulated spider legs; HOUND must read as a canine quadruped; WISP has an oversized head and short limbs.
 - `voxel-arena-gameplay-target.png` — target third-person voxel battlefield mood, combat readability, and HUD direction.
@@ -16,8 +17,9 @@ Unity models are procedural block meshes, so they cannot reproduce the illustrat
 - BASTION: two wider moving track loops with four rollers per side, low armored hull, twin amber sensor pods, and paired shoulder missile trays.
 - TARANTULA: lower split carapace, red multi-eye sensor cluster, and four independently animated outward-splayed articulated legs.
 - HOUND: longer horizontal ribcage, larger forward muzzle and nose, upright ears, visible shoulder/hip bearings, four paws, and a segmented tail.
+- Lock-on availability follows the supplied sheet: WISP **off**, BASTION **on**, TARANTULA **on**, HOUND **off**. This is now shown in the hangar and enforced by right-click targeting. A lock-required special can still fire without its tracking bonus on a frame that has no lock sensor. The pictured individual weapon, energy-shield, and HOUND blade-mode systems remain concept-only; the current simplified shared gun controls remain in place.
 
-The comparison set is `Implemented/`: 16 actual Windows-build screenshots, four directions per selectable robot, captured after this pass. Runtime smoke checks cover the modeled features and the existing movement/weapon loop. The latest Windows build completed successfully and the game-player smoke suite passed 217 checks. The shapes remain deliberately voxel-procedural and the official visual target is still not matched in material finish or fine detail; these are intermediate models, not final art approval.
+The comparison set is `Implemented/`: 16 actual Windows-build screenshots, four directions per selectable robot, captured after the modeling pass. Runtime smoke checks cover the modeled features and existing movement/weapon loop. The latest Windows build completed successfully and the game-player smoke suite passed 225 checks, including the four-frame lock-on availability and acquisition rules. The shapes remain deliberately voxel-procedural and the official visual target is still not matched in material finish or fine detail; these are intermediate models, not final art approval.
 
 - WISP: `Implemented/01-wisp-front.png` and the matching `right`, `rear`, and `left` files.
 - BASTION: `Implemented/02-bastion-front.png` and the matching four views.

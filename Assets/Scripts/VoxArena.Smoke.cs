@@ -183,6 +183,26 @@ public sealed partial class VoxArena
             CraftCatalog.Selectable[0].name=="WISP" && CraftCatalog.Selectable[1].name=="BASTION" &&
             CraftCatalog.Selectable[2].name=="TARANTULA" && CraftCatalog.Selectable[3].name=="HOUND",
             "hangar roster is limited to four current prototypes");
+        Check(!CraftCatalog.Selectable[0].supportsLockOn && CraftCatalog.Selectable[1].supportsLockOn &&
+            CraftCatalog.Selectable[2].supportsLockOn && !CraftCatalog.Selectable[3].supportsLockOn,
+            "lock-on availability matches official WISP/BASTION/TARANTULA/HOUND concept");
+        TestSetupSelectable(0,1);
+        Check(!CanStartLockOn(player) && CanStartLockOn(enemy),
+            "WISP cannot enter lock-on while BASTION can");
+        targetLock=true;
+        Check(!TryAcquireTargetLock(player,enemy) && !targetLock,
+            "WISP right-click cannot acquire a target lock");
+        Check(TryAcquireTargetLock(enemy,player) && targetLock,
+            "BASTION right-click can acquire a target lock");
+        TestSetupSelectable(2,3);
+        Check(CanStartLockOn(player) && !CanStartLockOn(enemy),
+            "TARANTULA can enter lock-on while HOUND cannot");
+        Check(TryAcquireTargetLock(player,enemy) && targetLock,
+            "TARANTULA right-click can acquire a target lock");
+        Check(!TryAcquireTargetLock(enemy,player) && !targetLock,
+            "HOUND right-click cannot acquire a target lock");
+        Check(CanFireSpecialWithCurrentLock(enemy),
+            "HOUND special remains usable without a lock-on sensor");
         TestSetupSelectable(0,1);
         Check(player.headPart.localScale.x>1.8f && player.legsPart.localScale.y<.6f &&
             player.corePart.localScale.x<1f && player.headPart.localScale.x/player.corePart.localScale.x>2f,

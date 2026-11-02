@@ -311,6 +311,27 @@ public sealed partial class VoxArena : MonoBehaviour
         view.transform.position=Vector3.Lerp(view.transform.position,center+new Vector3(46,58,-46),blend);
         if(starRoot!=null) starRoot.position=new Vector3(Mathf.Floor(center.x/80)*80,0,Mathf.Floor(center.z/80)*80);
     }
+    bool CanStartLockOn(Fighter fighter)
+    {
+        return fighter!=null && fighter.spec!=null && fighter.spec.supportsLockOn;
+    }
+    bool TryAcquireTargetLock(Fighter fighter,Fighter target)
+    {
+        if(!CanStartLockOn(fighter) || target==null ||
+            Vector3.Distance(fighter.root.position,target.root.position)>fighter.spec.lockRange)
+        {
+            targetLock=false;
+            return false;
+        }
+        targetLock=true;
+        occludedLockTimer=fighter.spec.occludedLockSeconds;
+        return true;
+    }
+    bool CanFireSpecialWithCurrentLock(Fighter fighter)
+    {
+        return fighter!=null && fighter.spec!=null &&
+            (!RequiresHomingLock(fighter.spec.special) || targetLock || !CanStartLockOn(fighter));
+    }
     void PlayerInput(float dt)
     {
         if(Input.GetKeyDown(KeyCode.Alpha1)) player.weaponSlot=1;
@@ -380,11 +401,11 @@ public sealed partial class VoxArena : MonoBehaviour
             player.jumpHoldElapsed=0f;
             player.jumpVelocity=jumpSpeed*player.spec.jumpImpulseScale/Mathf.Sqrt(Mathf.Max(.5f,player.spec.jumpWeightFactor));
         }
-        if(Input.GetMouseButtonDown(1) && Vector3.Distance(player.root.position,enemy.root.position)<=player.spec.lockRange)
-        {
-            targetLock=true; occludedLockTimer=player.spec.occludedLockSeconds;
-        }
-        if(Input.GetMouseButtonUp(1) || Vector3.Distance(player.root.position,enemy.root.position)>player.spec.lockRange) targetLock=false;
+        bool lockOnAvailable=CanStartLockOn(player);
+        if(!lockOnAvailable) targetLock=false;
+        if(lockOnAvailable && Input.GetMouseButtonDown(1)) TryAcquireTargetLock(player,enemy);
+        if(!lockOnAvailable || Input.GetMouseButtonUp(1) ||
+            Vector3.Distance(player.root.position,enemy.root.position)>player.spec.lockRange) targetLock=false;
         if(!targetLock)
         {
             cameraYaw+=Input.GetAxis("Mouse X")*mouseSensitivity;
@@ -431,7 +452,7 @@ public sealed partial class VoxArena : MonoBehaviour
             else if(player.weaponSlot==2)
             {
                 if(player.specialTimer>0) player.failedFireFlash=.2f;
-                else if(!RequiresHomingLock(player.spec.special) || targetLock) Special(player,enemy,aimDirection);
+                else if(CanFireSpecialWithCurrentLock(player)) Special(player,enemy,aimDirection);
                 else player.failedFireFlash=.2f;
             }
         }
