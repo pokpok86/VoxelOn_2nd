@@ -233,6 +233,8 @@ public sealed partial class VoxArena
         Plate("Tank armor prow",f.legsPart,new Vector3(0,-.47f,.68f),
             new Vector3(.76f,.10f,.15f),armor,-12);
         f.treadLinks=new Transform[2][]; f.treadPerimeter=2.8f;
+        f.treadSidePhases=new float[2];
+        f.previousTreadHeading=Vector3.ProjectOnPlane(f.chassisForward,Vector3.up).normalized;
         float radius=.39f, halfStraight=.43f;
         f.treadPerimeter=4f*halfStraight+2f*Mathf.PI*radius;
         for(int side=0;side<2;side++)
@@ -310,16 +312,31 @@ public sealed partial class VoxArena
         // Track travel follows chassis forward, not the independently aimed root/upper body.
         Vector3 chassis=Vector3.ProjectOnPlane(f.chassisForward,Vector3.up);
         if(chassis.sqrMagnitude<.0001f) chassis=Vector3.forward;
-        float speed=Vector3.Dot(f.velocity,chassis.normalized);
-        f.treadPhase=Mathf.Repeat(f.treadPhase+speed*dt,f.treadPerimeter);
+        chassis.Normalize();
+        float speed=Vector3.Dot(f.velocity,chassis);
+        // Each track travels a different distance during a chassis yaw. The track
+        // centers are +/-0.83m, so pure pivoting drives opposite shoe directions.
+        if(f.treadSidePhases==null || f.treadSidePhases.Length!=f.treadLinks.Length)
+            f.treadSidePhases=new float[f.treadLinks.Length];
+        Vector3 previous=Vector3.ProjectOnPlane(f.previousTreadHeading,Vector3.up);
+        if(previous.sqrMagnitude<.0001f) previous=chassis;
+        float yawRadians=Vector3.SignedAngle(previous.normalized,chassis,Vector3.up)*Mathf.Deg2Rad;
+        f.previousTreadHeading=chassis;
         for(int side=0;side<f.treadLinks.Length;side++)
+        {
+            float sideOffset=side==0?-.83f:.83f;
+            f.treadSidePhases[side]=Mathf.Repeat(
+                f.treadSidePhases[side]+speed*dt+yawRadians*sideOffset,f.treadPerimeter);
             for(int i=0;i<f.treadLinks[side].Length;i++)
-                PlaceTreadLink(f.treadLinks[side][i],f.treadPhase+i*f.treadPerimeter/f.treadLinks[side].Length,
+                PlaceTreadLink(f.treadLinks[side][i],
+                    f.treadSidePhases[side]+i*f.treadPerimeter/f.treadLinks[side].Length,
                     f.treadPerimeter,0,.39f,.43f);
+        }
     }
     void BuildRobot(Fighter f)
     {
         f.treadLinks=null; f.treadPerimeter=0f; f.treadPhase=0f;
+        f.treadSidePhases=null; f.previousTreadHeading=f.chassisForward;
         f.quadrupedLegs=null; f.quadrupedKnees=null; f.quadrupedAnkles=null;
         if(f.body!=null) { f.body.gameObject.SetActive(false); Destroy(f.body.gameObject); }
         f.body=Module("Modular robot",f.root,Vector3.zero);
