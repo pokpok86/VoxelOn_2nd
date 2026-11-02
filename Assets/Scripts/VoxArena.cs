@@ -48,7 +48,7 @@ public sealed partial class VoxArena : MonoBehaviour
         public float dashRemaining,dashCooldownLeft;
         // Part modifiers: replace with equipped leg/booster stats when assembly is implemented.
         public float dashSpeedFactor=1f,dashDistanceFactor=1f,dashCostFactor=1f;
-        public bool boostHeld,wasBoostHeld,boostLocked,boosting,rushHit,jumpHeld;
+        public bool boostHeld,wasBoostHeld,boostLocked,boosting,rushHit,jumpHeld,jumpChargeCanceled;
         public string aiState="APPROACH";
         public float Radius=>CraftRadius*spec.size;
     }
@@ -182,7 +182,7 @@ public sealed partial class VoxArena : MonoBehaviour
             f.pulseTime=f.lockTime=f.rushTime=f.aiClock=f.aiReaction=f.stuckTime=f.orbitTime=0;
             f.velocity=f.aiMove=f.smoothedTargetVelocity=Vector3.zero;
             f.boostHeld=f.wasBoostHeld=f.boostLocked=f.boosting=f.rushHit=f.jumpHeld=false;
-            f.jumpHeight=f.jumpVelocity=f.jumpOriginY=f.jumpHoldElapsed=0; f.crouching=false; f.failedFireFlash=0;
+            f.jumpHeight=f.jumpVelocity=f.jumpOriginY=f.jumpHoldElapsed=0; f.jumpChargeCanceled=false; f.crouching=false; f.failedFireFlash=0;
             f.knockdownTime=f.invulnerableTime=0;
             f.dashRemaining=f.dashCooldownLeft=0;
             f.dashDirection=Vector3.zero;
@@ -316,11 +316,18 @@ public sealed partial class VoxArena : MonoBehaviour
         {
             bool grounded=player.jumpHeight<=.02f && player.jumpVelocity<=0f;
             bool canCharge=grounded && player.knockdownTime<=0f && player.lockTime<=0f;
-            if(player.jumpHeld && canCharge)
+            // Shift cancels an ongoing charge, and cancellation remains latched
+            // until Space is released so a held key cannot silently restart it.
+            if(boostPressed && player.jumpHeld && player.jumpHoldElapsed>0f)
+            {
+                player.jumpHoldElapsed=0f;
+                player.jumpChargeCanceled=true;
+            }
+            if(player.jumpHeld && canCharge && !player.jumpChargeCanceled)
                 player.jumpHoldElapsed=Mathf.Min(player.spec.jumpChargeSeconds,player.jumpHoldElapsed+dt);
             else if(Input.GetKeyUp(KeyCode.Space))
             {
-                if(canCharge && player.jumpHoldElapsed>0f)
+                if(canCharge && !player.jumpChargeCanceled && player.jumpHoldElapsed>0f)
                 {
                     float charge=Mathf.Clamp01(player.jumpHoldElapsed/Mathf.Max(.01f,player.spec.jumpChargeSeconds));
                     float power=Mathf.Lerp(player.spec.jumpMinImpulseFactor,player.spec.jumpImpulseScale,charge);
@@ -328,6 +335,7 @@ public sealed partial class VoxArena : MonoBehaviour
                     player.jumpVelocity=jumpSpeed*power/Mathf.Sqrt(Mathf.Max(.5f,player.spec.jumpWeightFactor));
                 }
                 player.jumpHoldElapsed=0f;
+                player.jumpChargeCanceled=false;
             }
             else if(!canCharge) player.jumpHoldElapsed=0f;
         }
@@ -622,7 +630,7 @@ public sealed partial class VoxArena : MonoBehaviour
         f.body.localPosition=Vector3.up*(f.knockdownTime>0?-.38f:f.crouching?-.22f:.40f-jumpChargePose*.34f)+Vector3.up*Mathf.Sin(roundTime*2.4f)*.06f;
         if(f.shadow!=null) { f.shadow.position=new Vector3(f.root.position.x,GroundSurfaceY+.06f,f.root.position.z); f.shadow.localScale=new Vector3(2.7f*f.spec.size,.012f,2.1f*f.spec.size); }
         Vector3 localVelocity=f.root.InverseTransformDirection(f.velocity);
-        f.body.localRotation=f.knockdownTime>0?Quaternion.Euler(68,0,0):Quaternion.Euler(Mathf.Clamp(localVelocity.z*.65f,-16,16),0,Mathf.Clamp(-localVelocity.x*.5f,-12,12));
+        f.body.localRotation=f.knockdownTime>0?Quaternion.Euler(68,0,0):Quaternion.Euler(Mathf.Clamp(localVelocity.z*.65f,-16,16)+jumpChargePose*28f,0,Mathf.Clamp(-localVelocity.x*.5f,-12,12));
         float stride=Mathf.Clamp01(Vector3.ProjectOnPlane(f.velocity,Vector3.up).magnitude/Mathf.Max(1f,f.spec.speed));
         float gait=Mathf.Sin(roundTime*(7f+stride*9f))*stride;
         f.leftLeg.localRotation=Quaternion.Euler(gait*25f,0,-5);
