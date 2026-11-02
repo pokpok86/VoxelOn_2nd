@@ -302,7 +302,7 @@ public sealed partial class VoxArena : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Space)&&player.jumpHeight<=.02f && player.knockdownTime<=0f && player.lockTime<=0f)
         {
             player.jumpOriginY=player.root.position.y;
-            player.jumpVelocity=jumpSpeed/Mathf.Sqrt(Mathf.Max(.5f,player.spec.jumpWeightFactor));
+            player.jumpVelocity=jumpSpeed*player.spec.jumpImpulseScale/Mathf.Sqrt(Mathf.Max(.5f,player.spec.jumpWeightFactor));
         }
         if(Input.GetMouseButtonDown(1) && Vector3.Distance(player.root.position,enemy.root.position)<=player.spec.lockRange)
         {
@@ -439,13 +439,13 @@ public sealed partial class VoxArena : MonoBehaviour
         // Vertical thrust shares fuel with horizontal boost; larger/heavier frames cost more.
         if(f.jumpHeight<=.02f && f.jumpVelocity>0) f.jumpOriginY=f.root.position.y;
         bool airborne=f.jumpHeight>0 || f.jumpVelocity>0;
-        bool verticalBoost=airborne && f.jumpHeight<jumpMaxHeight && f.jumpHeld && !f.boostLocked && f.boostEnergy>0;
+        bool verticalBoost=f.spec.allowVerticalBoost && airborne && f.jumpHeight<jumpMaxHeight && f.jumpHeld && !f.boostLocked && f.boostEnergy>0;
         if(verticalBoost)
         {
             float weightFactor=Mathf.Max(.5f,f.spec.jumpWeightFactor); // Explicit per-frame tuning, independent of armor and visual scale.
             float drain=jumpBoostDrain*weightFactor*dt;
             float fraction=drain>0?Mathf.Min(1,f.boostEnergy/drain):1;
-            f.jumpVelocity+=jumpThrust/weightFactor*fraction*dt;
+            f.jumpVelocity+=jumpThrust*f.spec.verticalBoostScale/weightFactor*fraction*dt;
             f.boostEnergy=Mathf.Max(0,f.boostEnergy-drain);
             f.recoveryTime=recoveryDelay;
             if(f.boostEnergy<=0) f.boostLocked=true;
@@ -484,13 +484,20 @@ public sealed partial class VoxArena : MonoBehaviour
         }
         // Tank prototype favors forward travel; lateral/reverse movement remains possible.
         // No visual track or independent turret is implied by this movement-only tuning.
-        if(f.spec.mobility==MobilityKind.Tank && desired.sqrMagnitude>.001f)
+        if(f.spec.mobility==MobilityKind.Tank && !f.spec.usePrototypeMovement && desired.sqrMagnitude>.001f)
         {
             Vector3 heading=Vector3.ProjectOnPlane(f.facing,Vector3.up).normalized;
             float forward=Vector3.Dot(desired.normalized,heading);
             desired*=forward>.5f?1.3f:forward<-.5f?.55f:.7f;
         }
         if(f.crouching) desired*=.4f;
+        // Tank handling prototype: changing direction bleeds momentum, then ramps back.
+        // Applies only to opt-in rigs; existing standard frames keep their response.
+        if(f.spec.usePrototypeMovement && f.spec.turnAcceleration>0f && !dashing)
+        {
+            Vector3 previous=Vector3.ProjectOnPlane(f.velocity,Vector3.up);
+            desired=Vector3.MoveTowards(previous,desired,f.spec.speed*f.spec.turnAcceleration*dt);
+        }
         if(f.spec.boost==BoostKind.Glide && !dashing) desired=Vector3.Lerp(Vector3.ProjectOnPlane(f.velocity,Vector3.up),desired,1-Mathf.Exp(-10*dt));
         if(f.lockTime>0) { desired=Vector3.zero; f.lockTime=Mathf.Max(0,f.lockTime-dt); }
         if(f.knockdownTime>0) { desired=Vector3.zero; f.boosting=false; }
@@ -510,7 +517,7 @@ public sealed partial class VoxArena : MonoBehaviour
         {
             float severity=Mathf.Clamp01((preLandingFallSpeed-15f)/20f);
             float recovery=Mathf.Max(.2f,f.spec.recoverySpeed);
-            f.knockdownTime=Mathf.Max(f.knockdownTime,(.2f+.55f*severity)/recovery);
+            f.knockdownTime=Mathf.Max(f.knockdownTime,(.2f+.55f*severity)*f.spec.landingStaggerScale/recovery);
             f.dashRemaining=0;
         }
         if(f.jumpHeight<=.001f && f.jumpVelocity<0) f.jumpVelocity=0;
