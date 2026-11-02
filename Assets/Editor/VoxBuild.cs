@@ -14,6 +14,12 @@ public static class VoxBuild
         var arena = new GameObject("VoxSky Arena").AddComponent<VoxArena>();
         arena.hullShader = Shader.Find("Standard");
         if (arena.hullShader == null) throw new Exception("Standard shader unavailable");
+        arena.wispModelSource=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/WISP/WISP_v001.fbx");
+        arena.wispSwordSource=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/WISP/WISP_Sword_v001.fbx");
+        arena.wispShieldSource=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/WISP/WISP_Shield_v001.fbx");
+        arena.wispBaseColorTexture=AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Art/Robots/WISP/Textures/WISP_BaseColor.png");
+        arena.wispEmissionTexture=AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Art/Robots/WISP/Textures/WISP_Emission.png");
+        if(arena.wispModelSource==null) Debug.LogWarning("WISP FBX is not installed; procedural WISP fallback will be used.");
         Directory.CreateDirectory("Assets/Scenes");
         EditorSceneManager.SaveScene(scene, "Assets/Scenes/Arena.unity");
         EditorBuildSettings.scenes = new [] { new EditorBuildSettingsScene("Assets/Scenes/Arena.unity", true) };
@@ -24,7 +30,7 @@ public static class VoxBuild
         PlayerSettings.fullScreenMode = FullScreenMode.Windowed;
         PlayerSettings.runInBackground = true;
         AssetDatabase.SaveAssets();
-        Debug.Log("VOXSKY_SCENE_READY");
+        Debug.Log("VOXSKY_SCENE_READY WISP_FBX="+(arena.wispModelSource!=null));
     }
 
     public static void BuildWindows()

@@ -6,6 +6,11 @@ using UnityEngine;
 public sealed partial class VoxArena : MonoBehaviour
 {
     public Shader hullShader;
+    [Header("Imported artist model references")]
+    public GameObject wispModelSource;
+    public GameObject wispSwordSource,wispShieldSource;
+    public Texture2D wispBaseColorTexture,wispEmissionTexture;
+    Material wispRuntimeMaterial;
     public float boostRecovery = 40, recoveryDelay = .6f;
     [Header("Jump and vertical boost")]
     public float jumpSpeed = 10.6f, jumpGravity = 24f, jumpThrust = 34f, jumpBoostDrain = 24f;
@@ -705,7 +710,8 @@ public sealed partial class VoxArena : MonoBehaviour
         UpdateMechanicalAudio(f,Time.deltaTime);
         f.root.rotation=Quaternion.LookRotation(f.facing);
         float jumpChargePose=f.spec.chargedReleaseJump && f.jumpHeld && f.jumpHeight<=.02f ? Mathf.Clamp01(f.jumpHoldElapsed/Mathf.Max(.01f,f.spec.jumpChargeSeconds)):0f;
-        f.body.localPosition=Vector3.up*(f.knockdownTime>0?-.38f:f.crouching?-.22f:.40f-jumpChargePose*.34f)+Vector3.up*Mathf.Sin(roundTime*2.4f)*.06f;
+        float neutralBodyHeight=f.spec.name=="WISP"&&wispModelSource!=null?0f:.40f;
+        f.body.localPosition=Vector3.up*(f.knockdownTime>0?-.38f:f.crouching?-.22f:neutralBodyHeight-jumpChargePose*.34f)+Vector3.up*Mathf.Sin(roundTime*2.4f)*.06f;
         if(f.shadow!=null) { f.shadow.position=new Vector3(f.root.position.x,GroundSurfaceY+.06f,f.root.position.z); f.shadow.localScale=new Vector3(2.7f*f.spec.size,.012f,2.1f*f.spec.size); }
         Vector3 localVelocity=f.root.InverseTransformDirection(f.velocity);
         f.body.localRotation=f.knockdownTime>0?Quaternion.Euler(68,0,0):Quaternion.Euler(Mathf.Clamp(localVelocity.z*.65f,-16,16)+jumpChargePose*28f,0,Mathf.Clamp(-localVelocity.x*.5f,-12,12));
@@ -727,7 +733,7 @@ public sealed partial class VoxArena : MonoBehaviour
         AnimateTreads(f,Time.deltaTime);
         f.leftArm.localRotation=Quaternion.Euler(-gait*13f,0,0);
         f.rightArm.localRotation=Quaternion.Euler(gait*13f,0,0);
-        f.gun.gameObject.SetActive(true);
+        f.gun.gameObject.SetActive(f.rushTime<=0f);
         f.shield.gameObject.SetActive(f.shieldFlash>0&&!Finished&&!inMenu);
         bool jumpExhaust=f.jumpVelocity>1f&&!inMenu&&!Finished;
         bool moveExhaust=f.boosting&&Vector3.ProjectOnPlane(f.velocity,Vector3.up).sqrMagnitude>1&&!inMenu&&!Finished;

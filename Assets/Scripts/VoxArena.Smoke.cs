@@ -204,9 +204,15 @@ public sealed partial class VoxArena
         Check(CanFireSpecialWithCurrentLock(enemy),
             "HOUND special remains usable without a lock-on sensor");
         TestSetupSelectable(0,1);
-        Check(player.headPart.localScale.x>1.8f && player.legsPart.localScale.y<.6f &&
-            player.corePart.localScale.x<1f && player.headPart.localScale.x/player.corePart.localScale.x>2f,
-            "WISP has oversized head, compact torso and short SD limbs");
+        if(wispModelSource!=null)
+            Check(player.headPart.name=="Head"&&player.headPart.GetComponentInChildren<Renderer>(true)!=null&&
+                player.legsPart.Find("Left_thigh/Left_knee/Left_ankle")!=null&&
+                player.headPart.parent==player.body&&player.corePart.parent==player.body,
+                "WISP uses artist-authored head and compact articulated leg structure");
+        else
+            Check(player.headPart.localScale.x>1.8f && player.legsPart.localScale.y<.6f &&
+                player.corePart.localScale.x<1f && player.headPart.localScale.x/player.corePart.localScale.x>2f,
+                "WISP has oversized head, compact torso and short SD limbs");
         Check(enemy.treadLinks!=null && enemy.treadLinks.Length==2 && enemy.treadLinks[0].Length>=20,
             "BASTION has two continuous animated track runs");
         Check(enemy.corePart.Find("Bastion square sensor turret")!=null &&
@@ -346,6 +352,9 @@ public sealed partial class VoxArena
         TestSetup(2);
         enemy.root.position=player.root.position+Vector3.forward*12;
         Special(player,enemy,Vector3.forward);
+        Check(player.saber.gameObject.activeInHierarchy&&
+            player.saber.GetComponentsInChildren<Renderer>(true).Length>0,
+            "WISP saber rush activates the delivered sword model");
         TestStep(.6f);
         float afterRush=enemy.hp+enemy.shieldEnergy;
         Check(afterRush<enemy.spec.health+enemy.spec.ShieldMax && player.rushTime==0,"saber rush reaches and strikes");
@@ -587,6 +596,35 @@ public sealed partial class VoxArena
             Check(player.spec.name==CraftCatalog.Selectable[i].name && player.selectableIndex==i,
                 "playable prototype selection "+CraftCatalog.Selectable[i].name);
             Check(framePortraits[i]!=null && framePortraits[i].IsCreated(),"prototype portrait rendered "+i);
+            if(i==0 && wispModelSource!=null)
+            {
+                Transform hand=player.leftArm.Find("Left_elbow/Left_hand");
+                Transform rightHand=player.rightArm.Find("Right_elbow/Right_hand");
+                Renderer visor=player.headPart.GetComponentInChildren<Renderer>(true);
+                Transform oldChest=player.body.Find("Core module/Armor chest");
+                Check(player.headPart.name=="Head"&&player.corePart.name=="Core"&&
+                    player.armsPart.name=="Arms"&&player.legsPart.name=="Legs"&&
+                    player.headPart.parent==player.body&&player.corePart.parent==player.body&&
+                    player.armsPart.parent==player.body&&player.legsPart.parent==player.body,
+                    "WISP uses artist FBX with separate head/core/arms/legs modules");
+                Check(rightHand!=null&&hand!=null&&player.saber.parent==rightHand.Find("SWORD_SOCKET")&&
+                    player.weaponPart.parent==player.rightArm&&
+                    player.leftLeg.Find("Left_knee/Left_ankle")!=null&&
+                    player.rightLeg.Find("Right_knee/Right_ankle")!=null,
+                    "WISP imported arm, leg, weapon and saber pivots remain connected");
+                Check(player.saber.name=="WISP sword v001"&&
+                    player.rightArm.Find("Right_elbow/Right_hand/SWORD_SOCKET/WISP sword v001")!=null&&
+                    player.leftArm.Find("Left_elbow/SHIELD_SOCKET/WISP shield v001 (visual only)")!=null&&
+                    !player.saber.gameObject.activeSelf,
+                    "WISP designer sword is used for its existing rush and shield is attached as a visual part");
+                Check(visor!=null&&visor.sharedMaterial.mainTexture==wispBaseColorTexture&&
+                    wispRuntimeMaterial!=null&&wispRuntimeMaterial.GetTexture("_EmissionMap")==wispEmissionTexture,
+                    "WISP base-color and emission texture atlas maps are assigned (base="+(visor!=null&&visor.sharedMaterial.mainTexture!=null?visor.sharedMaterial.mainTexture.name:"null")+" emission="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.GetTexture("_EmissionMap")!=null?wispRuntimeMaterial.GetTexture("_EmissionMap").name:"null")+")");
+                Check(oldChest!=null&&oldChest.GetComponent<Renderer>().enabled==false,
+                    "WISP duplicate procedural torso armor is hidden");
+                Check(Mathf.Abs(player.body.localPosition.y)<.1f,
+                    "WISP imported feet use the documented ground origin");
+            }
         }
         TestSetup(0,1);
         TestSetup(); SetPaused(false); ToggleGuide();

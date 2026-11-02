@@ -19,7 +19,7 @@ Unity models are procedural block meshes, so they cannot reproduce the illustrat
 - HOUND: longer horizontal ribcage, larger forward muzzle and nose, upright ears, visible shoulder/hip bearings, four paws, and a segmented tail.
 - Lock-on availability follows the supplied sheet: WISP **off**, BASTION **on**, TARANTULA **on**, HOUND **off**. This is now shown in the hangar and enforced by right-click targeting. A lock-required special can still fire without its tracking bonus on a frame that has no lock sensor. The pictured individual weapon, energy-shield, and HOUND blade-mode systems remain concept-only; the current simplified shared gun controls remain in place.
 
-The comparison set is `Implemented/`: 16 actual Windows-build screenshots, four directions per selectable robot, captured after the modeling pass. Runtime smoke checks cover the modeled features and existing movement/weapon loop. The latest Windows build completed successfully and the game-player smoke suite passed 225 checks, including the four-frame lock-on availability and acquisition rules. The shapes remain deliberately voxel-procedural and the official visual target is still not matched in material finish or fine detail; these are intermediate models, not final art approval.
+The comparison set is `Implemented/`: 16 actual Windows-build screenshots (four directions per selectable robot). Captures were regenerated on 2026-11-03 after WISP's delivered FBXs were connected. WISP now uses the artist-authored 249-node model, separated head/core/arms/legs, base-color and emission atlases, shield mesh, and sword mesh for its existing saber-rush special. The shield mesh is cosmetic; shared combat rules remain unchanged. BASTION, TARANTULA and HOUND remain procedural. Unity 6000.6.7f1 Windows build passed and the player smoke suite passed **232 checks**, including WISP module/socket, attachment activation, and texture assertions. The images remain intermediate implementation references, not final art approval.
 
 - WISP: `Implemented/01-wisp-front.png` and the matching `right`, `rear`, and `left` files.
 - BASTION: `Implemented/02-bastion-front.png` and the matching four views.
@@ -31,7 +31,7 @@ The comparison set is `Implemented/`: 16 actual Windows-build screenshots, four 
 1. Compare the Unity capture against `four-robot-visual-target.png` at matching scale and camera angle.
 2. BASTION: confirm two continuous track loops touch the floor and rotate with forward/reverse travel; do not count shin tread decoration as tracks.
 3. TARANTULA and HOUND: confirm four independently animated legs, knee/ankle joints, and distinct spider/canine head profiles.
-4. WISP: confirm the head is visibly larger and limbs shorter than the other frames.
+4. WISP: compare the imported designer mesh and detachable module pivots against the supplied handoff table; review material finish and silhouette against the concept.
 5. Check that weapon firing, target lock, collision, and ground movement still work with the new visual hierarchy.
 
 Do not add final detailing or declare a silhouette approved without producer review.

@@ -84,8 +84,10 @@ public sealed partial class VoxArena
             Transform hip=side<0?f.leftLeg:f.rightLeg;
             if(hip==null) continue;
             Transform knee=hip.Find(side<0?"Left knee pivot":"Right knee pivot");
+            if(knee==null && f.spec.name=="WISP") knee=hip.Find(side<0?"Left_knee":"Right_knee");
             if(knee==null) continue;
             Transform ankle=knee.Find(side<0?"Left ankle pivot":"Right ankle pivot");
+            if(ankle==null && f.spec.name=="WISP") ankle=knee.Find(side<0?"Left_ankle":"Right_ankle");
             float cycle=Mathf.Sin(phase+(side<0?0f:Mathf.PI));
             float lift=Mathf.Max(0f,cycle)*stride;
             float bend=airborne?(runner?37f:heavy?18f:29f):
@@ -218,6 +220,136 @@ public sealed partial class VoxArena
         // weapon on a dedicated center mount, not visible humanoid arms.
         f.corePart.gameObject.SetActive(false);
         f.armsPart.gameObject.SetActive(false);
+    }
+    void ApplyImportedWisp(Fighter f)
+    {
+        if(wispModelSource==null || f.spec.name!="WISP") return;
+
+        Transform legacyCore=f.corePart,legacyHead=f.headPart,legacyArms=f.armsPart,legacyLegs=f.legsPart;
+        GameObject imported=Instantiate(wispModelSource,f.body);
+        imported.name="WISP artist model v001";
+        Transform root=imported.transform.Find("Root");
+        Transform arms=root!=null?root.Find("Arms"):null;
+        Transform core=root!=null?root.Find("Core"):null;
+        Transform head=root!=null?root.Find("Head"):null;
+        Transform legs=root!=null?root.Find("Legs"):null;
+        Transform rightShoulder=arms!=null?arms.Find("Right_shoulder"):null;
+        Transform rightHand=rightShoulder!=null?rightShoulder.Find("Right_elbow/Right_hand"):null;
+        Transform leftShoulder=arms!=null?arms.Find("Left_shoulder"):null;
+        Transform leftHand=leftShoulder!=null?leftShoulder.Find("Left_elbow/Left_hand"):null;
+        Transform leftThigh=legs!=null?legs.Find("Left_thigh"):null;
+        Transform rightThigh=legs!=null?legs.Find("Right_thigh"):null;
+        if(root==null || arms==null || core==null || head==null || legs==null || rightShoulder==null || rightHand==null || leftShoulder==null || leftHand==null || leftThigh==null || rightThigh==null)
+        {
+            Debug.LogError("WISP FBX v001 is missing a required module or joint. Keeping the procedural WISP model.");
+            Destroy(imported);
+            return;
+        }
+
+        // Keep each artist-authored module under the game's existing modular body root.
+        // The supplied FBX is already in meters, +Y up, +Z forward, with feet at Y=0.
+        foreach(Transform part in new[]{arms,core,head,legs}) part.SetParent(f.body,false);
+        f.armsPart=arms; f.corePart=core; f.headPart=head; f.legsPart=legs;
+        f.pelvisPart=core.Find("Pelvis"); f.backPart=core.Find("BACKPACK_SOCKET");
+        f.leftArm=leftShoulder; f.rightArm=rightShoulder;
+        f.leftLeg=leftThigh; f.rightLeg=rightThigh;
+
+        // Preserve weapon and boost effects while removing only duplicate primitive armor.
+        Transform[] obsolete={legacyCore,legacyHead,legacyArms,legacyLegs};
+        foreach(Transform group in obsolete)
+            if(group!=null)
+                foreach(Renderer renderer in group.GetComponentsInChildren<Renderer>(true))
+                {
+                    Transform t=renderer.transform;
+                    if((f.gun!=null && t.IsChildOf(f.gun)) || (f.fist!=null && t.IsChildOf(f.fist)) ||
+                       (f.saber!=null && t.IsChildOf(f.saber)) || (f.thruster!=null && t.IsChildOf(f.thruster)) ||
+                       (f.jumpFlame!=null && t.IsChildOf(f.jumpFlame)) || (f.shield!=null && t.IsChildOf(f.shield))) continue;
+                    renderer.enabled=false;
+                }
+
+        // Existing movement animation drives the imported shoulder and thigh pivots.
+        // Place the common rapid-fire weapon at the documented right-hand socket.
+        f.weaponPart.SetParent(rightShoulder,false);
+        f.weaponPart.localPosition=new Vector3(.07f,-.81f,.115f);
+        f.weaponPart.localRotation=Quaternion.identity;
+        f.weaponPart.localScale=Vector3.one;
+        // Keep the existing saber rush functional, now rooted at the imported left hand.
+        Transform proceduralSaber=f.saber;
+        proceduralSaber.gameObject.SetActive(false);
+        f.shield.SetParent(f.body,false);
+
+        Transform[] importedModules={arms,core,head,legs};
+        if(wispRuntimeMaterial==null)
+        {
+            Material source=null;
+            foreach(Transform module in importedModules)
+                foreach(Renderer renderer in module.GetComponentsInChildren<Renderer>(true))
+                {
+                    foreach(Material material in renderer.sharedMaterials)
+                        if(material!=null) { source=material; break; }
+                    if(source!=null) break;
+                }
+            if(source!=null)
+            {
+                Shader atlasShader=Shader.Find("Standard");
+                wispRuntimeMaterial=new Material(atlasShader!=null?atlasShader:source.shader);
+                wispRuntimeMaterial.name="WISP_Atlas_Runtime";
+                if(source.HasProperty("_Color") && wispRuntimeMaterial.HasProperty("_Color"))
+                    wispRuntimeMaterial.SetColor("_Color",source.GetColor("_Color"));
+                if(wispBaseColorTexture!=null)
+                {
+                    if(wispRuntimeMaterial.HasProperty("_BaseMap")) wispRuntimeMaterial.SetTexture("_BaseMap",wispBaseColorTexture);
+                    if(wispRuntimeMaterial.HasProperty("_MainTex")) wispRuntimeMaterial.SetTexture("_MainTex",wispBaseColorTexture);
+                }
+                if(wispEmissionTexture!=null && wispRuntimeMaterial.HasProperty("_EmissionMap"))
+                {
+                    wispRuntimeMaterial.SetTexture("_EmissionMap",wispEmissionTexture);
+                    wispRuntimeMaterial.EnableKeyword("_EMISSION");
+                    if(wispRuntimeMaterial.HasProperty("_EmissionColor")) wispRuntimeMaterial.SetColor("_EmissionColor",Color.white*2.5f);
+                }
+                if(wispRuntimeMaterial.HasProperty("_Metallic")) wispRuntimeMaterial.SetFloat("_Metallic",.05f);
+                if(wispRuntimeMaterial.HasProperty("_Glossiness")) wispRuntimeMaterial.SetFloat("_Glossiness",.14f);
+            }
+        }
+        if(wispRuntimeMaterial!=null)
+        {
+            foreach(Transform module in importedModules)
+            foreach(Renderer renderer in module.GetComponentsInChildren<Renderer>(true))
+            {
+                Material[] materials=renderer.sharedMaterials;
+                for(int i=0;i<materials.Length;i++) materials[i]=wispRuntimeMaterial;
+                renderer.sharedMaterials=materials;
+            }
+        }
+        Transform swordSocket=rightHand.Find("SWORD_SOCKET");
+        if(wispSwordSource!=null && swordSocket!=null)
+        {
+            GameObject sword=Instantiate(wispSwordSource,swordSocket,false);
+            sword.name="WISP sword v001";
+            sword.transform.localPosition=Vector3.zero;
+            sword.transform.localRotation=Quaternion.identity;
+            sword.transform.localScale=Vector3.one;
+            foreach(Renderer renderer in sword.GetComponentsInChildren<Renderer>(true))
+                if(wispRuntimeMaterial!=null) renderer.sharedMaterial=wispRuntimeMaterial;
+            f.saber=sword.transform;
+            f.saber.gameObject.SetActive(false);
+        }
+        Transform shieldSocket=leftShoulder.Find("Left_elbow/SHIELD_SOCKET");
+        if(wispShieldSource!=null && shieldSocket!=null)
+        {
+            GameObject shieldMesh=Instantiate(wispShieldSource,shieldSocket,false);
+            shieldMesh.name="WISP shield v001 (visual only)";
+            shieldMesh.transform.localPosition=Vector3.zero;
+            shieldMesh.transform.localRotation=Quaternion.identity;
+            shieldMesh.transform.localScale=Vector3.one;
+            foreach(Renderer renderer in shieldMesh.GetComponentsInChildren<Renderer>(true))
+                if(wispRuntimeMaterial!=null) renderer.sharedMaterial=wispRuntimeMaterial;
+        }
+        if(wispSwordSource!=null && swordSocket==null)
+            Debug.LogWarning("WISP sword FBX was supplied, but the documented SWORD_SOCKET was not found.");
+        if(wispShieldSource!=null && shieldSocket==null)
+            Debug.LogWarning("WISP shield FBX was supplied, but the documented SHIELD_SOCKET was not found.");
+        Debug.Log("WISP_ART_MODEL_APPLIED v001; base="+(wispBaseColorTexture!=null)+" emission="+(wispEmissionTexture!=null)+" shader="+(wispRuntimeMaterial!=null?wispRuntimeMaterial.shader.name:"none")+" emissionProperty="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.HasProperty("_EmissionMap"))+" emissionMapped="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.GetTexture("_EmissionMap")!=null));
     }
     void BuildTankTracks(Fighter f,Color armor,Color dark,Color edge)
     {
@@ -760,6 +892,7 @@ public sealed partial class VoxArena
             }
         }
         AddFrameIdentity(f,armor,hull,dark,edge);
+        ApplyImportedWisp(f);
     }
     RenderTexture[] framePortraits;
     void BuildPortraits()
