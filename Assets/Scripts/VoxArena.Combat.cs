@@ -256,6 +256,7 @@ public sealed partial class VoxArena
             if(cover && (!hit || coverDistance<=targetDistance))
             {
                 Vector3 impact=from+(to-from).normalized*Mathf.Max(0,coverDistance-.12f);
+                DamageDestructibleCover(impact,s.damage*(s.blast>0?1.6f:1f));
                 if(s.blast>0) Explode(s,impact); else Burst(impact,TeamColor(s.owner),3);
                 RemoveShot(i); continue;
             }
