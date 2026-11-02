@@ -40,7 +40,7 @@ public sealed partial class VoxArena : MonoBehaviour
         public float pulseTime,lockTime,rushTime,aiClock,aiReaction,stuckTime,orbitTime;
         public Vector3 aiMove,lastPosition,smoothedTargetVelocity;
         public int orbitSign=1;
-        public float jumpHeight,jumpVelocity,jumpOriginY;
+        public float jumpHeight,jumpVelocity,jumpOriginY,jumpHoldElapsed;
         public bool crouching;
         public float failedFireFlash;
         public float knockdownTime,invulnerableTime;
@@ -182,7 +182,7 @@ public sealed partial class VoxArena : MonoBehaviour
             f.pulseTime=f.lockTime=f.rushTime=f.aiClock=f.aiReaction=f.stuckTime=f.orbitTime=0;
             f.velocity=f.aiMove=f.smoothedTargetVelocity=Vector3.zero;
             f.boostHeld=f.wasBoostHeld=f.boostLocked=f.boosting=f.rushHit=f.jumpHeld=false;
-            f.jumpHeight=f.jumpVelocity=f.jumpOriginY=0; f.crouching=false; f.failedFireFlash=0;
+            f.jumpHeight=f.jumpVelocity=f.jumpOriginY=f.jumpHoldElapsed=0; f.crouching=false; f.failedFireFlash=0;
             f.knockdownTime=f.invulnerableTime=0;
             f.dashRemaining=f.dashCooldownLeft=0;
             f.dashDirection=Vector3.zero;
@@ -315,6 +315,7 @@ public sealed partial class VoxArena : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Space)&&player.jumpHeight<=.02f && player.knockdownTime<=0f && player.lockTime<=0f)
         {
             player.jumpOriginY=player.root.position.y;
+            player.jumpHoldElapsed=0f;
             player.jumpVelocity=jumpSpeed*player.spec.jumpImpulseScale/Mathf.Sqrt(Mathf.Max(.5f,player.spec.jumpWeightFactor));
         }
         if(Input.GetMouseButtonDown(1) && Vector3.Distance(player.root.position,enemy.root.position)<=player.spec.lockRange)
@@ -485,6 +486,17 @@ public sealed partial class VoxArena : MonoBehaviour
         // Holding Space adds fuel-powered lift, capped at a readable obstacle-clearing height.
         if(f.jumpHeight>=jumpMaxHeight && f.jumpVelocity>0) f.jumpVelocity=0;
         float gravityScale=f.jumpVelocity<0?fallGravityMultiplier:1f;
+        // A short tap gives a low hop; holding Space within the early ascent
+        // reduces gravity. Releasing ends the hold window for this jump.
+        if(f.spec.variableJumpHeight && f.jumpVelocity>0f && f.jumpHeight>0f)
+        {
+            if(!f.jumpHeld) f.jumpHoldElapsed=f.spec.jumpHoldWindow;
+            else if(f.jumpHoldElapsed<f.spec.jumpHoldWindow)
+            {
+                gravityScale*=Mathf.Clamp(f.spec.jumpHeldGravityFactor,.1f,1f);
+                f.jumpHoldElapsed+=dt;
+            }
+        }
         f.jumpVelocity-=jumpGravity*gravityScale*f.spec.fallGravityFactor*dt;
         Vector3 desired=motion*speed;
         if(dashing)
