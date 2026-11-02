@@ -15,6 +15,15 @@ public sealed partial class VoxArena
     sealed class Debris { public Transform visual; public Vector3 origin,size; public float phase,hp; public bool destroyed; }
     readonly List<Bounds> obstacles=new List<Bounds>();
     readonly List<Debris> debris=new List<Debris>();
+    sealed class CoverFragment
+    {
+        public Transform visual;
+        public Vector3 velocity;
+        public float spin,age;
+        public bool settled;
+    }
+    readonly List<CoverFragment> coverFragments=new List<CoverFragment>();
+    const int MaxCoverFragments=320;
     Transform starRoot;
     // Terrain blocks share the obstacle model so navigation, shots and landing agree.
     readonly List<Bounds> terrainSteps=new List<Bounds>();
@@ -213,6 +222,7 @@ public sealed partial class VoxArena
     void UpdateObstacles(float dt)
     {
         spaceClock+=dt;
+        UpdateCoverFragments(dt);
         for(int i=0;i<debris.Count;i++)
         {
             Debris d=debris[i];
@@ -223,6 +233,63 @@ public sealed partial class VoxArena
             obstacles[i]=DebrisBounds(p,d.size);
         }
         if(player!=null) { ResolveOverlap(player); ResolveOverlap(enemy); }
+    }
+    void ScatterCoverFragments(Debris source,Vector3 impact)
+    {
+        if(source.visual==null) return;
+        // Sample the actual child renderers: fragments inherit the cover's
+        // original painted colours, not a generic explosion palette.
+        Renderer[] parts=source.visual.GetComponentsInChildren<Renderer>();
+        if(parts.Length==0) return;
+        int count=Mathf.Clamp(Mathf.RoundToInt(source.size.x*source.size.z*.48f),16,34);
+        for(int j=0;j<count;j++)
+        {
+            Renderer part=parts[Random.Range(0,parts.Length)];
+            if(part==null) continue;
+            Color color=part.sharedMaterial!=null && part.sharedMaterial.HasProperty("_Color")?
+                part.sharedMaterial.color:new Color(.32f,.36f,.37f);
+            Vector3 spawn=part.bounds.center+new Vector3(
+                Random.Range(-.4f,.4f),Random.Range(-.3f,.3f),Random.Range(-.4f,.4f));
+            float scale=j%5==0?Random.Range(.55f,.95f):Random.Range(.16f,.43f);
+            Transform piece=Box("Visual-only cover fragment",null,spawn,
+                Vector3.one*scale,color);
+            Collider collider=piece.GetComponent<Collider>();
+            if(collider!=null) Destroy(collider);
+            Vector3 direction=(spawn-impact).normalized+
+                new Vector3(Random.Range(-1f,1f),Random.Range(.15f,1.3f),Random.Range(-1f,1f));
+            direction.Normalize();
+            coverFragments.Add(new CoverFragment{
+                visual=piece,velocity=direction*Random.Range(4f,11f),
+                spin=Random.Range(-260f,260f)
+            });
+        }
+        // Retain a bounded set of settled debris, so long matches do not
+        // accumulate thousands of GameObjects. All fragments are visual only.
+        while(coverFragments.Count>MaxCoverFragments)
+        {
+            CoverFragment oldest=coverFragments[0];
+            if(oldest.visual!=null) Destroy(oldest.visual.gameObject);
+            coverFragments.RemoveAt(0);
+        }
+    }
+    void UpdateCoverFragments(float dt)
+    {
+        foreach(CoverFragment fragment in coverFragments)
+        {
+            if(fragment.visual==null || fragment.settled) continue;
+            fragment.age+=dt;
+            fragment.velocity+=Vector3.down*19f*dt;
+            Vector3 next=fragment.visual.position+fragment.velocity*dt;
+            float floor=GroundSurfaceY+fragment.visual.localScale.y*.5f;
+            if(next.y<=floor)
+            {
+                next.y=floor;
+                fragment.velocity=Vector3.zero;
+                fragment.settled=true;
+            }
+            fragment.visual.position=next;
+            fragment.visual.Rotate(Vector3.up,fragment.spin*dt,Space.World);
+        }
     }
     void DamageDestructibleCover(Vector3 impact,float damage)
     {
@@ -237,6 +304,7 @@ public sealed partial class VoxArena
             d.hp-=Mathf.Max(0,damage);
             if(d.hp>0) return;
             d.destroyed=true;
+            ScatterCoverFragments(d,impact);
             if(d.visual!=null) Destroy(d.visual.gameObject);
             // Keep list indices stable for UpdateObstacles.
             obstacles[i]=new Bounds(new Vector3(0,-10000f,0),Vector3.zero);
