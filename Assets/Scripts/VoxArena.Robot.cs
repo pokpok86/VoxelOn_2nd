@@ -206,8 +206,10 @@ public sealed partial class VoxArena
             {
                 // Heavy tread-inspired greaves are a visual handling cue; this is
                 // still a biped prototype, not a functional tracked vehicle.
-                BeveledPlate("Tank outer greave",knee,new Vector3(side*.32f,-0.320f,-.06f),
-                    new Vector3(.27f,.98f,.82f),dark,0,.12f,.92f);
+                // Widen the continuous outer tread housing outward for a heavier tank silhouette.
+                // Keep the knee pivot, tread relief and gameplay collision unchanged.
+                BeveledPlate("Tank outer greave",knee,new Vector3(side*.35f,-0.320f,-.06f),
+                    new Vector3(.33f,.98f,.82f),dark,0,.12f,.92f);
                 BeveledPlate("Tank greave armor",knee,new Vector3(side*.48f,-0.320f,.06f),
                     new Vector3(.12f,.77f,.67f),armor,0,.17f,.78f);
                 for(int tread=0;tread<4;tread++)
