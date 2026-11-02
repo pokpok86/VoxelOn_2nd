@@ -440,7 +440,7 @@ public sealed partial class VoxArena : MonoBehaviour
         bool wants=!dashing&&f.boostHeld&&direction.sqrMagnitude>.01f;
         f.boosting=wants&&!f.boostLocked&&f.lockTime<=0;
         Vector3 motion=Vector3.ClampMagnitude(direction,1);
-        float speed=f.spec.speed;
+        float speed=f.spec.usePrototypeMovement?f.spec.prototypeBaseSpeed:f.spec.speed;
         if(f.boosting)
         {
             float active=dt;
@@ -511,7 +511,7 @@ public sealed partial class VoxArena : MonoBehaviour
         if(f.spec.usePrototypeMovement && f.spec.turnAcceleration>0f && !dashing)
         {
             Vector3 previous=Vector3.ProjectOnPlane(f.velocity,Vector3.up);
-            desired=Vector3.MoveTowards(previous,desired,f.spec.speed*f.spec.turnAcceleration*dt);
+            desired=Vector3.MoveTowards(previous,desired,speed*f.spec.turnAcceleration*dt);
         }
         if(f.spec.boost==BoostKind.Glide && !dashing) desired=Vector3.Lerp(Vector3.ProjectOnPlane(f.velocity,Vector3.up),desired,1-Mathf.Exp(-10*dt));
         if(f.lockTime>0) { desired=Vector3.zero; f.lockTime=Mathf.Max(0,f.lockTime-dt); }
