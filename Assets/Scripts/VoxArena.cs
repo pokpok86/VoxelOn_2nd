@@ -289,6 +289,19 @@ public sealed partial class VoxArena : MonoBehaviour
         float y=(Input.GetKey(KeyCode.W)?1:0)-(Input.GetKey(KeyCode.S)?1:0);
         Vector3 move=Vector3.ClampMagnitude(right*x+forward*y,1);
         player.boostHeld=Input.GetKey(KeyCode.LeftShift)||Input.GetKey(KeyCode.RightShift);
+        // Runner prototype: forward Shift stays a ground sprint; sideways/backward
+        // Shift starts a short, low-hop distance dash. Legacy frames retain double-tap.
+        bool boostPressed=Input.GetKeyDown(KeyCode.LeftShift)||Input.GetKeyDown(KeyCode.RightShift);
+        if(player.spec.usePrototypeMovement && player.spec.mobility==MobilityKind.Runner &&
+           boostPressed && move.sqrMagnitude>.01f && player.jumpHeight<=.02f)
+        {
+            float forwardIntent=Vector3.Dot(move.normalized,forward);
+            if(forwardIntent<.5f && TryDash(player,move))
+            {
+                player.jumpOriginY=player.root.position.y;
+                player.jumpVelocity=Mathf.Max(player.jumpVelocity,jumpSpeed*.23f);
+            }
+        }
         // A second press of the same movement key within the window starts a fixed-distance dash.
         KeyCode[] keys={KeyCode.W,KeyCode.A,KeyCode.S,KeyCode.D};
         Vector3[] axes={forward,-right,-forward,right};
