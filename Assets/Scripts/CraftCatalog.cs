@@ -35,9 +35,9 @@ public sealed class CraftSpec
     public float turnAcceleration=0f; // seconds^-1; 0 retains legacy movement
     public float jumpImpulseScale=1f, verticalBoostScale=1f, landingStaggerScale=1f;
     public bool allowVerticalBoost=true;
-    // Variable jump: hold Space briefly to reduce ascent gravity, release for a short hop.
-    public bool variableJumpHeight=false;
-    public float jumpHoldWindow=.32f, jumpHeldGravityFactor=.35f;
+    // Charge on ground while Space is held; release to launch.
+    public bool chargedReleaseJump=false;
+    public float jumpChargeSeconds=.85f, jumpMinImpulseFactor=.38f;
     // Distinguish a rig with no ground booster from one with air lift disabled.
     public bool allowHorizontalBoost=true;
     public float ShieldMax => health <= 300 ? health * .15f : 0;
@@ -100,8 +100,8 @@ public static class CraftCatalog
         spider.forwardSpeedFactor=spider.reverseSpeedFactor=1f;
         spider.leftSpeedFactor=spider.rightSpeedFactor=1f;
         spider.jumpImpulseScale=1.0f; spider.allowVerticalBoost=false;
-        spider.variableJumpHeight=true; spider.jumpHoldWindow=.38f;
-        spider.jumpHeldGravityFactor=.24f;
+        spider.chargedReleaseJump=true; spider.jumpChargeSeconds=.85f;
+        spider.jumpMinImpulseFactor=.38f;
         spider.allowHorizontalBoost=false;
         hound.name="HOUND"; hound.mobility=MobilityKind.Quadruped;
         hound.usePrototypeMovement=true;
