@@ -64,3 +64,18 @@ When implementing, record source SHA, chosen tuning values and WHY, affected fil
 - Numeric preview image created in chat: `voxelon_numeric_geometry_preview.png`, WISP and BASTION simplified 3D cuboid approximation from existing Robot.cs authored dimensions. This is NOT a Unity renderer, full source mesh replay, or gameplay screenshot. Image lives in conversation output, not committed to GitHub.
 - **WHY:** Establish explicit four-form data without silently remapping eight old entries, and check existing authored geometry proportions before expanding visual complexity.
 - **Local QA:** compile `CreateFourFormPrototypes`, verify cloning and 3/4 speed ratios, check the current WISP/BASTION mesh in Unity against numeric preview. Record screenshots and any mismatch. No Unity tests performed.
+
+## 2026-11-02 10:04 KST — TARANTULA booster prohibition (incremental)
+
+### WHY / DESIGN INTENT
+TARANTULA's approved specification explicitly prohibits boosters, but its prototype only disabled vertical lift; generic horizontal boost and legacy Pulse handling could still activate once the four-form roster is wired. Add an explicit per-spec horizontal permission instead of branching on display names or globally disabling boosts.
+
+### CHANGED
+- `work` `0ea1f8132fa4dda17a8922ea5a9326a350a1226b`: `Assets/Scripts/CraftCatalog.cs` adds `allowHorizontalBoost` (default true); sets TARANTULA prototype false.
+- `work` `af5b6bf7f3cbeb8fe37b64dae0e51a0d27edbc2e`: `Assets/Scripts/VoxArena.cs` checks that flag before generic horizontal boost or Pulse activation.
+
+### INVARIANTS
+Existing eight-frame catalog retains its horizontal boost by default; WISP and BASTION boosters are not disabled. TARANTULA's high jump remains independent from boost permissions. No visual geometry changed, so no BEFORE/AFTER image generated.
+
+### VALIDATION / LIMITATIONS / NEXT
+Unity build, smoke and play: **NOT RUN** (home Windows PC off). Four-form prototypes are not wired into the playable selection yet, so this is an enforced movement-rule prerequisite, **not a completed TARANTULA rig**. When wired, press Shift while walking/airborne and verify no horizontal speed gain, no Pulse, no vertical thrust, while Space jump remains high; verify legacy frames still boost. If unexpectedly boosting, inspect `Move`'s `wants` and Pulse guards and actual runtime spec copy. No change to `main`.
