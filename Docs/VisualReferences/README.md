@@ -1,6 +1,8 @@
 # VoxelOn official visual targets
 
-These three reference images are the producer-provided visual direction, not screenshots of the current build:
+These reference images define the visual direction; none is a screenshot of the current build:
+
+- `VoxelOn-four-robot-target-v2.png` — newly generated, higher-finish concept board derived from the producer's references. It is a visual target, not an in-game model or screenshot.
 
 - `four-robot-visual-target.png` — target silhouettes and material direction for WISP, BASTION, TARANTULA, and HOUND. BASTION must use a real tracked lower chassis; TARANTULA must have four articulated spider legs; HOUND must read as a canine quadruped; WISP has an oversized head and short limbs.
 - `voxel-arena-gameplay-target.png` — target third-person voxel battlefield mood, combat readability, and HUD direction.
