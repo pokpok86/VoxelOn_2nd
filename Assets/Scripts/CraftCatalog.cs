@@ -35,6 +35,8 @@ public sealed class CraftSpec
     public float turnAcceleration=0f; // seconds^-1; 0 retains legacy movement
     public float jumpImpulseScale=1f, verticalBoostScale=1f, landingStaggerScale=1f;
     public bool allowVerticalBoost=true;
+    // Distinguish a rig with no ground booster from one with air lift disabled.
+    public bool allowHorizontalBoost=true;
     public float ShieldMax => health <= 300 ? health * .15f : 0;
     // Per-fighter runtime copy so tuning the rival never mutates the player's catalog preset.
     public CraftSpec RuntimeCopy() => (CraftSpec)MemberwiseClone();
@@ -95,6 +97,7 @@ public static class CraftCatalog
         spider.forwardSpeedFactor=spider.reverseSpeedFactor=1f;
         spider.leftSpeedFactor=spider.rightSpeedFactor=1f;
         spider.jumpImpulseScale=1.35f; spider.allowVerticalBoost=false;
+        spider.allowHorizontalBoost=false;
         hound.name="HOUND"; hound.mobility=MobilityKind.Quadruped;
         hound.usePrototypeMovement=true;
         hound.prototypeBaseSpeed=13f;
