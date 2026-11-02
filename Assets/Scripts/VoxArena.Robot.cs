@@ -217,7 +217,10 @@ public sealed partial class VoxArena
     void AnimateTreads(Fighter f,float dt)
     {
         if(f.treadLinks==null || f.treadPerimeter<=0f) return;
-        float speed=Vector3.Dot(f.root.InverseTransformDirection(f.velocity),Vector3.forward);
+        // Track travel follows chassis forward, not the independently aimed root/upper body.
+        Vector3 chassis=Vector3.ProjectOnPlane(f.chassisForward,Vector3.up);
+        if(chassis.sqrMagnitude<.0001f) chassis=Vector3.forward;
+        float speed=Vector3.Dot(f.velocity,chassis.normalized);
         f.treadPhase=Mathf.Repeat(f.treadPhase+speed*dt,f.treadPerimeter);
         for(int side=0;side<f.treadLinks.Length;side++)
             for(int i=0;i<f.treadLinks[side].Length;i++)
