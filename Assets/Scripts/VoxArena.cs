@@ -409,6 +409,8 @@ public sealed partial class VoxArena : MonoBehaviour
     }
     float BoostDirectionFactor(Fighter f,Vector3 direction)
     {
+        // Prototype tank boost is direction-neutral; legacy frames keep target bias.
+        if(f.spec.usePrototypeMovement && f.spec.mobility==MobilityKind.Tank) return 1f;
         Fighter target=Opponent(f);
         if(target==null) return 1f;
         Vector3 toward=(target.root.position-f.root.position).normalized;
