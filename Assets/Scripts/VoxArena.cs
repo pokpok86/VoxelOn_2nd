@@ -432,12 +432,20 @@ public sealed partial class VoxArena : MonoBehaviour
         // Release both boost controls before rearming an exhausted shared gauge.
         if(!f.boostHeld && !f.jumpHeld) f.boostLocked=false;
         bool wasBoosting=f.boosting;
-        if(f.spec.boost==BoostKind.Pulse && f.boostHeld && !f.wasBoostHeld && f.lockTime<=0 &&
+        if(f.spec.boost==BoostKind.Pulse && !f.spec.usePrototypeMovement && f.boostHeld && !f.wasBoostHeld && f.lockTime<=0 &&
             f.boostEnergy>=f.spec.boostDrain*f.spec.pulseDuration && direction.sqrMagnitude>.01f)
         { f.pulseTime=f.spec.pulseDuration; f.pulseDirection=direction.normalized; }
         f.wasBoostHeld=f.boostHeld;
         bool dashing=f.dashRemaining>0;
         bool wants=!dashing&&f.boostHeld&&direction.sqrMagnitude>.01f;
+        // WISP prototype: Shift is a sprint only while moving forward relative
+        // to the camera-aligned input. Side/reverse Shift uses the low-hop dash.
+        if(f.spec.usePrototypeMovement && f.spec.mobility==MobilityKind.Runner && wants)
+        {
+            Vector3 horizontalFacing=Vector3.ProjectOnPlane(f.facing,Vector3.up).normalized;
+            if(horizontalFacing.sqrMagnitude>.001f &&
+               Vector3.Dot(direction.normalized,horizontalFacing)<.5f) wants=false;
+        }
         f.boosting=wants&&!f.boostLocked&&f.lockTime<=0;
         Vector3 motion=Vector3.ClampMagnitude(direction,1);
         float speed=f.spec.usePrototypeMovement?f.spec.prototypeBaseSpeed:f.spec.speed;
@@ -446,7 +454,7 @@ public sealed partial class VoxArena : MonoBehaviour
             float active=dt;
             float required=f.spec.boostDrain*active;
             float fraction=required>0?Mathf.Min(1,f.boostEnergy/required):1;
-            speed=Mathf.Lerp(f.spec.speed,f.spec.boostSpeed*BoostDirectionFactor(f,motion),fraction*active/dt);
+            speed=Mathf.Lerp(speed,f.spec.boostSpeed*BoostDirectionFactor(f,motion),fraction*active/dt);
             f.boostEnergy=Mathf.Max(0,f.boostEnergy-required); f.recoveryTime=recoveryDelay;
             if(f.boostEnergy<=0) { f.boostLocked=true; f.boosting=false; }
             if(!wasBoosting) PlaySound(SoundKind.Boost,f.root.position,.45f);
