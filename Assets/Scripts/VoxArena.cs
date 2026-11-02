@@ -421,6 +421,8 @@ public sealed partial class VoxArena : MonoBehaviour
     }
     bool TryDash(Fighter f,Vector3 direction)
     {
+        // TARANTULA has no booster: reject double-tap/Shift dash at the shared entry point.
+        if(!f.spec.allowHorizontalBoost) return false;
         if(direction.sqrMagnitude<.01f || f.dashRemaining>0 || f.dashCooldownLeft>0 || f.boostLocked || f.lockTime>0) return false;
         // Runner ground dodges use cooldown/distance, not boost fuel.
         // Airborne dodges still consume the shared gauge.
