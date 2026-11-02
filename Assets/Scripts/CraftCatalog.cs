@@ -40,6 +40,8 @@ public sealed class CraftSpec
     public float jumpChargeSeconds=.85f, jumpMinImpulseFactor=.38f;
     // Distinguish a rig with no ground booster from one with air lift disabled.
     public bool allowHorizontalBoost=true;
+    // Per-frame dash range multiplier; legacy frames remain at 1.0.
+    public float dashRangeScale=1f;
     public float ShieldMax => health <= 300 ? health * .15f : 0;
     // Per-fighter runtime copy so tuning the rival never mutates the player's catalog preset.
     public CraftSpec RuntimeCopy() => (CraftSpec)MemberwiseClone();
@@ -109,6 +111,7 @@ public static class CraftCatalog
         hound.forwardSpeedFactor=1f; hound.reverseSpeedFactor=1f/3f;
         hound.leftSpeedFactor=hound.rightSpeedFactor=1f/3f;
         hound.jumpImpulseScale=1.35f; hound.allowVerticalBoost=false;
+        hound.dashRangeScale=1.45f; // Longer ground dash, not higher dash speed.
         return new[]{runner,tank,spider,hound};
     }
     static CraftCatalog()
