@@ -132,29 +132,32 @@ public sealed partial class VoxArena
             if(side>0) f.fist=Plate("Punch gauntlet",arm,new Vector3(0,-.83f,.82f),new Vector3(.42f,.34f,.42f),armor);
             Transform leg=Module(side<0?"Left leg socket":"Right leg socket",f.legsPart,new Vector3(side*.30f,-.56f,0));
             BeveledPlate("Thigh",leg,new Vector3(0,-.26f,0),new Vector3(heavy?.53f:.37f,.52f,.43f),hull);
-            Plate("Knee coupling",leg,new Vector3(0,-.59f,0),new Vector3(.31f,.22f,.34f),dark);
-            Plate("Armor knee",leg,new Vector3(0,-.60f,.25f),new Vector3(.39f,.29f,.18f),armor,-18);
-            BeveledPlate("Shin",leg,new Vector3(0,-.94f,-.02f),new Vector3(heavy?.57f:.38f,.64f,.46f),hull,-7);
-            Plate("Knee piston",leg,new Vector3(0,-.75f,-.25f),new Vector3(.10f,.42f,.10f),edge);
-            Plate("Shin side trim",leg,new Vector3(side*.24f,-.98f,.08f),new Vector3(.07f,.42f,.29f),armor);
+            // Explicit articulated child pivots. Positions preserve the existing assembled silhouette.
+            Transform knee=Module(side<0?"Left knee pivot":"Right knee pivot",leg,new Vector3(0,-.59f,0));
+            Transform ankle=Module(side<0?"Left ankle pivot":"Right ankle pivot",knee,new Vector3(0,-.75f,0));
+            Plate("Knee coupling",knee,Vector3.zero,new Vector3(.31f,.22f,.34f),dark);
+            Plate("Armor knee",knee,new Vector3(0,-0.010f,.25f),new Vector3(.39f,.29f,.18f),armor,-18);
+            BeveledPlate("Shin",knee,new Vector3(0,-0.350f,-.02f),new Vector3(heavy?.57f:.38f,.64f,.46f),hull,-7);
+            Plate("Knee piston",knee,new Vector3(0,-0.160f,-.25f),new Vector3(.10f,.42f,.10f),edge);
+            Plate("Shin side trim",knee,new Vector3(side*.24f,-0.390f,.08f),new Vector3(.07f,.42f,.29f),armor);
             // Frame 01: a recessed shin intake and two floating armor lips.
             // Attached to the existing leg socket; animation and hitboxes are untouched.
             if(f.frameIndex==0)
             {
-                Plate("Shin intake recess",leg,new Vector3(0,-1.00f,.228f),
+                Plate("Shin intake recess",knee,new Vector3(0,-0.410f,.228f),
                     new Vector3(.22f,.28f,.025f),dark);
                 for(int slit=0;slit<3;slit++)
                     Plate("Shin intake grille "+slit,leg,
                         new Vector3(0,-.90f-slit*.075f,.248f),
                         new Vector3(.17f,.022f,.018f),edge);
-                BeveledPlate("Shin upper guard",leg,new Vector3(0,-.70f,.235f),
+                BeveledPlate("Shin upper guard",knee,new Vector3(0,-0.110f,.235f),
                     new Vector3(.34f,.12f,.13f),armor,-8);
-                Plate("Shin lower guard",leg,new Vector3(0,-1.20f,.22f),
+                Plate("Shin lower guard",knee,new Vector3(0,-0.610f,.22f),
                     new Vector3(.32f,.075f,.12f),hull);
             }
-            Plate("Calf booster",leg,new Vector3(0,-.85f,-.35f),new Vector3(.27f,.46f,.28f),dark,15);
+            Plate("Calf booster",knee,new Vector3(0,-0.260f,-.35f),new Vector3(.27f,.46f,.28f),dark,15);
             Shape(PrimitiveType.Cube,"Calf nozzle",leg,new Vector3(0,-1.1f,-.40f),new Vector3(.16f,.08f,.12f),armor,true);
-            Plate("Foot",leg,new Vector3(0,-1.34f,kestrelSd?.18f:.15f),
+            Plate("Foot",ankle,new Vector3(0,0.000f,kestrelSd?.18f:.15f),
                 new Vector3(heavy?.61f:kestrelSd?.64f:.42f,kestrelSd?.25f:.22f,kestrelSd?.92f:.76f),dark);
             BeveledPlate("Toe armor",leg,new Vector3(0,kestrelSd?-1.21f:-1.24f,kestrelSd?.43f:.38f),
                 new Vector3(heavy?.57f:kestrelSd?.59f:.39f,kestrelSd?.14f:.12f,kestrelSd?.40f:.30f),armor,-10);
@@ -163,18 +166,18 @@ public sealed partial class VoxArena
             if(f.spec.mobility==MobilityKind.Runner)
             {
                 // Readable swept-back sprinting profile, not loose rods.
-                BeveledPlate("Runner calf aero shell",leg,new Vector3(side*.17f,-.95f,-.31f),
+                BeveledPlate("Runner calf aero shell",knee,new Vector3(side*.17f,-0.360f,-.31f),
                     new Vector3(.25f,.76f,.48f),armor,-18,.20f,.65f);
-                BeveledPlate("Runner heel spur",leg,new Vector3(0,-1.34f,-.25f),
+                BeveledPlate("Runner heel spur",ankle,new Vector3(0,0.000f,-.25f),
                     new Vector3(.32f,.15f,.50f),hull,-12,.18f,.70f);
             }
             else if(f.spec.mobility==MobilityKind.Tank)
             {
                 // Heavy tread-inspired greaves are a visual handling cue; this is
                 // still a biped prototype, not a functional tracked vehicle.
-                BeveledPlate("Tank outer greave",leg,new Vector3(side*.32f,-.91f,-.06f),
+                BeveledPlate("Tank outer greave",knee,new Vector3(side*.32f,-0.320f,-.06f),
                     new Vector3(.27f,.98f,.82f),dark,0,.12f,.92f);
-                BeveledPlate("Tank greave armor",leg,new Vector3(side*.48f,-.91f,.06f),
+                BeveledPlate("Tank greave armor",knee,new Vector3(side*.48f,-0.320f,.06f),
                     new Vector3(.12f,.77f,.67f),armor,0,.17f,.78f);
                 for(int tread=0;tread<4;tread++)
                     Plate("Tank tread relief "+tread,leg,
