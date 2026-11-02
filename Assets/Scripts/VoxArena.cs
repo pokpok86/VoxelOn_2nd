@@ -432,12 +432,12 @@ public sealed partial class VoxArena : MonoBehaviour
         // Release both boost controls before rearming an exhausted shared gauge.
         if(!f.boostHeld && !f.jumpHeld) f.boostLocked=false;
         bool wasBoosting=f.boosting;
-        if(f.spec.boost==BoostKind.Pulse && !f.spec.usePrototypeMovement && f.boostHeld && !f.wasBoostHeld && f.lockTime<=0 &&
+        if(f.spec.allowHorizontalBoost && f.spec.boost==BoostKind.Pulse && !f.spec.usePrototypeMovement && f.boostHeld && !f.wasBoostHeld && f.lockTime<=0 &&
             f.boostEnergy>=f.spec.boostDrain*f.spec.pulseDuration && direction.sqrMagnitude>.01f)
         { f.pulseTime=f.spec.pulseDuration; f.pulseDirection=direction.normalized; }
         f.wasBoostHeld=f.boostHeld;
         bool dashing=f.dashRemaining>0;
-        bool wants=!dashing&&f.boostHeld&&direction.sqrMagnitude>.01f;
+        bool wants=f.spec.allowHorizontalBoost&&!dashing&&f.boostHeld&&direction.sqrMagnitude>.01f;
         // WISP prototype: Shift is a sprint only while moving forward relative
         // to the camera-aligned input. Side/reverse Shift uses the low-hop dash.
         if(f.spec.usePrototypeMovement && f.spec.mobility==MobilityKind.Runner && wants)
