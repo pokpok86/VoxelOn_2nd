@@ -75,7 +75,9 @@ public sealed partial class VoxArena
             float lift=Mathf.Max(0f,cycle)*stride;
             float bend=airborne?(runner?37f:heavy?18f:29f):
                 landing?52f:(heavy?16f:runner?43f:30f)*lift;
-            float anklePitch=airborne?-18f:landing?-24f:-bend*.58f+cycle*stride*6f;
+            float charge=f.spec.chargedReleaseJump && f.jumpHeld && f.jumpHeight<=.02f ? Mathf.Clamp01(f.jumpHoldElapsed/Mathf.Max(.01f,f.spec.jumpChargeSeconds)):0f;
+            if(charge>0f) bend=Mathf.Lerp(bend,65f,charge);
+            float anklePitch=charge>0f?-bend*.5f:airborne?-18f:landing?-24f:-bend*.58f+cycle*stride*6f;
             knee.localRotation=Quaternion.Euler(bend,0,0);
             if(ankle!=null) ankle.localRotation=Quaternion.Euler(anklePitch,0,0);
         }
