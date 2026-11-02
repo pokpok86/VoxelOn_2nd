@@ -200,6 +200,13 @@ public sealed partial class VoxArena : MonoBehaviour
         }
         player.root.position=new Vector3(-15,1.1f,-15); enemy.root.position=new Vector3(15,1.1f,15);
         FaceOpponent(player,enemy); FaceOpponent(enemy,player);
+        // FaceOpponent changes aiming on round reset; initialize the independent
+        // chassis heading only here, never on subsequent aim/lock updates.
+        foreach(Fighter f in fighterRoster)
+        {
+            Vector3 heading=Vector3.ProjectOnPlane(f.facing,Vector3.up);
+            f.chassisForward=heading.sqrMagnitude>.001f?heading.normalized:Vector3.forward;
+        }
         cameraYaw=Mathf.Atan2(player.facing.x,player.facing.z)*Mathf.Rad2Deg; targetLock=false;
         player.lastPosition=player.root.position; enemy.lastPosition=enemy.root.position;
         roundTime=0; paused=false; spaceClock=0; cameraShakeTime=cameraShakeStrength=0; UpdateObstacles(0);
