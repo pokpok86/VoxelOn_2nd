@@ -102,7 +102,7 @@ public static class CraftCatalog
         spider.forwardSpeedFactor=spider.reverseSpeedFactor=1f;
         spider.leftSpeedFactor=spider.rightSpeedFactor=1f;
         spider.jumpImpulseScale=1.0f; spider.allowVerticalBoost=false;
-        spider.chargedReleaseJump=true; spider.jumpChargeSeconds=.85f;
+        spider.chargedReleaseJump=true; spider.jumpChargeSeconds=2f;
         spider.jumpMinImpulseFactor=.38f;
         spider.allowHorizontalBoost=false;
         hound.name="HOUND"; hound.mobility=MobilityKind.Quadruped;
