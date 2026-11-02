@@ -31,6 +31,7 @@ public sealed class CraftSpec
     public MobilityKind mobility=MobilityKind.StandardBiped;
     // Per-rig movement spec: common maximum reference; ratios are directional fractions.
     public bool usePrototypeMovement=false;
+    public float prototypeBaseSpeed=13f; // shared reference speed; TARANTULA may exceed it
     public float turnAcceleration=0f; // seconds^-1; 0 retains legacy movement
     public float jumpImpulseScale=1f, verticalBoostScale=1f, landingStaggerScale=1f;
     public bool allowVerticalBoost=true;
@@ -99,6 +100,7 @@ public static class CraftCatalog
                 f.jumpImpulseScale=1f; }
             // Temporary tank-handling test rig; BASTION mesh remains bipedal.
             if(i==1) { f.mobility=MobilityKind.Tank; f.usePrototypeMovement=true;
+                f.forwardSpeedFactor=f.reverseSpeedFactor=f.leftSpeedFactor=f.rightSpeedFactor=1f;
                 f.turnAcceleration=4f; f.jumpImpulseScale=.55f;
                 f.verticalBoostScale=.55f; f.landingStaggerScale=1.35f;
                 f.fallGravityFactor=1.35f; }
