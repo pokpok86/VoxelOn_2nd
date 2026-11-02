@@ -12,7 +12,7 @@ public sealed partial class VoxArena
             // Outdoor floor is warm rock, not the factory grid/runway.
             Box("Canyon sandy stone floor",starRoot,
                 new Vector3(0,GroundSurfaceY+.006f,0),
-                new Vector3(190,.018f,190),new Color(.33f,.29f,.24f));
+                new Vector3(280,.018f,280),new Color(.33f,.29f,.24f));
             return;
         }
         Color seam=new Color(.20f,.25f,.26f),paint=new Color(.31f,.39f,.39f);
