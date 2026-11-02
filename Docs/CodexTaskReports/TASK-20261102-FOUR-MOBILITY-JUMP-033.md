@@ -42,3 +42,10 @@ When implementing, record source SHA, chosen tuning values and WHY, affected fil
 - `ad647afd268bdfe267c093d7f3531d50c37ccf1b`: BASTION prototype boost speed no longer varies with opponent direction; existing non-prototype boost target bias unchanged.
 - **Why:** The previous opponent-relative boost multiplier contradicted the all-direction tank booster requirement. These changes preserve the current boost system while removing one inconsistent speed source.
 - **Still pending:** actual four-rig selection, 3/4 movement and jump, common max speed normalization, new booster implementation for all four, full animation/visuals, Unity compile and gameplay verification.
+
+## Remote checkpoint 4 — shared normal movement speed
+- `f4239f3eb59d6e76d0dd93bc22929c66c9987e1c`: explicit `prototypeBaseSpeed=13f` shared speed reference; BASTION cardinal directional factors set to 1:1:1:1. WISP remains 5:2:3:3 normalized.
+- `ff4fa31ed7c867a800a2ca6bd5ebd6aaff0ebaa2`: prototype rigs use shared 13f normal movement reference, including tank turn acceleration. Legacy frames retain their original per-catalog speeds.
+- **Why:** Earlier WISP speed 15 and BASTION speed 10 violated the user-approved equal maximum baseline. Tank direction change should be a transient acceleration penalty, not a permanent side/reverse penalty.
+- **Known caveat:** Existing horizontal boost still uses legacy per-catalog boostSpeed and may exceed shared reference; requested booster behavior is not fully implemented. Tank turn ramp is a provisional linear acceleration; no independent chassis facing yet. Unity NOT run.
+- **QA:** Measure WISP cardinal speeds 13/5.2/7.8/7.8; BASTION 13 in all cardinal directions after acceleration settles, check 180-degree turnaround delay, ensure old frames unchanged. These are theoretical expected values before collision/animation effects.
