@@ -12,7 +12,7 @@ public sealed partial class VoxArena
     const float GroundSurfaceY=-.91f;
     const float FighterSupportOffset=2.01f;
     const float FighterGroundY=GroundSurfaceY+FighterSupportOffset;
-    sealed class Debris { public Transform visual; public Vector3 origin,size; public float phase; }
+    sealed class Debris { public Transform visual; public Vector3 origin,size; public float phase,hp; public bool destroyed; }
     readonly List<Bounds> obstacles=new List<Bounds>();
     readonly List<Debris> debris=new List<Debris>();
     Transform starRoot;
@@ -200,7 +200,7 @@ public sealed partial class VoxArena
         Transform root=new GameObject("Ground cover "+debris.Count).transform;
         root.position=origin;
         BuildGroundCover(root,size,debris.Count);
-        debris.Add(new Debris{visual=root,origin=origin,size=size,phase=phase});
+        debris.Add(new Debris{visual=root,origin=origin,size=size,phase=phase,hp=120f+size.x*size.z*1.5f});
         obstacles.Add(DebrisBounds(origin,size));
     }
     Bounds DebrisBounds(Vector3 center,Vector3 size)
@@ -216,12 +216,32 @@ public sealed partial class VoxArena
         for(int i=0;i<debris.Count;i++)
         {
             Debris d=debris[i];
+            if(d.destroyed) continue;
             Vector3 p=d.origin; // Ground cover stays fixed so players can learn reliable escape routes.
             d.visual.position=p;
             // Collision bounds and the visual translate together.
             obstacles[i]=DebrisBounds(p,d.size);
         }
         if(player!=null) { ResolveOverlap(player); ResolveOverlap(enemy); }
+    }
+    void DamageDestructibleCover(Vector3 impact,float damage)
+    {
+        // Debris is registered first in obstacles, preserving index alignment.
+        // Terrain steps, perimeter, and structural walls are indestructible.
+        for(int i=0;i<debris.Count;i++)
+        {
+            Debris d=debris[i];
+            if(d.destroyed) continue;
+            Bounds b=obstacles[i];
+            if((b.ClosestPoint(impact)-impact).sqrMagnitude>4f) continue;
+            d.hp-=Mathf.Max(0,damage);
+            if(d.hp>0) return;
+            d.destroyed=true;
+            if(d.visual!=null) Destroy(d.visual.gameObject);
+            // Keep list indices stable for UpdateObstacles.
+            obstacles[i]=new Bounds(new Vector3(0,-10000f,0),Vector3.zero);
+            return;
+        }
     }
     bool Occupied(Vector3 p,float radius)
     {
@@ -344,6 +364,9 @@ public sealed partial class VoxArena
                 float floor=LandingHeight(p,f.Radius,previousY);
                 if(next.y<=floor)
                 {
+                    if(f.jumpVelocity < -9f && floor>FighterGroundY+.3f)
+                        DamageDestructibleCover(new Vector3(p.x,floor-FighterSupportOffset,p.z),
+                            (Mathf.Abs(f.jumpVelocity)-9f)*17f);
                     p.y=floor;
                     f.jumpVelocity=0;
                 }
