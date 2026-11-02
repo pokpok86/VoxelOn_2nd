@@ -81,6 +81,28 @@ public static class CraftCatalog
             430,.22f,10.5f,21.5f,200,11,1.28f,BoostKind.Cruise,0,
             PrimaryKind.Grenade,"BLAST SHELL",26,2.0f,52,56,.65f,SpecialKind.Minefield,"MINEFIELD",12)
     };
+    // Four-form test roster. Runtime copies keep the original eight-frame catalog intact.
+    // Selection/UI wiring and dedicated four-leg geometry are separate tasks.
+    public static CraftSpec[] CreateFourFormPrototypes()
+    {
+        CraftSpec runner=All[2].RuntimeCopy();
+        CraftSpec tank=All[1].RuntimeCopy();
+        CraftSpec spider=All[3].RuntimeCopy();
+        CraftSpec hound=All[6].RuntimeCopy();
+        spider.name="TARANTULA"; spider.mobility=MobilityKind.Quadruped;
+        spider.usePrototypeMovement=true;
+        spider.prototypeBaseSpeed=13.8f;
+        spider.forwardSpeedFactor=spider.reverseSpeedFactor=1f;
+        spider.leftSpeedFactor=spider.rightSpeedFactor=1f;
+        spider.jumpImpulseScale=1.35f; spider.allowVerticalBoost=false;
+        hound.name="HOUND"; hound.mobility=MobilityKind.Quadruped;
+        hound.usePrototypeMovement=true;
+        hound.prototypeBaseSpeed=13f;
+        hound.forwardSpeedFactor=1f; hound.reverseSpeedFactor=1f/3f;
+        hound.leftSpeedFactor=hound.rightSpeedFactor=1f/3f;
+        hound.jumpImpulseScale=1.35f; hound.allowVerticalBoost=false;
+        return new[]{runner,tank,spider,hound};
+    }
     static CraftCatalog()
     {
         // Example head profiles until head parts are independently selectable.
