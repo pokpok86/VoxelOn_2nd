@@ -99,12 +99,14 @@ public sealed partial class VoxArena : MonoBehaviour
     {
         Application.targetFrameRate=120;
         bool performance=Array.IndexOf(Environment.GetCommandLineArgs(),"--performance-test")>=0;
-        smoke=performance||Array.IndexOf(Environment.GetCommandLineArgs(),"--smoke-test")>=0;
+        bool captureGallery=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-docs-gallery")>=0;
+        smoke=performance||captureGallery||Array.IndexOf(Environment.GetCommandLineArgs(),"--smoke-test")>=0;
         if(RunPreferenceProbe()) return;
         BuildWorld(); BuildAudio(); LoadPreferences();
         ApplyCharacter(player,selectedCraft); ApplyCharacter(enemy,rivalSelection<0?1:rivalSelection);
         ResetRound(); BuildPortraits(); inMenu=true;
         if(performance) StartCoroutine(PerformanceTest());
+        else if(captureGallery) StartCoroutine(CaptureDocumentationGallery());
         else if(smoke) StartCoroutine(SmokeTest());
     }
     Material Mat(Color color)

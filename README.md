@@ -61,6 +61,7 @@ WEAPON TUNING에서 탄속·탄 크기·발사 간격을 조절하고 SOUND EFFE
 - [개발 계획](PLAN.md)
 - [검증 기록](docs/PROTOTYPE.md)
 - [아침 플레이 안내와 야간 변경 사항](docs/MORNING_PLAYTEST.md)
+- [게임 화면 갤러리 (기체 8종 4방향 + 전장 배경)](docs/Screenshots/README.md)
 
 야간 작업 전 실행 가능한 백업은 로컬 `Backups/prototype-v6/Windows`, 단계별 소스는 로컬 `Backups/night-*/Scripts`에 보관했습니다. 야간 작업 후 Git을 도입했으며 [클라우드 작업 안내](docs/CLOUD_WORK.md)에 연결 상태를 기록합니다. 빌드·로그·백업은 GitHub에 포함하지 않으므로 새로 내려받은 프로젝트에서는 Unity로 빌드해야 합니다.
 

@@ -12,6 +12,68 @@ public sealed partial class VoxArena
         if(preview==null) throw new System.Exception("Screen capture unavailable");
         File.WriteAllBytes(path,preview.EncodeToPNG()); Destroy(preview); Debug.Log("VOXSKY_PREVIEW "+path);
     }
+    IEnumerator CaptureDocumentationGallery()
+    {
+        yield return new WaitForEndOfFrame();
+        string root=Path.Combine(Directory.GetCurrentDirectory(),"docs","Screenshots");
+        string robots=Path.Combine(root,"Robots"),arena=Path.Combine(root,"Arena");
+        Directory.CreateDirectory(robots); Directory.CreateDirectory(arena);
+        const int width=768,height=432;
+        RenderTexture target=new RenderTexture(width,height,24,RenderTextureFormat.ARGB32);
+        Texture2D image=new Texture2D(width,height,TextureFormat.RGB24,false);
+        RenderTexture previousTarget=view.targetTexture,previousActive=RenderTexture.active;
+        bool previousOrtho=view.orthographic; float previousFov=view.fieldOfView;
+        Color previousBackground=view.backgroundColor; CameraClearFlags previousClear=view.clearFlags;
+        view.targetTexture=target; view.orthographic=false; view.fieldOfView=40;
+        view.clearFlags=CameraClearFlags.SolidColor; view.backgroundColor=new Color(.035f,.055f,.08f);
+        aimMarker.gameObject.SetActive(false);
+        enemy.root.gameObject.SetActive(false); enemy.shadow.gameObject.SetActive(false);
+        player.root.gameObject.SetActive(true); player.shadow.gameObject.SetActive(true);
+        Vector3 center=new Vector3(0,1.1f,0),focus=center+Vector3.up*.7f;
+        Vector3[] directions={Vector3.forward,Vector3.back,Vector3.left,Vector3.right};
+        string[] views={"front","back","left","right"};
+        int written=0;
+        for(int frame=0;frame<CraftCatalog.All.Length;frame++)
+        {
+            ApplyCharacter(player,frame); player.root.position=center; player.root.rotation=Quaternion.identity;
+            player.facing=Vector3.forward; player.velocity=Vector3.zero; player.boosting=false;
+            player.thruster.gameObject.SetActive(false); player.jumpFlame.gameObject.SetActive(false);
+            player.shield.gameObject.SetActive(false); player.saber.gameObject.SetActive(false);
+            player.gun.gameObject.SetActive(true); player.fist.gameObject.SetActive(false);
+            Animate(player);
+            string slug=CraftCatalog.All[frame].name.ToLowerInvariant();
+            for(int angle=0;angle<directions.Length;angle++)
+            {
+                view.transform.position=center+directions[angle]*8.7f+Vector3.up*3f;
+                view.transform.LookAt(focus);
+                view.Render();
+                RenderTexture.active=target; image.ReadPixels(new Rect(0,0,width,height),0,0); image.Apply();
+                string path=Path.Combine(robots,(frame+1).ToString("00")+"-"+slug+"-"+views[angle]+".png");
+                File.WriteAllBytes(path,image.EncodeToPNG()); written++;
+            }
+        }
+        // Capture the same arena from four compass positions without either robot
+        // obscuring the terrain, skyline, cover distribution or perimeter props.
+        player.root.gameObject.SetActive(false); player.shadow.gameObject.SetActive(false);
+        view.fieldOfView=55; view.farClipPlane=600;
+        Vector3[] compass={Vector3.forward,Vector3.right,Vector3.back,Vector3.left};
+        string[] sectors={"north","east","south","west"};
+        for(int i=0;i<compass.Length;i++)
+        {
+            view.transform.position=new Vector3(0,36,0)+compass[i]*78f;
+            view.transform.LookAt(new Vector3(0,0,0));
+            view.Render();
+            RenderTexture.active=target; image.ReadPixels(new Rect(0,0,width,height),0,0); image.Apply();
+            string path=Path.Combine(arena,"arena-"+sectors[i]+"-sector.png");
+            File.WriteAllBytes(path,image.EncodeToPNG()); written++;
+        }
+        RenderTexture.active=previousActive; view.targetTexture=previousTarget;
+        view.orthographic=previousOrtho; view.fieldOfView=previousFov;
+        view.clearFlags=previousClear; view.backgroundColor=previousBackground;
+        Destroy(image); target.Release(); Destroy(target);
+        Debug.Log("VOXSKY_GALLERY_PASS "+written+" images: 8 frames x 4 angles + 4 arena sectors at "+root);
+        Application.Quit(0);
+    }
     void TestSetup(int pilot=0,int rival=0)
     {
         ApplyCharacter(player,pilot); ApplyCharacter(enemy,rival); ResetRound(); inMenu=false;
