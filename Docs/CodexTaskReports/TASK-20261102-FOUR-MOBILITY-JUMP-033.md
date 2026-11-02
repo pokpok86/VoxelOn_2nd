@@ -36,3 +36,9 @@ When implementing, record source SHA, chosen tuning values and WHY, affected fil
 - **Intent:** Make directional booster behavior testable without changing existing combat input or all frames at once. Reuse dash collision/cooldown instead of introducing a parallel collision path.
 - **Limitations:** Shift dash currently inherits the existing dash fuel check/cost and distance, which need tuning; forward run is still legacy boost; airborne/held Shift and other rigs still need dedicated rules. Unity compilation and runtime NOT tested.
 - **Local tests:** WISP Shift+W vs Shift+A/S/D, diagonal forward threshold, pressing Shift while airborne, collision termination, repeated Shift after cooldown, fuel exhaustion, other frame double-tap behavior. Record any unexpected extra horizontal boost immediately after dash.
+
+## Remote checkpoint 3 — BASTION gravity and boost direction
+- `898ab520a3bd9cc723c654056cc95ecc06b291af`: BASTION prototype descent gravity factor 1.35x, consistent with heavy faster-fall request.
+- `ad647afd268bdfe267c093d7f3531d50c37ccf1b`: BASTION prototype boost speed no longer varies with opponent direction; existing non-prototype boost target bias unchanged.
+- **Why:** The previous opponent-relative boost multiplier contradicted the all-direction tank booster requirement. These changes preserve the current boost system while removing one inconsistent speed source.
+- **Still pending:** actual four-rig selection, 3/4 movement and jump, common max speed normalization, new booster implementation for all four, full animation/visuals, Unity compile and gameplay verification.
