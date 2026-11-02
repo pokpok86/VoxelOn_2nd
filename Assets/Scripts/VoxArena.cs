@@ -625,6 +625,7 @@ public sealed partial class VoxArena : MonoBehaviour
     }
     void Animate(Fighter f)
     {
+        UpdateMechanicalAudio(f,Time.deltaTime);
         f.root.rotation=Quaternion.LookRotation(f.facing);
         float jumpChargePose=f.spec.chargedReleaseJump && f.jumpHeld && f.jumpHeight<=.02f ? Mathf.Clamp01(f.jumpHoldElapsed/Mathf.Max(.01f,f.spec.jumpChargeSeconds)):0f;
         f.body.localPosition=Vector3.up*(f.knockdownTime>0?-.38f:f.crouching?-.22f:.40f-jumpChargePose*.34f)+Vector3.up*Mathf.Sin(roundTime*2.4f)*.06f;
