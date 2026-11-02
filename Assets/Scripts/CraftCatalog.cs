@@ -29,6 +29,11 @@ public sealed class CraftSpec
     public SpecialKind special;
     public BoostKind boost;
     public MobilityKind mobility=MobilityKind.StandardBiped;
+    // Per-rig movement spec: common maximum reference; ratios are directional fractions.
+    public bool usePrototypeMovement=false;
+    public float turnAcceleration=0f; // seconds^-1; 0 retains legacy movement
+    public float jumpImpulseScale=1f, verticalBoostScale=1f, landingStaggerScale=1f;
+    public bool allowVerticalBoost=true;
     public float ShieldMax => health <= 300 ? health * .15f : 0;
     // Per-fighter runtime copy so tuning the rival never mutates the player's catalog preset.
     public CraftSpec RuntimeCopy() => (CraftSpec)MemberwiseClone();
@@ -88,9 +93,14 @@ public static class CraftCatalog
             f.stepHeight= i==1 || i==7 ? .52f : .58f;
             f.jumpWeightFactor= i==1 || i==7 ? 1.3f : i==2 || i==5 ? .85f : 1f;
             // WISP is the runner prototype. Tank/quadruped remain opt-in until their models exist.
-            if(i==2) f.mobility=MobilityKind.Runner;
+            if(i==2) { f.mobility=MobilityKind.Runner; f.usePrototypeMovement=true;
+                f.forwardSpeedFactor=1f; f.reverseSpeedFactor=.4f;
+                f.leftSpeedFactor=.6f; f.rightSpeedFactor=.6f;
+                f.jumpImpulseScale=1f; }
             // Temporary tank-handling test rig; BASTION mesh remains bipedal.
-            if(i==1) f.mobility=MobilityKind.Tank;
+            if(i==1) { f.mobility=MobilityKind.Tank; f.usePrototypeMovement=true;
+                f.turnAcceleration=4f; f.jumpImpulseScale=.55f;
+                f.verticalBoostScale=.55f; f.landingStaggerScale=1.35f; }
         }
     }
 }
