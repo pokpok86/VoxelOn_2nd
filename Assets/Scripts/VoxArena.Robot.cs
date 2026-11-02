@@ -212,10 +212,29 @@ public sealed partial class VoxArena
                     new Vector3(.33f,.98f,.82f),dark,0,.12f,.92f);
                 BeveledPlate("Tank greave armor",knee,new Vector3(side*.48f,-0.320f,.06f),
                     new Vector3(.12f,.77f,.77f),armor,0,.17f,.78f);
+                // Closed rectangular tread silhouette on the outside of each greave.
+                // Cosmetic only: tread motion, ground contact and tracked steering
+                // require a separate chassis rig; do not treat this as a tracked drive.
+                for(int tread=0;tread<5;tread++)
+                {
+                    float y=-.70f+tread*.19f;
+                    Plate("Tank tread front "+tread,knee,
+                        new Vector3(side*.555f,y,.40f),
+                        new Vector3(.055f,.15f,.085f),edge);
+                    Plate("Tank tread rear "+tread,knee,
+                        new Vector3(side*.555f,y,-.45f),
+                        new Vector3(.055f,.15f,.085f),edge);
+                }
                 for(int tread=0;tread<4;tread++)
-                    Plate("Tank tread relief "+tread,knee,
-                        new Vector3(side*.555f,-.61f+tread*.18f,.06f),
-                        new Vector3(.035f,.055f,.54f),edge);
+                {
+                    float z=-.37f+tread*.23f;
+                    Plate("Tank tread upper "+tread,knee,
+                        new Vector3(side*.555f,.13f,z),
+                        new Vector3(.055f,.085f,.19f),edge);
+                    Plate("Tank tread lower "+tread,knee,
+                        new Vector3(side*.555f,-.77f,z),
+                        new Vector3(.055f,.085f,.19f),edge);
+                }
             }
             Plate("Backpack booster",f.backPart,new Vector3(side*.38f,0,-.10f),new Vector3(.31f,.90f,.43f),edge);
             Shape(PrimitiveType.Cube,"Backpack nozzle",f.backPart,new Vector3(side*.38f,-.48f,-.14f),new Vector3(.23f,.09f,.27f),armor,true);
