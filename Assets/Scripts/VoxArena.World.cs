@@ -5,6 +5,10 @@ public sealed partial class VoxArena
 {
     // The fighter root is centered near the chest while grounded. Keep the
     // visible floor and obstacle collision bottoms aligned to the same plane.
+    public enum ArenaMapKind { IndoorFactory, OutdoorCanyon }
+    [Header("Arena map (select before Play)")]
+    public ArenaMapKind arenaMap=ArenaMapKind.IndoorFactory;
+    const float ArenaHalfWidth=95f;
     const float GroundSurfaceY=-.91f;
     const float FighterSupportOffset=2.01f;
     const float FighterGroundY=GroundSurfaceY+FighterSupportOffset;
@@ -40,7 +44,10 @@ public sealed partial class VoxArena
         view.gameObject.AddComponent<AudioListener>();
         BuildGround();
         BuildVisualEnvironment();
+        BuildArenaPerimeter();
         BuildSalvage();
+        if(arenaMap==ArenaMapKind.IndoorFactory)
+        {
         AddDebris(new Vector3(-16,1.1f,3),new Vector3(5,4.2f,5),0);
         AddDebris(new Vector3(20,1.1f,38),new Vector3(6,3.4f,5),1.4f);
         AddDebris(new Vector3(-5,1.1f,-19),new Vector3(4,1.8f,6),2.8f);
@@ -70,10 +77,72 @@ public sealed partial class VoxArena
         BuildElevationCourse();
         for(int side=-1;side<=1;side+=2) for(int i=0;i<5;i++)
             obstacles.Add(new Bounds(new Vector3(side*(48+i*14),2,45+i%2*16),new Vector3(10,9+i%3*3,13)));
+        }
+        else BuildCanyonTerrain();
         player=MakeFighter("Pilot frame",Cyan); enemy=MakeFighter("Rival frame",Orange);
         aimMarker=new GameObject("Aim reticle").transform;
         Shape(PrimitiveType.Cube,"Aim cross",aimMarker,Vector3.zero,new Vector3(.8f,.06f,.07f),Cyan,true);
         Shape(PrimitiveType.Cube,"Aim cross",aimMarker,Vector3.zero,new Vector3(.07f,.06f,.8f),Cyan,true);
+    }
+    void BuildArenaPerimeter()
+    {
+        // Geometry is readable from inside, but movement is also clamped so
+        // high-jump and dash fighters cannot escape over a decorative boundary.
+        Color wall=arenaMap==ArenaMapKind.IndoorFactory?
+            new Color(.16f,.20f,.24f):new Color(.29f,.26f,.22f);
+        float height=arenaMap==ArenaMapKind.IndoorFactory?65f:24f;
+        for(int axis=0;axis<2;axis++)
+        for(int side=-1;side<=1;side+=2)
+        {
+            Vector3 size=axis==0?new Vector3(5,height,200):new Vector3(200,height,5);
+            Vector3 pos=axis==0?new Vector3(side*(ArenaHalfWidth+2.5f),GroundSurfaceY+height*.5f,0):
+                new Vector3(0,GroundSurfaceY+height*.5f,side*(ArenaHalfWidth+2.5f));
+            Box(arenaMap==ArenaMapKind.IndoorFactory?"Hangar boundary wall":"Canyon cliff boundary",
+                null,pos,size,wall);
+            if(arenaMap==ArenaMapKind.OutdoorCanyon)
+            {
+                // Layered blocky rock strata; the cliff is a perimeter, not a pit.
+                for(int j=0;j<12;j++)
+                {
+                    float along=-84+j*15.3f;
+                    float rockHeight=9f+Mathf.PerlinNoise(j*.31f,axis+side+2)*13f;
+                    Vector3 rockPos=axis==0?
+                        new Vector3(side*(ArenaHalfWidth-3f),GroundSurfaceY+rockHeight*.5f,along):
+                        new Vector3(along,GroundSurfaceY+rockHeight*.5f,side*(ArenaHalfWidth-3f));
+                    Vector3 rockSize=axis==0?new Vector3(9,rockHeight,16):new Vector3(16,rockHeight,9);
+                    Box("Canyon stratified rock "+axis+" "+side+" "+j,null,rockPos,rockSize,
+                        Color.Lerp(new Color(.25f,.23f,.20f),new Color(.42f,.35f,.27f),j/12f));
+                }
+            }
+        }
+    }
+    void BuildCanyonTerrain()
+    {
+        // Shallow stepped ridges above the base floor: no enclosed depressions.
+        // Each approach is built from 0.32m risers so a fighter can walk back out.
+        Color low=new Color(.34f,.30f,.25f),high=new Color(.43f,.37f,.29f);
+        for(int ridge=0;ridge<7;ridge++)
+        {
+            float cx=-62f+ridge*21f;
+            float cz=(ridge%2==0?24f:-27f);
+            for(int step=0;step<7;step++)
+            {
+                float h=.32f*(step+1);
+                float x=cx+(step-3)*2.6f;
+                AddTerrainBlock("Canyon climbable ridge "+ridge+" "+step,
+                    new Vector3(x,GroundSurfaceY+h*.5f,cz),
+                    new Vector3(2.75f,h,14f+ridge%3*3f),
+                    Color.Lerp(low,high,step/6f));
+            }
+        }
+        // Scattered broad shelves provide sightline variation without dense cover.
+        for(int i=0;i<5;i++)
+        {
+            float x=-50f+i*25f,z=(i%2==0?-57f:55f);
+            float h=1.2f+i%3*.5f;
+            AddTerrainBlock("Canyon shelf "+i,new Vector3(x,GroundSurfaceY+h*.5f,z),
+                new Vector3(10,h,12),low);
+        }
     }
     void AddTerrainBlock(string name,Vector3 center,Vector3 size,Color color)
     {
@@ -278,6 +347,8 @@ public sealed partial class VoxArena
                 else if(!Occupied(next,f.Radius)) p=next;
             }
             p.y=Mathf.Max(FighterGroundY,p.y);
+            p.x=Mathf.Clamp(p.x,-ArenaHalfWidth+f.Radius,ArenaHalfWidth-f.Radius);
+            p.z=Mathf.Clamp(p.z,-ArenaHalfWidth+f.Radius,ArenaHalfWidth-f.Radius);
         }
         f.root.position=p;
     }
