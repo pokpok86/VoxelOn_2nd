@@ -61,6 +61,16 @@ public sealed partial class VoxArena
                         Mathf.Exp(-t*10f)*.17f;
                 data[i]=Mathf.Clamp(sample,-1f,1f);
             }
+            // Keep every generated effect within the same safe peak range while
+            // preserving its waveform shape; newly added mechanical clips had
+            // otherwise exceeded the audio smoke-test ceiling.
+            float peak=0f;
+            for(int i=0;i<count;i++) peak=Mathf.Max(peak,Mathf.Abs(data[i]));
+            if(peak>.30f)
+            {
+                float gain=.30f/peak;
+                for(int i=0;i<count;i++) data[i]*=gain;
+            }
             AudioClip clip=AudioClip.Create("VoxSky "+kind,count,1,44100,false); clip.SetData(data,0); soundClips.Add(kind,clip);
         }
         for(int i=0;i<10;i++)
@@ -84,7 +94,7 @@ public sealed partial class VoxArena
                 stepTimer=0f;
                 bool heavy=fighter.spec.mobility==MobilityKind.Tank;
                 PlaySound(heavy?SoundKind.HeavyStep:SoundKind.Footstep,
-                    fighter.root.position,heavy?.85f:.55f,Random.Range(.91f,1.09f));
+                    fighter.root.position,heavy?.85f:.55f,UnityEngine.Random.Range(.91f,1.09f));
             }
         }
         else stepTimer=0f;

@@ -1,33 +1,28 @@
-# VoxelOn visual prototype — Unity verification checklist
+# VoxelOn official visual targets
 
-Branch: `feature/visual-polish-20261031` (draft PR #6)
+These three reference images are the producer-provided visual direction, not screenshots of the current build:
 
-## What is actually implemented
-- Procedural beveled/tapered armor on all eight frames (chest, shoulder, helmet, forearm, thigh, shin, toe, hip).
-- Extra layered armor tiles **only on frame 01**.
-- Warm directional key, cool directional rim and tuned ambient light.
-- Numeric industrial skyline: eight distant towers with floor bands and light strips.
-- Numeric perimeter pylons and flat arena lane markings.
-- Existing weapon, animation, gameplay, target-lock and collision calculations are intended to remain unchanged.
+- `four-robot-visual-target.png` — target silhouettes and material direction for WISP, BASTION, TARANTULA, and HOUND. BASTION must use a real tracked lower chassis; TARANTULA must have four articulated spider legs; HOUND must read as a canine quadruped; WISP has an oversized head and short limbs.
+- `voxel-arena-gameplay-target.png` — target third-person voxel battlefield mood, combat readability, and HUD direction.
+- `four-frame-mobility-and-weapon-concept.png` — current shared movement/jump ratios and weapon/control design reference. This image is future design guidance; this visual pass does not change weapon inputs or the current weapon rules.
 
-## Important visual limits
-- This is **not** the photorealistic concept illustration, nor a high-resolution voxel asset pipeline.
-- Current models use procedural primitive shapes and beveled meshes; detail is intentionally an intermediate prototype.
-- Environment towers are decorative and intentionally have **no colliders**.
-- No local Unity editor build or screenshot was available when this branch was authored.
+## Current prototype status
 
-## First Unity test
-1. Open the project using the existing Unity version. Wait for script compilation.
-2. If compilation fails, record exact Console messages and file/line before changing anything.
-3. Select frame 01 and compare front, side and rear against the concept image.
-4. Inspect armor normals (dark/invisible faces), shoulder/hip clipping and detached module movement.
-5. Confirm the far skyline appears, but does not block movement or projectile collision.
-6. Test F2 lab, target lock, boost, jump, firing and frame switching.
-7. Record screenshots with the same camera angle for future comparison.
-8. Do not merge the draft PR until Unity compile and play-mode tests pass.
+Unity models are procedural block meshes, so they cannot reproduce the illustration's exact surface finish. This pass focuses on silhouette and structure before surface detailing: WISP proportions, a moving linked-track BASTION base, four-joint leg rigs for TARANTULA and HOUND, and each frame's jump ceiling. Existing combat, hit volumes, and controls remain shared.
 
-## Follow-up priorities
-- Fix mesh face winding and overdraw based on Unity screenshots.
-- Create proper voxelized beveled armor geometry and shared mesh/material caches.
-- Add articulated mechanical joints and higher-quality materials.
-- Tune lighting and performance on the target hardware.
+The comparison set is `Implemented/`: 16 actual Unity-build screenshots, four directions per selectable robot. Review them beside the concept before evaluating proportions. Runtime smoke checks confirm the BASTION links scroll under forward movement and TARANTULA reaches a higher jump arc. These are prototype checkpoints, not final art approval.
+
+- WISP: `Implemented/01-wisp-front.png` and the matching `right`, `rear`, and `left` files.
+- BASTION: `Implemented/02-bastion-front.png` and the matching four views.
+- TARANTULA: `Implemented/03-tarantula-front.png` and the matching four views.
+- HOUND: `Implemented/04-hound-front.png` and the matching four views.
+
+## Model validation checklist
+
+1. Compare the Unity capture against `four-robot-visual-target.png` at matching scale and camera angle.
+2. BASTION: confirm two continuous track loops touch the floor and rotate with forward/reverse travel; do not count shin tread decoration as tracks.
+3. TARANTULA and HOUND: confirm four independently animated legs, knee/ankle joints, and distinct spider/canine head profiles.
+4. WISP: confirm the head is visibly larger and limbs shorter than the other frames.
+5. Check that weapon firing, target lock, collision, and ground movement still work with the new visual hierarchy.
+
+Do not add final detailing or declare a silhouette approved without producer review.

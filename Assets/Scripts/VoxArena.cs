@@ -9,6 +9,8 @@ public sealed partial class VoxArena : MonoBehaviour
     public float boostRecovery = 40, recoveryDelay = .6f;
     [Header("Jump and vertical boost")]
     public float jumpSpeed = 10.6f, jumpGravity = 24f, jumpThrust = 34f, jumpBoostDrain = 24f;
+    [Tooltip("Landing hit-stun is disabled for current playtests; hard landings still use normal movement physics.")]
+    public bool landingStaggerEnabled=false;
     [Tooltip("Maximum vertical rise from takeoff, including held Space thrust.")]
     public float jumpMaxHeight = 6.4f;
     [Tooltip("Extra gravity while descending so landings feel quicker.")]
@@ -32,9 +34,12 @@ public sealed partial class VoxArena : MonoBehaviour
         public Transform pelvisPart;
         // Stable team identity; multiple fighters can share a team in future modes.
         public int teamId;
-        public int frameIndex; public float hitFlash;
+        public int frameIndex,selectableIndex=-1; public float hitFlash;
+        public Transform[] quadrupedLegs,quadrupedKnees,quadrupedAnkles;
+        public Transform[][] treadLinks;
+        public float treadPhase,treadPerimeter;
         public int weaponSlot=1,magazine=30; public float reloadTime;
-        public CraftSpec spec=CraftCatalog.All[0];
+        public CraftSpec spec=CraftCatalog.Selectable[0];
         public Vector3 facing=Vector3.forward,velocity,pulseDirection,rushDirection;
         // Independent ground chassis heading for opt-in tank steering; aiming remains on facing.
         public Vector3 chassisForward=Vector3.forward;
@@ -102,13 +107,15 @@ public sealed partial class VoxArena : MonoBehaviour
         Application.targetFrameRate=120;
         bool performance=Array.IndexOf(Environment.GetCommandLineArgs(),"--performance-test")>=0;
         bool captureGallery=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-docs-gallery")>=0;
-        smoke=performance||captureGallery||Array.IndexOf(Environment.GetCommandLineArgs(),"--smoke-test")>=0;
+        bool captureVisualTargets=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-visual-targets")>=0;
+        smoke=performance||captureGallery||captureVisualTargets||Array.IndexOf(Environment.GetCommandLineArgs(),"--smoke-test")>=0;
         if(RunPreferenceProbe()) return;
         BuildWorld(); BuildAudio(); LoadPreferences();
-        ApplyCharacter(player,selectedCraft); ApplyCharacter(enemy,rivalSelection<0?1:rivalSelection);
+        ApplySelectableCharacter(player,selectedCraft); ApplySelectableCharacter(enemy,rivalSelection<0?1:rivalSelection);
         ResetRound(); BuildPortraits(); inMenu=true;
         if(performance) StartCoroutine(PerformanceTest());
         else if(captureGallery) StartCoroutine(CaptureDocumentationGallery());
+        else if(captureVisualTargets) StartCoroutine(CapturePrototypeVisuals());
         else if(smoke) StartCoroutine(SmokeTest());
     }
     Material Mat(Color color)
@@ -149,7 +156,19 @@ public sealed partial class VoxArena : MonoBehaviour
     }
     void ApplyCharacter(Fighter f,int index)
     {
-        f.spec=CraftCatalog.All[index].RuntimeCopy(); f.frameIndex=index; ResetAllocations(f);
+        CraftSpec preset=CraftCatalog.All[Mathf.Clamp(index,0,CraftCatalog.All.Length-1)];
+        ApplyCharacterPreset(f,preset,index,-1);
+    }
+    void ApplySelectableCharacter(Fighter f,int index)
+    {
+        int selected=Mathf.Clamp(index,0,CraftCatalog.Selectable.Length-1);
+        CraftSpec preset=CraftCatalog.Selectable[selected];
+        ApplyCharacterPreset(f,preset,preset.sourceFrameIndex,selected);
+    }
+    void ApplyCharacterPreset(Fighter f,CraftSpec preset,int visualFrameIndex,int selectableIndex)
+    {
+        f.spec=preset.RuntimeCopy(); f.frameIndex=Mathf.Clamp(visualFrameIndex,0,CraftCatalog.All.Length-1);
+        f.selectableIndex=selectableIndex; ResetAllocations(f);
         // Re-selecting a tank must not inherit the previous chassis heading.
         // Keep chassis yaw independent of the upper-body aiming direction after spawn.
         Vector3 initialChassis=Vector3.ProjectOnPlane(f.facing,Vector3.up);
@@ -163,7 +182,7 @@ public sealed partial class VoxArena : MonoBehaviour
     void BeginMatch()
     {
         enemyCraft=ResolveRival(); SavePreferences();
-        ApplyCharacter(player,selectedCraft); ApplyCharacter(enemy,enemyCraft);
+        ApplySelectableCharacter(player,selectedCraft); ApplySelectableCharacter(enemy,enemyCraft);
         ResetRound(); inMenu=false; view.orthographic=smoke||spectatorMode; view.fieldOfView=60;
         cameraPitch=spectatorMode?42:12;
         Cursor.lockState=spectatorMode?CursorLockMode.None:CursorLockMode.Locked; Cursor.visible=spectatorMode;
@@ -464,6 +483,7 @@ public sealed partial class VoxArena : MonoBehaviour
     void Move(Fighter f,Vector3 direction,float dt)
     {
         if(f.reloadTime>0) { f.reloadTime=Mathf.Max(0,f.reloadTime-dt); if(f.reloadTime<=0) f.magazine=30; }
+        float maxJumpHeight=jumpMaxHeight*Mathf.Max(.1f,f.spec.jumpHeightScale);
         f.weaponTimer=Mathf.Max(0,f.weaponTimer-dt); f.specialTimer=Mathf.Max(0,f.specialTimer-dt);
         f.dashCooldownLeft=Mathf.Max(0,f.dashCooldownLeft-dt);
         f.shieldFlash=Mathf.Max(0,f.shieldFlash-dt); f.hitFlash=Mathf.Max(0,f.hitFlash-dt);
@@ -506,7 +526,7 @@ public sealed partial class VoxArena : MonoBehaviour
         // Vertical thrust shares fuel with horizontal boost; larger/heavier frames cost more.
         if(f.jumpHeight<=.02f && f.jumpVelocity>0) f.jumpOriginY=f.root.position.y;
         bool airborne=f.jumpHeight>0 || f.jumpVelocity>0;
-        bool verticalBoost=f.spec.allowVerticalBoost && airborne && f.jumpHeight<jumpMaxHeight && f.jumpHeld && !f.boostLocked && f.boostEnergy>0;
+        bool verticalBoost=f.spec.allowVerticalBoost && airborne && f.jumpHeight<maxJumpHeight && f.jumpHeld && !f.boostLocked && f.boostEnergy>0;
         if(verticalBoost)
         {
             float weightFactor=Mathf.Max(.5f,f.spec.jumpWeightFactor); // Explicit per-frame tuning, independent of armor and visual scale.
@@ -527,7 +547,7 @@ public sealed partial class VoxArena : MonoBehaviour
         }
         f.pulseTime=Mathf.Max(0,f.pulseTime-dt);
         // Holding Space adds fuel-powered lift, capped at a readable obstacle-clearing height.
-        if(f.jumpHeight>=jumpMaxHeight && f.jumpVelocity>0) f.jumpVelocity=0;
+        if(f.jumpHeight>=maxJumpHeight && f.jumpVelocity>0) f.jumpVelocity=0;
         float gravityScale=f.jumpVelocity<0?fallGravityMultiplier:1f;
         f.jumpVelocity-=jumpGravity*gravityScale*f.spec.fallGravityFactor*dt;
         Vector3 desired=motion*speed;
@@ -594,15 +614,15 @@ public sealed partial class VoxArena : MonoBehaviour
         float preLandingHeight=f.jumpHeight;
         float preLandingFallSpeed=-f.jumpVelocity;
         Vector3 before=f.root.position; MoveWithObstacles(f,desired*dt+Vector3.up*f.jumpVelocity*dt);
-        float jumpCeiling=f.jumpOriginY+jumpMaxHeight;
+        float jumpCeiling=f.jumpOriginY+maxJumpHeight;
         if(f.root.position.y>jumpCeiling) { f.root.position=new Vector3(f.root.position.x,jumpCeiling,f.root.position.z); f.jumpVelocity=0; }
         f.jumpHeight=Mathf.Max(0,f.root.position.y-LandingHeight(f.root.position,f.Radius,f.root.position.y));
         // High-speed landing briefly staggers the legs; unlike weapon knockdown it grants no invulnerability.
-        if(preLandingHeight>.05f && f.jumpHeight<=.001f && preLandingFallSpeed>15f)
+        if(landingStaggerEnabled && preLandingHeight>.05f && f.jumpHeight<=.001f && preLandingFallSpeed>15f)
         {
             float severity=Mathf.Clamp01((preLandingFallSpeed-15f)/20f);
-            float recovery=Mathf.Max(.2f,f.spec.recoverySpeed);
-            f.knockdownTime=Mathf.Max(f.knockdownTime,(.2f+.55f*severity)*f.spec.landingStaggerScale/recovery);
+            float landingRecovery=Mathf.Max(.2f,f.spec.recoverySpeed);
+            f.knockdownTime=Mathf.Max(f.knockdownTime,(.2f+.55f*severity)*f.spec.landingStaggerScale/landingRecovery);
             f.dashRemaining=0;
         }
         if(f.jumpHeight<=.001f && f.jumpVelocity<0) f.jumpVelocity=0;
@@ -671,6 +691,7 @@ public sealed partial class VoxArena : MonoBehaviour
         f.leftLeg.localRotation=Quaternion.Euler(gait*25f,0,-5);
         f.rightLeg.localRotation=Quaternion.Euler(-gait*25f,0,5);
         AnimateLegJoints(f,stride,gait);
+        AnimateTreads(f,Time.deltaTime);
         f.leftArm.localRotation=Quaternion.Euler(-gait*13f,0,0);
         f.rightArm.localRotation=Quaternion.Euler(gait*13f,0,0);
         f.gun.gameObject.SetActive(true);

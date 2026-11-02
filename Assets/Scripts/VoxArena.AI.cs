@@ -121,8 +121,31 @@ public sealed partial class VoxArena
         bool threatened=ThreatAt(f,Vector3.zero,.55f)>14f;
         float jumpCycle=1.7f+personality*1.6f;
         bool jumpWindow=(f.aiClock+personality*2f)%jumpCycle<(.38f+personality*.25f);
-        f.jumpHeld=(!testRival || aiJumpEnabled) && (obstacleAhead || (threatened && jumpWindow)) && f.boostEnergy>f.spec.boostCapacity*.18f;
-        if(f.jumpHeld && f.jumpHeight<=.02f && f.jumpVelocity<=0) { f.jumpOriginY=f.root.position.y; f.jumpVelocity=jumpSpeed; }
+        bool jumpRequest=(!testRival || aiJumpEnabled) && (obstacleAhead || (threatened && jumpWindow)) && f.boostEnergy>f.spec.boostCapacity*.18f;
+        if(f.spec.chargedReleaseJump)
+        {
+            bool grounded=f.jumpHeight<=.02f && f.jumpVelocity<=0f;
+            bool continuingCharge=f.jumpHoldElapsed>0f && grounded;
+            f.jumpHeld=grounded && (jumpRequest || continuingCharge);
+            if(f.jumpHeld)
+            {
+                f.jumpHoldElapsed=Mathf.Min(f.spec.jumpChargeSeconds,f.jumpHoldElapsed+dt);
+                if(f.jumpHoldElapsed>=f.spec.jumpChargeSeconds)
+                {
+                    float power=Mathf.Lerp(f.spec.jumpMinImpulseFactor,f.spec.jumpImpulseScale,1f);
+                    f.jumpOriginY=f.root.position.y;
+                    f.jumpVelocity=jumpSpeed*power/Mathf.Sqrt(Mathf.Max(.5f,f.spec.jumpWeightFactor));
+                    f.jumpHeld=false; f.jumpHoldElapsed=0f;
+                }
+            }
+            else if(grounded && f.jumpHoldElapsed>0f) f.jumpHoldElapsed=0f;
+        }
+        else
+        {
+            f.jumpHeld=jumpRequest;
+            if(f.jumpHeld && f.jumpHeight<=.02f && f.jumpVelocity<=0)
+            { f.jumpOriginY=f.root.position.y; f.jumpVelocity=jumpSpeed*f.spec.jumpImpulseScale/Mathf.Sqrt(Mathf.Max(.5f,f.spec.jumpWeightFactor)); }
+        }
         Vector3 movement=f.aiMove;
         // Practice rivals pause between maneuvers, while still escaping blocked routes.
         // Practice keeps drifting between decisions instead of appearing to stall.

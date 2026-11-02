@@ -6,7 +6,7 @@ public sealed partial class VoxArena
     const string PreferencePrefix="VoxSky.Pilot.";
     static float ValidTuning(float value)=>float.IsNaN(value)||float.IsInfinity(value)?1:Mathf.Clamp(value,.5f,2);
     static float ValidVolume(float value)=>float.IsNaN(value)||float.IsInfinity(value)?.7f:Mathf.Clamp01(value);
-    int ResolveRival()=>rivalSelection<0?UnityEngine.Random.Range(0,CraftCatalog.All.Length):Mathf.Clamp(rivalSelection,0,CraftCatalog.All.Length-1);
+    int ResolveRival()=>rivalSelection<0?UnityEngine.Random.Range(0,CraftCatalog.Selectable.Length):Mathf.Clamp(rivalSelection,0,CraftCatalog.Selectable.Length-1);
     void LoadPreferences(string scope=PreferencePrefix)
     {
         if(smoke&&scope==PreferencePrefix) return; // Regression tests must start from defaults and leave player preferences alone.
@@ -15,8 +15,8 @@ public sealed partial class VoxArena
         muted=PlayerPrefs.GetInt(scope+"Muted",0)!=0;
         float storedVolume=PlayerPrefs.GetFloat(scope+"Volume",.7f);
         effectsVolume=ValidVolume(storedVolume);
-        selectedCraft=Mathf.Clamp(PlayerPrefs.GetInt(scope+"Frame",0),0,CraftCatalog.All.Length-1);
-        rivalSelection=Mathf.Clamp(PlayerPrefs.GetInt(scope+"Rival",-1),-1,CraftCatalog.All.Length-1);
+        selectedCraft=Mathf.Clamp(PlayerPrefs.GetInt(scope+"Frame",0),0,CraftCatalog.Selectable.Length-1);
+        rivalSelection=Mathf.Clamp(PlayerPrefs.GetInt(scope+"Rival",-1),-1,CraftCatalog.Selectable.Length-1);
         bulletSpeedScale=ValidTuning(PlayerPrefs.GetFloat(scope+"BulletSpeed",1));
         bulletSizeScale=ValidTuning(PlayerPrefs.GetFloat(scope+"BulletSize",1));
         weaponCooldownScale=ValidTuning(PlayerPrefs.GetFloat(scope+"Cooldown",1));

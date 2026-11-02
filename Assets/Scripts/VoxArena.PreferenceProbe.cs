@@ -18,14 +18,14 @@ public sealed partial class VoxArena
             if(write)
             {
                 difficulty=1; aimAssist=false; muted=true; effectsVolume=.23f;
-                selectedCraft=5; rivalSelection=3; bulletSpeedScale=1.4f; bulletSizeScale=.8f; weaponCooldownScale=1.3f;
+                selectedCraft=2; rivalSelection=3; bulletSpeedScale=1.4f; bulletSizeScale=.8f; weaponCooldownScale=1.3f;
                 SavePreferences(scope);
                 Debug.Log("VOXSKY_PREFS_WRITE_PASS");
             }
             else
             {
                 LoadPreferences(scope);
-                ok=difficulty==1&&!aimAssist&&muted&&selectedCraft==5&&rivalSelection==3&&
+                ok=difficulty==1&&!aimAssist&&muted&&selectedCraft==2&&rivalSelection==3&&
                     Mathf.Abs(effectsVolume-.23f)<.0001f&&Mathf.Abs(bulletSpeedScale-1.4f)<.0001f&&
                     Mathf.Abs(bulletSizeScale-.8f)<.0001f&&Mathf.Abs(weaponCooldownScale-1.3f)<.0001f;
                 Debug.Log(ok?"VOXSKY_PREFS_RESTART_PASS":"VOXSKY_PREFS_RESTART_FAIL");

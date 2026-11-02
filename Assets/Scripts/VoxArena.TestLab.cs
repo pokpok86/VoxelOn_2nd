@@ -85,7 +85,7 @@ public sealed partial class VoxArena
         if(GUI.Button(new Rect(537,112,170,31),"RESET THIS FRAME"))
         {
             Fighter f=TestFighter;
-            f.spec=CraftCatalog.All[f.frameIndex].RuntimeCopy();
+            f.spec=PresetFor(f).RuntimeCopy();
             f.body.localScale=Vector3.one*f.spec.size;
             f.hp=Mathf.Min(f.hp,f.spec.health);
             f.boostEnergy=Mathf.Min(f.boostEnergy,f.spec.boostCapacity);

@@ -5,6 +5,47 @@ using UnityEngine;
 
 public sealed partial class VoxArena
 {
+    IEnumerator CapturePrototypeVisuals()
+    {
+        yield return new WaitForEndOfFrame();
+        string root=Path.Combine(Directory.GetCurrentDirectory(),"Docs","VisualReferences","Implemented");
+        Directory.CreateDirectory(root);
+        const int width=768,height=432;
+        RenderTexture target=new RenderTexture(width,height,24,RenderTextureFormat.ARGB32);
+        Texture2D image=new Texture2D(width,height,TextureFormat.RGB24,false);
+        RenderTexture previousTarget=view.targetTexture,previousActive=RenderTexture.active;
+        bool previousOrtho=view.orthographic; float previousFov=view.fieldOfView;
+        Color previousBackground=view.backgroundColor; CameraClearFlags previousClear=view.clearFlags;
+        view.targetTexture=target; view.orthographic=false; view.fieldOfView=40;
+        view.clearFlags=CameraClearFlags.SolidColor; view.backgroundColor=new Color(.035f,.055f,.08f);
+        aimMarker.gameObject.SetActive(false);
+        enemy.root.gameObject.SetActive(false); enemy.shadow.gameObject.SetActive(false);
+        Vector3 center=new Vector3(0,1.1f,0),focus=center+Vector3.up*.65f;
+        Vector3[] directions={Vector3.forward,Vector3.right,Vector3.back,Vector3.left};
+        string[] views={"front","right","rear","left"}; int written=0;
+        for(int frame=0;frame<CraftCatalog.Selectable.Length;frame++)
+        {
+            ApplySelectableCharacter(player,frame); player.root.position=center; player.root.rotation=Quaternion.identity;
+            player.facing=Vector3.forward; player.velocity=Vector3.zero; player.boosting=false;
+            player.thruster.gameObject.SetActive(false); player.jumpFlame.gameObject.SetActive(false);
+            player.shield.gameObject.SetActive(false); player.saber.gameObject.SetActive(false);
+            Animate(player);
+            for(int angle=0;angle<directions.Length;angle++)
+            {
+                view.transform.position=center+directions[angle]*8.7f+Vector3.up*3f;
+                view.transform.LookAt(focus); view.Render(); RenderTexture.active=target;
+                image.ReadPixels(new Rect(0,0,width,height),0,0); image.Apply();
+                string path=Path.Combine(root,(frame+1).ToString("00")+"-"+player.spec.name.ToLowerInvariant()+"-"+views[angle]+".png");
+                File.WriteAllBytes(path,image.EncodeToPNG()); written++;
+            }
+        }
+        RenderTexture.active=previousActive; view.targetTexture=previousTarget;
+        view.orthographic=previousOrtho; view.fieldOfView=previousFov;
+        view.clearFlags=previousClear; view.backgroundColor=previousBackground;
+        Destroy(image); target.Release(); Destroy(target);
+        Debug.Log("VOXSKY_VISUAL_TARGETS_PASS "+written+" images saved to "+root);
+        Application.Quit(0);
+    }
     void SavePreview(string name)
     {
         string path=Path.GetFullPath(Path.Combine(Application.dataPath,"../../"+name));
@@ -80,6 +121,12 @@ public sealed partial class VoxArena
         player.root.position=new Vector3(100,1.1f,100); enemy.root.position=new Vector3(100,1.1f,125);
         FaceOpponent(player,enemy); FaceOpponent(enemy,player);
     }
+    void TestSetupSelectable(int pilot=0,int rival=0)
+    {
+        ApplySelectableCharacter(player,pilot); ApplySelectableCharacter(enemy,rival); ResetRound(); inMenu=false;
+        player.root.position=new Vector3(100,1.1f,100); enemy.root.position=new Vector3(100,1.1f,125);
+        FaceOpponent(player,enemy); FaceOpponent(enemy,player);
+    }
     void SaveWeaponStudy()
     {
         // Render the actual projectile meshes at native world scale, not concept artwork.
@@ -131,17 +178,55 @@ public sealed partial class VoxArena
         Vector3 before=enemy.root.position;
         yield return null;
         Check(inMenu&&before==enemy.root.position,"menu freezes battle");
-        Check(CraftCatalog.All.Length==8,"eight frames");
+        Check(CraftCatalog.All.Length==8,"legacy eight-frame catalog retained");
+        Check(CraftCatalog.Selectable.Length==4 &&
+            CraftCatalog.Selectable[0].name=="WISP" && CraftCatalog.Selectable[1].name=="BASTION" &&
+            CraftCatalog.Selectable[2].name=="TARANTULA" && CraftCatalog.Selectable[3].name=="HOUND",
+            "hangar roster is limited to four current prototypes");
+        TestSetupSelectable(0,1);
+        Check(player.headPart.localScale.x>1.3f && player.legsPart.localScale.y<.8f,
+            "WISP has oversized head and shortened limb silhouette");
+        Check(enemy.treadLinks!=null && enemy.treadLinks.Length==2 && enemy.treadLinks[0].Length>=20,
+            "BASTION has two continuous animated track runs");
+        Vector3 firstTread=enemy.treadLinks[0][0].localPosition;
+        enemy.velocity=Vector3.forward*4f; AnimateTreads(enemy,.1f);
+        Check((enemy.treadLinks[0][0].localPosition-firstTread).sqrMagnitude>.01f,
+            "BASTION tread shoes scroll with forward movement");
+        TestSetupSelectable(2,3);
+        Check(player.quadrupedLegs!=null && player.quadrupedLegs.Length==4 && player.quadrupedKnees.Length==4 &&
+            player.spec.jumpHeightScale>1.4f && jumpMaxHeight*player.spec.jumpHeightScale>9f,
+            "TARANTULA four-leg rig and raised jump ceiling");
+        Check(player.armsPart!=null&&!player.armsPart.gameObject.activeSelf&&player.weaponPart.parent==player.legsPart&&player.gun.gameObject.activeInHierarchy,
+            "TARANTULA keeps its gun on a visible chassis mount");
+        Check(enemy.quadrupedLegs!=null && enemy.quadrupedLegs.Length==4 && enemy.spec.name=="HOUND",
+            "HOUND canine four-leg rig");
+        Vector3 jumpStart=new Vector3(0,FighterGroundY,0);
+        bool clearJumpPath=!ObstacleOnSegment(jumpStart,jumpStart+Vector3.up*9f,player.Radius,out _);
+        for(int radius=10;radius<=120&&!clearJumpPath;radius+=10)
+            for(int angle=0;angle<16&&!clearJumpPath;angle++)
+            {
+                float radians=angle*Mathf.PI/8f;
+                Vector3 candidate=new Vector3(Mathf.Cos(radians)*radius,FighterGroundY,Mathf.Sin(radians)*radius);
+                clearJumpPath=!ObstacleOnSegment(candidate,candidate+Vector3.up*9f,player.Radius,out _);
+                if(clearJumpPath) jumpStart=candidate;
+            }
+        player.root.position=jumpStart; player.jumpOriginY=jumpStart.y;
+        player.jumpVelocity=jumpSpeed*player.spec.jumpImpulseScale/Mathf.Sqrt(Mathf.Max(.5f,player.spec.jumpWeightFactor));
+        float tarantulaPeak=0f;
+        for(int tick=0;tick<120;tick++) { Move(player,Vector3.zero,.02f); tarantulaPeak=Mathf.Max(tarantulaPeak,player.jumpHeight); }
+        Check(clearJumpPath&&tarantulaPeak>4.5f&&tarantulaPeak<jumpMaxHeight*player.spec.jumpHeightScale,
+            "TARANTULA reaches the higher jump arc in motion");
+        TestSetupSelectable(0,1);
         Check(ValidTuning(float.NaN)==1&&ValidTuning(float.PositiveInfinity)==1&&ValidTuning(-9)==.5f&&ValidTuning(9)==2,"invalid saved tuning is sanitized");
-        for(int rival=0;rival<8;rival++)
+        for(int rival=0;rival<CraftCatalog.Selectable.Length;rival++)
         {
             rivalSelection=rival; BeginMatch();
-            Check(enemyCraft==rival&&enemy.spec!=CraftCatalog.All[rival]&&
-                enemy.spec.name==CraftCatalog.All[rival].name,"fixed practice rival "+rival);
+            Check(enemyCraft==rival&&enemy.spec!=CraftCatalog.Selectable[rival]&&
+                enemy.spec.name==CraftCatalog.Selectable[rival].name,"fixed practice rival "+rival);
         }
         rivalSelection=-1;
         bool validRandom=true;
-        for(int roll=0;roll<32;roll++) { int candidate=ResolveRival(); validRandom&=candidate>=0&&candidate<8; }
+        for(int roll=0;roll<32;roll++) { int candidate=ResolveRival(); validRandom&=candidate>=0&&candidate<CraftCatalog.Selectable.Length; }
         Check(validRandom,"random rival remains valid");
         // Engine foundation regressions: team-aware roster and explicit AI actor.
         TestSetup();
@@ -278,11 +363,27 @@ public sealed partial class VoxArena
         float energy=player.boostEnergy; player.boostHeld=false; before=player.root.position;
         Move(player,Vector3.forward,.1f);
         Check(Mathf.Abs(Vector3.Distance(before,player.root.position)-player.spec.speed*player.spec.forwardSpeedFactor*.1f)<.01f&&player.boostEnergy==energy,"cruise release restores normal directional speed");
-        TestSetup(2); player.boostHeld=true; before=player.root.position; float pulseEnergy=player.boostEnergy;
+        TestSetup(2); Vector3 boostStart=Vector3.zero; bool clearBoostPath=false;
+        for(int radius=10;radius<=120&&!clearBoostPath;radius+=10)
+            for(int angle=0;angle<16&&!clearBoostPath;angle++)
+            {
+                float radians=angle*Mathf.PI/8f;
+                Vector3 candidate=new Vector3(Mathf.Cos(radians)*radius,FighterGroundY,Mathf.Sin(radians)*radius);
+                bool clear=true;
+                for(int step=0;step<=80&&clear;step++)
+                    clear=!Occupied(candidate+Vector3.forward*(step*.1f),player.Radius);
+                if(clear && !ObstacleOnSegment(candidate,candidate+Vector3.forward*8f,player.Radius,out _))
+                { boostStart=candidate; clearBoostPath=true; }
+            }
+        Check(clearBoostPath,"boost release regression uses an obstacle-free path");
+        player.root.position=boostStart; enemy.root.position=boostStart+Vector3.forward*25;
+        player.facing=Vector3.forward; player.boostHeld=true; before=player.root.position; float pulseEnergy=player.boostEnergy;
         Move(player,Vector3.forward,.1f);
         Check(player.boosting&&Vector3.Distance(before,player.root.position)>player.spec.speed*.1f&&player.boostEnergy<pulseEnergy,"held boost accelerates and drains fuel");
         player.boostHeld=false; before=player.root.position; Move(player,Vector3.forward,.1f);
-        Check(!player.boosting&&Mathf.Abs(Vector3.Distance(before,player.root.position)-player.spec.speed*player.spec.forwardSpeedFactor*.1f)<.01f,"releasing boost returns to normal directional speed");
+        float normalForwardSpeed=(player.spec.usePrototypeMovement?player.spec.prototypeBaseSpeed:player.spec.speed)*player.spec.forwardSpeedFactor;
+        Check(!player.boosting&&Mathf.Abs(Vector3.Distance(before,player.root.position)-normalForwardSpeed*.1f)<.01f,
+            "releasing boost returns to the prototype's normal directional speed");
         TestSetup(0); player.boostHeld=true; Move(player,Vector3.right,.1f);
         float firstSpeed=player.velocity.magnitude;
         Move(player,Vector3.right,.1f);
@@ -434,19 +535,28 @@ public sealed partial class VoxArena
             TestSetup(i);
             if(player.spec.ShieldMax>0) { protectedFrames++; Check(player.spec.health<=300,"shield reserved for fragile frame"); }
             Check(player.headPart.parent==player.body&&player.corePart.parent==player.body&&player.armsPart.parent==player.body&&player.legsPart.parent==player.body&&player.weaponPart.parent==player.rightArm,"detachable module hierarchy "+i);
-            Check(framePortraits[i]!=null && framePortraits[i].IsCreated(),"frame portrait rendered "+i);
             if(i==0)
             {
                 Transform head=player.headPart.Find("Helmet"),chest=player.corePart.Find("Armor chest");
-                Transform shoulder=player.rightArm.Find("Armor shoulder"),foot=player.leftLeg.Find("Foot");
+                Transform shoulder=player.rightArm.Find("Armor shoulder"),foot=null;
+                foreach(Transform part in player.leftLeg.GetComponentsInChildren<Transform>())
+                    if(part.name=="Foot") { foot=part; break; }
                 Check(head!=null&&head.localScale.x>=.75f&&head.localScale.y>=.63f&&
                     chest!=null&&chest.localScale.x>=1.35f&&
                     shoulder!=null&&shoulder.localScale.x>=.77f&&
                     foot!=null&&foot.localScale.x>=.63f&&foot.localScale.z>=.91f,
-                    "Kestrel SD silhouette enlarges head, torso, shoulders and feet");
+                    "Kestrel SD silhouette enlarges head, torso, shoulders and feet (head="+(head!=null?head.localScale.ToString():"missing")+" chest="+(chest!=null?chest.localScale.ToString():"missing")+" shoulder="+(shoulder!=null?shoulder.localScale.ToString():"missing")+" foot="+(foot!=null?foot.localScale.ToString():"missing")+")");
             }
         }
         Check(protectedFrames==2,"only two light frames retain shield");
+        for(int i=0;i<CraftCatalog.Selectable.Length;i++)
+        {
+            TestSetupSelectable(i,(i+1)%CraftCatalog.Selectable.Length);
+            Check(player.spec.name==CraftCatalog.Selectable[i].name && player.selectableIndex==i,
+                "playable prototype selection "+CraftCatalog.Selectable[i].name);
+            Check(framePortraits[i]!=null && framePortraits[i].IsCreated(),"prototype portrait rendered "+i);
+        }
+        TestSetup(0,1);
         TestSetup(); SetPaused(false); ToggleGuide();
         Check(showGuide&&paused,"guide pauses an active battle");
         CloseGuide(); Check(!showGuide&&!paused,"closing guide resumes previously active battle");
@@ -561,14 +671,14 @@ public sealed partial class VoxArena
             Debug.Log($"DUEL_SAMPLE {player.spec.name} vs {enemy.spec.name} duration={elapsed:0.0} pilotHP={player.hp:0.0} rivalHP={enemy.hp:0.0}");
             yield return null;
         }
-        bool audioGood=soundClips.Count==7;
+        bool audioGood=soundClips.Count==System.Enum.GetValues(typeof(SoundKind)).Length;
         foreach(AudioClip clip in soundClips.Values)
         {
             float[] samples=new float[clip.samples]; clip.GetData(samples,0); float peak=0;
             foreach(float s in samples) { audioGood&=!float.IsNaN(s)&&!float.IsInfinity(s); peak=Mathf.Max(peak,Mathf.Abs(s)); }
             audioGood&=peak>.01f&&peak<=.30f;
         }
-        Check(audioGood&&voices.Count==10&&view.GetComponent<AudioListener>()!=null,"seven audible synthesized sound clips and playback voices");
+        Check(audioGood&&voices.Count==10&&view.GetComponent<AudioListener>()!=null,"all synthesized sound clips and playback voices");
         TestSetup(); muted=false; smoke=false;
         PlaySound(SoundKind.Fire,player.root.position,.4f);
         yield return null;
@@ -597,7 +707,8 @@ public sealed partial class VoxArena
         bool repeatedRestarts=true;
         for(int restart=0;restart<12;restart++)
         {
-            selectedCraft=restart%8; rivalSelection=(restart+3)%8; BeginMatch();
+            selectedCraft=restart%CraftCatalog.Selectable.Length;
+            rivalSelection=(restart+3)%CraftCatalog.Selectable.Length; BeginMatch();
             Attack(player,enemy,(enemy.root.position-player.root.position).normalized);
             Special(enemy,player,(player.root.position-enemy.root.position).normalized);
             ReturnToHangar(); yield return null;

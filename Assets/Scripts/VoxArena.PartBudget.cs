@@ -44,6 +44,9 @@ public sealed partial class VoxArena
         for(int i=0;i<allocationFields.Length;i++) allocations.Remove(AllocationKey(f,i));
         for(int i=0;i<allocationFields.Length;i++) ApplyAllocation(f,i);
     }
+    CraftSpec PresetFor(Fighter f)=>f.selectableIndex>=0
+        ?CraftCatalog.Selectable[Mathf.Clamp(f.selectableIndex,0,CraftCatalog.Selectable.Length-1)]
+        :CraftCatalog.All[Mathf.Clamp(f.frameIndex,0,CraftCatalog.All.Length-1)];
     void AllocatePoint(Fighter f,int category,int index,float desired)
     {
         float[] p=AllocationFor(f,category);
@@ -76,7 +79,7 @@ public sealed partial class VoxArena
         if(f==null || category<0 || category>=allocationFields.Length) return;
         float[] points=AllocationFor(f,category);
         string[] keys=allocationFields[category];
-        CraftSpec preset=CraftCatalog.All[f.frameIndex];
+        CraftSpec preset=PresetFor(f);
         float neutral=100f/keys.Length;
         for(int i=0;i<keys.Length;i++)
         {

@@ -423,7 +423,7 @@ public sealed partial class VoxArena
             Vector3 next=p+Vector3.up*step.y;
             if(step.y>0)
             {
-                float jumpTop=f.jumpOriginY+jumpMaxHeight;
+                float jumpTop=f.jumpOriginY+jumpMaxHeight*Mathf.Max(.1f,f.spec.jumpHeightScale);
                 if(next.y>jumpTop) { next.y=jumpTop; p=next; f.jumpVelocity=0; }
                 else if(!Occupied(next,f.Radius)) p=next;
                 else f.jumpVelocity=Mathf.Min(0,f.jumpVelocity);

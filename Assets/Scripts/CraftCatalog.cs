@@ -9,6 +9,8 @@ public enum MobilityKind { StandardBiped, Runner, Tank, Quadruped }
 public sealed class CraftSpec
 {
     public string name, role, description, weaponName, specialName;
+    // Original geometry/legacy catalog slot used by the current procedural model builder.
+    public int sourceFrameIndex=-1;
     public Color color;
     public float health, armor, speed, boostSpeed, boostCapacity, boostDrain, pulseDuration;
     // Future leg-part values. 4:3:2 forward/strafe/reverse movement ratio.
@@ -17,6 +19,8 @@ public sealed class CraftSpec
     public float fallGravityFactor=1f, knockdownResistance=1f, recoverySpeed=1f;
     // Explicit gameplay weight multiplier for jump and vertical boost; not inferred from armor or mesh size.
     public float jumpWeightFactor=1f;
+    // Per-frame ceiling multiplier; movement and vertical thrust remain independent.
+    public float jumpHeightScale=1f;
     // Future head-part lock sensor and aim stability values.
     public float lockRange=80f, aimSpreadDegrees=0.6f;
     // Head sensor memory: lose occluded lock only after this time; distance still hard-limits lock.
@@ -62,6 +66,9 @@ public sealed class CraftSpec
 }
 public static class CraftCatalog
 {
+    // Only these manager prototypes are selectable in the current hangar.
+    // All remains as the archived eight-frame baseline for combat regression coverage.
+    public static readonly CraftSpec[] Selectable;
     public static readonly CraftSpec[] All = {
         new CraftSpec("KESTREL","CROSS-FIRE","Twin bolts, then a center shot. Sweeping beam.",new Color(.18f,.88f,.96f),
             340,.08f,13,27.5f,160,16,1,BoostKind.Glide,0,
@@ -88,29 +95,40 @@ public static class CraftCatalog
             430,.22f,10.5f,21.5f,200,11,1.28f,BoostKind.Cruise,0,
             PrimaryKind.Grenade,"BLAST SHELL",26,2.0f,52,56,.65f,SpecialKind.Minefield,"MINEFIELD",12)
     };
-    // Four-form test roster. Runtime copies keep the original eight-frame catalog intact.
-    // Selection/UI wiring and dedicated four-leg geometry are separate tasks.
+    // Four current prototype choices. Runtime copies keep the archived eight-frame
+    // catalog available for combat regression checks and future reference.
     public static CraftSpec[] CreateFourFormPrototypes()
     {
         CraftSpec runner=All[2].RuntimeCopy();
         CraftSpec tank=All[1].RuntimeCopy();
         CraftSpec spider=All[3].RuntimeCopy();
         CraftSpec hound=All[6].RuntimeCopy();
+        runner.color=new Color(.78f,.84f,.91f);
+        runner.role="SD RUNNER";
+        tank.color=new Color(.38f,.47f,.27f);
+        tank.role="TRACKED SIEGE FRAME";
+        tank.forwardSpeedFactor=1f; tank.reverseSpeedFactor=.4f;
+        tank.leftSpeedFactor=tank.rightSpeedFactor=.6f;
+        tank.jumpHeightScale=.72f;
         spider.name="TARANTULA"; spider.mobility=MobilityKind.Quadruped;
+        spider.color=new Color(.61f,.31f,.83f);
+        spider.role="SPIDER QUADRUPED";
         spider.usePrototypeMovement=true;
         spider.prototypeBaseSpeed=13.8f;
         spider.forwardSpeedFactor=spider.reverseSpeedFactor=1f;
         spider.leftSpeedFactor=spider.rightSpeedFactor=1f;
-        spider.jumpImpulseScale=1.0f; spider.allowVerticalBoost=false;
-        spider.chargedReleaseJump=true; spider.jumpChargeSeconds=2f;
-        spider.jumpMinImpulseFactor=.38f;
+        spider.jumpImpulseScale=1.45f; spider.jumpHeightScale=1.55f; spider.allowVerticalBoost=false;
+        spider.chargedReleaseJump=true; spider.jumpChargeSeconds=1.1f;
+        spider.jumpMinImpulseFactor=.70f;
         spider.allowHorizontalBoost=false;
         hound.name="HOUND"; hound.mobility=MobilityKind.Quadruped;
+        hound.color=new Color(.76f,.62f,.42f);
+        hound.role="CANINE QUADRUPED";
         hound.usePrototypeMovement=true;
         hound.prototypeBaseSpeed=13f;
         hound.forwardSpeedFactor=1f; hound.reverseSpeedFactor=1f/3f;
         hound.leftSpeedFactor=hound.rightSpeedFactor=1f/3f;
-        hound.jumpImpulseScale=1.35f; hound.allowVerticalBoost=false;
+        hound.jumpImpulseScale=1.35f; hound.jumpHeightScale=1.35f; hound.allowVerticalBoost=false;
         hound.dashRangeScale=1.45f; // Longer ground dash, not higher dash speed.
         return new[]{runner,tank,spider,hound};
     }
@@ -121,6 +139,7 @@ public static class CraftCatalog
         for(int i=0;i<All.Length;i++)
         {
             CraftSpec f=All[i];
+            f.sourceFrameIndex=i;
             f.occludedLockSeconds= i==5 || i==6 ? 3.5f : i==1 || i==7 ? 1.1f : 2f;
             f.occludedLockRange= i==5 || i==6 ? 88f : i==1 || i==7 ? 58f : 70f;
             f.lockRange=Mathf.Max(f.lockRange,f.occludedLockRange);
@@ -138,5 +157,6 @@ public static class CraftCatalog
                 f.verticalBoostScale=.55f; f.landingStaggerScale=1.35f;
                 f.fallGravityFactor=1.35f; }
         }
+        Selectable=CreateFourFormPrototypes();
     }
 }

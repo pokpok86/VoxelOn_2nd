@@ -113,28 +113,28 @@ public sealed partial class VoxArena
     {
         Panel(new Rect(0, 0, 1280, 720), new Color(.025f, .045f, .075f, .98f));
         Text(32, 22, 500, "VOX / SKY  —  HANGAR", title);
-        Text(34, 65, 1000, "THIRD PERSON DUEL   /   8 MODULAR FRAMES   /   RAPID GUN", small);
+        Text(34, 65, 1000, "THIRD PERSON DUEL   /   4 MOBILITY PROTOTYPES   /   RAPID GUN", small);
         if(GUI.Button(new Rect(1040,28,208,38),"WEAPON TUNING")) showTuning=true;
         if(GUI.Button(new Rect(820,28,200,38),"HOW TO PLAY / F1")) ToggleGuide();
-        for (int i = 0; i < CraftCatalog.All.Length; i++)
+        for (int i = 0; i < CraftCatalog.Selectable.Length; i++)
         {
-            CraftSpec spec = CraftCatalog.All[i];
+            CraftSpec spec = CraftCatalog.Selectable[i];
             Rect card = new Rect(32 + i % 4 * 308, 113 + i / 4 * 178, 292, 162);
             bool selected = selectedCraft == i;
             Panel(card, selected ? new Color(.10f,.22f,.29f) : new Color(.065f,.095f,.14f));
             Panel(new Rect(card.x, card.y, 4, card.height), spec.color);
             if(framePortraits!=null) GUI.DrawTexture(new Rect(card.x+183,card.y+35,105,123),framePortraits[i],ScaleMode.ScaleToFit);
-            Text(card.x + 16, card.y + 12, 240, spec.name, label);
+            Text(card.x + 16, card.y + 12, 240, (i+1)+"  /  "+spec.name, label);
             Text(card.x + 16, card.y + 43, 255, spec.role, small);
             Text(card.x + 16, card.y + 76, 175, "1  RAPID GUN / 30", small);
             Text(card.x + 16, card.y + 124, 260, $"BOOST {spec.boost} / {spec.boostSpeed:0.#}   HP {spec.health}", small);
             if (GUI.Button(card, GUIContent.none, GUIStyle.none))
             {
                 selectedCraft = i;
-                ApplyCharacter(player, selectedCraft);
+                ApplySelectableCharacter(player, selectedCraft);
             }
         }
-        CraftSpec chosen = CraftCatalog.All[selectedCraft];
+        CraftSpec chosen = CraftCatalog.Selectable[selectedCraft];
         Panel(new Rect(32, 487, 1216, 105), new Color(.065f,.095f,.14f));
         GUI.color = chosen.color;
         Text(50, 500, 1100, chosen.name + "  /  " + chosen.role, label);
@@ -145,8 +145,8 @@ public sealed partial class VoxArena
         Text(34, 654, 850, "Hold Shift to boost. Space jumps. Empty magazines reload automatically; R reloads early.", small);
         if(GUI.Button(new Rect(210,686,220,25),"AI: "+DifficultyName)) difficulty=(difficulty+1)%3;
         if(GUI.Button(new Rect(450,686,220,25),"AIM ASSIST: "+(aimAssist?"ON":"OFF"))) aimAssist=!aimAssist;
-        if(GUI.Button(new Rect(690,686,270,25),"RIVAL: "+(rivalSelection<0?"RANDOM":CraftCatalog.All[rivalSelection].name)))
-            rivalSelection=rivalSelection>=CraftCatalog.All.Length-1?-1:rivalSelection+1;
+        if(GUI.Button(new Rect(690,686,270,25),"RIVAL: "+(rivalSelection<0?"RANDOM":CraftCatalog.Selectable[rivalSelection].name)))
+            rivalSelection=rivalSelection>=CraftCatalog.Selectable.Length-1?-1:rivalSelection+1;
         if(GUI.Button(new Rect(972,686,155,25),"MODE: "+(spectatorMode?"AI VIEW":"PILOT"))) spectatorMode=!spectatorMode;
         if(GUI.Button(new Rect(34,686,150,25),muted?"SOUND OFF / V":"SOUND ON / V")) ToggleMute();
         GUI.backgroundColor = chosen.color;

@@ -64,6 +64,21 @@ public sealed partial class VoxArena
         bool heavy=f.spec.mobility==MobilityKind.Tank;
         bool runner=f.spec.mobility==MobilityKind.Runner;
         float phase=roundTime*(heavy?7f:runner?16f:11f);
+        if(f.spec.mobility==MobilityKind.Quadruped && f.quadrupedLegs!=null)
+        {
+            bool spider=f.spec.name=="TARANTULA";
+            for(int i=0;i<f.quadrupedLegs.Length;i++)
+            {
+                float cycle=Mathf.Sin(phase+((i==0||i==3)?0f:Mathf.PI));
+                float lift=Mathf.Max(0f,cycle)*stride;
+                float swing=(spider?24f:32f)*cycle*stride;
+                float kneeBend=airborne?(spider?22f:35f):Mathf.Max(0f,cycle)*(spider?28f:20f);
+                if(f.quadrupedLegs[i]!=null) f.quadrupedLegs[i].localRotation=Quaternion.Euler(swing,0,0);
+                if(f.quadrupedKnees[i]!=null) f.quadrupedKnees[i].localRotation=Quaternion.Euler(kneeBend+lift*18f,0,0);
+                if(f.quadrupedAnkles[i]!=null) f.quadrupedAnkles[i].localRotation=Quaternion.Euler(airborne?-12f:-lift*16f,0,0);
+            }
+            return;
+        }
         for(int side=-1;side<=1;side+=2)
         {
             Transform hip=side<0?f.leftLeg:f.rightLeg;
@@ -82,8 +97,137 @@ public sealed partial class VoxArena
             if(ankle!=null) ankle.localRotation=Quaternion.Euler(anklePitch,0,0);
         }
     }
+    void BuildFourLegs(Fighter f,Color armor,Color dark,Color edge)
+    {
+        f.pelvisPart.gameObject.SetActive(false);
+        if(f.leftLeg!=null) f.leftLeg.gameObject.SetActive(false);
+        if(f.rightLeg!=null) f.rightLeg.gameObject.SetActive(false);
+        bool spider=f.spec.name=="TARANTULA";
+        f.quadrupedLegs=new Transform[4]; f.quadrupedKnees=new Transform[4]; f.quadrupedAnkles=new Transform[4];
+        Plate(spider?"Tarantula abdomen armor":"Hound ribcage armor",f.legsPart,
+            new Vector3(0,-.57f,-.08f),spider?new Vector3(1.08f,.36f,1.26f):new Vector3(.92f,.38f,1.48f),armor);
+        for(int i=0;i<4;i++)
+        {
+            int side=(i%2==0)?-1:1; bool front=i<2;
+            float x=side*(front?(spider?.48f:.38f):(spider?.78f:.78f)), z=front?.48f:-.52f;
+            Transform hip=Module((spider?"Spider":"Hound")+" leg root "+i,f.legsPart,new Vector3(x,-.67f,z));
+            f.quadrupedLegs[i]=hip;
+            Shape(PrimitiveType.Sphere,"Hip rotary joint",hip,Vector3.zero,Vector3.one*(spider?.25f:.30f),dark);
+            float upperLength=spider?.55f:.43f;
+            BeveledPlate("Upper leg armor",hip,new Vector3(side*(spider?.20f:.09f),-.20f,front?.08f:-.08f),
+                new Vector3(spider?.25f:.36f,upperLength,.30f),edge,0,.10f,.82f);
+            Transform knee=Module("Knee articulation",hip,new Vector3(side*(spider?.39f:.14f),-.43f,front?.13f:-.13f));
+            f.quadrupedKnees[i]=knee;
+            Shape(PrimitiveType.Sphere,"Knee joint",knee,Vector3.zero,Vector3.one*(spider?.19f:.22f),dark);
+            float lower=spider?.63f:.50f;
+            BeveledPlate("Lower leg armor",knee,new Vector3(side*(spider?.16f:.04f),-.25f,front?.06f:-.06f),
+                new Vector3(spider?.20f:.30f,lower,.24f),armor,0,.09f,.78f);
+            Transform ankle=Module("Ankle articulation",knee,new Vector3(side*(spider?.31f:.08f),-.50f,front?.08f:-.08f));
+            f.quadrupedAnkles[i]=ankle;
+            Plate(spider?"Tarsal foot":"Padded paw",ankle,new Vector3(0,-.035f,.08f),
+                spider?new Vector3(.28f,.14f,.38f):new Vector3(.38f,.20f,.45f),dark);
+            if(spider)
+                for(int toe=0;toe<2;toe++) Plate("Tarantula claw",ankle,new Vector3((toe==0?-.07f:.07f),-.10f,.29f),new Vector3(.07f,.08f,.20f),armor,-12);
+            else Plate("Hound toe cap",ankle,new Vector3(0,.055f,.24f),new Vector3(.27f,.09f,.20f),armor);
+        }
+        if(!spider)
+        {
+            foreach(string name in new[]{"Helmet","Helmet crown","Face mask","Sensor housing","Visor","Sensor fin"})
+                for(int i=0;i<f.headPart.childCount;i++)
+                    if(f.headPart.GetChild(i).name==name) f.headPart.GetChild(i).gameObject.SetActive(false);
+            BeveledPlate("Hound compact skull",f.headPart,Vector3.zero,new Vector3(.54f,.39f,.56f),armor,0,.13f,.82f);
+            BeveledPlate("Hound muzzle",f.headPart,new Vector3(0,-.09f,.34f),new Vector3(.34f,.20f,.48f),armor,0,.07f,.78f);
+            Plate("Hound nose",f.headPart,new Vector3(0,-.08f,.59f),new Vector3(.16f,.10f,.09f),dark);
+            for(int side=-1;side<=1;side+=2)
+            {
+                Shape(PrimitiveType.Cube,"Hound optical eye",f.headPart,new Vector3(side*.18f,.04f,.285f),
+                    new Vector3(.075f,.07f,.04f),new Color(1,.72f,.25f),true);
+                BeveledPlate("Hound ear",f.headPart,new Vector3(side*.22f,.28f,-.03f),
+                    new Vector3(.15f,.34f,.16f),armor,side*-12,.11f,.70f);
+            }
+            BeveledPlate("Hound neck bridge",f.legsPart,new Vector3(0,-.24f,.53f),
+                new Vector3(.46f,.25f,.55f),edge,0,.08f,.82f);
+            BeveledPlate("Hound tail root",f.legsPart,new Vector3(0,-.34f,-.77f),
+                new Vector3(.20f,.20f,.34f),edge,18,.07f,.78f);
+            BeveledPlate("Hound tail tip",f.legsPart,new Vector3(0,-.16f,-1.00f),
+                new Vector3(.14f,.18f,.24f),armor,28,.06f,.70f);
+        }
+        else
+        {
+            foreach(string name in new[]{"Helmet","Helmet crown","Face mask","Sensor housing","Visor","Sensor fin"})
+                for(int i=0;i<f.headPart.childCount;i++)
+                    if(f.headPart.GetChild(i).name==name) f.headPart.GetChild(i).gameObject.SetActive(false);
+            BeveledPlate("Tarantula sensor carapace",f.headPart,Vector3.zero,new Vector3(.58f,.28f,.48f),armor,0,.10f,.78f);
+            for(int side=-1;side<=1;side+=2)
+                for(int row=0;row<2;row++)
+                    Shape(PrimitiveType.Cube,"Tarantula optic array",f.headPart,
+                        new Vector3(side*(.16f+row*.075f),-.02f-row*.075f,.245f),new Vector3(.07f,.06f,.035f),edge,true);
+        }
+        // These archetypes are chassis-first quadrupeds; the inherited biped
+        // chest and shoulder rig obscured the four-leg silhouette. Keep their
+        // weapon on a dedicated center mount, not visible humanoid arms.
+        f.corePart.gameObject.SetActive(false);
+        f.armsPart.gameObject.SetActive(false);
+    }
+    void BuildTankTracks(Fighter f,Color armor,Color dark,Color edge)
+    {
+        f.pelvisPart.gameObject.SetActive(false);
+        if(f.leftLeg!=null) f.leftLeg.gameObject.SetActive(false);
+        if(f.rightLeg!=null) f.rightLeg.gameObject.SetActive(false);
+        Plate("BASTION low tank hull",f.legsPart,new Vector3(0,-.68f,-.02f),new Vector3(1.42f,.58f,1.36f),armor);
+        Plate("Tank front glacis",f.legsPart,new Vector3(0,-.60f,.66f),new Vector3(1.12f,.42f,.18f),edge,-12);
+        f.treadLinks=new Transform[2][]; f.treadPerimeter=2.8f;
+        float radius=.34f, halfStraight=.38f;
+        f.treadPerimeter=4f*halfStraight+2f*Mathf.PI*radius;
+        for(int side=0;side<2;side++)
+        {
+            float x=side==0?-.76f:.76f;
+            Transform track=Module("Continuous tank track "+side,f.legsPart,new Vector3(x,-.89f,0));
+            float width=.50f;
+            // Individual shoes form the visible continuous run; omit the solid
+            // outer sidewall that hid the links in the first capture.
+            f.treadLinks[side]=new Transform[28];
+            for(int i=0;i<f.treadLinks[side].Length;i++)
+            {
+                Transform link=Plate("Individual moving tread shoe",track,Vector3.zero,
+                    new Vector3(width,.105f,.15f),i%2==0?edge:dark);
+                f.treadLinks[side][i]=link;
+            }
+            for(int wheel=0;wheel<3;wheel++)
+            {
+                float z=-.40f+wheel*.40f;
+                Transform roller=Shape(PrimitiveType.Cylinder,"Road roller",track,new Vector3(0,-.06f,z),
+                    new Vector3(.26f,.13f,.26f),edge);
+                roller.localRotation=Quaternion.Euler(0,0,90);
+            }
+        }
+        AnimateTreads(f,0f);
+    }
+    void PlaceTreadLink(Transform link,float distance,float perimeter,float x,float radius,float halfStraight)
+    {
+        float d=Mathf.Repeat(distance,perimeter), arc=Mathf.PI*radius;
+        Vector3 p; Vector3 tangent;
+        if(d<2f*halfStraight) { p=new Vector3(x,radius,halfStraight-d); tangent=Vector3.back; }
+        else if((d-=2f*halfStraight)<arc)
+        { float a=Mathf.PI*.5f+d/radius; p=new Vector3(x,radius*Mathf.Sin(a),-halfStraight-radius*Mathf.Cos(a)); tangent=new Vector3(0,Mathf.Cos(a),-Mathf.Sin(a)); }
+        else if((d-=arc)<2f*halfStraight) { p=new Vector3(x,-radius,-halfStraight+d); tangent=Vector3.forward; }
+        else { d-=2f*halfStraight; float a=-Mathf.PI*.5f+d/radius; p=new Vector3(x,radius*Mathf.Sin(a),halfStraight+radius*Mathf.Cos(a)); tangent=new Vector3(0,Mathf.Cos(a),-Mathf.Sin(a)); }
+        link.localPosition=p; link.localRotation=Quaternion.LookRotation(tangent,Vector3.Cross(tangent,Vector3.right));
+    }
+    void AnimateTreads(Fighter f,float dt)
+    {
+        if(f.treadLinks==null || f.treadPerimeter<=0f) return;
+        float speed=Vector3.Dot(f.root.InverseTransformDirection(f.velocity),Vector3.forward);
+        f.treadPhase=Mathf.Repeat(f.treadPhase+speed*dt,f.treadPerimeter);
+        for(int side=0;side<f.treadLinks.Length;side++)
+            for(int i=0;i<f.treadLinks[side].Length;i++)
+                PlaceTreadLink(f.treadLinks[side][i],f.treadPhase+i*f.treadPerimeter/f.treadLinks[side].Length,
+                    f.treadPerimeter,0,.34f,.38f);
+    }
     void BuildRobot(Fighter f)
     {
+        f.treadLinks=null; f.treadPerimeter=0f; f.treadPhase=0f;
+        f.quadrupedLegs=null; f.quadrupedKnees=null; f.quadrupedAnkles=null;
         if(f.body!=null) { f.body.gameObject.SetActive(false); Destroy(f.body.gameObject); }
         f.body=Module("Modular robot",f.root,Vector3.zero);
         f.corePart=Module("Core module",f.body,Vector3.zero);
@@ -94,9 +238,9 @@ public sealed partial class VoxArena
         f.backPart=Module("Backpack module",f.corePart,new Vector3(0,.42f,-.52f));
         Color armor=f.spec.color, hull=new Color(.55f,.62f,.68f), dark=new Color(.065f,.09f,.12f);
         Color edge=new Color(.28f,.35f,.40f), light=new Color(.85f,.9f,.91f);
-        bool heavy=f.frameIndex==1||f.frameIndex==7;
-        bool lightFrame=f.frameIndex==2||f.frameIndex==5;
-        bool kestrelSd=f.frameIndex==0;
+        bool heavy=f.spec.mobility==MobilityKind.Tank;
+        bool lightFrame=f.spec.mobility==MobilityKind.Quadruped;
+        bool kestrelSd=f.frameIndex==0 || f.spec.mobility==MobilityKind.Runner;
         float shoulder=kestrelSd?1.00f:heavy?1.04f:lightFrame?.74f:.87f;
         Plate("Core inner frame",f.corePart,new Vector3(0,.45f,0),new Vector3(kestrelSd?.94f:.82f,.95f,kestrelSd?.70f:.62f),dark);
         BeveledPlate("Armor chest",f.corePart,new Vector3(0,.70f,.23f),
@@ -267,7 +411,33 @@ public sealed partial class VoxArena
             }
             if(side<0) { f.leftArm=arm;f.leftLeg=leg; } else {f.rightArm=arm;f.rightLeg=leg;}
         }
+        if(f.spec.mobility==MobilityKind.Runner)
+        {
+            f.headPart.localScale=Vector3.one*1.85f;
+            f.headPart.localPosition=new Vector3(0,1.20f,.02f);
+            f.armsPart.localScale=new Vector3(1f,.68f,1f);
+            f.legsPart.localScale=new Vector3(1f,.60f,1f);
+        }
+        else if(f.spec.mobility==MobilityKind.Tank) BuildTankTracks(f,armor,dark,edge);
+        else if(f.spec.mobility==MobilityKind.Quadruped)
+        {
+            bool spider=f.spec.name=="TARANTULA";
+            f.corePart.localPosition=new Vector3(0,-.18f,0);
+            f.corePart.localScale=new Vector3(spider?.90f:.88f,spider?.72f:.78f,.88f);
+            f.armsPart.localPosition=new Vector3(0,-.22f,0);
+            f.armsPart.localScale=new Vector3(.82f,.68f,.82f);
+            f.headPart.localPosition=new Vector3(0,spider?.04f:-.04f,spider?.65f:.84f);
+            f.headPart.localScale=Vector3.one*(spider?.88f:1f);
+            BuildFourLegs(f,armor,dark,edge);
+        }
         f.weaponPart=Module("Right weapon socket",f.rightArm,new Vector3(0,-.75f,.70f));
+        if(f.spec.mobility==MobilityKind.Quadruped)
+        {
+            f.weaponPart.SetParent(f.legsPart,false);
+            f.weaponPart.localPosition=new Vector3(0,-.34f,.53f);
+            f.weaponPart.localRotation=Quaternion.identity;
+            f.weaponPart.localScale=Vector3.one*.82f;
+        }
         f.gun=Module("Primary weapon module",f.weaponPart,Vector3.zero);
         bool longGun=f.frameIndex==5; float length=longGun?2.6f:heavy?1.55f:1.05f;
         Plate("Weapon receiver",f.gun,new Vector3(0,0,.26f),new Vector3(heavy?.58f:.34f,.34f,.80f),dark);
@@ -453,15 +623,15 @@ public sealed partial class VoxArena
     RenderTexture[] framePortraits;
     void BuildPortraits()
     {
-        framePortraits=new RenderTexture[8];
+        framePortraits=new RenderTexture[CraftCatalog.Selectable.Length];
         Fighter model=MakeFighter("Portrait studio robot",Cyan); model.root.position=new Vector3(0,60,0);
         Camera camera=new GameObject("Portrait studio camera").AddComponent<Camera>();
         camera.enabled=false; camera.orthographic=true; camera.orthographicSize=2.9f; camera.clearFlags=CameraClearFlags.SolidColor;
         camera.backgroundColor=new Color(.065f,.095f,.14f,1); camera.cullingMask=1<<8;
         camera.transform.position=model.root.position+new Vector3(5,3.5f,7); camera.transform.LookAt(model.root.position+Vector3.up*.1f);
-        for(int i=0;i<8;i++)
+        for(int i=0;i<CraftCatalog.Selectable.Length;i++)
         {
-            ApplyCharacter(model,i); model.body.localPosition=Vector3.up*.4f;
+            ApplySelectableCharacter(model,i); model.body.localPosition=Vector3.up*.4f;
             model.gun.gameObject.SetActive(true); model.fist.gameObject.SetActive(false);
             foreach(Transform t in model.body.GetComponentsInChildren<Transform>()) t.gameObject.layer=8;
             framePortraits[i]=new RenderTexture(192,224,16); camera.targetTexture=framePortraits[i]; camera.Render();
