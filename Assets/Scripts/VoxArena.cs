@@ -36,6 +36,8 @@ public sealed partial class VoxArena : MonoBehaviour
         public int weaponSlot=1,magazine=30; public float reloadTime;
         public CraftSpec spec=CraftCatalog.All[0];
         public Vector3 facing=Vector3.forward,velocity,pulseDirection,rushDirection;
+        // Independent ground chassis heading for opt-in tank steering; aiming remains on facing.
+        public Vector3 chassisForward=Vector3.forward;
         public float hp,boostEnergy,shieldEnergy,weaponTimer,specialTimer,recoveryTime,shieldRecoveryTime,shieldFlash;
         public float pulseTime,lockTime,rushTime,aiClock,aiReaction,stuckTime,orbitTime;
         public Vector3 aiMove,lastPosition,smoothedTargetVelocity;
@@ -544,6 +546,24 @@ public sealed partial class VoxArena : MonoBehaviour
             desired*=forward>.5f?1.3f:forward<-.5f?.55f:.7f;
         }
         if(f.crouching) desired*=.4f;
+        // Opt-in tank chassis: choose the shorter forward/reverse turn. Opposite input
+        // reverses immediately, while oblique input rotates at a finite angular rate.
+        // This is movement-only: the visual track/turret hierarchy is not yet separated.
+        if(f.spec.usePrototypeMovement && f.spec.mobility==MobilityKind.Tank && !dashing
+            && desired.sqrMagnitude>.001f)
+        {
+            Vector3 chassis=Vector3.ProjectOnPlane(f.chassisForward,Vector3.up);
+            if(chassis.sqrMagnitude<.001f) chassis=Vector3.forward;
+            chassis.Normalize();
+            Vector3 request=desired.normalized;
+            bool reverse=Vector3.Dot(chassis,request)<0f;
+            Vector3 target=reverse?-request:request;
+            float angle=Vector3.Angle(chassis,target);
+            f.chassisForward=Vector3.RotateTowards(chassis,target,120f*Mathf.Deg2Rad*dt,0f).normalized;
+            // Stationary pivot until aligned: prevents unrealistic sideways sliding.
+            float alignment=Mathf.Clamp01(1f-angle/90f);
+            desired=f.chassisForward*(reverse?-1f:1f)*desired.magnitude*alignment;
+        }
         // Tank handling prototype: changing direction bleeds momentum, then ramps back.
         // Applies only to opt-in rigs; existing standard frames keep their response.
         if(f.spec.usePrototypeMovement && f.spec.turnAcceleration>0f && !dashing)
