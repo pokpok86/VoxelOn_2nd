@@ -211,7 +211,7 @@ public sealed partial class VoxArena
                 BeveledPlate("Tank outer greave",knee,new Vector3(side*.35f,-0.320f,-.06f),
                     new Vector3(.33f,.98f,.82f),dark,0,.12f,.92f);
                 BeveledPlate("Tank greave armor",knee,new Vector3(side*.48f,-0.320f,.06f),
-                    new Vector3(.12f,.77f,.67f),armor,0,.17f,.78f);
+                    new Vector3(.12f,.77f,.77f),armor,0,.17f,.78f);
                 for(int tread=0;tread<4;tread++)
                     Plate("Tank tread relief "+tread,knee,
                         new Vector3(side*.555f,-.61f+tread*.18f,.06f),
