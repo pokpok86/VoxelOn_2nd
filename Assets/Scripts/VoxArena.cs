@@ -149,7 +149,12 @@ public sealed partial class VoxArena : MonoBehaviour
     }
     void ApplyCharacter(Fighter f,int index)
     {
-        f.spec=CraftCatalog.All[index].RuntimeCopy(); f.frameIndex=index; ResetAllocations(f); BuildRobot(f); f.body.localScale=Vector3.one*f.spec.size;
+        f.spec=CraftCatalog.All[index].RuntimeCopy(); f.frameIndex=index; ResetAllocations(f);
+        // Re-selecting a tank must not inherit the previous chassis heading.
+        // Keep chassis yaw independent of the upper-body aiming direction after spawn.
+        Vector3 initialChassis=Vector3.ProjectOnPlane(f.facing,Vector3.up);
+        f.chassisForward=initialChassis.sqrMagnitude>.001f?initialChassis.normalized:Vector3.forward;
+        BuildRobot(f); f.body.localScale=Vector3.one*f.spec.size;
         foreach(Renderer r in f.body.GetComponentsInChildren<Renderer>())
             if(r.name.StartsWith("Armor") || r.name=="Visor") r.sharedMaterial=r.name=="Visor"?Glow(f.spec.color):Mat(f.spec.color);
         // Weapon silhouettes are built separately from arm modules.
