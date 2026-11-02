@@ -187,7 +187,7 @@ public sealed partial class VoxArena : MonoBehaviour
             f.dashRemaining=f.dashCooldownLeft=0;
             f.dashDirection=Vector3.zero;
             f.dashSpeedFactor=Mathf.Clamp(f.spec.speed/13f,.7f,1.25f);
-            f.dashDistanceFactor=Mathf.Clamp(f.spec.speed/13f,.75f,1.2f);
+            f.dashDistanceFactor=Mathf.Clamp(f.spec.speed/13f,.75f,1.2f)*Mathf.Max(.1f,f.spec.dashRangeScale);
             f.dashCostFactor=1f; // No mass-derived mobility modifiers in test baseline.
             f.orbitSign=1;
         }
