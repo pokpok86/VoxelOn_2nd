@@ -110,6 +110,17 @@ public sealed partial class VoxArena
                 new Vector3(heavy?.88f:kestrelSd?.78f:.58f,heavy?.62f:kestrelSd?.58f:.45f,kestrelSd?.78f:.72f),armor,-8);
             Plate("Shoulder cap",arm,new Vector3(side*(kestrelSd?.16f:.13f),.36f,0),
                 new Vector3(heavy?.83f:kestrelSd?.73f:.52f,.07f,kestrelSd?.68f:.60f),hull);
+            if(f.spec.mobility==MobilityKind.Tank)
+            {
+                // One coherent, wide shoulder armor mass instead of decorative rods.
+                // Follows the arm socket and never changes hitboxes or handling.
+                BeveledPlate("Tank shoulder bulwark",arm,
+                    new Vector3(side*.21f,.18f,-.07f),
+                    new Vector3(.98f,.69f,.94f),armor,-6,.15f,.90f);
+                Plate("Tank shoulder inset",arm,
+                    new Vector3(side*.21f,.20f,.425f),
+                    new Vector3(.65f,.28f,.07f),dark);
+            }
             Plate("Upper arm",arm,new Vector3(0,-.37f,0),new Vector3(.30f,.42f,.33f),edge);
             Shape(PrimitiveType.Sphere,"Elbow joint",arm,new Vector3(0,-.58f,.08f),Vector3.one*.29f,dark);
             BeveledPlate("Armor forearm",arm,new Vector3(0,-.75f,.24f),new Vector3(.42f,.45f,.64f),hull,-12);
