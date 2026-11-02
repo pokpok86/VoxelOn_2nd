@@ -606,6 +606,7 @@ public sealed partial class VoxArena : MonoBehaviour
         float gait=Mathf.Sin(roundTime*(7f+stride*9f))*stride;
         f.leftLeg.localRotation=Quaternion.Euler(gait*25f,0,-5);
         f.rightLeg.localRotation=Quaternion.Euler(-gait*25f,0,5);
+        AnimateLegJoints(f,stride,gait);
         f.leftArm.localRotation=Quaternion.Euler(-gait*13f,0,0);
         f.rightArm.localRotation=Quaternion.Euler(gait*13f,0,0);
         f.gun.gameObject.SetActive(true);
