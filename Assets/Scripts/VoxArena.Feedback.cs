@@ -71,7 +71,8 @@ public sealed partial class VoxArena
     {
         Vector3 center=fighter.root.position+Vector3.up*.6f;
         // Orthographic camera rays are parallel; a ray from camera.position would be incorrect.
-        return ObstacleOnSegment(center-view.transform.forward*120,center,0,out _);
+        Vector3 origin=view.orthographic?center-view.transform.forward*120:view.transform.position;
+        return ObstacleOnSegment(origin,center,0,out _);
     }
     void DrawOccludedPilot()
     {

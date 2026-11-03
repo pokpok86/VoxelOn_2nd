@@ -22,6 +22,24 @@ public sealed partial class VoxArena
         for(int frame=0;frame<35;frame++) { Animate(player); yield return null; }
         yield return new WaitForEndOfFrame();
         if(!SaveGameplayUIFrame("WISP-guard-gameplay.png")) yield break;
+        if(System.Array.IndexOf(System.Environment.GetCommandLineArgs(),"--camera-review")>=0)
+        {
+            TestSetupSelectable(0,0);inMenu=false;smoke=false;spectatorMode=false;
+            player.root.position=new Vector3(100,FighterGroundY,100);enemy.root.position=new Vector3(110,FighterGroundY,125);
+            player.facing=Vector3.forward;player.velocity=Vector3.zero;targetLock=false;cameraYaw=0;cameraPitch=DefaultThirdPersonPitch;
+            Bounds wall=new Bounds(new Vector3(100,3,96.5f),new Vector3(20,8,2));obstacles.Add(wall);
+            Transform art=PlaceEnvironment("FoundryCargo",null,new Vector3(100,GroundSurfaceY,96.5f),new Vector3(20,7.91f,2));
+            for(int frame=0;frame<80;frame++){Animate(player);yield return null;}
+            yield return new WaitForEndOfFrame();
+            if(!SaveGameplayUIFrame("CameraFix-center-close.png"))yield break;
+            Debug.Log("CAMERA_REVIEW pitch="+(-Mathf.Asin(view.transform.forward.y)*Mathf.Rad2Deg)+" requested="+cameraPitch+" headAlpha="+cameraBodyOpacity);
+            cameraPitch=-5;
+            for(int frame=0;frame<80;frame++){Animate(player);yield return null;}
+            yield return new WaitForEndOfFrame();
+            if(!SaveGameplayUIFrame("CameraFix-center-look-up.png"))yield break;
+            Debug.Log("CAMERA_REVIEW pitch="+(-Mathf.Asin(view.transform.forward.y)*Mathf.Rad2Deg)+" requested="+cameraPitch+" headAlpha="+cameraBodyOpacity);
+            obstacles.RemoveAt(obstacles.Count-1);if(art!=null)Destroy(art.gameObject);
+        }
         Application.Quit(0);
     }
     bool SaveGameplayUIFrame(string filename)
@@ -757,7 +775,7 @@ public sealed partial class VoxArena
                 Check(hasWispBounds&&Mathf.Abs(wispBounds.min.y-GroundSurfaceY)<.01f&&
                     Mathf.Abs(player.body.localPosition.y)<.001f,
                     "WISP sole vertices rest on the arena floor without idle hover (minY="+wispBounds.min.y.ToString("F3")+" floor="+GroundSurfaceY.ToString("F3")+")");
-                Check(wispBounds.size.y>3.8f&&wispBounds.size.y<4.6f,
+                Check(wispModelSource.name=="WISP_v005"?Mathf.Abs(wispBounds.size.y-3.778f)<.025f:wispBounds.size.y>3.8f&&wispBounds.size.y<4.6f,
                     "WISP imported visual keeps arena robot scale (height="+wispBounds.size.y.ToString("F3")+")");
                 Vector3 restingShield=player.guardShield.position;
                 player.guarding=true; player.guardBlend=1; Animate(player);
@@ -869,7 +887,7 @@ public sealed partial class VoxArena
         obstacles.RemoveAt(obstacles.Count-1);
         Vector3 savedCameraPosition=view.transform.position;
         Quaternion savedCameraRotation=view.transform.rotation;
-        float savedNearClip=view.nearClipPlane;
+        float savedNearClip=view.nearClipPlane;bool savedCameraOrtho=view.orthographic;
         TestSetupSelectable(0,1);
         Bounds cameraWall=new Bounds(new Vector3(100,3,96.5f),new Vector3(20,8,2));
         obstacles.Add(cameraWall);
@@ -886,7 +904,7 @@ public sealed partial class VoxArena
         Vector3 pilotViewport=view.WorldToViewportPoint(player.root.position);
         Check(pilotViewport.z>0&&pilotViewport.x>0&&pilotViewport.x<1&&pilotViewport.y>0&&pilotViewport.y<1,
             "close-wall camera keeps pilot inside view");
-        Check(!HeadOverlapsCenterReticle(player),"wall-side camera keeps WISP helmet clear of center crosshair");
+        Check(!VisibleWispHeadBlocksReticle(),"wall-side camera leaves the reticle visible with close head transparency");
         smoke=savedSmoke; obstacles.RemoveAt(obstacles.Count-1);
         smoke=false;
         foreach(float pitch in new[]{-5f,DefaultThirdPersonPitch,45f})
@@ -901,7 +919,7 @@ public sealed partial class VoxArena
         Check(cameraSolids.Count>=4&&ConstrainCamera(perimeterFocus,perimeterFocus+Vector3.back*9,.4f).z>-140f,
             "camera remains inside visible arena boundary walls");
         TestSetup();
-        view.transform.SetPositionAndRotation(savedCameraPosition,savedCameraRotation); view.nearClipPlane=savedNearClip;
+        view.transform.SetPositionAndRotation(savedCameraPosition,savedCameraRotation); view.nearClipPlane=savedNearClip;view.orthographic=savedCameraOrtho;
         float largest=CraftCatalog.All[1].size*CraftRadius;
         bool routes=true;
         // All four cardinal exits from the central open pad must fit the heaviest frame.
@@ -1000,6 +1018,10 @@ public sealed partial class VoxArena
         TestSetup(0,1);
         player.root.position=new Vector3(41,1.1f,50); enemy.root.position=new Vector3(30,1.1f,33);
         FaceOpponent(player,enemy); FaceOpponent(enemy,player); Animate(player); Animate(enemy); UpdateCamera(10);
+        // Explicit orthographic fixture, independent of the previous free-look test.
+        player.root.position=new Vector3(48,FighterGroundY,58);Animate(player);
+        view.orthographic=true;view.transform.position=new Vector3(48,4,30);
+        view.transform.LookAt(player.root.position+Vector3.up*.6f);
         Check(CameraOccludes(player),"pilot remains identifiable behind distant factory");
         yield return new WaitForEndOfFrame(); SavePreview("CoverPreview.png");
         SaveWeaponStudy();

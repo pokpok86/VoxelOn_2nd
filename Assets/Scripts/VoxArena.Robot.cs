@@ -356,7 +356,7 @@ public sealed partial class VoxArena
                 {
                     wispRuntimeMaterial.SetTexture("_EmissionMap",wispEmissionTexture);
                     wispRuntimeMaterial.EnableKeyword("_EMISSION");
-                    if(wispRuntimeMaterial.HasProperty("_EmissionColor")) wispRuntimeMaterial.SetColor("_EmissionColor",Color.white*(wispModelSource.name.Contains("v004")?.9f:2.5f));
+                    if(wispRuntimeMaterial.HasProperty("_EmissionColor")) wispRuntimeMaterial.SetColor("_EmissionColor",Color.white*((wispModelSource.name.Contains("v004")||wispModelSource.name.Contains("v005"))?.9f:2.5f));
                 }
                 if(wispRuntimeMaterial.HasProperty("_Metallic")) wispRuntimeMaterial.SetFloat("_Metallic",.05f);
                 if(wispRuntimeMaterial.HasProperty("_Glossiness")) wispRuntimeMaterial.SetFloat("_Glossiness",.14f);
@@ -407,6 +407,7 @@ public sealed partial class VoxArena
         if(wispShieldSource!=null && shieldSocket==null)
             Debug.LogWarning("WISP shield FBX was supplied, but the documented SHIELD_SOCKET was not found.");
         CacheWispHeadBounds(f);
+        if(f==player) RegisterCameraFadeRenderers(f);
         Debug.Log("WISP_ART_MODEL_APPLIED "+wispModelSource.name+"; base="+(wispBaseColorTexture!=null)+" emission="+(wispEmissionTexture!=null)+" shader="+(wispRuntimeMaterial!=null?wispRuntimeMaterial.shader.name:"none")+" emissionProperty="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.HasProperty("_EmissionMap"))+" emissionMapped="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.GetTexture("_EmissionMap")!=null));
     }
     void BuildTankTracks(Fighter f,Color armor,Color dark,Color edge)

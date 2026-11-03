@@ -1,0 +1,15 @@
+{
+  "v004": {
+    "nonhead_meshes": 91,
+    "nonhead_sha256": "e37e63c8cd11973fd164701c9780b3e5c8cfd8eb38abd590ffed64e9195ae591",
+    "bones": 24,
+    "rig_sha256": "89ad7f49a371dcfb25f9d6172ff366bac4877cac8e8e966df3a22cb0c45e6797"
+  },
+  "v005": {
+    "nonhead_meshes": 91,
+    "nonhead_sha256": "e37e63c8cd11973fd164701c9780b3e5c8cfd8eb38abd590ffed64e9195ae591",
+    "bones": 24,
+    "rig_sha256": "89ad7f49a371dcfb25f9d6172ff366bac4877cac8e8e966df3a22cb0c45e6797"
+  },
+  "body_and_rig_unchanged": true
+}

@@ -42,6 +42,7 @@ public sealed partial class VoxArena
         check(player.magazine==29&&player.reloadTime>0,"partial magazine auto reload begins after 2.2 idle seconds");
         for(int tick=0;tick<64;tick++)Move(player,Vector3.zero,.025f);
         check(player.magazine==30&&player.reloadTime==0,"idle reload completes without requiring an empty magazine");
+        CameraMotionChecks(check);
         smoke=savedSmoke;TestSetup();
     }
     void SaveEnvironmentView(string file,Vector3 from,Vector3 at)

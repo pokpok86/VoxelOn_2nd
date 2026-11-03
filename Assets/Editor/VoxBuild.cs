@@ -13,10 +13,12 @@ public static class VoxBuild
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         var arena = new GameObject("VoxSky Arena").AddComponent<VoxArena>();
         arena.hullShader = Shader.Find("Standard");
+        arena.cameraFadeShader=Shader.Find("VoxelOn/CameraHeadFade");
+        if(arena.cameraFadeShader==null)throw new Exception("Camera head fade shader unavailable");
         if (arena.hullShader == null) throw new Exception("Standard shader unavailable");
-        var modelImporter=AssetImporter.GetAtPath("Assets/Art/Robots/WISP/WISP_v004.fbx") as ModelImporter;
+        var modelImporter=AssetImporter.GetAtPath("Assets/Art/Robots/WISP/WISP_v005.fbx") as ModelImporter;
         if(modelImporter!=null&&!modelImporter.isReadable) { modelImporter.isReadable=true;modelImporter.preserveHierarchy=true;modelImporter.optimizeGameObjects=false;modelImporter.SaveAndReimport(); }
-        arena.wispModelSource=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/WISP/WISP_v004.fbx");
+        arena.wispModelSource=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/WISP/WISP_v005.fbx");
         arena.wispSwordSource=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/WISP/WISP_Sword_v001.fbx");
         arena.wispShieldSource=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/WISP/WISP_Shield_v002.fbx");
         arena.wispBaseColorTexture=AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Art/Robots/WISP/Textures/WISP_BaseColor_v004.png");

@@ -18,12 +18,14 @@ public sealed partial class VoxArena
     }
     void ReturnToHangar()
     {
+        ResetMouseLookCapture();
         inMenu=true; paused=false; showTuning=false; showGuide=false; resumeAfterGuide=false;
         Cursor.lockState=CursorLockMode.None; Cursor.visible=true; view.orthographic=true;
         ClearBattlePresentation(); SavePreferences();
     }
     void SetPaused(bool value)
     {
+        ResetMouseLookCapture();
         paused=value;
         Cursor.lockState=value||spectatorMode?CursorLockMode.None:CursorLockMode.Locked;
         Cursor.visible=value||spectatorMode;

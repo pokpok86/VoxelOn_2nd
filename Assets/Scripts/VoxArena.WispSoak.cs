@@ -16,7 +16,7 @@ public sealed partial class VoxArena
         UpdateCamera(10); // Match the normal match-start camera snap after test spawn placement.
         var frames=new List<float>();double begin=Time.realtimeSinceStartupAsDouble,last=begin;
         int fired=0,partialReloads=0,emptyReloads=0,boostFrames=0,jumpStarts=0,peakShots=0,nextCapture=0;
-        float playerTravel=0,enemyTravel=0,peakJump=0,lostSeconds=0,maxLostSeconds=0;bool capturedHeadClear=true;bool ammoOk=true,energyOk=true,finite=true,cameraOk=true,flamesOk=true;
+        float playerTravel=0,enemyTravel=0,peakJump=0,lostSeconds=0,maxLostSeconds=0;bool mousePitchRange=true;bool capturedHeadClear=true;bool ammoOk=true,energyOk=true,finite=true,cameraOk=true,flamesOk=true;
         float[] jumpAt={4,17,30,40};float[] captureAt={12,28,42};
         string map=arenaMap==ArenaMapKind.OutdoorCanyon?"Canyon":"Foundry";
         Debug.Log("WISP_SOAK_START "+map+" seconds=45 scriptedAim=true hpRestored=true audio=muted resolution="+Screen.width+"x"+Screen.height+" vsync="+QualitySettings.vSyncCount+" targetFPS="+Application.targetFrameRate);
@@ -58,6 +58,8 @@ public sealed partial class VoxArena
             flamesOk&=player.jumpHeld&&player.jumpHeight>.08f||!player.thruster.gameObject.activeSelf;
             yield return new WaitForEndOfFrame(); // LateUpdate has applied the real shoulder camera.
             finite&=Finite(view.transform.position);
+            float actualPitch=-Mathf.Asin(Mathf.Clamp(view.transform.forward.y,-1,1))*Mathf.Rad2Deg;
+            mousePitchRange&=actualPitch>=-5.1f&&actualPitch<=45.1f;
             Vector3 torso=view.WorldToViewportPoint(player.root.position+Vector3.up*.2f);
             bool framed=torso.z>0&&torso.x>.04f&&torso.x<.96f&&torso.y>.16f&&torso.y<.85f;
             lostSeconds=framed?0:lostSeconds+frame;maxLostSeconds=Mathf.Max(maxLostSeconds,lostSeconds);
@@ -65,7 +67,7 @@ public sealed partial class VoxArena
             foreach(Bounds b in obstacles)cameraOk&=!b.Contains(view.transform.position);
             if(nextCapture<captureAt.Length&&elapsed>=captureAt[nextCapture])
             {
-                bool headClearNow=!HeadOverlapsCenterReticle(player);capturedHeadClear&=headClearNow;
+                bool headClearNow=!VisibleWispHeadBlocksReticle();capturedHeadClear&=headClearNow;
                 Debug.Log("SOAK_HEAD_RETICLE "+map+" t="+captureAt[nextCapture]+" clear="+headClearNow);
                 if(!SaveGameplayUIFrame("WISP-soak-"+captureAt[nextCapture].ToString("00")+"s.png"))yield break;
                 nextCapture++;
@@ -83,7 +85,8 @@ public sealed partial class VoxArena
         Check(playerTravel>40&&enemyTravel>10,"player and Practice AI continue moving");
         Check(!targetLock&&!CanStartLockOn(player),"WISP remains manual aim without target lock");
         Check(maxLostSeconds<.25f,"robot torso remains framed above HUD during close-wall corrections");
-        Check(capturedHeadClear,"player helmet clears the center reticle in all captured gameplay frames");
+        Check(mousePitchRange,"camera stays within mouse pitch range instead of forced ground view");
+        Check(capturedHeadClear,"player head does not visibly obscure the reticle in captured gameplay frames");
         Check(nextCapture==3,"three nonblank actual gameplay frames captured");
         frames.Sort();float sum=0;foreach(float ms in frames)sum+=ms;
         if(frames.Count>0)Debug.Log("WISP_SOAK_METRICS "+map+" frames="+frames.Count+" avgMs="+(sum/frames.Count).ToString("F2")+

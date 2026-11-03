@@ -6,12 +6,13 @@ using UnityEngine;
 public sealed partial class VoxArena : MonoBehaviour
 {
     public Shader hullShader;
+    public Shader cameraFadeShader;
     [Header("Imported artist model references")]
     public GameObject wispModelSource;
     public GameObject wispSwordSource,wispShieldSource;
     public Texture2D wispBaseColorTexture,wispEmissionTexture;
     Material wispRuntimeMaterial;
-    bool IsArticulatedWisp=>wispModelSource!=null&&(wispModelSource.name=="WISP_v003"||wispModelSource.name=="WISP_v004");
+    bool IsArticulatedWisp=>wispModelSource!=null&&(wispModelSource.name=="WISP_v003"||wispModelSource.name=="WISP_v004"||wispModelSource.name=="WISP_v005");
     public float boostRecovery = 40, recoveryDelay = .6f;
     [Header("Jump and vertical boost")]
     public float jumpSpeed = 10.6f, jumpGravity = 24f, jumpThrust = 34f, jumpBoostDrain = 24f;
@@ -123,7 +124,7 @@ public sealed partial class VoxArena : MonoBehaviour
         bool captureGallery=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-docs-gallery")>=0;
         bool captureVisualTargets=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-visual-targets")>=0;
         bool environmentSmoke=Array.IndexOf(Environment.GetCommandLineArgs(),"--environment-smoke")>=0;
-        captureGameplayPreview=wispSoak||Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-gameplay-ui")>=0;
+        captureGameplayPreview=Array.IndexOf(Environment.GetCommandLineArgs(),"--camera-review")>=0||wispSoak||Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-gameplay-ui")>=0;
         smoke=wispSoak||performance||captureGallery||captureVisualTargets||environmentSmoke||Array.IndexOf(Environment.GetCommandLineArgs(),"--smoke-test")>=0;
         arenaMap=Array.IndexOf(Environment.GetCommandLineArgs(),"--outdoor")>=0?ArenaMapKind.OutdoorCanyon:
             smoke?ArenaMapKind.IndoorFactory:(ArenaMapKind)Mathf.Clamp(PlayerPrefs.GetInt(PreferencePrefix+"Map",0),0,1);
@@ -215,6 +216,7 @@ public sealed partial class VoxArena : MonoBehaviour
         ApplySelectableCharacter(player,selectedCraft); ApplySelectableCharacter(enemy,enemyCraft);
         ResetRound(); inMenu=false; view.orthographic=smoke||spectatorMode; view.fieldOfView=60;
         cameraPitch=spectatorMode?42:DefaultThirdPersonPitch;
+        ResetMouseLookCapture();
         Cursor.lockState=spectatorMode?CursorLockMode.None:CursorLockMode.Locked; Cursor.visible=spectatorMode;
     }
     void ResetRound()
@@ -265,6 +267,7 @@ public sealed partial class VoxArena : MonoBehaviour
     void Update()
     {
         if(player==null || enemy==null) return;
+        if(!Application.isFocused||Cursor.lockState!=CursorLockMode.Locked)ResetMouseLookCapture();
         if(captureGameplayPreview) return;
         if(Input.GetKeyDown(KeyCode.F1)) { ToggleGuide(); return; }
         if(Input.GetKeyDown(KeyCode.F2) && !inMenu && !smoke) { testLabOpen=!testLabOpen; SetTestCursor(); }
@@ -294,6 +297,7 @@ public sealed partial class VoxArena : MonoBehaviour
     void LateUpdate() { if(player!=null && enemy!=null) UpdateCamera(Time.deltaTime); }
     void UpdateCamera(float dt)
     {
+        if(paused&&!inMenu&&!smoke&&!spectatorMode)return;
         if(spectatorMode&&!inMenu)
         {
             Vector3 spectatorCenter=(player.root.position+enemy.root.position)*.5f;
@@ -312,84 +316,17 @@ public sealed partial class VoxArena : MonoBehaviour
         }
         if(!inMenu&&!paused&&!smoke)
         {
-            if(targetLock)
-            {
-                Vector3 toward=enemy.root.position-player.root.position;
-                cameraYaw=Mathf.LerpAngle(cameraYaw,Mathf.Atan2(toward.x,toward.z)*Mathf.Rad2Deg,1-Mathf.Exp(-8*dt));
-                cameraPitch=Mathf.Lerp(cameraPitch,DefaultThirdPersonPitch,1-Mathf.Exp(-8*dt));
-            }
-            Quaternion rotation=Quaternion.Euler(cameraPitch,cameraYaw,0);
-            Vector3 focus=player.root.position+Vector3.up*1.4f;
-            Vector3 shoulderOffset=rotation*Vector3.right*2.4f;
-            Vector3 desired=focus-rotation*Vector3.forward*10.5f+shoulderOffset;
-            desired=ConstrainCamera(focus,desired,.4f);
-            bool closeCamera=Vector3.Distance(focus,desired)<2.4f;
-            if(closeCamera)
-            {
-                float bestScore=float.NegativeInfinity; bool shoulderSpace=false;
-                foreach(float angle in new[]{-55f,55f,-80f,80f})
-                {
-                    Vector3 alternate=focus-Quaternion.Euler(0,angle,0)*(rotation*Vector3.forward)*5.5f;
-                    alternate=ConstrainCamera(focus,alternate,.4f);
-                    float clearance=Vector3.Distance(focus,alternate);
-                    float score=clearance-Mathf.Abs(angle)*.01f-Vector3.Distance(view.transform.position,alternate)*.03f;
-                    if(clearance>2.4f&&score>bestScore) { desired=alternate; bestScore=score; shoulderSpace=true; }
-                }
-                if(!shoulderSpace)
-                {
-                    Vector3 raised=ConstrainCamera(focus,focus+Vector3.up*4f-Vector3.ProjectOnPlane(rotation*Vector3.forward,Vector3.up)*.5f,.4f);
-                    if(Vector3.Distance(focus,raised)>Vector3.Distance(focus,desired)) desired=raised;
-                }
-            }
-            // Crowded cover can leave a legal but excessively close boom. Keep
-            // the original yaw and gain vertical stand-off rather than magnifying
-            // the helmet across the aiming reticle or hiding the torso below HUD.
-            if(Vector3.Distance(focus,desired)<6.5f)
-            {
-                Vector3 overhead=ConstrainCamera(focus,focus+Vector3.up*8f-
-                    Vector3.ProjectOnPlane(rotation*Vector3.forward,Vector3.up).normalized*.25f,.4f);
-                if(Vector3.Distance(focus,overhead)>6.5f) { desired=overhead;closeCamera=true; }
-            }
-            float followBlend=1-Mathf.Exp(-12*dt);
-            Vector3 cameraPosition=Vector3.Lerp(view.transform.position,desired,followBlend);
-            if(cameraShakeTime>0)
-            {
-                cameraShakeTime=Mathf.Max(0,cameraShakeTime-dt);
-                cameraPosition+=new Vector3(Mathf.Sin(Time.time*83f),Mathf.Cos(Time.time*109f),0)*cameraShakeStrength*(cameraShakeTime/.3f);
-            }
-            view.transform.position=ConstrainCamera(focus,cameraPosition,.4f);
-            view.nearClipPlane=.08f;
-            Vector3 closeRight=Vector3.Cross(Vector3.up,focus-view.transform.position).normalized;
-            Vector3 aimFocus=closeCamera?focus+closeRight*2.6f:
-                focus+Vector3.ProjectOnPlane(rotation*Vector3.forward,Vector3.up).normalized*2.5f+shoulderOffset;
-            // The camera can be collision-constrained at 3–7m without entering
-            // the emergency <2.4m search. Full-distance look-ahead then cropped
-            // the robot below the HUD. Frame its torso progressively at close range.
-            float actualDistance=Vector3.Distance(focus,view.transform.position);
-            float openFraming=Mathf.InverseLerp(2.5f,8f,actualDistance);
-            Vector3 torsoFocus=player.root.position+Vector3.up*.2f+
-                closeRight*Mathf.Min(2.2f,actualDistance*.4f);
-            aimFocus=Vector3.Lerp(torsoFocus,aimFocus,openFraming);
-            Quaternion cameraRotation=Quaternion.LookRotation(aimFocus-view.transform.position,Vector3.up);
-            // Position is already damped; keep the torso framed immediately
-            // during a wall correction instead of adding a second rotation lag.
-            view.transform.rotation=openFraming<1?cameraRotation:Quaternion.Slerp(view.transform.rotation,cameraRotation,followBlend);
-            // Eight cached head-bound corners are cheap enough for every frame.
-            // Keep the real helmet/horns outside the protected aiming area even
-            // while camera collision and jump animation change their projection.
-            for(int correction=0;correction<8&&ProjectedWispHeadCoversReticle();correction++)
-            {
-                aimFocus+=view.transform.right*.35f;
-                view.transform.rotation=Quaternion.LookRotation(aimFocus-view.transform.position,Vector3.up);
-            }
+            UpdateThirdPersonCamera(dt);
             return;
         }
+        view.orthographic=true;
         Vector3 center=(player.root.position+enemy.root.position)*.5f, separation=player.root.position-enemy.root.position;
         float zoom=Mathf.Max(12.5f,(Mathf.Abs(Vector3.Dot(separation,view.transform.up))*.5f+5)/.68f,
             (Mathf.Abs(Vector3.Dot(separation,view.transform.right))*.5f+7)/view.aspect);
         float blend=1-Mathf.Exp(-7*dt);
         view.orthographicSize=Mathf.Lerp(view.orthographicSize,zoom,blend);
         view.transform.position=Vector3.Lerp(view.transform.position,center+new Vector3(46,58,-46),blend);
+        view.transform.LookAt(center);
         if(starRoot!=null) starRoot.position=Vector3.zero;
     }
     Vector3 ConstrainCamera(Vector3 focus,Vector3 candidate,float radius)
@@ -512,8 +449,8 @@ public sealed partial class VoxArena : MonoBehaviour
             Vector3.Distance(player.root.position,enemy.root.position)>player.spec.lockRange) targetLock=false;
         if(!targetLock)
         {
-            cameraYaw+=Input.GetAxis("Mouse X")*mouseSensitivity;
-            cameraPitch=Mathf.Clamp(cameraPitch-Input.GetAxis("Mouse Y")*mouseSensitivity,-5,45);
+            ApplyMouseLook(Input.GetAxis("Mouse X"),Input.GetAxis("Mouse Y"),
+                Application.isFocused&&Cursor.lockState==CursorLockMode.Locked);
         }
         UpdatePlayerHeading(player,move,forward,targetLock,lockOnAvailable,dt);
         Move(player,move,dt);
@@ -895,6 +832,7 @@ public sealed partial class VoxArena : MonoBehaviour
     {
         if(guideFont!=null) Destroy(guideFont);
         if(wispRuntimeMaterial!=null) Destroy(wispRuntimeMaterial);
+        if(cameraBodyFadeMaterial!=null) Destroy(cameraBodyFadeMaterial);
         foreach(Mesh mesh in environmentMeshes) if(mesh!=null) Destroy(mesh);
         if(framePortraits!=null) foreach(RenderTexture rt in framePortraits) if(rt!=null) { rt.Release(); Destroy(rt); }
         foreach(Material m in materials.Values) if(m!=null) Destroy(m);
