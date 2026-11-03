@@ -40,3 +40,11 @@ Blender 환경 v003은 실내 구조 보강과 외곽 협곡 실루엣을 다듬
 공장 벽을 Blender에서 정비 베이·환기구·절제된 조명으로 다듬었습니다. [이전 실내](Before-v005/Foundry-overview.png), [벽 근처 실제 화면](Foundry-clearance-wall.png), [실외 벽 근처](Canyon-clearance-wall.png)를 비교할 수 있습니다. 원본은 ArtSource/Environment/VoxelOn_Environment_v005.blend에 있습니다.
 
 실제 스킨100760개 정점으로 측정한 WISP 높이는4.038m이며 독립 관절 계산과0.000001m 이내로 일치했습니다. 몸통은 기존 충돌 반경 안에 들어갑니다. 팔·장식의 최대 폭은 더 넓어서 벽에 일부 겹칠 수 있으며 해결됐다고 보고하지 않습니다. 비례나 피격 범위는 바꾸지 않았습니다. 환경/시각 검사61개 통과; [검증 증거와 한계](../../Validation/20261104-Checkpoint5.md). 최종 아트 승인은 남아 있습니다.
+
+## 04시 벽의 판 겹침 수정과 실내 조명
+
+같은 카메라로 [기준](Foundry-lighting-01-baseline.png) · [기존 구조물 그림자 제외](Foundry-lighting-02-no-legacy-shadows.png) · [배경 그림자 수신 제외](Foundry-lighting-03-no-backdrop-receive.png)를 비교했습니다. 이 세 진단 이미지는 수정 전 v005 기준이며 비교 후 설정을 복원했습니다.
+
+원인은 Blender 수정 과정에서 대각 지지대를 큰 직육면체 판으로 재구성한 것이었습니다. v006은 원래 정점·면을 보존해 얇은 대각 지지대를 복원했습니다. 현재 위 실내 이미지에는 큰 체크형 판이 사라지고 지지대 구조가 보입니다. 기존 지붕의 그림자가 실내 조명을 모두 가리던 설정도 고쳐 바닥의 구조물 그림자가 나타납니다.
+
+실내 실제 검사38개 통과. 실외는 변경하지 않았습니다. [검증 기록](../../Validation/20261104-Checkpoint6.md), [현재 Blender 환경 원본 안내](../../../ArtSource/Environment/README.md).

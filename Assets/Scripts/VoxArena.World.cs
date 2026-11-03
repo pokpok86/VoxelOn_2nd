@@ -122,8 +122,11 @@ public sealed partial class VoxArena
             PlaceEnvironment("CanyonBoundary",null,new Vector3(0,GroundSurfaceY,0),Vector3.one)!=null;
         if(arenaMap==ArenaMapKind.IndoorFactory)
         {
-            Box("High hangar ceiling",null,new Vector3(0,GroundSurfaceY+69f,0),
+            Transform ceiling=Box("High hangar ceiling",null,new Vector3(0,GroundSurfaceY+69f,0),
                 new Vector3(290,2,290),new Color(.11f,.15f,.19f));
+            // This directional key represents interior lighting; the visual roof
+            // must not occlude it and flatten all lighting to ambient only.
+            ceiling.GetComponent<Renderer>().shadowCastingMode=UnityEngine.Rendering.ShadowCastingMode.Off;
             cameraSolids.Add(new Bounds(new Vector3(0,GroundSurfaceY+69f,0),new Vector3(290,2,290)));
         }
         for(int axis=0;axis<2;axis++)

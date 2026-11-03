@@ -111,6 +111,25 @@ public sealed partial class VoxArena
         TestSetupSelectable(0,0);ResetRound();inMenu=false;
         return vertices>1000&&coreVertices>0&&all.size.y>3.7f&&all.size.y<4.3f&&maxSkinError<.005f;
     }
+    void SaveFoundryLightingStudy()
+    {
+        Vector3 from=new Vector3(42,28,-45),at=new Vector3(0,3,10);
+        player.root.gameObject.SetActive(false);enemy.root.gameObject.SetActive(false);
+        SaveEnvironmentView("Foundry-lighting-01-baseline.png",from,at);
+        var changed=new List<Renderer>();var modes=new List<UnityEngine.Rendering.ShadowCastingMode>();
+        foreach(Renderer r in FindObjectsByType<Renderer>(FindObjectsSortMode.None))
+            if(r.name=="Hangar boundary wall"||r.name=="High hangar ceiling")
+            {changed.Add(r);modes.Add(r.shadowCastingMode);r.shadowCastingMode=UnityEngine.Rendering.ShadowCastingMode.Off;}
+        SaveEnvironmentView("Foundry-lighting-02-no-legacy-shadows.png",from,at);
+        GameObject art=GameObject.Find("Blender FBX / FoundryBackdrop");
+        Renderer[] surfaces=art.GetComponentsInChildren<Renderer>();
+        foreach(Renderer r in surfaces)r.receiveShadows=false;
+        SaveEnvironmentView("Foundry-lighting-03-no-backdrop-receive.png",from,at);
+        foreach(Renderer r in surfaces)r.receiveShadows=true;
+        for(int i=0;i<changed.Count;i++)changed[i].shadowCastingMode=modes[i];
+        player.root.gameObject.SetActive(true);enemy.root.gameObject.SetActive(true);
+        Debug.Log("FOUNDRY_LIGHTING_STUDY_PASS 3 real renders; shadow settings restored");
+    }
     IEnumerator EnvironmentSmoke()
     {
         yield return new WaitForEndOfFrame();
@@ -161,6 +180,7 @@ public sealed partial class VoxArena
         string map=arenaMap==ArenaMapKind.OutdoorCanyon?"Canyon":"Foundry";
         Check(MeasureWispStandingEnvelope(map),"genuine baked WISP envelope has expected standing scale and torso weights");
         SaveWispMovementStudy(map);
+        if(arenaMap==ArenaMapKind.IndoorFactory&&Array.IndexOf(Environment.GetCommandLineArgs(),"--lighting-study")>=0) SaveFoundryLightingStudy();
         player.root.gameObject.SetActive(false);enemy.root.gameObject.SetActive(false);player.shadow.gameObject.SetActive(false);enemy.shadow.gameObject.SetActive(false);
         SaveEnvironmentView(map+"-overview.png",new Vector3(42,28,-45),new Vector3(0,3,10));
         Bounds close=arenaMap==ArenaMapKind.OutdoorCanyon?terrainSteps[terrainSteps.Count-1]:obstacles[0];
