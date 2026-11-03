@@ -46,7 +46,10 @@ public sealed partial class VoxArena
         rim.intensity=.34f;
         rim.shadows=LightShadows.None;
         rim.transform.rotation=Quaternion.Euler(28,145,0);
-        RenderSettings.ambientLight=new Color(.39f,.45f,.54f);
+        RenderSettings.ambientMode=UnityEngine.Rendering.AmbientMode.Trilight;
+        RenderSettings.ambientSkyColor=new Color(.39f,.45f,.54f);
+        RenderSettings.ambientEquatorColor=new Color(.34f,.39f,.46f);
+        RenderSettings.ambientGroundColor=new Color(.12f,.14f,.17f);
         view=new GameObject("Quarter view camera").AddComponent<Camera>(); view.tag="MainCamera";
         view.transform.position=new Vector3(46,58,-46); view.transform.LookAt(Vector3.zero);
         view.cullingMask=~(1<<8); view.orthographic=true; view.orthographicSize=24; view.farClipPlane=600;
@@ -55,8 +58,10 @@ public sealed partial class VoxArena
         if(arenaMap==ArenaMapKind.OutdoorCanyon)
         {
             view.backgroundColor=new Color(.48f,.70f,.84f);
-            light.intensity=1.3f; light.color=new Color(1,.91f,.75f);
-            RenderSettings.ambientLight=new Color(.58f,.62f,.63f);
+            light.intensity=1.15f; light.color=new Color(1,.91f,.75f);
+            RenderSettings.ambientSkyColor=new Color(.50f,.57f,.65f);
+            RenderSettings.ambientEquatorColor=new Color(.38f,.40f,.42f);
+            RenderSettings.ambientGroundColor=new Color(.21f,.19f,.16f);
             RenderSettings.fog=true; RenderSettings.fogColor=new Color(.55f,.65f,.69f);
             RenderSettings.fogMode=FogMode.ExponentialSquared; RenderSettings.fogDensity=.0022f;
         }

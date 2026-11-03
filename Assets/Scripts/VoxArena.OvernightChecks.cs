@@ -53,6 +53,28 @@ public sealed partial class VoxArena
         image.ReadPixels(new Rect(0,0,1280,720),0,0);image.Apply();File.WriteAllBytes(Path.Combine(folder,file),image.EncodeToPNG());
         RenderTexture.active=previous;view.targetTexture=null;target.Release();Destroy(target);Destroy(image);
     }
+    void SaveWispMovementStudy(string map)
+    {
+        Vector3 anchor=new Vector3(100,FighterGroundY,100);
+        string[] poses={"stand","strafe-left","strafe-right","run","jump-held","jump-released"};
+        foreach(string pose in poses)
+        {
+            TestSetupSelectable(0,0);player.root.position=anchor;player.facing=Vector3.forward;player.root.rotation=Quaternion.identity;
+            enemy.root.gameObject.SetActive(false);enemy.shadow.gameObject.SetActive(false);
+            Vector3 input=pose=="strafe-left"?Vector3.left:pose=="strafe-right"?Vector3.right:pose=="run"?Vector3.forward:Vector3.zero;
+            player.boostHeld=pose=="run";
+            if(pose.StartsWith("jump"))
+            {
+                player.jumpOriginY=anchor.y;player.jumpVelocity=jumpSpeed*player.spec.jumpImpulseScale/Mathf.Sqrt(player.spec.jumpWeightFactor);
+                player.jumpHeld=pose=="jump-held";
+            }
+            for(int tick=0;tick<12;tick++)Move(player,input,1f/60);
+            roundTime=.1f;Animate(player);
+            // Fixed floor-level target keeps actual jump height visible; no camera follow.
+            SaveEnvironmentView(map+"-motion-"+pose+".png",anchor+new Vector3(7,4,10),anchor+Vector3.up*.7f);
+        }
+        TestSetupSelectable(0,0);ResetRound();inMenu=false;Animate(player);Animate(enemy);
+    }
     IEnumerator EnvironmentSmoke()
     {
         yield return new WaitForEndOfFrame();
@@ -86,8 +108,9 @@ public sealed partial class VoxArena
                 Check(found&&Mathf.Abs(shown.min.y-solid.min.y)<.02f&&Mathf.Abs(shown.max.y-solid.max.y)<.02f,"FBX cover floor/roof matches collision "+d.visual.name);
             }
         }
-        player.root.gameObject.SetActive(false);enemy.root.gameObject.SetActive(false);player.shadow.gameObject.SetActive(false);enemy.shadow.gameObject.SetActive(false);
         string map=arenaMap==ArenaMapKind.OutdoorCanyon?"Canyon":"Foundry";
+        SaveWispMovementStudy(map);
+        player.root.gameObject.SetActive(false);enemy.root.gameObject.SetActive(false);player.shadow.gameObject.SetActive(false);enemy.shadow.gameObject.SetActive(false);
         SaveEnvironmentView(map+"-overview.png",new Vector3(42,28,-45),new Vector3(0,3,10));
         Bounds close=arenaMap==ArenaMapKind.OutdoorCanyon?terrainSteps[terrainSteps.Count-1]:obstacles[0];
         SaveEnvironmentView(map+"-cover.png",close.center+new Vector3(9,6,-11),close.center);

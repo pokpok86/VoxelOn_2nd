@@ -13,3 +13,5 @@ Blender에서 v003을 바탕으로 만든 별도 버전입니다. 원본 v001/v0
 [정면](WISP-v004-front.png) · [후면](WISP-v004-rear.png) · [실내 게임](Foundry-WISP-crosshair-camera.png) · [실외 게임](Canyon-WISP-crosshair-camera.png)
 
 Windows Unity 빌드 및268개 회귀 검사, 실내외 환경51개 검사 통과. 렌더 이미지와 실제 게임 화면을 확인했습니다. 장시간 수동 플레이 및 최종 아트 승인은 남아 있습니다. work 후보이며 main 미반영입니다.
+
+01시 검증 추가: 실제 게임의 센서 발광 계수를0.9로 낮춰 Blender의 청록색을 유지했습니다. 크기/스킨/관절 원본은 그대로입니다. [동작 비교 화면](../Screenshots/Overnight-20261104/README.md), 전체 스모크268개와 환경51개 통과.

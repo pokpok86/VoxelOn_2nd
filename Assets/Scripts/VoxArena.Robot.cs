@@ -323,7 +323,7 @@ public sealed partial class VoxArena
                 {
                     wispRuntimeMaterial.SetTexture("_EmissionMap",wispEmissionTexture);
                     wispRuntimeMaterial.EnableKeyword("_EMISSION");
-                    if(wispRuntimeMaterial.HasProperty("_EmissionColor")) wispRuntimeMaterial.SetColor("_EmissionColor",Color.white*2.5f);
+                    if(wispRuntimeMaterial.HasProperty("_EmissionColor")) wispRuntimeMaterial.SetColor("_EmissionColor",Color.white*(wispModelSource.name.Contains("v004")?.9f:2.5f));
                 }
                 if(wispRuntimeMaterial.HasProperty("_Metallic")) wispRuntimeMaterial.SetFloat("_Metallic",.05f);
                 if(wispRuntimeMaterial.HasProperty("_Glossiness")) wispRuntimeMaterial.SetFloat("_Glossiness",.14f);
