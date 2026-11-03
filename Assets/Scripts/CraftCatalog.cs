@@ -99,6 +99,7 @@ public static class CraftCatalog
     };
     // Four current prototype choices. Runtime copies keep the archived eight-frame
     // catalog available for combat regression checks and future reference.
+    public const int UnlockedCount=1; // WISP playtest; archived prototypes unlock with their finished visuals/motion.
     public static CraftSpec[] CreateFourFormPrototypes()
     {
         CraftSpec runner=All[2].RuntimeCopy();
@@ -107,7 +108,14 @@ public static class CraftCatalog
         CraftSpec hound=All[6].RuntimeCopy();
         runner.color=new Color(.78f,.84f,.91f);
         runner.role="SD RUNNER";
+        runner.description="Left-hand rapid gun. Right-hand shield guard pose.";
         runner.supportsLockOn=false;
+        runner.prototypeBaseSpeed=15f;
+        runner.forwardSpeedFactor=runner.leftSpeedFactor=runner.rightSpeedFactor=1f;
+        runner.reverseSpeedFactor=1f/3f;
+        runner.boostSpeed=32f; runner.boostDrain=24f;
+        runner.jumpImpulseScale=1.45f; runner.jumpHeightScale=1.3f;
+        runner.verticalBoostScale=1.4f; runner.fallGravityFactor=1.5f;
         tank.color=new Color(.38f,.47f,.27f);
         tank.role="TRACKED SIEGE FRAME";
         tank.supportsLockOn=true;

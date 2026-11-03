@@ -40,7 +40,7 @@ public sealed partial class VoxArena
         DrawOccludedPilot();
         Vector3 point=view.WorldToViewportPoint(enemy.root.position);
         float x=point.x*1280,y=(1-point.y)*720;
-        if(point.z>0&&x>40&&x<1240&&y>140&&y<540)
+        if(player.spec.name!="WISP"&&point.z>0&&x>40&&x<1240&&y>140&&y<540)
         {
             Color color=hitConfirmTime>0?Color.white:assistEngaged?Cyan:new Color(1,.55f,.28f);
             float r=24*enemy.spec.size;

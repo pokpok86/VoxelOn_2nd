@@ -1,0 +1,191 @@
+[
+  {
+    "name": "Root",
+    "parent": "-",
+    "position_Unity": [
+      0.0,
+      0.0,
+      -0.0
+    ]
+  },
+  {
+    "name": "Head",
+    "parent": "Root",
+    "position_Unity": [
+      0.0,
+      2.1344,
+      0.025
+    ]
+  },
+  {
+    "name": "Core",
+    "parent": "Root",
+    "position_Unity": [
+      0.0,
+      1.4244,
+      -0.0
+    ]
+  },
+  {
+    "name": "Arms",
+    "parent": "Root",
+    "position_Unity": [
+      0.0,
+      0.0,
+      -0.0
+    ]
+  },
+  {
+    "name": "Legs",
+    "parent": "Root",
+    "position_Unity": [
+      0.0,
+      0.0,
+      -0.0
+    ]
+  },
+  {
+    "name": "Weapon",
+    "parent": "Root",
+    "position_Unity": [
+      0.0,
+      0.0,
+      -0.0
+    ]
+  },
+  {
+    "name": "Left_shoulder",
+    "parent": "Arms",
+    "position_Unity": [
+      0.56,
+      1.7244,
+      -0.0
+    ]
+  },
+  {
+    "name": "Right_shoulder",
+    "parent": "Arms",
+    "position_Unity": [
+      -0.56,
+      1.7244,
+      -0.0
+    ]
+  },
+  {
+    "name": "Left_elbow",
+    "parent": "Left_shoulder",
+    "position_Unity": [
+      0.63,
+      1.3144,
+      -0.0
+    ]
+  },
+  {
+    "name": "Right_elbow",
+    "parent": "Right_shoulder",
+    "position_Unity": [
+      -0.63,
+      1.3144,
+      -0.0
+    ]
+  },
+  {
+    "name": "Left_hand",
+    "parent": "Left_elbow",
+    "position_Unity": [
+      0.63,
+      0.9144,
+      0.015
+    ]
+  },
+  {
+    "name": "Right_hand",
+    "parent": "Right_elbow",
+    "position_Unity": [
+      -0.63,
+      0.9144,
+      0.015
+    ]
+  },
+  {
+    "name": "Left_thigh",
+    "parent": "Legs",
+    "position_Unity": [
+      0.25,
+      1.0044,
+      -0.0
+    ]
+  },
+  {
+    "name": "Right_thigh",
+    "parent": "Legs",
+    "position_Unity": [
+      -0.25,
+      1.0044,
+      -0.0
+    ]
+  },
+  {
+    "name": "Left_knee",
+    "parent": "Left_thigh",
+    "position_Unity": [
+      0.25,
+      0.5844,
+      -0.0
+    ]
+  },
+  {
+    "name": "Right_knee",
+    "parent": "Right_thigh",
+    "position_Unity": [
+      -0.25,
+      0.5844,
+      -0.0
+    ]
+  },
+  {
+    "name": "Left_ankle",
+    "parent": "Left_knee",
+    "position_Unity": [
+      0.25,
+      0.1044,
+      -0.0
+    ]
+  },
+  {
+    "name": "Right_ankle",
+    "parent": "Right_knee",
+    "position_Unity": [
+      -0.25,
+      0.1044,
+      -0.0
+    ]
+  },
+  {
+    "name": "SWORD_SOCKET",
+    "parent": "Right_hand",
+    "position_Unity": [
+      -0.63,
+      0.8994,
+      0.115
+    ]
+  },
+  {
+    "name": "SHIELD_SOCKET",
+    "parent": "Left_elbow",
+    "position_Unity": [
+      0.81,
+      1.2844,
+      0.08
+    ]
+  },
+  {
+    "name": "BACKPACK_SOCKET",
+    "parent": "Core",
+    "position_Unity": [
+      0.0,
+      1.7044,
+      -0.35
+    ]
+  }
+]

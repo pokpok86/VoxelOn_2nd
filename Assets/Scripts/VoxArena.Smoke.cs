@@ -5,6 +5,54 @@ using UnityEngine;
 
 public sealed partial class VoxArena
 {
+    IEnumerator CaptureGameplayUI()
+    {
+        yield return new WaitForSecondsRealtime(.2f);
+        yield return new WaitForEndOfFrame();
+        if(!SaveGameplayUIFrame("WISP-only-hangar.png")) yield break;
+        TestSetupSelectable(0,0); inMenu=false; smoke=false; spectatorMode=false;
+        player.root.position=new Vector3(0,FighterGroundY,0); enemy.root.position=new Vector3(0,FighterGroundY,30);
+        player.facing=Vector3.forward; player.velocity=Vector3.zero; canShoot=true; targetLock=false;
+        cameraYaw=0; cameraPitch=DefaultThirdPersonPitch; view.orthographic=false; view.fieldOfView=60;
+        aimMarker.gameObject.SetActive(false); Animate(player); Animate(enemy); UpdateCamera(10);
+        yield return new WaitForSecondsRealtime(.4f);
+        yield return new WaitForEndOfFrame();
+        if(!SaveGameplayUIFrame("WISP-crosshair-camera.png")) yield break;
+        player.guarding=true;
+        for(int frame=0;frame<35;frame++) { Animate(player); yield return null; }
+        yield return new WaitForEndOfFrame();
+        if(!SaveGameplayUIFrame("WISP-guard-gameplay.png")) yield break;
+        Application.Quit(0);
+    }
+    bool SaveGameplayUIFrame(string filename)
+    {
+        Texture2D screenshot=ScreenCapture.CaptureScreenshotAsTexture();
+        if(screenshot==null) { Debug.LogError("WISP_GAMEPLAY_UI_CAPTURE_FAIL"); Application.Quit(2); return false; }
+        string path=Path.Combine(Directory.GetCurrentDirectory(),"Docs","Models",(arenaMap==ArenaMapKind.OutdoorCanyon?"Canyon-":"Foundry-")+filename);
+        File.WriteAllBytes(path,screenshot.EncodeToPNG()); Destroy(screenshot);
+        Debug.Log("WISP_GAMEPLAY_UI_CAPTURE_PASS "+path); return true;
+    }
+    bool HeadOverlapsCenterReticle(Fighter fighter)
+    {
+        Vector2 min=Vector2.one*float.PositiveInfinity,max=Vector2.one*float.NegativeInfinity;
+        bool projected=false;
+        foreach(SkinnedMeshRenderer skin in fighter.body.GetComponentsInChildren<SkinnedMeshRenderer>())
+        {
+            Vector3[] vertices=skin.sharedMesh.vertices; BoneWeight[] weights=skin.sharedMesh.boneWeights;
+            Matrix4x4[] bind=skin.sharedMesh.bindposes;
+            for(int v=0;v<vertices.Length;v++)
+            {
+                int boneIndex=weights[v].boneIndex0;
+                if(!skin.bones[boneIndex].IsChildOf(fighter.headPart)) continue;
+                Vector3 point=view.WorldToViewportPoint((skin.bones[boneIndex].localToWorldMatrix*bind[boneIndex]).MultiplyPoint3x4(vertices[v]));
+                if(point.z<=0) continue;
+                min=Vector2.Min(min,new Vector2(point.x,point.y)); max=Vector2.Max(max,new Vector2(point.x,point.y)); projected=true;
+            }
+        }
+        if(!projected) return false;
+        // Include the complete HUD reticle, not just its center dot.
+        return new Rect(min.x-18f/1280,min.y-18f/720,max.x-min.x+36f/1280,max.y-min.y+36f/720).Contains(new Vector2(.5f,.5f));
+    }
     IEnumerator CapturePrototypeVisuals()
     {
         yield return new WaitForEndOfFrame();
@@ -38,6 +86,39 @@ public sealed partial class VoxArena
                 string path=Path.Combine(root,(frame+1).ToString("00")+"-"+player.spec.name.ToLowerInvariant()+"-"+views[angle]+".png");
                 File.WriteAllBytes(path,image.EncodeToPNG()); written++;
             }
+        }
+        if(wispModelSource!=null&&IsArticulatedWisp)
+        {
+            ApplySelectableCharacter(player,0); player.root.position=center; player.facing=Vector3.forward;
+            inMenu=false;
+            string[] poses={"stand","stride-left","stride-right","jump","guard"};
+            for(int pose=0;pose<poses.Length;pose++)
+            {
+                roundTime=pose==1?.10f:pose==2?.30f:0f;
+                player.velocity=pose==1||pose==2?Vector3.forward*player.spec.speed:Vector3.zero;
+                player.jumpHeight=pose==3?2f:0f; player.jumpVelocity=pose==3?4f:0f;
+                player.guarding=pose==4; player.guardBlend=pose==4?1:0;
+                player.root.position=center+Vector3.up*player.jumpHeight; Animate(player);
+                view.transform.position=center+(pose==3?new Vector3(6f,4.2f,9f):new Vector3(6f,2.2f,7f));
+                view.transform.LookAt(center+Vector3.up*(pose==3?1.3f:.2f));
+                view.Render(); RenderTexture.active=target;
+                image.ReadPixels(new Rect(0,0,width,height),0,0); image.Apply();
+                File.WriteAllBytes(Path.Combine(Directory.GetCurrentDirectory(),"Docs","Models","WISP-v003-unity-"+poses[pose]+".png"),image.EncodeToPNG());
+            }
+            Debug.Log("WISP_V003_MOTION_CAPTURE_PASS 5 actual player poses");
+            player.guarding=false; player.guardBlend=0;
+            player.root.position=center; player.velocity=Vector3.zero; player.jumpHeight=player.jumpVelocity=0; Animate(player);
+            Bounds wallBounds=new Bounds(center+new Vector3(0,2,-3.5f),new Vector3(20,8,2));
+            Transform wall=Box("Camera regression wall",null,wallBounds.center,wallBounds.size,new Color(.3f,.34f,.4f));
+            obstacles.Add(wallBounds);
+            bool savedSmoke=smoke,savedMenu=inMenu; smoke=false; inMenu=false;
+            targetLock=false; cameraYaw=0; cameraPitch=DefaultThirdPersonPitch; view.fieldOfView=60;
+            view.transform.position=center+new Vector3(0,2,-9);
+            for(int step=0;step<90;step++) UpdateCamera(.025f);
+            view.Render(); RenderTexture.active=target; image.ReadPixels(new Rect(0,0,width,height),0,0); image.Apply();
+            File.WriteAllBytes(Path.Combine(Directory.GetCurrentDirectory(),"Docs","Models","WISP-camera-wall.png"),image.EncodeToPNG());
+            smoke=savedSmoke; inMenu=savedMenu; obstacles.RemoveAt(obstacles.Count-1); Destroy(wall.gameObject);
+            Debug.Log("WISP_WALL_CAMERA_CAPTURE_PASS");
         }
         RenderTexture.active=previousActive; view.targetTexture=previousTarget;
         view.orthographic=previousOrtho; view.fieldOfView=previousFov;
@@ -182,7 +263,9 @@ public sealed partial class VoxArena
         Check(CraftCatalog.Selectable.Length==4 &&
             CraftCatalog.Selectable[0].name=="WISP" && CraftCatalog.Selectable[1].name=="BASTION" &&
             CraftCatalog.Selectable[2].name=="TARANTULA" && CraftCatalog.Selectable[3].name=="HOUND",
-            "hangar roster is limited to four current prototypes");
+            "four prototype definitions remain archived for future unlocks");
+        Check(CraftCatalog.UnlockedCount==1&&CraftCatalog.Selectable[0].name=="WISP"&&player.spec.name=="WISP"&&enemy.spec.name=="WISP",
+            "hangar and initial rival expose WISP only");
         Check(!CraftCatalog.Selectable[0].supportsLockOn && CraftCatalog.Selectable[1].supportsLockOn &&
             CraftCatalog.Selectable[2].supportsLockOn && !CraftCatalog.Selectable[3].supportsLockOn,
             "lock-on availability matches official WISP/BASTION/TARANTULA/HOUND concept");
@@ -205,9 +288,9 @@ public sealed partial class VoxArena
             "HOUND special remains usable without a lock-on sensor");
         TestSetupSelectable(0,1);
         if(wispModelSource!=null)
-            Check(player.headPart.name=="Head"&&player.headPart.GetComponentInChildren<Renderer>(true)!=null&&
+            Check(player.headPart.name=="Head"&&(IsArticulatedWisp?player.body.GetComponentInChildren<SkinnedMeshRenderer>(true)!=null:player.headPart.GetComponentInChildren<Renderer>(true)!=null)&&
                 player.legsPart.Find("Left_thigh/Left_knee/Left_ankle")!=null&&
-                player.headPart.parent==player.body&&player.corePart.parent==player.body,
+                player.headPart.parent==player.corePart.parent&&player.headPart.IsChildOf(player.body),
                 "WISP uses artist-authored head and compact articulated leg structure");
         else
             Check(player.headPart.localScale.x>1.8f && player.legsPart.localScale.y<.6f &&
@@ -258,14 +341,14 @@ public sealed partial class VoxArena
         Check(ValidTuning(float.NaN)==1&&ValidTuning(float.PositiveInfinity)==1&&ValidTuning(-9)==.5f&&ValidTuning(9)==2,"invalid saved tuning is sanitized");
         for(int rival=0;rival<CraftCatalog.Selectable.Length;rival++)
         {
-            rivalSelection=rival; BeginMatch();
-            Check(enemyCraft==rival&&enemy.spec!=CraftCatalog.Selectable[rival]&&
-                enemy.spec.name==CraftCatalog.Selectable[rival].name,"fixed practice rival "+rival);
+            rivalSelection=rival; selectedCraft=rival; BeginMatch();
+            Check(enemyCraft==0&&selectedCraft==0&&enemy.spec!=CraftCatalog.Selectable[0]&&
+                enemy.spec.name=="WISP"&&player.spec.name=="WISP","locked player and rival selection resolves to WISP "+rival);
         }
         rivalSelection=-1;
         bool validRandom=true;
-        for(int roll=0;roll<32;roll++) { int candidate=ResolveRival(); validRandom&=candidate>=0&&candidate<CraftCatalog.Selectable.Length; }
-        Check(validRandom,"random rival remains valid");
+        for(int roll=0;roll<32;roll++) { int candidate=ResolveRival(); validRandom&=candidate>=0&&candidate<CraftCatalog.UnlockedCount; }
+        Check(validRandom,"random rival selects only unlocked frames");
         // Engine foundation regressions: team-aware roster and explicit AI actor.
         TestSetup();
         Check(fighterRoster.Count==2 && Opponent(player)==enemy && Opponent(enemy)==player,
@@ -538,11 +621,18 @@ public sealed partial class VoxArena
             traveled+=Vector3.Distance(p,enemy.root.position);
         }
         Check(traveled>20&&Mathf.Abs(enemy.root.position.x)+Mathf.Abs(enemy.root.position.z)>50,"AI keeps moving near former map corner");
-        TestSetup(); player.facing=Vector3.forward;
-        for(int i=0;i<12;i++) FaceMovement(player,Vector3.right,.025f);
+        TestSetupSelectable(0,1); player.facing=Vector3.forward;
+        for(int i=0;i<12;i++) UpdatePlayerHeading(player,Vector3.right,Vector3.forward,false,false,.025f);
         Animate(player);
-        Check(Vector3.Angle(player.facing,Vector3.right)<1&&Vector3.Angle(player.root.forward,Vector3.right)<1,
-            "body turns toward camera-relative movement after lock-on is released");
+        Check(Vector3.Angle(player.facing,Vector3.forward)<1&&Vector3.Angle(player.root.forward,Vector3.forward)<1,
+            "no-lock WISP keeps mouse-camera heading while moving sideways");
+        Vector3 cameraStrafe=CameraRelativeMove(Vector3.forward,Vector3.right,1,0);
+        Check(Vector3.Angle(cameraStrafe,Vector3.right)<.1f&&Mathf.Abs(Vector3.Dot(cameraStrafe,Vector3.forward))<.001f,
+            "no-lock lateral input remains a camera-relative sidestep");
+        TestSetupSelectable(1,0); player.facing=Vector3.forward;
+        for(int i=0;i<12;i++) UpdatePlayerHeading(player,Vector3.right,Vector3.forward,false,true,.025f);
+        Check(Vector3.Angle(player.facing,Vector3.right)<1,
+            "lock-capable frame still turns toward movement while lock is released");
         difficulty=2;
         TestSetup();
         player.velocity=Vector3.right*12; enemy.smoothedTargetVelocity=player.velocity;
@@ -570,12 +660,21 @@ public sealed partial class VoxArena
         Check(assisted.x>0&&InArc(player,assisted),"assist leads nearby moving target within firing arc");
         Check(AssistAim(player,enemy,Vector3.back)==Vector3.back,"assist never snaps backward aim");
         aimAssist=false; Check(AssistAim(player,enemy,Vector3.forward)==Vector3.forward,"assist can be disabled"); aimAssist=true;
+        TestSetupSelectable(0,1); player.facing=Vector3.forward;
+        enemy.root.position=player.root.position+new Vector3(3,0,20); enemy.velocity=Vector3.right*8;
+        Check(!CanAssist(player,enemy,Vector3.forward)&&AssistAim(player,enemy,Vector3.forward)==Vector3.forward&&
+            FollowupAim(player,enemy,Vector3.forward,.2f,1)==Vector3.forward,
+            "WISP never applies target snapping, leading or followup aim assistance");
+        Special(player,enemy,Vector3.forward);
+        Check(Vector3.Angle(player.rushDirection,Vector3.forward)<.01f,
+            "WISP saber rush follows manual aim instead of steering toward rival");
         int protectedFrames=0;
         for(int i=0;i<8;i++)
         {
             TestSetup(i);
             if(player.spec.ShieldMax>0) { protectedFrames++; Check(player.spec.health<=300,"shield reserved for fragile frame"); }
-            Check(player.headPart.parent==player.body&&player.corePart.parent==player.body&&player.armsPart.parent==player.body&&player.legsPart.parent==player.body&&player.weaponPart.parent==player.rightArm,"detachable module hierarchy "+i);
+            Transform expectedParent=player.spec.name=="WISP"&&wispModelSource!=null&&IsArticulatedWisp?player.body.Find("WISP artist model v003/WISP_Rig_v003/Root"):player.body;
+            Check(player.headPart.parent==expectedParent&&player.corePart.parent==expectedParent&&player.armsPart.parent==expectedParent&&player.legsPart.parent==expectedParent&&player.weaponPart.IsChildOf(player.spec.name=="WISP"&&wispModelSource!=null?player.leftArm:player.rightArm),"detachable module hierarchy "+i);
             if(i==0)
             {
                 Transform head=player.headPart.Find("Helmet"),chest=player.corePart.Find("Armor chest");
@@ -600,30 +699,89 @@ public sealed partial class VoxArena
             {
                 Transform hand=player.leftArm.Find("Left_elbow/Left_hand");
                 Transform rightHand=player.rightArm.Find("Right_elbow/Right_hand");
-                Renderer visor=player.headPart.GetComponentInChildren<Renderer>(true);
+                bool articulated=IsArticulatedWisp;
+                Transform artist=player.body.Find(articulated?"WISP artist model v003":"WISP artist model v001");
+                Transform moduleParent=articulated?artist.Find("WISP_Rig_v003/Root"):player.body;
+                Renderer visor=articulated?artist.GetComponentInChildren<Renderer>(true):player.headPart.GetComponentInChildren<Renderer>(true);
                 Transform oldChest=player.body.Find("Core module/Armor chest");
                 Check(player.headPart.name=="Head"&&player.corePart.name=="Core"&&
                     player.armsPart.name=="Arms"&&player.legsPart.name=="Legs"&&
-                    player.headPart.parent==player.body&&player.corePart.parent==player.body&&
-                    player.armsPart.parent==player.body&&player.legsPart.parent==player.body,
+                    player.headPart.parent==moduleParent&&player.corePart.parent==moduleParent&&
+                    player.armsPart.parent==moduleParent&&player.legsPart.parent==moduleParent,
                     "WISP uses artist FBX with separate head/core/arms/legs modules");
                 Check(rightHand!=null&&hand!=null&&player.saber.parent==rightHand.Find("SWORD_SOCKET")&&
-                    player.weaponPart.parent==player.rightArm&&
+                    player.weaponPart.parent==(articulated?hand:player.leftArm)&&
                     player.leftLeg.Find("Left_knee/Left_ankle")!=null&&
                     player.rightLeg.Find("Right_knee/Right_ankle")!=null,
                     "WISP imported arm, leg, weapon and saber pivots remain connected");
                 Check(player.saber.name=="WISP sword v001"&&
                     player.rightArm.Find("Right_elbow/Right_hand/SWORD_SOCKET/WISP sword v001")!=null&&
-                    player.leftArm.Find("Left_elbow/SHIELD_SOCKET/WISP shield v001 (visual only)")!=null&&
+                    player.rightArm.Find("Right_elbow/RIGHT_SHIELD_SOCKET/WISP right shield (guard pose)")!=null&&
                     !player.saber.gameObject.activeSelf,
-                    "WISP designer sword is used for its existing rush and shield is attached as a visual part");
+                    "WISP archived sword remains connected and right-hand shield is attached");
                 Check(visor!=null&&visor.sharedMaterial.mainTexture==wispBaseColorTexture&&
                     wispRuntimeMaterial!=null&&wispRuntimeMaterial.GetTexture("_EmissionMap")==wispEmissionTexture,
-                    "WISP base-color and emission texture atlas maps are assigned (base="+(visor!=null&&visor.sharedMaterial.mainTexture!=null?visor.sharedMaterial.mainTexture.name:"null")+" emission="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.GetTexture("_EmissionMap")!=null?wispRuntimeMaterial.GetTexture("_EmissionMap").name:"null")+")");
+                    "WISP base-color and emission texture atlas maps are assigned (base="+(visor!=null&&visor.sharedMaterial.mainTexture!=null?visor.sharedMaterial.mainTexture.name:"null")+" shader="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.shader!=null?wispRuntimeMaterial.shader.name:"null")+" main="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.GetTexture("_MainTex")!=null?wispRuntimeMaterial.GetTexture("_MainTex").name:"null")+" emission="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.GetTexture("_EmissionMap")!=null?wispRuntimeMaterial.GetTexture("_EmissionMap").name:"null")+")");
                 Check(oldChest!=null&&oldChest.GetComponent<Renderer>().enabled==false,
                     "WISP duplicate procedural torso armor is hidden");
-                Check(Mathf.Abs(player.body.localPosition.y)<.1f,
-                    "WISP imported feet use the documented ground origin");
+                Animate(player);
+                Bounds wispBounds=new Bounds(); bool hasWispBounds=false;
+                foreach(Transform module in articulated?new[]{artist}:new[]{player.armsPart,player.corePart,player.headPart,player.legsPart})
+                    foreach(Renderer partRenderer in module.GetComponentsInChildren<Renderer>(true))
+                        if(partRenderer.enabled&&partRenderer.gameObject.activeInHierarchy)
+                        {
+                            if(partRenderer is SkinnedMeshRenderer skin)
+                            {
+                                Vector3[] vertices=skin.sharedMesh.vertices;
+                                BoneWeight[] weights=skin.sharedMesh.boneWeights;
+                                Matrix4x4[] bind=skin.sharedMesh.bindposes;
+                                for(int vertex=0;vertex<vertices.Length;vertex++)
+                                {
+                                    BoneWeight weight=weights[vertex];
+                                    Vector3 world=(skin.bones[weight.boneIndex0].localToWorldMatrix*bind[weight.boneIndex0]).MultiplyPoint3x4(vertices[vertex]);
+                                    if(!hasWispBounds) { wispBounds=new Bounds(world,Vector3.zero); hasWispBounds=true; }
+                                    else wispBounds.Encapsulate(world);
+                                }
+                            }
+                            else
+                            {
+                                if(!hasWispBounds) { wispBounds=partRenderer.bounds; hasWispBounds=true; }
+                                else wispBounds.Encapsulate(partRenderer.bounds);
+                            }
+                        }
+                Check(hasWispBounds&&Mathf.Abs(wispBounds.min.y-GroundSurfaceY)<.01f&&
+                    Mathf.Abs(player.body.localPosition.y)<.001f,
+                    "WISP sole vertices rest on the arena floor without idle hover (minY="+wispBounds.min.y.ToString("F3")+" floor="+GroundSurfaceY.ToString("F3")+")");
+                Check(wispBounds.size.y>3.8f&&wispBounds.size.y<4.6f,
+                    "WISP imported visual keeps arena robot scale (height="+wispBounds.size.y.ToString("F3")+")");
+                Vector3 restingShield=player.guardShield.position;
+                player.guarding=true; player.guardBlend=1; Animate(player);
+                Check(Vector3.Dot(player.guardShield.forward,player.root.forward)>.99f&&
+                    Vector3.Dot(player.guardShield.position-restingShield,player.root.forward)>.1f&&
+                    Quaternion.Angle(player.rightArm.localRotation,Quaternion.identity)>30f,
+                    "WISP right arm raises shield forward with its face toward the aim direction");
+                player.guarding=false; player.guardBlend=0; Animate(player);
+                Check(Vector3.Distance(restingShield,player.guardShield.position)<.01f&&player.weaponPart.IsChildOf(player.leftArm),
+                    "WISP shield returns to rest and gun remains mounted on left hand");
+                if(articulated)
+                {
+                    Transform knee=player.leftLeg.Find("Left_knee");
+                    SkinnedMeshRenderer driven=null;
+                    foreach(SkinnedMeshRenderer skin in artist.GetComponentsInChildren<SkinnedMeshRenderer>())
+                        foreach(BoneWeight weight in skin.sharedMesh.boneWeights)
+                            if(weight.weight0>.99f&&skin.bones[weight.boneIndex0]==knee) { driven=skin; break; }
+                    Check(driven!=null&&artist.GetComponentsInChildren<SkinnedMeshRenderer>().Length==112,
+                        "WISP v003 has actual weighted mechanical joint meshes");
+                    if(driven!=null)
+                    {
+                        Mesh a=new Mesh(),b=new Mesh(); driven.BakeMesh(a);
+                        Quaternion rest=knee.localRotation; knee.localRotation=Quaternion.Euler(24,0,0)*rest;
+                        driven.BakeMesh(b); float displacement=0;
+                        for(int v=0;v<a.vertexCount;v++) displacement=Mathf.Max(displacement,Vector3.Distance(a.vertices[v],b.vertices[v]));
+                        knee.localRotation=rest; Destroy(a); Destroy(b);
+                        Check(displacement>.02f,"WISP knee rotation deforms the real skinned mesh");
+                    }
+                }
             }
         }
         TestSetup(0,1);
@@ -704,6 +862,41 @@ public sealed partial class VoxArena
         obstacles.Add(new Bounds(sightPoint,Vector3.one*3));
         Check(CameraOccludes(player),"orthographic occlusion detects cover in front of pilot");
         obstacles.RemoveAt(obstacles.Count-1);
+        Vector3 savedCameraPosition=view.transform.position;
+        Quaternion savedCameraRotation=view.transform.rotation;
+        float savedNearClip=view.nearClipPlane;
+        TestSetupSelectable(0,1);
+        Bounds cameraWall=new Bounds(new Vector3(100,3,96.5f),new Vector3(20,8,2));
+        obstacles.Add(cameraWall);
+        Vector3 cameraFocus=player.root.position+Vector3.up*1.4f;
+        Vector3 constrained=ConstrainCamera(cameraFocus,cameraFocus+Vector3.back*8.5f,.4f);
+        Check(constrained.z>cameraWall.max.z+.4f&&Vector3.Distance(cameraFocus,constrained)<2.2f,
+            "camera retracts before close wall without forcing a minimum boom through it");
+        bool savedSmoke=smoke; smoke=false; targetLock=false; cameraYaw=0; cameraPitch=DefaultThirdPersonPitch;
+        view.transform.position=cameraFocus+Vector3.back*10;
+        UpdateCamera(.016f);
+        Check(Vector3.Distance(view.transform.position,ConstrainCamera(cameraFocus,view.transform.position,.4f))<.001f,
+            "camera collision corrects smoothing immediately even when previous position is behind wall");
+        for(int frame=0;frame<60;frame++) UpdateCamera(.025f);
+        Vector3 pilotViewport=view.WorldToViewportPoint(player.root.position);
+        Check(pilotViewport.z>0&&pilotViewport.x>0&&pilotViewport.x<1&&pilotViewport.y>0&&pilotViewport.y<1,
+            "close-wall camera keeps pilot inside view");
+        Check(!HeadOverlapsCenterReticle(player),"wall-side camera keeps WISP helmet clear of center crosshair");
+        smoke=savedSmoke; obstacles.RemoveAt(obstacles.Count-1);
+        smoke=false;
+        foreach(float pitch in new[]{-5f,DefaultThirdPersonPitch,45f})
+        foreach(float yaw in new[]{0f,90f})
+        {
+            cameraPitch=pitch; cameraYaw=yaw;
+            for(int frame=0;frame<80;frame++) UpdateCamera(.025f);
+            Check(!HeadOverlapsCenterReticle(player),"WISP head and crosshair stay separated at camera pitch "+pitch+" yaw "+yaw);
+        }
+        smoke=savedSmoke;
+        Vector3 perimeterFocus=new Vector3(0,5,-138.9f);
+        Check(cameraSolids.Count>=4&&ConstrainCamera(perimeterFocus,perimeterFocus+Vector3.back*9,.4f).z>-140f,
+            "camera remains inside visible arena boundary walls");
+        TestSetup();
+        view.transform.SetPositionAndRotation(savedCameraPosition,savedCameraRotation); view.nearClipPlane=savedNearClip;
         float largest=CraftCatalog.All[1].size*CraftRadius;
         bool routes=true;
         // All four cardinal exits from the central open pad must fit the heaviest frame.
@@ -818,6 +1011,7 @@ public sealed partial class VoxArena
         Check(player.magazine==0&&player.reloadTime>0,"empty magazine starts automatic reload");
         TestStep(1.7f);
         Check(player.magazine==30&&player.reloadTime==0,"automatic reload refills the 30-round magazine");
+        WispOvernightChecks(Check);
         smoke=originalSmoke;
         Debug.Log(passed?"VOXSKY_SMOKE_PASS "+count+" checks: ground, modular robots, camera, slot-one gun, mobility, practice AI, aim assist, audio":"VOXSKY_SMOKE_FAIL");
         yield return new WaitForSeconds(.3f); Application.Quit(passed?0:2);

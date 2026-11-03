@@ -29,7 +29,7 @@ public sealed partial class VoxArena
             string[] fields=allocationFields[category];
             points=new float[fields.Length];
             // Directional example requested: 40 front, 30 back, 15 per side.
-            if(category==4) {points[0]=40;points[1]=30;points[2]=15;points[3]=15;}
+            if(category==4&&!(f.selectableIndex>=0&&f.spec.name=="WISP")) {points[0]=40;points[1]=30;points[2]=15;points[3]=15;}
             else
             {
                 float each=100f/fields.Length;

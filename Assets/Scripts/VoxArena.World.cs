@@ -14,6 +14,7 @@ public sealed partial class VoxArena
     const float FighterGroundY=GroundSurfaceY+FighterSupportOffset;
     sealed class Debris { public Transform visual; public Vector3 origin,size; public float phase,hp; public bool destroyed; }
     readonly List<Bounds> obstacles=new List<Bounds>();
+    readonly List<Bounds> cameraSolids=new List<Bounds>();
     readonly List<Debris> debris=new List<Debris>();
     sealed class CoverFragment
     {
@@ -51,6 +52,15 @@ public sealed partial class VoxArena
         view.cullingMask=~(1<<8); view.orthographic=true; view.orthographicSize=24; view.farClipPlane=600;
         view.backgroundColor=new Color(.009f,.014f,.04f); view.clearFlags=CameraClearFlags.SolidColor;
         view.gameObject.AddComponent<AudioListener>();
+        if(arenaMap==ArenaMapKind.OutdoorCanyon)
+        {
+            view.backgroundColor=new Color(.48f,.70f,.84f);
+            light.intensity=1.3f; light.color=new Color(1,.91f,.75f);
+            RenderSettings.ambientLight=new Color(.58f,.62f,.63f);
+            RenderSettings.fog=true; RenderSettings.fogColor=new Color(.55f,.65f,.69f);
+            RenderSettings.fogMode=FogMode.ExponentialSquared; RenderSettings.fogDensity=.0022f;
+        }
+        else RenderSettings.fog=false;
         BuildGround();
         BuildVisualEnvironment();
         BuildArenaPerimeter();
@@ -85,7 +95,10 @@ public sealed partial class VoxArena
         AddDebris(new Vector3(-166,1.1f,-164),new Vector3(7,2.6f,9),6.4f);
         BuildElevationCourse();
         for(int side=-1;side<=1;side+=2) for(int i=0;i<5;i++)
-            obstacles.Add(new Bounds(new Vector3(side*(48+i*14),2,45+i%2*16),new Vector3(10,9+i%3*3,13)));
+        {
+            float height=6+i%3*3+.3f;
+            obstacles.Add(new Bounds(new Vector3(side*(48+i*14),GroundSurfaceY+height*.5f,45+i%2*16),new Vector3(10,height,13)));
+        }
         }
         else BuildCanyonTerrain();
         player=MakeFighter("Pilot frame",Cyan); enemy=MakeFighter("Rival frame",Orange);
@@ -101,8 +114,11 @@ public sealed partial class VoxArena
             new Color(.16f,.20f,.24f):new Color(.29f,.26f,.22f);
         float height=arenaMap==ArenaMapKind.IndoorFactory?65f:24f;
         if(arenaMap==ArenaMapKind.IndoorFactory)
+        {
             Box("High hangar ceiling",null,new Vector3(0,GroundSurfaceY+69f,0),
                 new Vector3(290,2,290),new Color(.11f,.15f,.19f));
+            cameraSolids.Add(new Bounds(new Vector3(0,GroundSurfaceY+69f,0),new Vector3(290,2,290)));
+        }
         for(int axis=0;axis<2;axis++)
         for(int side=-1;side<=1;side+=2)
         {
@@ -111,6 +127,7 @@ public sealed partial class VoxArena
                 new Vector3(0,GroundSurfaceY+height*.5f,side*(ArenaHalfWidth+2.5f));
             Box(arenaMap==ArenaMapKind.IndoorFactory?"Hangar boundary wall":"Canyon cliff boundary",
                 null,pos,size,wall);
+            cameraSolids.Add(new Bounds(pos,size));
             if(arenaMap==ArenaMapKind.OutdoorCanyon)
             {
                 // Layered blocky rock strata; the cliff is a perimeter, not a pit.
@@ -122,8 +139,8 @@ public sealed partial class VoxArena
                         new Vector3(side*(ArenaHalfWidth-3f),GroundSurfaceY+rockHeight*.5f,along):
                         new Vector3(along,GroundSurfaceY+rockHeight*.5f,side*(ArenaHalfWidth-3f));
                     Vector3 rockSize=axis==0?new Vector3(9,rockHeight,16):new Vector3(16,rockHeight,9);
-                    Box("Canyon stratified rock "+axis+" "+side+" "+j,null,rockPos,rockSize,
-                        Color.Lerp(new Color(.25f,.23f,.20f),new Color(.42f,.35f,.27f),j/12f));
+                    PlaceEnvironment("CanyonRock",null,new Vector3(rockPos.x,GroundSurfaceY,rockPos.z),rockSize);
+                    cameraSolids.Add(new Bounds(rockPos,rockSize));
                 }
             }
         }
@@ -147,6 +164,12 @@ public sealed partial class VoxArena
                     Color.Lerp(low,high,step/6f));
             }
         }
+        for(int i=0;i<12;i++)
+        {
+            float angle=i*Mathf.PI/6f;
+            float height=4f+i%3*1.5f,radius=40f+(i%3)*20f;
+            AddTerrainBlock("Canyon tall voxel cover "+i,new Vector3(Mathf.Sin(angle)*radius,GroundSurfaceY+height*.5f,Mathf.Cos(angle)*radius),new Vector3(7+i%3,height,8+i%2*2),low);
+        }
         // Scattered broad shelves provide sightline variation without dense cover.
         for(int i=0;i<5;i++)
         {
@@ -158,7 +181,8 @@ public sealed partial class VoxArena
     }
     void AddTerrainBlock(string name,Vector3 center,Vector3 size,Color color)
     {
-        Box(name,null,center,size,color);
+        Transform terrain=Module(name,null,center);
+        BuildVoxelCover(terrain,size,arenaMap==ArenaMapKind.OutdoorCanyon?100:2);
         Bounds bounds=new Bounds(center,size);
         obstacles.Add(bounds);
         terrainSteps.Add(bounds);

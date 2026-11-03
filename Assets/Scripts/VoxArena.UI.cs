@@ -15,6 +15,21 @@ public sealed partial class VoxArena
     float lockVisual;
     Vector2 lockScreenPosition;
     bool lockVisualInitialized;
+    bool ShowAimReticle=>!inMenu&&!paused&&!Finished&&!spectatorMode;
+    void DrawAimReticle()
+    {
+        if(!ShowAimReticle) return;
+        Color ink=new Color(.015f,.025f,.035f,.95f);
+        Color ready=canShoot?Color.white:new Color(1,.62f,.25f);
+        Rect[] ticks={new Rect(623,359,10,2),new Rect(647,359,10,2),new Rect(639,343,2,10),new Rect(639,367,2,10)};
+        foreach(Rect tick in ticks)
+        {
+            Panel(new Rect(tick.x-1,tick.y-1,tick.width+2,tick.height+2),ink);
+            Panel(tick,ready);
+        }
+        Panel(new Rect(637,357,6,6),ink);
+        Panel(new Rect(639,359,2,2),Color.white);
+    }
     void DrawLockReticle()
     {
         if(spectatorMode || Finished || paused || view==null || enemy==null) return;
@@ -65,7 +80,7 @@ public sealed partial class VoxArena
         if(showGuide) { DrawGuide(); return; }
         if (inMenu) { GUI.enabled=!showTuning; DrawHangar(); GUI.enabled=true; if(showTuning) DrawTuning(); return; }
         Panel(new Rect(0, 0, 1280, 94), new Color(.025f, .045f, .075f, .96f));
-        Text(28, 14, 270, "VOX / SKY", title);
+        Text(28, 14, 270, "Voxel-On", title);
         Text(30, 52, 300, "GROUND FRAME  /  DUEL 06", small);
         Text(340, 9, 300, "PILOT / " + player.spec.name, label);
         Text(342, 36, 310, $"HULL {Mathf.CeilToInt(player.hp)} / {player.spec.health}"+(player.spec.ShieldMax>0?$"   SHIELD {Mathf.CeilToInt(player.shieldEnergy)}":""), small);
@@ -78,14 +93,14 @@ public sealed partial class VoxArena
         Text(1010, 18, 250, $"{(int)roundTime / 60:00}:{(int)roundTime % 60:00}     W {wins} / L {losses}", label);
         Panel(new Rect(0, 616, 1280, 104), new Color(.025f, .045f, .075f, .96f));
         Text(28, 626, 360, player.spec.name + " / " + player.spec.role, label);
-        Text(28, 658, 360, (player.weaponSlot==3?"[3] SALVAGE / MELEE":player.weaponSlot==1?"[1] RIGHT HAND / RAPID GUN":"[2] LEFT HAND / SPECIAL") , small);
+        Text(28, 658, 360, player.spec.name=="WISP"?"LEFT HAND / RAPID GUN":(player.weaponSlot==3?"[3] SALVAGE / MELEE":player.weaponSlot==1?"[1] RIGHT HAND / RAPID GUN":"[2] LEFT HAND / SPECIAL") , small);
         Text(28, 682, 360, player.weaponSlot==3?(heldSalvage==null?"EMPTY HAND / F PICKUP":heldSalvage.kind.ToString().ToUpper()+" / "+(heldSalvage.kind==SalvageKind.Shield?shieldRemaining.ToString("0")+" HP":"LMB USE")):player.weaponSlot==1?(player.reloadTime>0?"RELOADING  "+player.reloadTime.ToString("0.0")+"s":"AMMO  "+player.magazine+" / 30"):("SPECIAL  "+(player.specialTimer>0?player.specialTimer.ToString("0.0")+"s":"READY")), small);
         Text(420, 620, 300, "BOOST / "+player.spec.boost+"  "+Mathf.CeilToInt(player.boostEnergy), small);
         Bar(422, 643, 220, player.boostEnergy / player.spec.boostCapacity, Cyan);
         Text(420, 652, 300, player.weaponSlot==1?"PRIMARY / "+player.magazine+" / 30":"SPECIAL / "+player.spec.specialName, small);
-        Bar(422, 675, 220, player.weaponSlot==1?1-player.weaponTimer/.105f:1-player.specialTimer/Mathf.Max(.01f,player.spec.specialCooldown), new Color(1,.70f,.30f));
-        Text(740, 620, 500, spectatorMode?"AI SPECTATOR / 360 ORBIT":(player.weaponSlot==1?"RIGHT HAND  /  PRIMARY":"LEFT HAND  /  SPECIAL"), small);
-        Bar(742,643,220,player.weaponSlot==1?player.magazine/30f:1-player.specialTimer/Mathf.Max(.01f,player.spec.specialCooldown),new Color(.8f,.45f,1));
+        Bar(422, 675, 220, player.weaponSlot==1?1-player.weaponTimer/PrimaryFireInterval:1-player.specialTimer/Mathf.Max(.01f,player.spec.specialCooldown), new Color(1,.70f,.30f));
+        Text(740, 620, 500, spectatorMode?"AI SPECTATOR / 360 ORBIT":player.spec.name=="WISP"?"RIGHT HAND / SHIELD POSE":(player.weaponSlot==1?"RIGHT HAND  /  PRIMARY":"LEFT HAND  /  SPECIAL"), small);
+        Bar(742,643,220,player.spec.name=="WISP"?player.guardBlend:player.weaponSlot==1?player.magazine/30f:1-player.specialTimer/Mathf.Max(.01f,player.spec.specialCooldown),new Color(.8f,.45f,1));
         if(player.failedFireFlash>0 && Mathf.Repeat(Time.unscaledTime*12f,1f)<.5f)
         {
             Color warning=new Color(1f,.28f,.15f);
@@ -93,13 +108,14 @@ public sealed partial class VoxArena
             Panel(new Rect(737,637,2,15),warning); Panel(new Rect(965,637,2,15),warning);
         }
         Text(740, 658, 520, "WASD MOVE / SHIFT BOOST / SPACE JUMP / F CROUCH", small);
-        Text(740, 682, 520, (player.spec.supportsLockOn?"RMB LOCK-ON":"RMB FREE AIM")+
+        Text(740, 682, 520, (player.spec.name=="WISP"?"RMB SHIELD POSE":player.spec.supportsLockOn?"RMB LOCK-ON":"RMB FREE AIM")+
             " / LMB FIRE / R RELOAD / SPACE JUMP", small);
         if (!Finished && !paused)
             Text(405, 574, 650, player.lockTime>0?"SPECIAL FIRING / MOVEMENT LOCKED":player.rushTime>0?"SABER RUSH":player.boostLocked ? "BOOST EMPTY / RELEASE SHIFT TO REARM" : AimStatus(), small);
         DrawCombatFeedback();
         DrawRadar();
         DrawLockReticle();
+        DrawAimReticle();
         if (Finished || paused)
         {
             Panel(new Rect(385, 245, 510, 205), new Color(.025f, .045f, .075f, .96f));
@@ -113,11 +129,12 @@ public sealed partial class VoxArena
     void DrawHangar()
     {
         Panel(new Rect(0, 0, 1280, 720), new Color(.025f, .045f, .075f, .98f));
-        Text(32, 22, 500, "VOX / SKY  —  HANGAR", title);
-        Text(34, 65, 1000, "THIRD PERSON DUEL   /   4 MOBILITY PROTOTYPES   /   RAPID GUN", small);
+        Text(32, 22, 500, "Voxel-On  —  HANGAR", title);
+        Text(34, 65, 1000, "THIRD PERSON DUEL   /   WISP FIELD TEST   /   RAPID GUN", small);
         if(GUI.Button(new Rect(1040,28,208,38),"WEAPON TUNING")) showTuning=true;
+        if(GUI.Button(new Rect(600,28,200,38),arenaMap==ArenaMapKind.IndoorFactory?"MAP: FOUNDRY":"MAP: CANYON")) SwitchArenaMap();
         if(GUI.Button(new Rect(820,28,200,38),"HOW TO PLAY / F1")) ToggleGuide();
-        for (int i = 0; i < CraftCatalog.Selectable.Length; i++)
+        for (int i = 0; i < CraftCatalog.UnlockedCount; i++)
         {
             CraftSpec spec = CraftCatalog.Selectable[i];
             Rect card = new Rect(32 + i % 4 * 308, 113 + i / 4 * 178, 292, 162);
@@ -127,7 +144,7 @@ public sealed partial class VoxArena
             if(framePortraits!=null) GUI.DrawTexture(new Rect(card.x+183,card.y+35,105,123),framePortraits[i],ScaleMode.ScaleToFit);
             Text(card.x + 16, card.y + 12, 240, (i+1)+"  /  "+spec.name, label);
             Text(card.x + 16, card.y + 43, 255, spec.role, small);
-            Text(card.x + 16, card.y + 76, 175, "1  RAPID GUN / 30", small);
+            Text(card.x + 16, card.y + 76, 175, spec.name=="WISP"?"LMB GUN / RMB SHIELD":"1  RAPID GUN / 30", small);
             Text(card.x + 16, card.y + 124, 260, $"BOOST {spec.boost} / {spec.boostSpeed:0.#}   HP {spec.health}", small);
             if (GUI.Button(card, GUIContent.none, GUIStyle.none))
             {
@@ -143,12 +160,16 @@ public sealed partial class VoxArena
         Text(50, 558, 1150,"MODULES: HEAD / CORE / ARMS / LEGS / WEAPON  -  ASSEMBLY COMING LATER",small);
         Text(50, 533, 1150, $"ARMOR {chosen.armor*100:0}%   SHIELD {chosen.ShieldMax:0}   MOVE {chosen.speed:0.#} / BOOST {chosen.boostSpeed:0.#}   STORED CONCEPT: {chosen.description}", small);
         Text(34, 618, 850, "WASD move / mouse look / RMB "+
-            (chosen.supportsLockOn?"lock-on":"no lock-on")+" / LMB fire", label);
+            (chosen.name=="WISP"?"shield pose":chosen.supportsLockOn?"lock-on":"no lock-on")+" / LMB fire", label);
         Text(34, 654, 850, "Hold Shift to boost. Space jumps. Empty magazines reload automatically; R reloads early.", small);
         if(GUI.Button(new Rect(210,686,220,25),"AI: "+DifficultyName)) difficulty=(difficulty+1)%3;
-        if(GUI.Button(new Rect(450,686,220,25),"AIM ASSIST: "+(aimAssist?"ON":"OFF"))) aimAssist=!aimAssist;
-        if(GUI.Button(new Rect(690,686,270,25),"RIVAL: "+(rivalSelection<0?"RANDOM":CraftCatalog.Selectable[rivalSelection].name)))
-            rivalSelection=rivalSelection>=CraftCatalog.Selectable.Length-1?-1:rivalSelection+1;
+        bool manualWisp=chosen.name=="WISP";
+        bool previousEnabled=GUI.enabled; GUI.enabled=previousEnabled&&!manualWisp;
+        if(GUI.Button(new Rect(450,686,220,25),manualWisp?"WISP: MANUAL AIM":"AIM ASSIST: "+(aimAssist?"ON":"OFF"))) aimAssist=!aimAssist;
+        GUI.enabled=previousEnabled;
+        if(CraftCatalog.UnlockedCount==1) Text(690,684,270,"RIVAL / WISP",small);
+        else if(GUI.Button(new Rect(690,686,270,25),"RIVAL: "+(rivalSelection<0?"RANDOM":CraftCatalog.Selectable[rivalSelection].name)))
+            rivalSelection=rivalSelection>=CraftCatalog.UnlockedCount-1?-1:rivalSelection+1;
         if(GUI.Button(new Rect(972,686,155,25),"MODE: "+(spectatorMode?"AI VIEW":"PILOT"))) spectatorMode=!spectatorMode;
         if(GUI.Button(new Rect(34,686,150,25),muted?"SOUND OFF / V":"SOUND ON / V")) ToggleMute();
         GUI.backgroundColor = chosen.color;

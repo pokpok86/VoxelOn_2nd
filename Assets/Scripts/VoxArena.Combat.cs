@@ -4,6 +4,7 @@ using UnityEngine;
 
 public sealed partial class VoxArena
 {
+    const float PrimaryFireInterval=.18f,PrimaryReloadSeconds=1.5f;
     sealed class Shot
     {
         public Transform visual; public Fighter owner; public Vector3 velocity,heading;
@@ -64,12 +65,12 @@ public sealed partial class VoxArena
             if(Finished||owner.lockTime>0||owner.rushTime>0) return;
             if(owner.weaponSlot!=1) return;
             if(owner.reloadTime>0||owner.magazine<=0||owner.weaponTimer>0||!InArc(owner,direction)) return;
-            owner.weaponTimer=.105f*weaponCooldownScale/Mathf.Max(.2f,owner.spec.rightArmHandling); owner.magazine--;
+            owner.weaponTimer=PrimaryFireInterval*weaponCooldownScale/Mathf.Max(.2f,owner.spec.rightArmHandling); owner.magazine--; owner.shotIdleTime=0;
             PlaySound(SoundKind.Fire,owner.root.position,.32f,1.45f);
             float spread=owner.spec.aimSpreadDegrees/Mathf.Max(.2f,owner.spec.rightArmStability);
             Vector3 fired=Quaternion.Euler(0,UnityEngine.Random.Range(-spread,spread),0)*direction;
             Fire(owner,fired,7,132,.24f,82);
-            if(owner.magazine<=0) owner.reloadTime=1.65f;
+            if(owner.magazine<=0) owner.reloadTime=PrimaryReloadSeconds;
             return;
         }
         if(Finished||owner.weaponTimer>0||owner.lockTime>0||owner.rushTime>0||!InArc(owner,direction)) return;
@@ -125,7 +126,7 @@ public sealed partial class VoxArena
             case SpecialKind.SiegeBeam: AddBeam(owner,d,.30f,.85f,2.0f,75,70,0,true); break;
             case SpecialKind.RailLance: AddBeam(owner,d,.24f,.18f,.9f,95,350,0,true); break;
             case SpecialKind.SaberRush:
-                owner.rushDirection=(target.root.position-owner.root.position).normalized;
+                owner.rushDirection=owner==player&&owner.spec.name=="WISP"?d:(target.root.position-owner.root.position).normalized;
                 owner.rushTime=.5f; owner.rushHit=false; owner.pulseTime=0;
                 owner.saber.gameObject.SetActive(true); break;
             case SpecialKind.MissileFan:

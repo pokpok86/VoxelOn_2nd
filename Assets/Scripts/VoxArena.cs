@@ -11,6 +11,7 @@ public sealed partial class VoxArena : MonoBehaviour
     public GameObject wispSwordSource,wispShieldSource;
     public Texture2D wispBaseColorTexture,wispEmissionTexture;
     Material wispRuntimeMaterial;
+    bool IsArticulatedWisp=>wispModelSource!=null&&(wispModelSource.name=="WISP_v003"||wispModelSource.name=="WISP_v004");
     public float boostRecovery = 40, recoveryDelay = .6f;
     [Header("Jump and vertical boost")]
     public float jumpSpeed = 10.6f, jumpGravity = 24f, jumpThrust = 34f, jumpBoostDrain = 24f;
@@ -37,6 +38,9 @@ public sealed partial class VoxArena : MonoBehaviour
         public Transform headPart,corePart,armsPart,legsPart,weaponPart,backPart,shadow;
         // Independent arm sockets; pelvis belongs to the leg module.
         public Transform pelvisPart;
+        public Transform guardShield,guardElbow;
+        public bool guarding;
+        public float guardBlend;
         // Stable team identity; multiple fighters can share a team in future modes.
         public int teamId;
         public int frameIndex,selectableIndex=-1; public float hitFlash;
@@ -45,7 +49,7 @@ public sealed partial class VoxArena : MonoBehaviour
         public float treadPhase,treadPerimeter;
         public float[] treadSidePhases;
         public Vector3 previousTreadHeading=Vector3.forward;
-        public int weaponSlot=1,magazine=30; public float reloadTime;
+        public int weaponSlot=1,magazine=30; public float reloadTime,shotIdleTime;
         public CraftSpec spec=CraftCatalog.Selectable[0];
         public Vector3 facing=Vector3.forward,velocity,pulseDirection,rushDirection;
         // Independent ground chassis heading for opt-in tank steering; aiming remains on facing.
@@ -80,7 +84,9 @@ public sealed partial class VoxArena : MonoBehaviour
     float cameraShakeTime,cameraShakeStrength;
     bool targetLock;
     float occludedLockTimer;
-    float cameraYaw=0,cameraPitch=12,mouseSensitivity=2.4f;
+    const float DefaultThirdPersonPitch=26f;
+    float cameraYaw=0,cameraPitch=DefaultThirdPersonPitch,mouseSensitivity=2.4f;
+    bool captureGameplayPreview;
     int selectedCraft,enemyCraft,wins,losses;
     float roundTime;
     GUIStyle label,small,title;
@@ -115,12 +121,19 @@ public sealed partial class VoxArena : MonoBehaviour
         bool performance=Array.IndexOf(Environment.GetCommandLineArgs(),"--performance-test")>=0;
         bool captureGallery=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-docs-gallery")>=0;
         bool captureVisualTargets=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-visual-targets")>=0;
-        smoke=performance||captureGallery||captureVisualTargets||Array.IndexOf(Environment.GetCommandLineArgs(),"--smoke-test")>=0;
+        bool environmentSmoke=Array.IndexOf(Environment.GetCommandLineArgs(),"--environment-smoke")>=0;
+        captureGameplayPreview=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-gameplay-ui")>=0;
+        smoke=performance||captureGallery||captureVisualTargets||environmentSmoke||Array.IndexOf(Environment.GetCommandLineArgs(),"--smoke-test")>=0;
+        arenaMap=Array.IndexOf(Environment.GetCommandLineArgs(),"--outdoor")>=0?ArenaMapKind.OutdoorCanyon:
+            smoke?ArenaMapKind.IndoorFactory:(ArenaMapKind)Mathf.Clamp(PlayerPrefs.GetInt(PreferencePrefix+"Map",0),0,1);
         if(RunPreferenceProbe()) return;
         BuildWorld(); BuildAudio(); LoadPreferences();
-        ApplySelectableCharacter(player,selectedCraft); ApplySelectableCharacter(enemy,rivalSelection<0?1:rivalSelection);
+        selectedCraft=Mathf.Clamp(selectedCraft,0,CraftCatalog.UnlockedCount-1);
+        ApplySelectableCharacter(player,selectedCraft); ApplySelectableCharacter(enemy,ResolveRival());
         ResetRound(); BuildPortraits(); inMenu=true;
-        if(performance) StartCoroutine(PerformanceTest());
+        if(environmentSmoke) StartCoroutine(EnvironmentSmoke());
+        else if(captureGameplayPreview) StartCoroutine(CaptureGameplayUI());
+        else if(performance) StartCoroutine(PerformanceTest());
         else if(captureGallery) StartCoroutine(CaptureDocumentationGallery());
         else if(captureVisualTargets) StartCoroutine(CapturePrototypeVisuals());
         else if(smoke) StartCoroutine(SmokeTest());
@@ -181,17 +194,25 @@ public sealed partial class VoxArena : MonoBehaviour
         Vector3 initialChassis=Vector3.ProjectOnPlane(f.facing,Vector3.up);
         f.chassisForward=initialChassis.sqrMagnitude>.001f?initialChassis.normalized:Vector3.forward;
         BuildRobot(f); f.body.localScale=Vector3.one*f.spec.size;
+        bool artistWisp=f.spec.name=="WISP"&&wispModelSource!=null&&f.headPart!=null;
         foreach(Renderer r in f.body.GetComponentsInChildren<Renderer>())
-            if(r.name.StartsWith("Armor") || r.name=="Visor") r.sharedMaterial=r.name=="Visor"?Glow(f.spec.color):Mat(f.spec.color);
+            if(r.name.StartsWith("Armor") || r.name=="Visor")
+            {
+                bool importedModule=artistWisp&&(IsArticulatedWisp||
+                    r.transform.IsChildOf(f.armsPart)||r.transform.IsChildOf(f.corePart)||
+                    r.transform.IsChildOf(f.headPart)||r.transform.IsChildOf(f.legsPart));
+                if(!importedModule) r.sharedMaterial=r.name=="Visor"?Glow(f.spec.color):Mat(f.spec.color);
+            }
         // Weapon silhouettes are built separately from arm modules.
         f.saber.gameObject.SetActive(false);
     }
     void BeginMatch()
     {
+        selectedCraft=Mathf.Clamp(selectedCraft,0,CraftCatalog.UnlockedCount-1);
         enemyCraft=ResolveRival(); SavePreferences();
         ApplySelectableCharacter(player,selectedCraft); ApplySelectableCharacter(enemy,enemyCraft);
         ResetRound(); inMenu=false; view.orthographic=smoke||spectatorMode; view.fieldOfView=60;
-        cameraPitch=spectatorMode?42:12;
+        cameraPitch=spectatorMode?42:DefaultThirdPersonPitch;
         Cursor.lockState=spectatorMode?CursorLockMode.None:CursorLockMode.Locked; Cursor.visible=spectatorMode;
     }
     void ResetRound()
@@ -211,11 +232,12 @@ public sealed partial class VoxArena : MonoBehaviour
         {
             f.hp=f.spec.health; f.boostEnergy=f.spec.boostCapacity; f.shieldEnergy=f.spec.ShieldMax;
             f.weaponTimer=f.specialTimer=f.recoveryTime=f.shieldRecoveryTime=f.shieldFlash=f.hitFlash=0;
-            f.weaponSlot=1; f.magazine=30; f.reloadTime=0;
+            f.weaponSlot=1; f.magazine=30; f.reloadTime=0; f.shotIdleTime=0;
             f.pulseTime=f.lockTime=f.rushTime=f.aiClock=f.aiReaction=f.stuckTime=f.orbitTime=0;
             f.velocity=f.aiMove=f.smoothedTargetVelocity=Vector3.zero;
             f.boostHeld=f.wasBoostHeld=f.boostLocked=f.boosting=f.rushHit=f.jumpHeld=false;
             f.jumpHeight=f.jumpVelocity=f.jumpOriginY=f.jumpHoldElapsed=0; f.jumpChargeCanceled=false; f.crouching=false; f.failedFireFlash=0;
+            f.guarding=false; f.guardBlend=0;
             f.knockdownTime=f.invulnerableTime=0;
             f.dashRemaining=f.dashCooldownLeft=0;
             f.dashDirection=Vector3.zero;
@@ -233,7 +255,7 @@ public sealed partial class VoxArena : MonoBehaviour
             Vector3 heading=Vector3.ProjectOnPlane(f.facing,Vector3.up);
             f.chassisForward=heading.sqrMagnitude>.001f?heading.normalized:Vector3.forward;
         }
-        cameraYaw=Mathf.Atan2(player.facing.x,player.facing.z)*Mathf.Rad2Deg; targetLock=false;
+        cameraYaw=Mathf.Atan2(player.facing.x,player.facing.z)*Mathf.Rad2Deg; cameraPitch=spectatorMode?42:DefaultThirdPersonPitch; targetLock=false;
         player.lastPosition=player.root.position; enemy.lastPosition=enemy.root.position;
         roundTime=0; paused=false; spaceClock=0; cameraShakeTime=cameraShakeStrength=0; UpdateObstacles(0);
         Animate(player); Animate(enemy); UpdateCamera(10);
@@ -241,6 +263,7 @@ public sealed partial class VoxArena : MonoBehaviour
     void Update()
     {
         if(player==null || enemy==null) return;
+        if(captureGameplayPreview) return;
         if(Input.GetKeyDown(KeyCode.F1)) { ToggleGuide(); return; }
         if(Input.GetKeyDown(KeyCode.F2) && !inMenu && !smoke) { testLabOpen=!testLabOpen; SetTestCursor(); }
         if(testLabOpen) { UpdateTestLabFrame(); return; }
@@ -252,7 +275,7 @@ public sealed partial class VoxArena : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.R))
         {
             if(Finished) BeginMatch();
-            else if(!paused&&player.magazine<30&&player.reloadTime<=0) player.reloadTime=1.65f;
+            else if(!paused&&player.magazine<30&&player.reloadTime<=0) player.reloadTime=PrimaryReloadSeconds;
         }
         if(Finished) { FinishPresentation(); return; }
         if(paused || smoke) return;
@@ -282,7 +305,7 @@ public sealed partial class VoxArena : MonoBehaviour
             view.orthographic=true; view.orthographicSize=26;
             view.transform.position=spectatorCenter-orbit*Vector3.forward*78;
             view.transform.LookAt(spectatorCenter);
-            if(starRoot!=null) starRoot.position=new Vector3(Mathf.Floor(spectatorCenter.x/80)*80,0,Mathf.Floor(spectatorCenter.z/80)*80);
+            if(starRoot!=null) starRoot.position=Vector3.zero;
             return;
         }
         if(!inMenu&&!paused&&!smoke)
@@ -291,21 +314,45 @@ public sealed partial class VoxArena : MonoBehaviour
             {
                 Vector3 toward=enemy.root.position-player.root.position;
                 cameraYaw=Mathf.LerpAngle(cameraYaw,Mathf.Atan2(toward.x,toward.z)*Mathf.Rad2Deg,1-Mathf.Exp(-8*dt));
-                cameraPitch=Mathf.Lerp(cameraPitch,12,1-Mathf.Exp(-8*dt));
+                cameraPitch=Mathf.Lerp(cameraPitch,DefaultThirdPersonPitch,1-Mathf.Exp(-8*dt));
             }
             Quaternion rotation=Quaternion.Euler(cameraPitch,cameraYaw,0);
-            Vector3 focus=player.root.position+Vector3.up*2.2f;
-            Vector3 desired=focus-rotation*Vector3.forward*8.5f;
-            if(ObstacleOnSegment(focus,desired,.25f,out float obstruction))
-                desired=focus+(desired-focus).normalized*Mathf.Max(2.2f,obstruction-.35f);
+            Vector3 focus=player.root.position+Vector3.up*1.4f;
+            Vector3 shoulderOffset=rotation*Vector3.right*2.4f;
+            Vector3 desired=focus-rotation*Vector3.forward*10.5f+shoulderOffset;
+            desired=ConstrainCamera(focus,desired,.4f);
+            bool closeCamera=Vector3.Distance(focus,desired)<2.4f;
+            if(closeCamera)
+            {
+                float bestScore=float.NegativeInfinity; bool shoulderSpace=false;
+                foreach(float angle in new[]{-55f,55f,-80f,80f})
+                {
+                    Vector3 alternate=focus-Quaternion.Euler(0,angle,0)*(rotation*Vector3.forward)*5.5f;
+                    alternate=ConstrainCamera(focus,alternate,.4f);
+                    float clearance=Vector3.Distance(focus,alternate);
+                    float score=clearance-Mathf.Abs(angle)*.01f-Vector3.Distance(view.transform.position,alternate)*.03f;
+                    if(clearance>2.4f&&score>bestScore) { desired=alternate; bestScore=score; shoulderSpace=true; }
+                }
+                if(!shoulderSpace)
+                {
+                    Vector3 raised=ConstrainCamera(focus,focus+Vector3.up*4f-Vector3.ProjectOnPlane(rotation*Vector3.forward,Vector3.up)*.5f,.4f);
+                    if(Vector3.Distance(focus,raised)>Vector3.Distance(focus,desired)) desired=raised;
+                }
+            }
             float followBlend=1-Mathf.Exp(-12*dt);
-            view.transform.position=Vector3.Lerp(view.transform.position,desired,followBlend);
+            Vector3 cameraPosition=Vector3.Lerp(view.transform.position,desired,followBlend);
             if(cameraShakeTime>0)
             {
                 cameraShakeTime=Mathf.Max(0,cameraShakeTime-dt);
-                view.transform.position+=new Vector3(Mathf.Sin(Time.time*83f),Mathf.Cos(Time.time*109f),0)*cameraShakeStrength*(cameraShakeTime/.3f);
+                cameraPosition+=new Vector3(Mathf.Sin(Time.time*83f),Mathf.Cos(Time.time*109f),0)*cameraShakeStrength*(cameraShakeTime/.3f);
             }
-            view.transform.rotation=Quaternion.Slerp(view.transform.rotation,rotation,followBlend);
+            view.transform.position=ConstrainCamera(focus,cameraPosition,.4f);
+            view.nearClipPlane=.08f;
+            Vector3 closeRight=Vector3.Cross(Vector3.up,focus-view.transform.position).normalized;
+            Vector3 aimFocus=closeCamera?focus+closeRight*1.7f:
+                focus+Vector3.ProjectOnPlane(rotation*Vector3.forward,Vector3.up).normalized*2.5f+shoulderOffset;
+            Quaternion cameraRotation=Quaternion.LookRotation(aimFocus-view.transform.position,Vector3.up);
+            view.transform.rotation=Quaternion.Slerp(view.transform.rotation,cameraRotation,followBlend);
             return;
         }
         Vector3 center=(player.root.position+enemy.root.position)*.5f, separation=player.root.position-enemy.root.position;
@@ -314,7 +361,24 @@ public sealed partial class VoxArena : MonoBehaviour
         float blend=1-Mathf.Exp(-7*dt);
         view.orthographicSize=Mathf.Lerp(view.orthographicSize,zoom,blend);
         view.transform.position=Vector3.Lerp(view.transform.position,center+new Vector3(46,58,-46),blend);
-        if(starRoot!=null) starRoot.position=new Vector3(Mathf.Floor(center.x/80)*80,0,Mathf.Floor(center.z/80)*80);
+        if(starRoot!=null) starRoot.position=Vector3.zero;
+    }
+    Vector3 ConstrainCamera(Vector3 focus,Vector3 candidate,float radius)
+    {
+        candidate.y=Mathf.Max(candidate.y,GroundSurfaceY+radius);
+        Vector3 delta=candidate-focus; float length=delta.magnitude;
+        if(length<.001f) return candidate;
+        Ray ray=new Ray(focus,delta/length); float nearest=length+.08f;
+        // Camera collision uses the full 3D volumes, including roofs and perimeter
+        // geometry. Gameplay's rooftop ray exemptions do not apply to the camera.
+        for(int group=0;group<2;group++)
+        foreach(Bounds solid in group==0?obstacles:cameraSolids)
+        {
+            Bounds expanded=solid; expanded.Expand(radius*2f);
+            if(expanded.Contains(focus)) nearest=.01f;
+            else if(expanded.IntersectRay(ray,out float hit)&&hit<=length) nearest=Mathf.Min(nearest,hit);
+        }
+        return focus+delta/length*Mathf.Min(length,Mathf.Max(.01f,nearest-.08f));
     }
     bool CanStartLockOn(Fighter fighter)
     {
@@ -339,21 +403,27 @@ public sealed partial class VoxArena : MonoBehaviour
     }
     void PlayerInput(float dt)
     {
-        if(Input.GetKeyDown(KeyCode.Alpha1)) player.weaponSlot=1;
-        if(Input.GetKeyDown(KeyCode.Alpha2)) player.weaponSlot=2;
-        if(Input.GetKeyDown(KeyCode.Alpha3)) player.weaponSlot=3;
+        bool wispHands=player.spec.name=="WISP";
+        player.guarding=wispHands&&Input.GetMouseButton(1);
+        if(wispHands) player.weaponSlot=1;
+        else
+        {
+            if(Input.GetKeyDown(KeyCode.Alpha1)) player.weaponSlot=1;
+            if(Input.GetKeyDown(KeyCode.Alpha2)) player.weaponSlot=2;
+            if(Input.GetKeyDown(KeyCode.Alpha3)) player.weaponSlot=3;
+        }
         player.crouching=Input.GetKey(KeyCode.F);
         if(Input.GetKeyDown(KeyCode.F)) TryPickupSalvage();
         Vector3 forward=Vector3.ProjectOnPlane(view.transform.forward,Vector3.up).normalized;
         Vector3 right=Vector3.ProjectOnPlane(view.transform.right,Vector3.up).normalized;
         float x=(Input.GetKey(KeyCode.D)?1:0)-(Input.GetKey(KeyCode.A)?1:0);
         float y=(Input.GetKey(KeyCode.W)?1:0)-(Input.GetKey(KeyCode.S)?1:0);
-        Vector3 move=Vector3.ClampMagnitude(right*x+forward*y,1);
+        Vector3 move=CameraRelativeMove(forward,right,x,y,wispHands);
         player.boostHeld=Input.GetKey(KeyCode.LeftShift)||Input.GetKey(KeyCode.RightShift);
         // Runner prototype: forward Shift stays a ground sprint; sideways/backward
         // Shift starts a short, low-hop distance dash. Legacy frames retain double-tap.
         bool boostPressed=Input.GetKeyDown(KeyCode.LeftShift)||Input.GetKeyDown(KeyCode.RightShift);
-        if(player.spec.usePrototypeMovement && player.spec.mobility==MobilityKind.Runner &&
+        if(player.spec.name!="WISP"&&player.spec.usePrototypeMovement && player.spec.mobility==MobilityKind.Runner &&
            boostPressed && move.sqrMagnitude>.01f && player.jumpHeight<=.02f)
         {
             float forwardIntent=Vector3.Dot(move.normalized,forward);
@@ -416,8 +486,7 @@ public sealed partial class VoxArena : MonoBehaviour
             cameraYaw+=Input.GetAxis("Mouse X")*mouseSensitivity;
             cameraPitch=Mathf.Clamp(cameraPitch-Input.GetAxis("Mouse Y")*mouseSensitivity,-5,45);
         }
-        if(targetLock) FaceOpponent(player,enemy,dt);
-        else FaceMovement(player,move,dt);
+        UpdatePlayerHeading(player,move,forward,targetLock,lockOnAvailable,dt);
         Move(player,move,dt);
         if(targetLock)
         {
@@ -480,6 +549,17 @@ public sealed partial class VoxArena : MonoBehaviour
         if(desired.sqrMagnitude<.001f || current.sqrMagnitude<.001f) return;
         f.facing=Vector3.RotateTowards(current.normalized,desired.normalized,8f*dt,0).normalized;
     }
+    void UpdatePlayerHeading(Fighter f,Vector3 move,Vector3 cameraForward,bool locked,bool lockAvailable,float dt)
+    {
+        if(locked) FaceOpponent(f,enemy,dt);
+        else FaceMovement(f,!lockAvailable?cameraForward:move,dt);
+    }
+    Vector3 CameraRelativeMove(Vector3 cameraForward,Vector3 cameraRight,float horizontal,float vertical,bool runner=false)
+    {
+        Vector3 forward=Vector3.ProjectOnPlane(cameraForward,Vector3.up).normalized;
+        Vector3 right=Vector3.ProjectOnPlane(cameraRight,Vector3.up).normalized;
+        return Vector3.ClampMagnitude(right*horizontal*(runner&&vertical>0?.3f:1f)+forward*vertical,1f);
+    }
     bool TryDash(Fighter f,Vector3 direction)
     {
         // TARANTULA has no booster: reject double-tap/Shift dash at the shared entry point.
@@ -500,6 +580,7 @@ public sealed partial class VoxArena : MonoBehaviour
     }
     float BoostDirectionFactor(Fighter f,Vector3 direction)
     {
+        if(f.spec.name=="WISP") return 1f;
         // Prototype tank boost is direction-neutral; legacy frames keep target bias.
         if(f.spec.usePrototypeMovement && f.spec.mobility==MobilityKind.Tank) return 1f;
         Fighter target=Opponent(f);
@@ -511,6 +592,8 @@ public sealed partial class VoxArena : MonoBehaviour
     void Move(Fighter f,Vector3 direction,float dt)
     {
         if(f.reloadTime>0) { f.reloadTime=Mathf.Max(0,f.reloadTime-dt); if(f.reloadTime<=0) f.magazine=30; }
+        f.shotIdleTime+=dt;
+        if(!smoke&&f.magazine<30&&f.reloadTime<=0&&f.shotIdleTime>=2.2f) f.reloadTime=PrimaryReloadSeconds;
         float maxJumpHeight=jumpMaxHeight*Mathf.Max(.1f,f.spec.jumpHeightScale);
         f.weaponTimer=Mathf.Max(0,f.weaponTimer-dt); f.specialTimer=Mathf.Max(0,f.specialTimer-dt);
         f.dashCooldownLeft=Mathf.Max(0,f.dashCooldownLeft-dt);
@@ -532,7 +615,7 @@ public sealed partial class VoxArena : MonoBehaviour
         bool wants=f.spec.allowHorizontalBoost&&!dashing&&f.boostHeld&&direction.sqrMagnitude>.01f;
         // WISP prototype: Shift is a sprint only while moving forward relative
         // to the camera-aligned input. Side/reverse Shift uses the low-hop dash.
-        if(f.spec.usePrototypeMovement && f.spec.mobility==MobilityKind.Runner && wants)
+        if(f.spec.name!="WISP"&&f.spec.usePrototypeMovement && f.spec.mobility==MobilityKind.Runner && wants)
         {
             Vector3 horizontalFacing=Vector3.ProjectOnPlane(f.facing,Vector3.up).normalized;
             if(horizontalFacing.sqrMagnitude>.001f &&
@@ -544,9 +627,10 @@ public sealed partial class VoxArena : MonoBehaviour
         if(f.boosting)
         {
             float active=dt;
-            float required=f.spec.boostDrain*active;
+            bool forwardRun=f.spec.name=="WISP"&&Vector3.Dot(motion.normalized,f.facing)>.8f;
+            float required=f.spec.boostDrain*active*(forwardRun?.5f:1f);
             float fraction=required>0?Mathf.Min(1,f.boostEnergy/required):1;
-            speed=Mathf.Lerp(speed,f.spec.boostSpeed*BoostDirectionFactor(f,motion),fraction*active/dt);
+            speed=Mathf.Lerp(speed,(forwardRun?f.spec.prototypeBaseSpeed*1.65f:f.spec.boostSpeed)*BoostDirectionFactor(f,motion),fraction*active/dt);
             f.boostEnergy=Mathf.Max(0,f.boostEnergy-required); f.recoveryTime=recoveryDelay;
             if(f.boostEnergy<=0) { f.boostLocked=true; f.boosting=false; }
             if(!wasBoosting) PlaySound(SoundKind.Boost,f.root.position,.45f);
@@ -595,7 +679,14 @@ public sealed partial class VoxArena : MonoBehaviour
                 Mathf.Max(0,-forward)*f.spec.reverseSpeedFactor+
                 Mathf.Max(0,lateral)*rightFactor+
                 Mathf.Max(0,-lateral)*leftFactor;
-            desired=motion.normalized*speed*ratio;
+            if(f.spec.name=="WISP")
+            {
+                Vector3 side=Vector3.Cross(Vector3.up,facing);
+                desired=f.boosting?motion.normalized*speed:
+                    (facing*(forward>=0?forward*f.spec.forwardSpeedFactor:forward*f.spec.reverseSpeedFactor)+
+                    side*lateral*(lateral<0?f.spec.leftSpeedFactor:f.spec.rightSpeedFactor))*speed;
+            }
+            else desired=motion.normalized*speed*ratio;
         }
         // Tank prototype favors forward travel; lateral/reverse movement remains possible.
         // No visual track or independent turret is implied by this movement-only tuning.
@@ -710,8 +801,10 @@ public sealed partial class VoxArena : MonoBehaviour
         UpdateMechanicalAudio(f,Time.deltaTime);
         f.root.rotation=Quaternion.LookRotation(f.facing);
         float jumpChargePose=f.spec.chargedReleaseJump && f.jumpHeld && f.jumpHeight<=.02f ? Mathf.Clamp01(f.jumpHoldElapsed/Mathf.Max(.01f,f.spec.jumpChargeSeconds)):0f;
-        float neutralBodyHeight=f.spec.name=="WISP"&&wispModelSource!=null?0f:.40f;
-        f.body.localPosition=Vector3.up*(f.knockdownTime>0?-.38f:f.crouching?-.22f:neutralBodyHeight-jumpChargePose*.34f)+Vector3.up*Mathf.Sin(roundTime*2.4f)*.06f;
+        bool importedWisp=f.spec.name=="WISP"&&wispModelSource!=null;
+        float neutralBodyHeight=importedWisp?0f:.40f;
+        float groundedBob=importedWisp&&f.jumpHeight<=.02f&&f.jumpVelocity<=0f?0f:Mathf.Sin(roundTime*2.4f)*.06f;
+        f.body.localPosition=Vector3.up*(f.knockdownTime>0?-.38f:f.crouching?-.22f:neutralBodyHeight-jumpChargePose*.34f)+Vector3.up*groundedBob;
         if(f.shadow!=null) { f.shadow.position=new Vector3(f.root.position.x,GroundSurfaceY+.06f,f.root.position.z); f.shadow.localScale=new Vector3(2.7f*f.spec.size,.012f,2.1f*f.spec.size); }
         Vector3 localVelocity=f.root.InverseTransformDirection(f.velocity);
         f.body.localRotation=f.knockdownTime>0?Quaternion.Euler(68,0,0):Quaternion.Euler(Mathf.Clamp(localVelocity.z*.65f,-16,16)+jumpChargePose*28f,0,Mathf.Clamp(-localVelocity.x*.5f,-12,12));
@@ -727,16 +820,32 @@ public sealed partial class VoxArena : MonoBehaviour
         else if(f.legsPart!=null) f.legsPart.localRotation=Quaternion.identity;
         float stride=Mathf.Clamp01(Vector3.ProjectOnPlane(f.velocity,Vector3.up).magnitude/Mathf.Max(1f,f.spec.speed));
         float gait=Mathf.Sin(roundTime*(7f+stride*9f))*stride;
-        f.leftLeg.localRotation=Quaternion.Euler(gait*25f,0,-5);
-        f.rightLeg.localRotation=Quaternion.Euler(-gait*25f,0,5);
+        bool riggedWisp=importedWisp&&IsArticulatedWisp;
+        f.leftLeg.localRotation=Quaternion.Euler(gait*25f,0,riggedWisp?0:-5);
+        f.rightLeg.localRotation=Quaternion.Euler(-gait*25f,0,riggedWisp?0:5);
         AnimateLegJoints(f,stride,gait);
+        if(riggedWisp&&f.jumpHeight<=.08f)
+        {
+            float strafe=Mathf.Clamp(localVelocity.x/Mathf.Max(1f,f.spec.prototypeBaseSpeed),-1f,1f);
+            f.leftLeg.localRotation=Quaternion.Euler(gait*10f,0,Mathf.Sin(roundTime*16f)*strafe*23f);
+            f.rightLeg.localRotation=Quaternion.Euler(-gait*10f,0,-Mathf.Sin(roundTime*16f)*strafe*23f);
+        }
         AnimateTreads(f,Time.deltaTime);
         f.leftArm.localRotation=Quaternion.Euler(-gait*13f,0,0);
         f.rightArm.localRotation=Quaternion.Euler(gait*13f,0,0);
+        if(importedWisp&&f.guardShield!=null&&f.guardElbow!=null)
+        {
+            float guardTarget=f.guarding&&!inMenu&&!Finished?1f:0f;
+            f.guardBlend=Mathf.MoveTowards(f.guardBlend,guardTarget,Mathf.Min(Time.deltaTime,.05f)*8f);
+            f.rightArm.localRotation=Quaternion.Slerp(f.rightArm.localRotation,Quaternion.Euler(-55,-55,-5),f.guardBlend);
+            f.guardElbow.localRotation=Quaternion.Euler(-30f*f.guardBlend,0,0);
+            f.guardShield.localRotation=Quaternion.identity;
+            f.guardShield.rotation=Quaternion.Slerp(f.guardShield.rotation,f.root.rotation,f.guardBlend);
+        }
         f.gun.gameObject.SetActive(f.rushTime<=0f);
         f.shield.gameObject.SetActive(f.shieldFlash>0&&!Finished&&!inMenu);
-        bool jumpExhaust=f.jumpVelocity>1f&&!inMenu&&!Finished;
-        bool moveExhaust=f.boosting&&Vector3.ProjectOnPlane(f.velocity,Vector3.up).sqrMagnitude>1&&!inMenu&&!Finished;
+        bool jumpExhaust=(f.spec.name=="WISP"?f.jumpHeight>.08f&&f.jumpHeld&&f.boostEnergy>0&&!f.boostLocked:f.jumpVelocity>1f)&&!inMenu&&!Finished;
+        bool moveExhaust=f.spec.name!="WISP"&&f.boosting&&Vector3.ProjectOnPlane(f.velocity,Vector3.up).sqrMagnitude>1&&!inMenu&&!Finished;
         if(f.jumpFlame!=null) f.jumpFlame.gameObject.SetActive(jumpExhaust);
         f.thruster.gameObject.SetActive(jumpExhaust||moveExhaust);
         if(f.thruster.gameObject.activeSelf)
@@ -756,6 +865,8 @@ public sealed partial class VoxArena : MonoBehaviour
     void OnDestroy()
     {
         if(guideFont!=null) Destroy(guideFont);
+        if(wispRuntimeMaterial!=null) Destroy(wispRuntimeMaterial);
+        foreach(Mesh mesh in environmentMeshes) if(mesh!=null) Destroy(mesh);
         if(framePortraits!=null) foreach(RenderTexture rt in framePortraits) if(rt!=null) { rt.Release(); Destroy(rt); }
         foreach(Material m in materials.Values) if(m!=null) Destroy(m);
         foreach(AudioClip clip in soundClips.Values) if(clip!=null) Destroy(clip);

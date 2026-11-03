@@ -129,3 +129,10 @@ Unity 6000.6.7f1의 별도 검증 프로젝트에서 세 FBX를 실제 가져왔
 - 공통 30발 총은 오른손 위치에 남기고, 칼 돌진 중에만 표시를 숨깁니다. 다른 세 프레임과 기존 전투 입력은 바꾸지 않았습니다.
 - Unity 빌드 로그: `Logs/Build-Wisp-FBX.log` (`VOXSKY_BUILD_PASS`가 최종 로그에 기록됨). Windows 플레이어 스모크: `Logs/Smoke-Wisp-FBX.log` (`VOXSKY_SMOKE_PASS 232 checks`). 시각 비교: `Docs/VisualReferences/Implemented/` (기체별 4방향, 16장).
 - 실제 게임에서 WISP의 질주·피격·계단/장애물 통과를 수동으로 조작하는 테스트는 별도로 하지 않았습니다. 모델에 물리 콜라이더나 새 애니메이션 클립은 추가되지 않았습니다.
+
+## WISP v002 외형 데이터 추가 (2026-11-03)
+
+참고 이미지의 큰 헬멧·뒤로 뻗는 뿔·넓은 바이저·노란 흡기구를 반영한 복셀 외형을 신규 추가했습니다. 파일은 `Assets/Art/Robots/WISP/WISP_v002.fbx`, 별도 라이플/방패는 `WISP_Rifle_v002.fbx`와 `WISP_Shield_v002.fbx`입니다. 외부 텍스처와 Source 원본도 v002 이름으로 추가했습니다.
+
+기존 v001의 파일·GUID 및 위 게임 연결 결과는 유지됩니다. v002를 게임에 자동 연결하지 않았습니다. 부품/장착점 이름은 호환되지만 좌표와 비례가 바뀌었으므로 새 Transform을 다시 연결하세요. 상세 연결점 표와 검증 범위는 [WISP-v002-Handoff.md](WISP-v002-Handoff.md), 미리보기는 [정면](WISP-v002-front.png) / [후면](WISP-v002-rear.png)입니다. Unity 6000.6.7f1 별도 검증 프로젝트에서 FBX 가져오기를 확인했으며, 게임 플레이 검증은 별도입니다.
+

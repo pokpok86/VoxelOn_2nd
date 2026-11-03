@@ -227,8 +227,9 @@ public sealed partial class VoxArena
 
         Transform legacyCore=f.corePart,legacyHead=f.headPart,legacyArms=f.armsPart,legacyLegs=f.legsPart;
         GameObject imported=Instantiate(wispModelSource,f.body);
-        imported.name="WISP artist model v001";
-        Transform root=imported.transform.Find("Root");
+        bool articulated=IsArticulatedWisp;
+        imported.name=articulated?"WISP artist model v003":"WISP artist model v001";
+        Transform root=imported.transform.Find(articulated?"WISP_Rig_v003/Root":"Root");
         Transform arms=root!=null?root.Find("Arms"):null;
         Transform core=root!=null?root.Find("Core"):null;
         Transform head=root!=null?root.Find("Head"):null;
@@ -241,14 +242,29 @@ public sealed partial class VoxArena
         Transform rightThigh=legs!=null?legs.Find("Right_thigh"):null;
         if(root==null || arms==null || core==null || head==null || legs==null || rightShoulder==null || rightHand==null || leftShoulder==null || leftHand==null || leftThigh==null || rightThigh==null)
         {
-            Debug.LogError("WISP FBX v001 is missing a required module or joint. Keeping the procedural WISP model.");
+            Debug.LogError(wispModelSource.name+" is missing a required module or joint. Keeping the procedural WISP model.");
             Destroy(imported);
             return;
         }
 
-        // Keep each artist-authored module under the game's existing modular body root.
-        // The supplied FBX is already in meters, +Y up, +Z forward, with feet at Y=0.
-        foreach(Transform part in new[]{arms,core,head,legs}) part.SetParent(f.body,false);
+        // The FBX origin is at the soles, while the gameplay root is chest-high.
+        // Offset all four modules so the imported sole plane matches the arena floor.
+        // Match the arena's established robot scale without changing collision or stats.
+        const float visualScale=1.75f;
+        float soleAdjustedSupport=FighterSupportOffset-.014f*visualScale;
+        if(articulated)
+        {
+            imported.transform.localScale=Vector3.one*visualScale;
+            imported.transform.localPosition=Vector3.down*(FighterSupportOffset/Mathf.Max(.01f,f.spec.size));
+            foreach(SkinnedMeshRenderer skin in imported.GetComponentsInChildren<SkinnedMeshRenderer>(true)) skin.updateWhenOffscreen=true;
+        }
+        else foreach(Transform part in new[]{arms,core,head,legs})
+        {
+            part.SetParent(f.body,false);
+            part.localPosition*=visualScale;
+            part.localScale*=visualScale;
+            part.localPosition+=Vector3.down*(soleAdjustedSupport/Mathf.Max(.01f,f.spec.size));
+        }
         f.armsPart=arms; f.corePart=core; f.headPart=head; f.legsPart=legs;
         f.pelvisPart=core.Find("Pelvis"); f.backPart=core.Find("BACKPACK_SOCKET");
         f.leftArm=leftShoulder; f.rightArm=rightShoulder;
@@ -268,9 +284,9 @@ public sealed partial class VoxArena
                 }
 
         // Existing movement animation drives the imported shoulder and thigh pivots.
-        // Place the common rapid-fire weapon at the documented right-hand socket.
-        f.weaponPart.SetParent(rightShoulder,false);
-        f.weaponPart.localPosition=new Vector3(.07f,-.81f,.115f);
+        // WISP uses a left-hand gun and a right-hand shield.
+        f.weaponPart.SetParent(articulated?leftHand:leftShoulder,false);
+        f.weaponPart.localPosition=articulated?new Vector3(0,-.015f,.1f):new Vector3(-.07f,-.81f,.115f);
         f.weaponPart.localRotation=Quaternion.identity;
         f.weaponPart.localScale=Vector3.one;
         // Keep the existing saber rush functional, now rooted at the imported left hand.
@@ -278,21 +294,23 @@ public sealed partial class VoxArena
         proceduralSaber.gameObject.SetActive(false);
         f.shield.SetParent(f.body,false);
 
-        Transform[] importedModules={arms,core,head,legs};
+        Transform[] importedModules=articulated?new[]{imported.transform}:new[]{arms,core,head,legs};
         if(wispRuntimeMaterial==null)
         {
             Material source=null;
             foreach(Transform module in importedModules)
                 foreach(Renderer renderer in module.GetComponentsInChildren<Renderer>(true))
                 {
+                    if(renderer.transform.IsChildOf(f.weaponPart)) continue;
                     foreach(Material material in renderer.sharedMaterials)
                         if(material!=null) { source=material; break; }
                     if(source!=null) break;
                 }
             if(source!=null)
             {
-                Shader atlasShader=Shader.Find("Standard");
-                wispRuntimeMaterial=new Material(atlasShader!=null?atlasShader:source.shader);
+                // Clone the artist-authored FBX material so the player build keeps
+                // its imported shader properties and atlas binding intact.
+                wispRuntimeMaterial=new Material(source);
                 wispRuntimeMaterial.name="WISP_Atlas_Runtime";
                 if(source.HasProperty("_Color") && wispRuntimeMaterial.HasProperty("_Color"))
                     wispRuntimeMaterial.SetColor("_Color",source.GetColor("_Color"));
@@ -316,6 +334,7 @@ public sealed partial class VoxArena
             foreach(Transform module in importedModules)
             foreach(Renderer renderer in module.GetComponentsInChildren<Renderer>(true))
             {
+                if(renderer.transform.IsChildOf(f.weaponPart)) continue;
                 Material[] materials=renderer.sharedMaterials;
                 for(int i=0;i<materials.Length;i++) materials[i]=wispRuntimeMaterial;
                 renderer.sharedMaterials=materials;
@@ -334,14 +353,19 @@ public sealed partial class VoxArena
             f.saber=sword.transform;
             f.saber.gameObject.SetActive(false);
         }
-        Transform shieldSocket=leftShoulder.Find("Left_elbow/SHIELD_SOCKET");
+        f.guardElbow=rightShoulder.Find("Right_elbow");
+        Transform originalShieldSocket=leftShoulder.Find("Left_elbow/SHIELD_SOCKET");
+        Vector3 shieldOffset=originalShieldSocket!=null?originalShieldSocket.localPosition:new Vector3(-.18f,-.03f,.08f);
+        shieldOffset.x=-shieldOffset.x;
+        Transform shieldSocket=Module("RIGHT_SHIELD_SOCKET",f.guardElbow,shieldOffset);
         if(wispShieldSource!=null && shieldSocket!=null)
         {
             GameObject shieldMesh=Instantiate(wispShieldSource,shieldSocket,false);
-            shieldMesh.name="WISP shield v001 (visual only)";
+            shieldMesh.name="WISP right shield (guard pose)";
             shieldMesh.transform.localPosition=Vector3.zero;
             shieldMesh.transform.localRotation=Quaternion.identity;
             shieldMesh.transform.localScale=Vector3.one;
+            f.guardShield=shieldMesh.transform;
             foreach(Renderer renderer in shieldMesh.GetComponentsInChildren<Renderer>(true))
                 if(wispRuntimeMaterial!=null) renderer.sharedMaterial=wispRuntimeMaterial;
         }
@@ -349,7 +373,7 @@ public sealed partial class VoxArena
             Debug.LogWarning("WISP sword FBX was supplied, but the documented SWORD_SOCKET was not found.");
         if(wispShieldSource!=null && shieldSocket==null)
             Debug.LogWarning("WISP shield FBX was supplied, but the documented SHIELD_SOCKET was not found.");
-        Debug.Log("WISP_ART_MODEL_APPLIED v001; base="+(wispBaseColorTexture!=null)+" emission="+(wispEmissionTexture!=null)+" shader="+(wispRuntimeMaterial!=null?wispRuntimeMaterial.shader.name:"none")+" emissionProperty="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.HasProperty("_EmissionMap"))+" emissionMapped="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.GetTexture("_EmissionMap")!=null));
+        Debug.Log("WISP_ART_MODEL_APPLIED "+wispModelSource.name+"; base="+(wispBaseColorTexture!=null)+" emission="+(wispEmissionTexture!=null)+" shader="+(wispRuntimeMaterial!=null?wispRuntimeMaterial.shader.name:"none")+" emissionProperty="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.HasProperty("_EmissionMap"))+" emissionMapped="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.GetTexture("_EmissionMap")!=null));
     }
     void BuildTankTracks(Fighter f,Color armor,Color dark,Color edge)
     {

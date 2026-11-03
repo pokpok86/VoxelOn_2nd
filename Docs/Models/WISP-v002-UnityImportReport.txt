@@ -1,0 +1,31 @@
+Bounds min=(-0.8691, 0.0000, -0.6451) max=(0.8691, 2.7360, 0.4594) size=(1.7383, 2.7360, 1.1045)
+Visor-head=(0.0000, -0.0100, 0.2974)
+Head world rotation=(0.00, 0.00, 0.00)
+Material=WISP_Atlas texture=Assets/Art/Robots/WISP/Textures/WISP_BaseColor_v002.png
+Material=WISP_Atlas texture=Assets/Art/Robots/WISP/Textures/WISP_BaseColor_v002.png
+Material=WISP_Atlas texture=Assets/Art/Robots/WISP/Textures/WISP_BaseColor_v002.png
+Material=WISP_Atlas texture=Assets/Art/Robots/WISP/Textures/WISP_BaseColor_v002.png
+Material=WISP_Atlas texture=Assets/Art/Robots/WISP/Textures/WISP_BaseColor_v002.png
+PIVOT|Root|WISP_v002(Clone)|(0.0000, 0.0000, 0.0000)|(0.0000, 0.0000, 0.0000)|(0.000, 0.000, 0.000)
+PIVOT|Arms|Root|(0.0000, 0.0000, 0.0000)|(0.0000, 0.0000, 0.0000)|(0.000, 0.000, 0.000)
+PIVOT|Left_shoulder|Arms|(-0.5600, 1.7244, 0.0000)|(-0.5600, 1.7244, 0.0000)|(0.000, 0.000, 0.000)
+PIVOT|Left_elbow|Left_shoulder|(-0.6300, 1.3144, 0.0000)|(-0.0700, -0.4100, 0.0000)|(0.000, 0.000, 0.000)
+PIVOT|Left_hand|Left_elbow|(-0.6300, 0.9144, 0.0150)|(0.0000, -0.4000, 0.0150)|(0.000, 0.000, 0.000)
+PIVOT|SHIELD_SOCKET|Left_elbow|(-0.8100, 1.2844, 0.0800)|(-0.1800, -0.0300, 0.0800)|(0.000, 0.000, 0.000)
+PIVOT|Right_shoulder|Arms|(0.5600, 1.7244, 0.0000)|(0.5600, 1.7244, 0.0000)|(0.000, 0.000, 0.000)
+PIVOT|Right_elbow|Right_shoulder|(0.6300, 1.3144, 0.0000)|(0.0700, -0.4100, 0.0000)|(0.000, 0.000, 0.000)
+PIVOT|Right_hand|Right_elbow|(0.6300, 0.9144, 0.0150)|(0.0000, -0.4000, 0.0150)|(0.000, 0.000, 0.000)
+PIVOT|SWORD_SOCKET|Right_hand|(0.6300, 0.8994, 0.1150)|(0.0000, -0.0150, 0.1000)|(0.000, 0.000, 0.000)
+PIVOT|Core|Root|(0.0000, 1.4244, 0.0000)|(0.0000, 1.4244, 0.0000)|(0.000, 0.000, 0.000)
+PIVOT|BACKPACK_SOCKET|Core|(0.0000, 1.7044, -0.3500)|(0.0000, 0.2800, -0.3500)|(0.000, 0.000, 0.000)
+PIVOT|Head|Root|(0.0000, 2.1344, 0.0250)|(0.0000, 2.1344, 0.0250)|(0.000, 0.000, 0.000)
+PIVOT|Legs|Root|(0.0000, 0.0000, 0.0000)|(0.0000, 0.0000, 0.0000)|(0.000, 0.000, 0.000)
+PIVOT|Left_thigh|Legs|(-0.2500, 1.0044, 0.0000)|(-0.2500, 1.0044, 0.0000)|(0.000, 0.000, 0.000)
+PIVOT|Left_knee|Left_thigh|(-0.2500, 0.5844, 0.0000)|(0.0000, -0.4200, 0.0000)|(0.000, 0.000, 0.000)
+PIVOT|Left_ankle|Left_knee|(-0.2500, 0.1044, 0.0000)|(0.0000, -0.4800, 0.0000)|(0.000, 0.000, 0.000)
+PIVOT|Right_thigh|Legs|(0.2500, 1.0044, 0.0000)|(0.2500, 1.0044, 0.0000)|(0.000, 0.000, 0.000)
+PIVOT|Right_knee|Right_thigh|(0.2500, 0.5844, 0.0000)|(0.0000, -0.4200, 0.0000)|(0.000, 0.000, 0.000)
+PIVOT|Right_ankle|Right_knee|(0.2500, 0.1044, 0.0000)|(0.0000, -0.4800, 0.0000)|(0.000, 0.000, 0.000)
+PIVOT|Weapon|Root|(0.0000, 0.0000, 0.0000)|(0.0000, 0.0000, 0.0000)|(0.000, 0.000, 0.000)
+Rifle renderers=11
+Shield renderers=7

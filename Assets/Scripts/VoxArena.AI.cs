@@ -158,7 +158,7 @@ public sealed partial class VoxArena
         bool lineClear=!ObstacleOnSegment(f.root.position,target.root.position,.2f,out _);
         Vector3 aim=AimLead(f,target);
         if(!smoke) f.weaponSlot=1;
-        if(!smoke&&f.magazine<=0&&f.reloadTime<=0) f.reloadTime=1.65f;
+        if(!smoke&&f.magazine<=0&&f.reloadTime<=0) f.reloadTime=PrimaryReloadSeconds;
         float attackRange=smoke?f.spec.range:82;
         if(lineClear && distance<attackRange && f.weaponTimer<=0 && (smoke||f.reloadTime<=0))
         {

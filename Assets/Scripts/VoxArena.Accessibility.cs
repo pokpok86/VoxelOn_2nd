@@ -8,6 +8,7 @@ public sealed partial class VoxArena
     string DifficultyName=>difficulty==0?"PRACTICE":difficulty==1?"STANDARD":"ACE";
     bool CanAssist(Fighter shooter,Fighter target,Vector3 requested)
     {
+        if(shooter==player&&shooter.spec.name=="WISP") return false;
         if(!aimAssist || !InArc(shooter,requested)) return false;
         Vector3 delta=target.root.position-shooter.root.position;
         float range=shooter==player&&!smoke?82:shooter.spec.range;

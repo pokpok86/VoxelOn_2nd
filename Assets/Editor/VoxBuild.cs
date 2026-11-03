@@ -14,16 +14,18 @@ public static class VoxBuild
         var arena = new GameObject("VoxSky Arena").AddComponent<VoxArena>();
         arena.hullShader = Shader.Find("Standard");
         if (arena.hullShader == null) throw new Exception("Standard shader unavailable");
-        arena.wispModelSource=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/WISP/WISP_v001.fbx");
+        var modelImporter=AssetImporter.GetAtPath("Assets/Art/Robots/WISP/WISP_v004.fbx") as ModelImporter;
+        if(modelImporter!=null&&!modelImporter.isReadable) { modelImporter.isReadable=true;modelImporter.preserveHierarchy=true;modelImporter.optimizeGameObjects=false;modelImporter.SaveAndReimport(); }
+        arena.wispModelSource=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/WISP/WISP_v004.fbx");
         arena.wispSwordSource=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/WISP/WISP_Sword_v001.fbx");
-        arena.wispShieldSource=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/WISP/WISP_Shield_v001.fbx");
-        arena.wispBaseColorTexture=AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Art/Robots/WISP/Textures/WISP_BaseColor.png");
-        arena.wispEmissionTexture=AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Art/Robots/WISP/Textures/WISP_Emission.png");
+        arena.wispShieldSource=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/WISP/WISP_Shield_v002.fbx");
+        arena.wispBaseColorTexture=AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Art/Robots/WISP/Textures/WISP_BaseColor_v004.png");
+        arena.wispEmissionTexture=AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Art/Robots/WISP/Textures/WISP_Emission_v004.png");
         if(arena.wispModelSource==null) Debug.LogWarning("WISP FBX is not installed; procedural WISP fallback will be used.");
         Directory.CreateDirectory("Assets/Scenes");
         EditorSceneManager.SaveScene(scene, "Assets/Scenes/Arena.unity");
         EditorBuildSettings.scenes = new [] { new EditorBuildSettingsScene("Assets/Scenes/Arena.unity", true) };
-        PlayerSettings.productName = "VoxSky";
+        PlayerSettings.productName = "Voxel-On";
         PlayerSettings.companyName = "VoxSky";
         PlayerSettings.defaultScreenWidth = 1280;
         PlayerSettings.defaultScreenHeight = 720;
@@ -39,7 +41,7 @@ public static class VoxBuild
         Directory.CreateDirectory("Builds/Windows");
         BuildReport report = BuildPipeline.BuildPlayer(new BuildPlayerOptions {
             scenes = new [] { "Assets/Scenes/Arena.unity" },
-            locationPathName = "Builds/Windows/VoxSky.exe",
+            locationPathName = "Builds/Windows/Voxel-On.exe",
             target = BuildTarget.StandaloneWindows64,
             options = BuildOptions.Development
         });
