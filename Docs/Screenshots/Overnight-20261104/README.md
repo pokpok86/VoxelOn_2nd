@@ -48,3 +48,14 @@ Blender 환경 v003은 실내 구조 보강과 외곽 협곡 실루엣을 다듬
 원인은 Blender 수정 과정에서 대각 지지대를 큰 직육면체 판으로 재구성한 것이었습니다. v006은 원래 정점·면을 보존해 얇은 대각 지지대를 복원했습니다. 현재 위 실내 이미지에는 큰 체크형 판이 사라지고 지지대 구조가 보입니다. 기존 지붕의 그림자가 실내 조명을 모두 가리던 설정도 고쳐 바닥의 구조물 그림자가 나타납니다.
 
 실내 실제 검사38개 통과. 실외는 변경하지 않았습니다. [검증 기록](../../Validation/20261104-Checkpoint6.md), [현재 Blender 환경 원본 안내](../../../ArtSource/Environment/README.md).
+
+## 05시 최종 통합·카메라 검증
+
+[수정 전 가까운 장애물 사례](Foundry-camera-before-close-framing.png)와 [최종 실내12초](../../Models/Foundry-WISP-soak-12s.png), [최종 실외12초](../../Models/Canyon-WISP-soak-12s.png)를 확인할 수 있습니다. 같은 자동 동작 순서라도 실제 프레임 시간과 AI 경로는 달라지므로 동일 자세의 픽셀 비교는 아닙니다. 좁은 곳에서는 위쪽 카메라 여유를 찾고, 실제 머리/안테나 투영이 중앙 조준점을 가릴 때만 보정합니다.
+
+| 실제 시간 자동 플레이 | 12초 | 28초 | 42초 |
+|---|---|---|---|
+| Foundry | [보기](../../Models/Foundry-WISP-soak-12s.png) | [보기](../../Models/Foundry-WISP-soak-28s.png) | [보기](../../Models/Foundry-WISP-soak-42s.png) |
+| Canyon | [보기](../../Models/Canyon-WISP-soak-12s.png) | [보기](../../Models/Canyon-WISP-soak-28s.png) | [보기](../../Models/Canyon-WISP-soak-42s.png) |
+
+최종357개 검사 통과(전체268+환경61+실시간28), 설정 저장/읽기 성공. [최종 결과와 한계](../../OVERNIGHT-20261104-RESULT.md), [로그 증거](../../Validation/20261104-Final.md). 외형 최종 승인·장시간 수동 플레이는 남아 있고 팔/장식 또는 아주 가까운 기체끼리의 겹침도 해결됐다고 주장하지 않습니다.

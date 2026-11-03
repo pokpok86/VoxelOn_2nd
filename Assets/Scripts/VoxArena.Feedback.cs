@@ -5,16 +5,17 @@ public sealed partial class VoxArena
     bool assistEngaged;
     float hitConfirmTime,hitConfirmDamage,damageDealt,damageTaken;
     bool lastHitShield;
+    float DisplayedPrimaryRange()=>smoke?player.spec.range:82f;
     string AimStatus()
     {
         if(!canShoot) return "OUTSIDE FIRING ARC";
         float distance=Vector3.Distance(player.root.position,enemy.root.position);
-        float range=!smoke?82:player.spec.range;
+        float range=DisplayedPrimaryRange();
         if(distance>range) return "RIVAL OUT OF PRIMARY RANGE";
         if(ObstacleOnSegment(player.root.position,enemy.root.position,.1f,out _)) return "RIVAL BEHIND COVER";
         if(!smoke&&player.reloadTime>0) return "RELOADING  "+player.reloadTime.ToString("0.0")+"s";
-        if(!smoke&&player.magazine<=0) return "MAG EMPTY / PRESS R TO RELOAD";
-        if(player.weaponTimer>0) return "RELOADING  "+player.weaponTimer.ToString("0.0")+"s";
+        if(!smoke&&player.magazine<=0) return "AUTO RELOAD PENDING";
+        if(player.weaponTimer>0) return "PRIMARY COOLDOWN  "+player.weaponTimer.ToString("0.0")+"s";
         return assistEngaged?"AIM ASSIST ACTIVE / PRIMARY READY":"MANUAL AIM / PRIMARY READY";
     }
     void RecordDamage(Fighter target,float amount,bool shield)
@@ -36,7 +37,7 @@ public sealed partial class VoxArena
     {
         if(paused||Finished) return;
         float distance=Vector3.Distance(player.root.position,enemy.root.position);
-        Text(28,574,370,$"DIST {distance:0} / RANGE {player.spec.range:0}",small);
+        Text(28,574,370,$"DIST {distance:0} / RANGE {DisplayedPrimaryRange():0}",small);
         DrawOccludedPilot();
         Vector3 point=view.WorldToViewportPoint(enemy.root.position);
         float x=point.x*1280,y=(1-point.y)*720;

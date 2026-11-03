@@ -850,7 +850,7 @@ public sealed partial class VoxArena
         TestSetup(); player.facing=Vector3.forward; canShoot=true;
         Check(CanAssist(player,enemy,Vector3.forward),"stationary target still displays active assistance");
         assistEngaged=true; player.weaponTimer=1;
-        Check(AimStatus().StartsWith("RELOADING"),"cooldown status cannot falsely promise ready fire");
+        Check(AimStatus().StartsWith("PRIMARY COOLDOWN")&&!AimStatus().Contains("READY"),"fire interval is labeled cooldown and cannot falsely promise ready fire");
         enemy.root.position+=Vector3.forward*100;
         Check(AimStatus().Contains("OUT OF PRIMARY RANGE")&&!CanAssist(player,enemy,Vector3.forward),"range status and assistance agree");
         TestSetup(); canShoot=false;

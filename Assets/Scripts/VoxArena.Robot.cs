@@ -4,6 +4,39 @@ using UnityEngine;
 // until the assembly system is introduced; visual changes never silently change balance.
 public sealed partial class VoxArena
 {
+    Bounds wispHeadBounds;
+    bool wispHeadBoundsReady;
+    void CacheWispHeadBounds(Fighter fighter)
+    {
+        if(wispHeadBoundsReady)return;
+        foreach(SkinnedMeshRenderer skin in fighter.body.GetComponentsInChildren<SkinnedMeshRenderer>())
+        {
+            Vector3[] points=skin.sharedMesh.vertices;BoneWeight[] weights=skin.sharedMesh.boneWeights;Matrix4x4[] bind=skin.sharedMesh.bindposes;
+            for(int i=0;i<points.Length;i++)
+            {
+                int index=weights[i].boneIndex0;Transform bone=skin.bones[index];
+                if(bone!=fighter.headPart&&!bone.IsChildOf(fighter.headPart))continue;
+                Vector3 local=fighter.headPart.InverseTransformPoint((bone.localToWorldMatrix*bind[index]).MultiplyPoint3x4(points[i]));
+                if(!wispHeadBoundsReady){wispHeadBounds=new Bounds(local,Vector3.zero);wispHeadBoundsReady=true;}
+                else wispHeadBounds.Encapsulate(local);
+            }
+        }
+    }
+    bool ProjectedWispHeadCoversReticle()
+    {
+        if(!wispHeadBoundsReady||player.spec.name!="WISP")return false;
+        Vector2 min=Vector2.one*float.PositiveInfinity,max=Vector2.one*float.NegativeInfinity;
+        for(int i=0;i<8;i++)
+        {
+            Vector3 corner=wispHeadBounds.center+Vector3.Scale(wispHeadBounds.extents,
+                new Vector3((i&1)==0?-1:1,(i&2)==0?-1:1,(i&4)==0?-1:1));
+            Vector3 point=view.WorldToViewportPoint(player.headPart.TransformPoint(corner));
+            if(point.z<=0)continue;
+            min=Vector2.Min(min,new Vector2(point.x,point.y));max=Vector2.Max(max,new Vector2(point.x,point.y));
+        }
+        const float marginX=22f/1280,marginY=22f/720;
+        return min.x<=.5f+marginX&&max.x>=.5f-marginX&&min.y<=.5f+marginY&&max.y>=.5f-marginY;
+    }
     Transform Module(string name,Transform parent,Vector3 position)
     {
         Transform t=new GameObject(name).transform; t.SetParent(parent,false); t.localPosition=position; return t;
@@ -373,6 +406,7 @@ public sealed partial class VoxArena
             Debug.LogWarning("WISP sword FBX was supplied, but the documented SWORD_SOCKET was not found.");
         if(wispShieldSource!=null && shieldSocket==null)
             Debug.LogWarning("WISP shield FBX was supplied, but the documented SHIELD_SOCKET was not found.");
+        CacheWispHeadBounds(f);
         Debug.Log("WISP_ART_MODEL_APPLIED "+wispModelSource.name+"; base="+(wispBaseColorTexture!=null)+" emission="+(wispEmissionTexture!=null)+" shader="+(wispRuntimeMaterial!=null?wispRuntimeMaterial.shader.name:"none")+" emissionProperty="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.HasProperty("_EmissionMap"))+" emissionMapped="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.GetTexture("_EmissionMap")!=null));
     }
     void BuildTankTracks(Fighter f,Color armor,Color dark,Color edge)

@@ -1,0 +1,25 @@
+{
+  "recordedAtUtc": "2026-11-03T20:46:18.8404752Z",
+  "product": "Voxel-On",
+  "unity": "6000.6.7f1",
+  "files": [
+    {
+      "path": "Builds/Windows/Voxel-On.exe",
+      "bytes": 667136,
+      "sha256": "3726509AF94BDACBFE23F85DA13109A7E70FB7D61913506E98690BD3208B2FD7"
+    },
+    {
+      "path": "Builds/Windows/Voxel-On_Data/Managed/Assembly-CSharp.dll",
+      "bytes": 230400,
+      "sha256": "D31B80D6BBFE1303ED5E37438ABFDD14909040EE1DF29A75A065EA67C4E5E269"
+    },
+    {
+      "path": "Builds/Windows/UnityPlayer.dll",
+      "bytes": 91611568,
+      "sha256": "C93B9EAA6B12782EA809A0A35D65E81BBDC24AD080C914A7CA017EA5534B8958"
+    }
+  ],
+  "oldVoxSkyDataPreservedAt": "Backups/Retired-VoxSky-20261104/VoxSky_Data",
+  "packageSmoke": "268 PASS after retiring old VoxSky data",
+  "sourceCommit": "See final handoff recorded at 06:00; files built before this checkpoint commit"
+}

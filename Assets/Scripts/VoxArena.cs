@@ -118,12 +118,13 @@ public sealed partial class VoxArena : MonoBehaviour
     void Start()
     {
         Application.targetFrameRate=120;
+        bool wispSoak=Array.IndexOf(Environment.GetCommandLineArgs(),"--wisp-soak")>=0;
         bool performance=Array.IndexOf(Environment.GetCommandLineArgs(),"--performance-test")>=0;
         bool captureGallery=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-docs-gallery")>=0;
         bool captureVisualTargets=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-visual-targets")>=0;
         bool environmentSmoke=Array.IndexOf(Environment.GetCommandLineArgs(),"--environment-smoke")>=0;
-        captureGameplayPreview=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-gameplay-ui")>=0;
-        smoke=performance||captureGallery||captureVisualTargets||environmentSmoke||Array.IndexOf(Environment.GetCommandLineArgs(),"--smoke-test")>=0;
+        captureGameplayPreview=wispSoak||Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-gameplay-ui")>=0;
+        smoke=wispSoak||performance||captureGallery||captureVisualTargets||environmentSmoke||Array.IndexOf(Environment.GetCommandLineArgs(),"--smoke-test")>=0;
         arenaMap=Array.IndexOf(Environment.GetCommandLineArgs(),"--outdoor")>=0?ArenaMapKind.OutdoorCanyon:
             smoke?ArenaMapKind.IndoorFactory:(ArenaMapKind)Mathf.Clamp(PlayerPrefs.GetInt(PreferencePrefix+"Map",0),0,1);
         if(RunPreferenceProbe()) return;
@@ -131,7 +132,8 @@ public sealed partial class VoxArena : MonoBehaviour
         selectedCraft=Mathf.Clamp(selectedCraft,0,CraftCatalog.UnlockedCount-1);
         ApplySelectableCharacter(player,selectedCraft); ApplySelectableCharacter(enemy,ResolveRival());
         ResetRound(); BuildPortraits(); inMenu=true;
-        if(environmentSmoke) StartCoroutine(EnvironmentSmoke());
+        if(wispSoak) StartCoroutine(WispSoak());
+        else if(environmentSmoke) StartCoroutine(EnvironmentSmoke());
         else if(captureGameplayPreview) StartCoroutine(CaptureGameplayUI());
         else if(performance) StartCoroutine(PerformanceTest());
         else if(captureGallery) StartCoroutine(CaptureDocumentationGallery());
@@ -339,6 +341,15 @@ public sealed partial class VoxArena : MonoBehaviour
                     if(Vector3.Distance(focus,raised)>Vector3.Distance(focus,desired)) desired=raised;
                 }
             }
+            // Crowded cover can leave a legal but excessively close boom. Keep
+            // the original yaw and gain vertical stand-off rather than magnifying
+            // the helmet across the aiming reticle or hiding the torso below HUD.
+            if(Vector3.Distance(focus,desired)<6.5f)
+            {
+                Vector3 overhead=ConstrainCamera(focus,focus+Vector3.up*8f-
+                    Vector3.ProjectOnPlane(rotation*Vector3.forward,Vector3.up).normalized*.25f,.4f);
+                if(Vector3.Distance(focus,overhead)>6.5f) { desired=overhead;closeCamera=true; }
+            }
             float followBlend=1-Mathf.Exp(-12*dt);
             Vector3 cameraPosition=Vector3.Lerp(view.transform.position,desired,followBlend);
             if(cameraShakeTime>0)
@@ -349,10 +360,28 @@ public sealed partial class VoxArena : MonoBehaviour
             view.transform.position=ConstrainCamera(focus,cameraPosition,.4f);
             view.nearClipPlane=.08f;
             Vector3 closeRight=Vector3.Cross(Vector3.up,focus-view.transform.position).normalized;
-            Vector3 aimFocus=closeCamera?focus+closeRight*1.7f:
+            Vector3 aimFocus=closeCamera?focus+closeRight*2.6f:
                 focus+Vector3.ProjectOnPlane(rotation*Vector3.forward,Vector3.up).normalized*2.5f+shoulderOffset;
+            // The camera can be collision-constrained at 3–7m without entering
+            // the emergency <2.4m search. Full-distance look-ahead then cropped
+            // the robot below the HUD. Frame its torso progressively at close range.
+            float actualDistance=Vector3.Distance(focus,view.transform.position);
+            float openFraming=Mathf.InverseLerp(2.5f,8f,actualDistance);
+            Vector3 torsoFocus=player.root.position+Vector3.up*.2f+
+                closeRight*Mathf.Min(2.2f,actualDistance*.4f);
+            aimFocus=Vector3.Lerp(torsoFocus,aimFocus,openFraming);
             Quaternion cameraRotation=Quaternion.LookRotation(aimFocus-view.transform.position,Vector3.up);
-            view.transform.rotation=Quaternion.Slerp(view.transform.rotation,cameraRotation,followBlend);
+            // Position is already damped; keep the torso framed immediately
+            // during a wall correction instead of adding a second rotation lag.
+            view.transform.rotation=openFraming<1?cameraRotation:Quaternion.Slerp(view.transform.rotation,cameraRotation,followBlend);
+            // Eight cached head-bound corners are cheap enough for every frame.
+            // Keep the real helmet/horns outside the protected aiming area even
+            // while camera collision and jump animation change their projection.
+            for(int correction=0;correction<8&&ProjectedWispHeadCoversReticle();correction++)
+            {
+                aimFocus+=view.transform.right*.35f;
+                view.transform.rotation=Quaternion.LookRotation(aimFocus-view.transform.position,Vector3.up);
+            }
             return;
         }
         Vector3 center=(player.root.position+enemy.root.position)*.5f, separation=player.root.position-enemy.root.position;
