@@ -28,6 +28,11 @@ public sealed partial class VoxArena
     {
         Texture2D screenshot=ScreenCapture.CaptureScreenshotAsTexture();
         if(screenshot==null) { Debug.LogError("WISP_GAMEPLAY_UI_CAPTURE_FAIL"); Application.Quit(2); return false; }
+        // Hidden/minimized player windows can return an all-black image despite
+        // a successful API call. Reject those instead of publishing false evidence.
+        Color[] pixels=screenshot.GetPixels();float minLight=1,maxLight=0;
+        for(int p=0;p<pixels.Length;p+=97) { float light=pixels[p].grayscale;minLight=Mathf.Min(minLight,light);maxLight=Mathf.Max(maxLight,light); }
+        if(maxLight-minLight<.05f) { Destroy(screenshot);Debug.LogError("WISP_GAMEPLAY_UI_CAPTURE_FAIL blank image");Application.Quit(2);return false; }
         string path=Path.Combine(Directory.GetCurrentDirectory(),"Docs","Models",(arenaMap==ArenaMapKind.OutdoorCanyon?"Canyon-":"Foundry-")+filename);
         File.WriteAllBytes(path,screenshot.EncodeToPNG()); Destroy(screenshot);
         Debug.Log("WISP_GAMEPLAY_UI_CAPTURE_PASS "+path); return true;
@@ -1017,4 +1022,3 @@ public sealed partial class VoxArena
         yield return new WaitForSeconds(.3f); Application.Quit(passed?0:2);
     }
 }
-

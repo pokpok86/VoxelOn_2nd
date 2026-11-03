@@ -95,7 +95,7 @@ public sealed partial class VoxArena
         Text(28, 626, 360, player.spec.name + " / " + player.spec.role, label);
         Text(28, 658, 360, player.spec.name=="WISP"?"LEFT HAND / RAPID GUN":(player.weaponSlot==3?"[3] SALVAGE / MELEE":player.weaponSlot==1?"[1] RIGHT HAND / RAPID GUN":"[2] LEFT HAND / SPECIAL") , small);
         Text(28, 682, 360, player.weaponSlot==3?(heldSalvage==null?"EMPTY HAND / F PICKUP":heldSalvage.kind.ToString().ToUpper()+" / "+(heldSalvage.kind==SalvageKind.Shield?shieldRemaining.ToString("0")+" HP":"LMB USE")):player.weaponSlot==1?(player.reloadTime>0?"RELOADING  "+player.reloadTime.ToString("0.0")+"s":"AMMO  "+player.magazine+" / 30"):("SPECIAL  "+(player.specialTimer>0?player.specialTimer.ToString("0.0")+"s":"READY")), small);
-        Text(420, 620, 300, "BOOST / "+player.spec.boost+"  "+Mathf.CeilToInt(player.boostEnergy), small);
+        Text(420, 620, 300, "BOOST / "+(player.spec.name=="WISP"?"RUN / SLIDE":player.spec.boost.ToString())+"  "+Mathf.CeilToInt(player.boostEnergy), small);
         Bar(422, 643, 220, player.boostEnergy / player.spec.boostCapacity, Cyan);
         Text(420, 652, 300, player.weaponSlot==1?"PRIMARY / "+player.magazine+" / 30":"SPECIAL / "+player.spec.specialName, small);
         Bar(422, 675, 220, player.weaponSlot==1?1-player.weaponTimer/PrimaryFireInterval:1-player.specialTimer/Mathf.Max(.01f,player.spec.specialCooldown), new Color(1,.70f,.30f));
@@ -145,7 +145,7 @@ public sealed partial class VoxArena
             Text(card.x + 16, card.y + 12, 240, (i+1)+"  /  "+spec.name, label);
             Text(card.x + 16, card.y + 43, 255, spec.role, small);
             Text(card.x + 16, card.y + 76, 175, spec.name=="WISP"?"LMB GUN / RMB SHIELD":"1  RAPID GUN / 30", small);
-            Text(card.x + 16, card.y + 124, 260, $"BOOST {spec.boost} / {spec.boostSpeed:0.#}   HP {spec.health}", small);
+            Text(card.x + 16, card.y + 124, 260, $"BOOST {(spec.name=="WISP"?"RUN/SLIDE":spec.boost.ToString())} / {spec.boostSpeed:0.#}   HP {spec.health}", small);
             if (GUI.Button(card, GUIContent.none, GUIStyle.none))
             {
                 selectedCraft = i;
@@ -161,7 +161,7 @@ public sealed partial class VoxArena
         Text(50, 533, 1150, $"ARMOR {chosen.armor*100:0}%   SHIELD {chosen.ShieldMax:0}   MOVE {chosen.speed:0.#} / BOOST {chosen.boostSpeed:0.#}   STORED CONCEPT: {chosen.description}", small);
         Text(34, 618, 850, "WASD move / mouse look / RMB "+
             (chosen.name=="WISP"?"shield pose":chosen.supportsLockOn?"lock-on":"no lock-on")+" / LMB fire", label);
-        Text(34, 654, 850, "Hold Shift to boost. Space jumps. Empty magazines reload automatically; R reloads early.", small);
+        Text(34, 654, 850, "Hold Shift: forward run / side-back slide. Space jumps. Stop firing to auto reload; R reloads early.", small);
         if(GUI.Button(new Rect(210,686,220,25),"AI: "+DifficultyName)) difficulty=(difficulty+1)%3;
         bool manualWisp=chosen.name=="WISP";
         bool previousEnabled=GUI.enabled; GUI.enabled=previousEnabled&&!manualWisp;
