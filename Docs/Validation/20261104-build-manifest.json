@@ -21,5 +21,6 @@
   ],
   "oldVoxSkyDataPreservedAt": "Backups/Retired-VoxSky-20261104/VoxSky_Data",
   "packageSmoke": "268 PASS after retiring old VoxSky data",
-  "sourceCommit": "See final handoff recorded at 06:00; files built before this checkpoint commit"
+  "sourceCommit": "7f31597596e05db93a3d33c7de52b65584bc94a6",
+  "finalizedAtUtc": "2026-11-03T21:01:31.6154182Z"
 }
