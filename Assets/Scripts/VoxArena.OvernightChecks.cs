@@ -75,6 +75,42 @@ public sealed partial class VoxArena
         }
         TestSetupSelectable(0,0);ResetRound();inMenu=false;Animate(player);Animate(enemy);
     }
+    bool MeasureWispStandingEnvelope(string map)
+    {
+        TestSetupSelectable(0,0);player.root.position=new Vector3(0,FighterGroundY,0);
+        player.root.rotation=Quaternion.identity;player.facing=Vector3.forward;player.velocity=Vector3.zero;Animate(player);
+        Bounds all=new Bounds();bool first=true;int vertices=0,coreVertices=0;float bodyHalfX=0,bodyHalfZ=0,maxSkinError=0;
+        Mesh baked=new Mesh();
+        foreach(SkinnedMeshRenderer skin in player.body.GetComponentsInChildren<SkinnedMeshRenderer>())
+        {
+            // true compensates renderer scale; TransformPoint applies it once.
+            // Independently compare every baked point with bone/bind skinning.
+            skin.BakeMesh(baked,true);Vector3[] points=baked.vertices;BoneWeight[] weights=skin.sharedMesh.boneWeights;
+            Vector3[] rest=skin.sharedMesh.vertices;Matrix4x4[] bind=skin.sharedMesh.bindposes;
+            for(int v=0;v<points.Length;v++)
+            {
+                Vector3 local=player.root.InverseTransformPoint(skin.transform.TransformPoint(points[v]));
+                if(first){all=new Bounds(local,Vector3.zero);first=false;}else all.Encapsulate(local);
+                vertices++;
+                int index=weights[v].boneIndex0;Transform bone=skin.bones[index];
+                Vector3 direct=player.root.InverseTransformPoint((bone.localToWorldMatrix*bind[index]).MultiplyPoint3x4(rest[v]));
+                maxSkinError=Mathf.Max(maxSkinError,Vector3.Distance(local,direct));
+                if(bone==player.corePart || bone.IsChildOf(player.corePart))
+                {coreVertices++;bodyHalfX=Mathf.Max(bodyHalfX,Mathf.Abs(local.x));bodyHalfZ=Mathf.Max(bodyHalfZ,Mathf.Abs(local.z));}
+            }
+        }
+        Destroy(baked);
+        Debug.Log("WISP_ENVELOPE "+map+" vertices="+vertices+" coreVertices="+coreVertices+
+            " height="+all.size.y.ToString("F3")+" visualHalfX="+Mathf.Max(Mathf.Abs(all.min.x),Mathf.Abs(all.max.x)).ToString("F3")+
+            " coreHalfX="+bodyHalfX.ToString("F3")+" coreHalfZ="+bodyHalfZ.ToString("F3")+" collisionRadius="+player.Radius.ToString("F3")+" bakeVsBindMaxError="+maxSkinError.ToString("F6"));
+        // Record genuine visual overlap without widening hitboxes or declaring
+        // decoration clearance equivalent to a combat-physics requirement.
+        player.root.position=new Vector3(ArenaHalfWidth-player.Radius,FighterGroundY,0);Animate(player);
+        enemy.root.gameObject.SetActive(false);enemy.shadow.gameObject.SetActive(false);
+        SaveEnvironmentView(map+"-clearance-wall.png",player.root.position+new Vector3(-7,3,-9),player.root.position+Vector3.up*.7f);
+        TestSetupSelectable(0,0);ResetRound();inMenu=false;
+        return vertices>1000&&coreVertices>0&&all.size.y>3.7f&&all.size.y<4.3f&&maxSkinError<.005f;
+    }
     IEnumerator EnvironmentSmoke()
     {
         yield return new WaitForEndOfFrame();
@@ -123,6 +159,7 @@ public sealed partial class VoxArena
             }
         }
         string map=arenaMap==ArenaMapKind.OutdoorCanyon?"Canyon":"Foundry";
+        Check(MeasureWispStandingEnvelope(map),"genuine baked WISP envelope has expected standing scale and torso weights");
         SaveWispMovementStudy(map);
         player.root.gameObject.SetActive(false);enemy.root.gameObject.SetActive(false);player.shadow.gameObject.SetActive(false);enemy.shadow.gameObject.SetActive(false);
         SaveEnvironmentView(map+"-overview.png",new Vector3(42,28,-45),new Vector3(0,3,10));

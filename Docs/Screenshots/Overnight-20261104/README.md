@@ -34,3 +34,9 @@ Blender 환경 v003은 실내 구조 보강과 외곽 협곡 실루엣을 다듬
 기존 경계의 어두운 평판과 내부로 튀어나온 장식 암석을 Blender 암벽 FBX로 교체했습니다. [이전 협곡](Before-v004/Canyon-overview.png)과 현재 위 이미지를 비교할 수 있습니다. 조종 가능한 경계는 동일하며, 카메라는 네 방향 벽을 통과하지 않는지 검사했습니다. 새 파일은 ArtSource/Environment/VoxelOn_Environment_v004.blend와 Assets/Resources/Environment/CanyonBoundary.fbx입니다.
 
 최신 Windows 빌드 성공, 전체268개+환경59개 통과. [실제 로그 발췌](../../Validation/20261104-Checkpoint4.md). 최종 아트·수동 플레이 검토는 남아 있으며 main 미반영입니다.
+
+## 03시 공장 정비 패널과 실제 크기 측정
+
+공장 벽을 Blender에서 정비 베이·환기구·절제된 조명으로 다듬었습니다. [이전 실내](Before-v005/Foundry-overview.png), [벽 근처 실제 화면](Foundry-clearance-wall.png), [실외 벽 근처](Canyon-clearance-wall.png)를 비교할 수 있습니다. 원본은 ArtSource/Environment/VoxelOn_Environment_v005.blend에 있습니다.
+
+실제 스킨100760개 정점으로 측정한 WISP 높이는4.038m이며 독립 관절 계산과0.000001m 이내로 일치했습니다. 몸통은 기존 충돌 반경 안에 들어갑니다. 팔·장식의 최대 폭은 더 넓어서 벽에 일부 겹칠 수 있으며 해결됐다고 보고하지 않습니다. 비례나 피격 범위는 바꾸지 않았습니다. 환경/시각 검사61개 통과; [검증 증거와 한계](../../Validation/20261104-Checkpoint5.md). 최종 아트 승인은 남아 있습니다.
