@@ -117,7 +117,9 @@ public sealed partial class VoxArena
         // high-jump and dash fighters cannot escape over a decorative boundary.
         Color wall=arenaMap==ArenaMapKind.IndoorFactory?
             new Color(.16f,.20f,.24f):new Color(.29f,.26f,.22f);
-        float height=arenaMap==ArenaMapKind.IndoorFactory?65f:24f;
+        float height=arenaMap==ArenaMapKind.IndoorFactory?65f:36f;
+        bool authoredCanyon=arenaMap==ArenaMapKind.OutdoorCanyon &&
+            PlaceEnvironment("CanyonBoundary",null,new Vector3(0,GroundSurfaceY,0),Vector3.one)!=null;
         if(arenaMap==ArenaMapKind.IndoorFactory)
         {
             Box("High hangar ceiling",null,new Vector3(0,GroundSurfaceY+69f,0),
@@ -130,10 +132,10 @@ public sealed partial class VoxArena
             Vector3 size=axis==0?new Vector3(5,height,290):new Vector3(290,height,5);
             Vector3 pos=axis==0?new Vector3(side*(ArenaHalfWidth+2.5f),GroundSurfaceY+height*.5f,0):
                 new Vector3(0,GroundSurfaceY+height*.5f,side*(ArenaHalfWidth+2.5f));
-            Box(arenaMap==ArenaMapKind.IndoorFactory?"Hangar boundary wall":"Canyon cliff boundary",
+            if(!authoredCanyon) Box(arenaMap==ArenaMapKind.IndoorFactory?"Hangar boundary wall":"Canyon cliff boundary",
                 null,pos,size,wall);
             cameraSolids.Add(new Bounds(pos,size));
-            if(arenaMap==ArenaMapKind.OutdoorCanyon)
+            if(arenaMap==ArenaMapKind.OutdoorCanyon && !authoredCanyon)
             {
                 // Layered blocky rock strata; the cliff is a perimeter, not a pit.
                 for(int j=0;j<18;j++)

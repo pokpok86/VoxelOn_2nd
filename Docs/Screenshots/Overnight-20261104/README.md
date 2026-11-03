@@ -28,3 +28,9 @@ Blender 환경 v003은 실내 구조 보강과 외곽 협곡 실루엣을 다듬
 | 실외 비교 | [정지](Canyon-motion-stand.png) · [옆걸음](Canyon-motion-strafe-left.png) · [점프](Canyon-motion-jump-held.png) |
 
 이 이미지는 실행 파일의 Move/Animate를 실제로 진행한 프레임을 렌더한 자료입니다. 수동 플레이 감각 및 최종 애니메이션 승인은 별도로 남아 있습니다. [실제 검사 로그 발췌](../../Validation/20261104-Checkpoint3.md).
+
+## 02시 협곡 경계 개선
+
+기존 경계의 어두운 평판과 내부로 튀어나온 장식 암석을 Blender 암벽 FBX로 교체했습니다. [이전 협곡](Before-v004/Canyon-overview.png)과 현재 위 이미지를 비교할 수 있습니다. 조종 가능한 경계는 동일하며, 카메라는 네 방향 벽을 통과하지 않는지 검사했습니다. 새 파일은 ArtSource/Environment/VoxelOn_Environment_v004.blend와 Assets/Resources/Environment/CanyonBoundary.fbx입니다.
+
+최신 Windows 빌드 성공, 전체268개+환경59개 통과. [실제 로그 발췌](../../Validation/20261104-Checkpoint4.md). 최종 아트·수동 플레이 검토는 남아 있으며 main 미반영입니다.

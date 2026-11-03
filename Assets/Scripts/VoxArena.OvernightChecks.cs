@@ -80,7 +80,7 @@ public sealed partial class VoxArena
         yield return new WaitForEndOfFrame();
         bool passed=true;int count=0;
         void Check(bool ok,string name){count++;passed&=ok;Debug.Log("ENV_CHECK "+name+" "+(ok?"PASS":"FAIL"));}
-        foreach(string asset in new[]{"FoundryCargo","FoundryGenerator","FoundryBarricade","CanyonRock","OutdoorGround","CanyonVista","FoundryBackdrop"})
+        foreach(string asset in new[]{"FoundryCargo","FoundryGenerator","FoundryBarricade","CanyonRock","OutdoorGround","CanyonVista","FoundryBackdrop","CanyonBoundary"})
             Check(Resources.Load<GameObject>("Environment/"+asset)!=null,"Blender FBX resource "+asset);
         Check(environmentFallbacks==0,"all environment graphics load from Blender FBX assets");
         TestSetupSelectable(0,0);ResetRound();inMenu=false;
@@ -88,6 +88,20 @@ public sealed partial class VoxArena
         Check(cameraSolids.Count>=4,"camera sees map perimeter volumes");
         if(arenaMap==ArenaMapKind.OutdoorCanyon)
         {
+            GameObject boundary=GameObject.Find("Blender FBX / CanyonBoundary");
+            Renderer cliff=boundary!=null?boundary.GetComponentInChildren<Renderer>():null;
+            Check(cliff!=null&&Mathf.Abs(cliff.bounds.min.y-GroundSurfaceY)<.02f&&
+                Mathf.Abs(cliff.bounds.min.x+145)<.02f&&Mathf.Abs(cliff.bounds.max.x-145)<.02f&&
+                Mathf.Abs(cliff.bounds.min.z+145)<.02f&&Mathf.Abs(cliff.bounds.max.z-145)<.02f&&
+                cliff.bounds.max.y<GroundSurfaceY+36,"Blender boundary aligns to arena footprint and safe camera height");
+            Check(GameObject.Find("Canyon cliff boundary")==null,"authored cliff replaces the old plain wall without duplicate surfaces");
+            for(int side=-1;side<=1;side+=2)
+            {
+                Vector3 focus=new Vector3(side*138,4,0),outside=new Vector3(side*150,4,0);
+                Check(Mathf.Abs(ConstrainCamera(focus,outside,.30f).x)<140,"camera remains inside authored canyon X boundary "+side);
+                focus=new Vector3(0,4,side*138);outside=new Vector3(0,4,side*150);
+                Check(Mathf.Abs(ConstrainCamera(focus,outside,.30f).z)<140,"camera remains inside authored canyon Z boundary "+side);
+            }
             Check(terrainSteps.Count>=50&&RenderSettings.fog,"outdoor canyon has climbable strata and daylight atmosphere");
             Check(GameObject.Find("Blender FBX / CanyonVista")!=null&&GameObject.Find("Blender FBX / OutdoorGround")!=null,"outdoor floor and vista use authored FBXs");
             Renderer floor=GameObject.Find("Blender FBX / OutdoorGround").GetComponentInChildren<Renderer>();
