@@ -8,6 +8,7 @@ public sealed partial class VoxArena
     string DifficultyName=>difficulty==0?"PRACTICE":difficulty==1?"STANDARD":"ACE";
     bool CanAssist(Fighter shooter,Fighter target,Vector3 requested)
     {
+        if(!smoke)return CanWeakAssist(shooter,target,requested);
         if(shooter==player&&shooter.spec.name=="WISP") return false;
         if(!aimAssist || !InArc(shooter,requested)) return false;
         Vector3 delta=target.root.position-shooter.root.position;
@@ -17,6 +18,7 @@ public sealed partial class VoxArena
     }
     Vector3 AssistAim(Fighter shooter,Fighter target,Vector3 requested,float delay=0,float speedFactor=1)
     {
+        if(!smoke)return WeakAssist(shooter,target,requested);
         if(!CanAssist(shooter,target,requested)) return requested;
         Vector3 delta=target.root.position-shooter.root.position;
         float speed=(shooter==player&&!smoke?132:shooter.spec.projectileSpeed)*bulletSpeedScale*speedFactor;

@@ -5,14 +5,14 @@ public sealed partial class VoxArena
 {
     // The fighter root is centered near the chest while grounded. Keep the
     // visible floor and obstacle collision bottoms aligned to the same plane.
-    public enum ArenaMapKind { IndoorFactory, OutdoorCanyon }
+    public enum ArenaMapKind { IndoorFactory, OutdoorCanyon, OpenPlains }
     [Header("Arena map (select before Play)")]
     public ArenaMapKind arenaMap=ArenaMapKind.IndoorFactory;
     const float ArenaHalfWidth=140f;
     const float GroundSurfaceY=-.91f;
     const float FighterSupportOffset=2.01f;
     const float FighterGroundY=GroundSurfaceY+FighterSupportOffset;
-    sealed class Debris { public Transform visual; public Vector3 origin,size; public float phase,hp; public bool destroyed; }
+    sealed class Debris { public Transform visual; public Vector3 origin,size; public float phase,hp; public bool destroyed; public List<Transform> cracks=new List<Transform>(); }
     readonly List<Bounds> obstacles=new List<Bounds>();
     readonly List<Bounds> cameraSolids=new List<Bounds>();
     readonly List<Debris> debris=new List<Debris>();
@@ -105,14 +105,17 @@ public sealed partial class VoxArena
             obstacles.Add(new Bounds(new Vector3(side*(48+i*14),GroundSurfaceY+height*.5f,45+i%2*16),new Vector3(10,height,13)));
         }
         }
-        else BuildCanyonTerrain();
+        else if(arenaMap==ArenaMapKind.OutdoorCanyon){ /* PD: keep outdoor combat floor open; old block course stays archived. */ }
+        else BuildPlainsCover();
         player=MakeFighter("Pilot frame",Cyan); enemy=MakeFighter("Rival frame",Orange);
+        BuildClimate();
         aimMarker=new GameObject("Aim reticle").transform;
         Shape(PrimitiveType.Cube,"Aim cross",aimMarker,Vector3.zero,new Vector3(.8f,.06f,.07f),Cyan,true);
         Shape(PrimitiveType.Cube,"Aim cross",aimMarker,Vector3.zero,new Vector3(.07f,.06f,.8f),Cyan,true);
     }
     void BuildArenaPerimeter()
     {
+        if(arenaMap==ArenaMapKind.OpenPlains)return;
         // Geometry is readable from inside, but movement is also clamped so
         // high-jump and dash fighters cannot escape over a decorative boundary.
         Color wall=arenaMap==ArenaMapKind.IndoorFactory?
@@ -169,16 +172,10 @@ public sealed partial class VoxArena
                 float h=.32f*(step+1);
                 float x=cx+(step-3)*2.6f;
                 AddTerrainBlock("Canyon climbable ridge "+ridge+" "+step,
-                    new Vector3(x,GroundSurfaceY+h*.5f,cz),
+                    new Vector3(x,GroundSurfaceY+h*.5f,cz+Mathf.Sin(step*.8f+ridge)*.65f),
                     new Vector3(2.75f,h,14f+ridge%3*3f),
                     Color.Lerp(low,high,step/6f));
             }
-        }
-        for(int i=0;i<12;i++)
-        {
-            float angle=i*Mathf.PI/6f;
-            float height=4f+i%3*1.5f,radius=40f+(i%3)*20f;
-            AddTerrainBlock("Canyon tall voxel cover "+i,new Vector3(Mathf.Sin(angle)*radius,GroundSurfaceY+height*.5f,Mathf.Cos(angle)*radius),new Vector3(7+i%3,height,8+i%2*2),low);
         }
         // Scattered broad shelves provide sightline variation without dense cover.
         for(int i=0;i<5;i++)
@@ -249,8 +246,8 @@ public sealed partial class VoxArena
     Bounds DebrisBounds(Vector3 center,Vector3 size)
     {
         float top=center.y+size.y*.5f;
-        float height=Mathf.Max(.01f,top-GroundSurfaceY);
-        return new Bounds(new Vector3(center.x,(top+GroundSurfaceY)*.5f,center.z),
+        float bottom=SurfaceHeight(center);float height=Mathf.Max(.01f,top-bottom);
+        return new Bounds(new Vector3(center.x,(top+bottom)*.5f,center.z),
             new Vector3(size.x,height,size.z));
     }
     void UpdateObstacles(float dt)
@@ -285,8 +282,7 @@ public sealed partial class VoxArena
             Vector3 spawn=part.bounds.center+new Vector3(
                 Random.Range(-.4f,.4f),Random.Range(-.3f,.3f),Random.Range(-.4f,.4f));
             float scale=j%5==0?Random.Range(.55f,.95f):Random.Range(.16f,.43f);
-            Transform piece=Box("Visual-only cover fragment",null,spawn,
-                Vector3.one*scale,color);
+            Transform piece=AcquirePDPart("RockFragment",spawn,Vector3.one*scale,color);if(piece==null)continue;
             Collider collider=piece.GetComponent<Collider>();
             if(collider!=null) Destroy(collider);
             Vector3 direction=(spawn-impact).normalized+
@@ -302,27 +298,19 @@ public sealed partial class VoxArena
         while(coverFragments.Count>MaxCoverFragments)
         {
             CoverFragment oldest=coverFragments[0];
-            if(oldest.visual!=null) Destroy(oldest.visual.gameObject);
+            if(oldest.visual!=null) ReleasePDPart(oldest.visual);
             coverFragments.RemoveAt(0);
         }
     }
     void UpdateCoverFragments(float dt)
     {
-        foreach(CoverFragment fragment in coverFragments)
+        for(int i=coverFragments.Count-1;i>=0;i--)
         {
-            if(fragment.visual==null || fragment.settled) continue;
-            fragment.age+=dt;
-            fragment.velocity+=Vector3.down*19f*dt;
-            Vector3 next=fragment.visual.position+fragment.velocity*dt;
-            float floor=GroundSurfaceY+fragment.visual.localScale.y*.5f;
-            if(next.y<=floor)
-            {
-                next.y=floor;
-                fragment.velocity=Vector3.zero;
-                fragment.settled=true;
-            }
-            fragment.visual.position=next;
-            fragment.visual.Rotate(Vector3.up,fragment.spin*dt,Space.World);
+            CoverFragment f=coverFragments[i];f.age+=dt;if(f.visual==null){coverFragments.RemoveAt(i);continue;}
+            if(f.age>7){ReleasePDPart(f.visual);coverFragments.RemoveAt(i);continue;}
+            if(f.settled)continue;f.velocity+=Vector3.down*19*dt;Vector3 next=f.visual.position+f.velocity*dt;float floor=SurfaceHeight(next)+f.visual.localScale.y*.5f;
+            if(next.y<=floor){next.y=floor;f.velocity=Vector3.zero;f.settled=true;}
+            f.visual.position=next;f.visual.Rotate(Vector3.up,f.spin*dt,Space.World);
         }
     }
     void DamageDestructibleCover(Vector3 impact,float damage)
@@ -336,14 +324,35 @@ public sealed partial class VoxArena
             Bounds b=obstacles[i];
             if((b.ClosestPoint(impact)-impact).sqrMagnitude>4f) continue;
             d.hp-=Mathf.Max(0,damage);
-            if(d.hp>0) return;
-            d.destroyed=true;
+            if(d.hp>0)
+            {
+                if(d.cracks.Count<4)
+                {
+                    Vector3 normal=impact-d.origin;int axis=Mathf.Abs(normal.x)>Mathf.Abs(normal.z)?0:2;normal=axis==0?Vector3.right*Mathf.Sign(normal.x):Vector3.forward*Mathf.Sign(normal.z);
+                    Transform crack=AcquirePDPart("Crack",b.ClosestPoint(impact)+normal*.025f,Vector3.one*Mathf.Min(d.size.x,d.size.z)*.7f,new Color(.025f,.03f,.035f));
+                    if(crack!=null){crack.rotation=Quaternion.FromToRotation(Vector3.up,normal);d.cracks.Add(crack);}
+                }
+                return;
+            }
+            d.destroyed=true;foreach(Transform crack in d.cracks)ReleasePDPart(crack);d.cracks.Clear();
             PlaySound(SoundKind.CoverBreak,impact,.95f);
             ScatterCoverFragments(d,impact);
+            for(int cloud=0;cloud<8;cloud++)EmitPDParticle("SmokePuff",impact,Vector3.up+UnityEngine.Random.onUnitSphere,.3f,new Color(.36f,.32f,.26f,.45f),1.6f,true);
+            EmitPDParticle("Ripple",impact,Vector3.zero,.8f,new Color(.65f,.56f,.40f,.4f),.65f,true);
             if(d.visual!=null) Destroy(d.visual.gameObject);
             // Keep list indices stable for UpdateObstacles.
             obstacles[i]=new Bounds(new Vector3(0,-10000f,0),Vector3.zero);
             return;
+        }
+    }
+    void ResetCoverForRound()
+    {
+        foreach(CoverFragment fragment in coverFragments)ReleasePDPart(fragment.visual);coverFragments.Clear();
+        for(int i=0;i<debris.Count;i++)
+        {
+            Debris d=debris[i];foreach(Transform crack in d.cracks)ReleasePDPart(crack);d.cracks.Clear();
+            if(d.destroyed){d.visual=new GameObject("Ground cover "+i).transform;d.visual.position=d.origin;BuildGroundCover(d.visual,d.size,i);d.destroyed=false;}
+            d.hp=120+d.size.x*d.size.z*1.5f;obstacles[i]=DebrisBounds(d.origin,d.size);
         }
     }
     bool Occupied(Vector3 p,float radius)
@@ -390,7 +399,7 @@ public sealed partial class VoxArena
     }
     float LandingHeight(Vector3 p,float radius,float previousY)
     {
-        float ground=FighterGroundY;
+        float ground=SurfaceHeight(p)+FighterSupportOffset;
         foreach(Bounds b in obstacles)
         {
             // A rooftop is a landing surface only if approached from above.
@@ -415,6 +424,11 @@ public sealed partial class VoxArena
                 e.max=new Vector3(e.max.x,b.max.y-.02f,e.max.z);
                 if(e.IntersectRay(ray,out float hit)&&hit<=length) nearest=Mathf.Min(nearest,hit);
             }
+        }
+        if(arenaMap==ArenaMapKind.OpenPlains)
+        {
+            int samples=Mathf.Max(1,Mathf.CeilToInt(length));
+            for(int i=0;i<=samples;i++){float distance=length*i/samples;Vector3 point=from+delta*(i/(float)samples);if(point.y-radius<=SurfaceHeight(point)){nearest=Mathf.Min(nearest,distance);break;}}
         }
         return nearest<=length;
     }
@@ -444,7 +458,11 @@ public sealed partial class VoxArena
         for(int i=0;i<count;i++)
         {
             Vector3 horizontal=new Vector3(step.x,0,step.z);
-            if(!Occupied(p+horizontal,f.Radius)) p+=horizontal;
+            if(!Occupied(p+horizontal,f.Radius))
+            {
+                Vector3 nextHorizontal=p+horizontal;float rise=SurfaceHeight(nextHorizontal)+FighterSupportOffset-p.y;
+                if(arenaMap!=ArenaMapKind.OpenPlains||rise<=f.spec.stepHeight+.01f){p=nextHorizontal;if(rise>0&&f.jumpVelocity<=0)p.y+=rise;}
+            }
             else if(TryStepUp(f,p,horizontal,out Vector3 stepped)) p=stepped;
             else
             {
@@ -478,9 +496,9 @@ public sealed partial class VoxArena
                 }
                 else if(!Occupied(next,f.Radius)) p=next;
             }
-            p.y=Mathf.Max(FighterGroundY,p.y);
-            p.x=Mathf.Clamp(p.x,-ArenaHalfWidth+f.Radius,ArenaHalfWidth-f.Radius);
-            p.z=Mathf.Clamp(p.z,-ArenaHalfWidth+f.Radius,ArenaHalfWidth-f.Radius);
+            p.y=Mathf.Max(SurfaceHeight(p)+FighterSupportOffset,p.y);
+            p.x=Mathf.Clamp(p.x,-ArenaLimit+f.Radius,ArenaLimit-f.Radius);
+            p.z=Mathf.Clamp(p.z,-ArenaLimit+f.Radius,ArenaLimit-f.Radius);
         }
         f.root.position=p;
     }

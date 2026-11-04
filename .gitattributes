@@ -11,3 +11,6 @@
 *.wav binary
 *.ogg binary
 *.fbx binary
+
+# Preserve exact captured runtime log bytes for SHA256 evidence.
+Docs/Validation/Overnight-20261105/*.txt -text

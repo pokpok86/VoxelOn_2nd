@@ -26,11 +26,13 @@ public sealed partial class VoxArena
             kind==SalvageKind.Club?new Color(.53f,.59f,.66f):new Color(.32f,.49f,.55f);
         Vector3 size=kind==SalvageKind.Throwable?new Vector3(.8f,.8f,.8f):
             kind==SalvageKind.Club?new Vector3(.28f,2.7f,.3f):new Vector3(2.1f,2.5f,.22f);
+        p.y=SurfaceHeight(p)+size.y*.5f;
         Transform t=Box("Salvage "+kind,null,p,size,c);
         salvage.Add(new Salvage{kind=kind,visual=t,spawn=p});
     }
     void BuildSalvage()
     {
+        if(arenaMap!=ArenaMapKind.IndoorFactory)return;
         AddSalvage(SalvageKind.Throwable,new Vector3(-11,1.6f,-10));
         AddSalvage(SalvageKind.Club,new Vector3(-9,2.4f,-14));
         AddSalvage(SalvageKind.Shield,new Vector3(-18,2.4f,-10));

@@ -39,7 +39,7 @@ public sealed partial class VoxArena
     void OnApplicationQuit()=>SavePreferences();
     void SwitchArenaMap()
     {
-        arenaMap=arenaMap==ArenaMapKind.IndoorFactory?ArenaMapKind.OutdoorCanyon:ArenaMapKind.IndoorFactory;
+        arenaMap=(ArenaMapKind)(((int)arenaMap+1)%2);
         SavePreferences();
         UnityEngine.SceneManagement.SceneManager.LoadScene("Arena");
     }

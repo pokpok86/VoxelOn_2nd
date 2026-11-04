@@ -10,6 +10,8 @@ public sealed partial class VoxArena
     float cameraBodyOpacity=1;
     bool cameraBodyFadeApplied;
     Material cameraBodyFadeMaterial;
+    readonly Dictionary<Material,Material> cameraFadeMaterials=new Dictionary<Material,Material>();
+    readonly Dictionary<Renderer,Material[]> cameraFadedArrays=new Dictionary<Renderer,Material[]>();
     readonly Dictionary<Renderer,Material[]> cameraFadeOriginals=new Dictionary<Renderer,Material[]>();
     void ResetMouseLookCapture(){mouseLookCaptured=false;discardMouseLookFrames=2;}
     void OnApplicationFocus(bool focused){ResetMouseLookCapture();}
@@ -35,7 +37,7 @@ public sealed partial class VoxArena
         Quaternion requested=Quaternion.Euler(cameraPitch,cameraYaw,0);
         Vector3 boom=-(requested*Vector3.forward)*12.5f;
         float highPivot=2.8f;
-        if(wispHeadBoundsReady&&player.spec.name=="WISP")
+        if(wispHeadBoundsReady&&(player.spec.name=="WISP"||player.importedChassis))
         {
             Vector3 cameraUp=requested*Vector3.up;float headTop=float.NegativeInfinity;
             for(int i=0;i<8;i++)
@@ -69,40 +71,36 @@ public sealed partial class VoxArena
     void RegisterCameraFadeRenderers(Fighter fighter)
     {
         foreach(var pair in cameraFadeOriginals)if(pair.Key!=null)pair.Key.sharedMaterials=pair.Value;
-        cameraFadeOriginals.Clear();cameraBodyOpacity=1;cameraBodyFadeApplied=false;
+        cameraFadeOriginals.Clear();cameraFadedArrays.Clear();cameraBodyOpacity=1;cameraBodyFadeApplied=false;
         foreach(Renderer part in fighter.body.GetComponentsInChildren<Renderer>())
         {
-            Material[] source=part.sharedMaterials;bool native=false;
+            Material[] source=part.sharedMaterials;bool native=fighter.simpleShell;
             foreach(Material material in source)if(material==wispRuntimeMaterial)native=true;
-            if(native)cameraFadeOriginals[part]=source;
+            if(native)
+            {
+                cameraFadeOriginals[part]=source;Material[] faded=new Material[source.Length];
+                for(int i=0;i<source.Length;i++)
+                {
+                    Material material=source[i];if(material==null)continue;
+                    if(!cameraFadeMaterials.TryGetValue(material,out Material clone)){clone=new Material(cameraFadeShader);clone.CopyPropertiesFromMaterial(material);clone.renderQueue=2450;cameraFadeMaterials[material]=clone;}
+                    faded[i]=clone;cameraBodyFadeMaterial=clone;
+                }
+                cameraFadedArrays[part]=faded;
+            }
         }
     }
     void UpdateCameraHeadFade(float dt,float distance)
     {
-        bool obstructs=player.spec.name=="WISP"&&(distance<2.4f||ProjectedWispHeadCoversReticle());
+        bool obstructs=(player.spec.name=="WISP"||player.importedChassis)&&(distance<2.4f||ProjectedWispHeadCoversReticle());
         cameraBodyOpacity=Mathf.MoveTowards(cameraBodyOpacity,obstructs?.12f:1,Mathf.Max(0,dt)*10);
         if(cameraBodyOpacity>.995f)
         {
             if(cameraBodyFadeApplied)foreach(var pair in cameraFadeOriginals)if(pair.Key!=null)pair.Key.sharedMaterials=pair.Value;
             cameraBodyFadeApplied=false;return;
         }
-        if(cameraBodyFadeMaterial==null&&wispRuntimeMaterial!=null)
-        {
-            cameraBodyFadeMaterial=new Material(cameraFadeShader!=null?cameraFadeShader:wispRuntimeMaterial.shader){name="WISP close camera self fade"};
-            cameraBodyFadeMaterial.CopyPropertiesFromMaterial(wispRuntimeMaterial);
-            cameraBodyFadeMaterial.renderQueue=2450;
-        }
-        if(cameraBodyFadeMaterial==null)return;
-        cameraBodyFadeMaterial.color=wispRuntimeMaterial.color;
-        cameraBodyFadeMaterial.SetFloat("_CameraFade",cameraBodyOpacity);
-        if(cameraBodyFadeApplied)return;
-        cameraBodyFadeApplied=true;
-        foreach(var pair in cameraFadeOriginals)
-        {
-            if(pair.Key==null)continue;
-            Material[] faded=new Material[pair.Value.Length];for(int i=0;i<faded.Length;i++)faded[i]=cameraBodyFadeMaterial;
-            pair.Key.sharedMaterials=faded;
-        }
+        foreach(Material clone in cameraFadeMaterials.Values)clone.SetFloat("_CameraFade",cameraBodyOpacity);
+        if(cameraBodyFadeApplied)return;cameraBodyFadeApplied=true;
+        foreach(var pair in cameraFadedArrays)if(pair.Key!=null)pair.Key.sharedMaterials=pair.Value;
     }
     bool VisibleWispHeadBlocksReticle()=>HeadOverlapsCenterReticle(player)&&
         !(cameraFadeOriginals.Count>0&&cameraBodyFadeMaterial!=null&&cameraBodyOpacity<.2f);

@@ -1,0 +1,161 @@
+{
+  "note": "Actual Unity renders; no AI concept images. Static models WISP011, BASTION006, TARANTULA005. Original capture fixture/source paths retained.",
+  "images": [
+    {
+      "file": "1-WISP-front.png",
+      "source": "Docs/Screenshots/NacchinStyle-20261105/Iteration06/Unity/1-WISP-front.png",
+      "sha256": "cb74421a08eb2722a627fd517836e105b88e5d5593fe709ff491b129de2133f3",
+      "bytes": 48436
+    },
+    {
+      "file": "1-WISP-right.png",
+      "source": "Docs/Screenshots/NacchinStyle-20261105/Iteration06/Unity/1-WISP-right.png",
+      "sha256": "43d4e80f6794e71e730b7066004ba703c9140596d93b8a739a360df39197b5ea",
+      "bytes": 69855
+    },
+    {
+      "file": "1-WISP-rear.png",
+      "source": "Docs/Screenshots/NacchinStyle-20261105/Iteration06/Unity/1-WISP-rear.png",
+      "sha256": "ac1c803466e4361cae1aa43a50411ee389ebfe9c9f48bf0d1335c288151152d8",
+      "bytes": 113592
+    },
+    {
+      "file": "1-WISP-left.png",
+      "source": "Docs/Screenshots/NacchinStyle-20261105/Iteration06/Unity/1-WISP-left.png",
+      "sha256": "0bf054a2d89fe031d7e03dadf23966ee762e61f3ecfacd46a21ad8939b76cead",
+      "bytes": 51060
+    },
+    {
+      "file": "1-WISP-three-quarter.png",
+      "source": "Docs/Screenshots/NacchinStyle-20261105/Iteration06/Unity/1-WISP-three-quarter.png",
+      "sha256": "4ca42b1eff9bd35116686fec2093e0eb5f65971a208d09955b7fe1082e8f2a54",
+      "bytes": 113841
+    },
+    {
+      "file": "2-BASTION-front.png",
+      "source": "Docs/Screenshots/NacchinStyle-20261105/Iteration06/Unity/2-BASTION-front.png",
+      "sha256": "f3d55066ec819a0e7fc333764efc4b19cb728ba2f6a6f0805f222bd72b94eec4",
+      "bytes": 53301
+    },
+    {
+      "file": "2-BASTION-right.png",
+      "source": "Docs/Screenshots/NacchinStyle-20261105/Iteration06/Unity/2-BASTION-right.png",
+      "sha256": "11e02b14caf70bff75a08223e8291b4b48b54746987ac5194845cb83d528992c",
+      "bytes": 126916
+    },
+    {
+      "file": "2-BASTION-rear.png",
+      "source": "Docs/Screenshots/NacchinStyle-20261105/Iteration06/Unity/2-BASTION-rear.png",
+      "sha256": "f6e93e475a85ecb1480e97928c152ae6677831221fe74ff04956bce60efb11f1",
+      "bytes": 146166
+    },
+    {
+      "file": "2-BASTION-left.png",
+      "source": "Docs/Screenshots/NacchinStyle-20261105/Iteration06/Unity/2-BASTION-left.png",
+      "sha256": "0dc64ef990f39afdd16e0f5b983fe3269edd9a8087b074ace0a0dc69f0af2d6f",
+      "bytes": 78047
+    },
+    {
+      "file": "2-BASTION-three-quarter.png",
+      "source": "Docs/Screenshots/NacchinStyle-20261105/Iteration06/Unity/2-BASTION-three-quarter.png",
+      "sha256": "33b8ada45347af63590be8f5cae757f5ab2121de87dd29edc2253dfb37d44c44",
+      "bytes": 176252
+    },
+    {
+      "file": "3-TARANTULA-front.png",
+      "source": "Docs/Screenshots/NacchinStyle-20261105/Iteration06/Unity/3-TARANTULA-front-wide.png",
+      "sha256": "08a839eee12ebf561aece25f079be34efd32f824b818e1a17acc377105d934ee",
+      "bytes": 45426
+    },
+    {
+      "file": "3-TARANTULA-right.png",
+      "source": "Docs/Screenshots/NacchinStyle-20261105/Iteration06/Unity/3-TARANTULA-right-wide.png",
+      "sha256": "d0e2c6a17a4056c2a8dcbd4aa607d8293bd8a34944c04482de3dc55bb7969a6e",
+      "bytes": 65858
+    },
+    {
+      "file": "3-TARANTULA-rear.png",
+      "source": "Docs/Screenshots/NacchinStyle-20261105/Iteration06/Unity/3-TARANTULA-rear-wide.png",
+      "sha256": "16514942c1e91efea8c5bbc7f400bcc20ba4df0823e375b703553ac94f34d724",
+      "bytes": 88041
+    },
+    {
+      "file": "3-TARANTULA-left.png",
+      "source": "Docs/Screenshots/NacchinStyle-20261105/Iteration06/Unity/3-TARANTULA-left-wide.png",
+      "sha256": "a08c30e649be81859905b84af3ce8840054f6baa2138a92cb8bc4885421e1ea2",
+      "bytes": 47518
+    },
+    {
+      "file": "3-TARANTULA-three-quarter.png",
+      "source": "Docs/Screenshots/NacchinStyle-20261105/Iteration06/Unity/3-TARANTULA-three-quarter-wide.png",
+      "sha256": "d8ee636becca86b4d6acf3e99a2fc169bbf696532d6fcfc50b35efc23ce03aa4",
+      "bytes": 116727
+    },
+    {
+      "file": "Hangar-WISP.png",
+      "source": "Docs/Models/Foundry-WISP-only-hangar.png",
+      "sha256": "c3dd133b07fc35865407d387af3dd2a5b785fdfe4726a27839105faf10b16dd3",
+      "bytes": 245510
+    },
+    {
+      "file": "Hangar-BASTION.png",
+      "source": "Docs/Models/Foundry-BASTION-hangar.png",
+      "sha256": "e50d2b53f2a88cc263a5222720f6e8224b93fdda972ad2ec95fff556676279df",
+      "bytes": 246645
+    },
+    {
+      "file": "Hangar-TARANTULA.png",
+      "source": "Docs/Models/Foundry-TARANTULA-hangar.png",
+      "sha256": "4260512c31195d8b991a0f22d15c9a7a510e7fec0f873b2b952291e109d39d6b",
+      "bytes": 248834
+    },
+    {
+      "file": "Foundry-rear-camera.png",
+      "source": "Docs/Models/Foundry-WISP-crosshair-camera.png",
+      "sha256": "7699d239c1f9869ae798bee1b3937a7d0c9bebc31587a3272add2017b0d99bd2",
+      "bytes": 444194
+    },
+    {
+      "file": "Foundry-guard.png",
+      "source": "Docs/Models/Foundry-WISP-guard-gameplay.png",
+      "sha256": "e06bcd66db7a12b6473d6fde416f4d06eabda2a02e9bb0448272711030fbeb95",
+      "bytes": 444250
+    },
+    {
+      "file": "Canyon-rear-camera.png",
+      "source": "Docs/Models/Canyon-WISP-crosshair-camera.png",
+      "sha256": "d23a8e378f20775d9a0a740817f281cf4d6f3d00aa9ce16520c18ee6ac52d125",
+      "bytes": 391204
+    },
+    {
+      "file": "Canyon-Rain-Evening.png",
+      "source": "Docs/Screenshots/PD14-Climate/OutdoorCanyon/Rain-Evening.png",
+      "sha256": "aceca84828107733ea4ee0aa6de1dd2d1353f18fe2e91a002d2e1ec597061201",
+      "bytes": 323135
+    },
+    {
+      "file": "Canyon-Thunderstorm-Evening.png",
+      "source": "Docs/Screenshots/PD14-Climate/OutdoorCanyon/Thunderstorm-Evening.png",
+      "sha256": "82396bbbc604ffd735b77f60a14c8f5c3924479c6c386fda364f93e2e99ec54d",
+      "bytes": 309725
+    },
+    {
+      "file": "Canyon-WISP-moving.png",
+      "source": "Docs/Screenshots/PD14-Three-Prototypes/OutdoorCanyon/1-WISP-1.png",
+      "sha256": "cb236f706c917ead9a795273d41a1b3683597f0567fe843da55aa9faa7819b64",
+      "bytes": 278545
+    },
+    {
+      "file": "Canyon-BASTION-moving.png",
+      "source": "Docs/Screenshots/PD14-Three-Prototypes/OutdoorCanyon/2-BASTION-1.png",
+      "sha256": "bfcc57bf693b9d5c998c21a9f7ddc058368723d6ff22e41c9aff5ffdcc7e574f",
+      "bytes": 352282
+    },
+    {
+      "file": "Canyon-TARANTULA-moving.png",
+      "source": "Docs/Screenshots/PD14-Three-Prototypes/OutdoorCanyon/3-TARANTULA-1.png",
+      "sha256": "5e2cce5af08b265aad8c8156bd15cfeab6e3218356964f3c810a7d47db79a320",
+      "bytes": 322094
+    }
+  ]
+}

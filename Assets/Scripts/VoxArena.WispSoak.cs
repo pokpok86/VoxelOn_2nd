@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,6 +13,7 @@ public sealed partial class VoxArena
         UnityEngine.Random.InitState(41104+(int)arenaMap);TestSetupSelectable(0,0);ResetRound();inMenu=false;smoke=false;muted=true;difficulty=0;
         spectatorMode=false;targetLock=false;view.orthographic=false;view.fieldOfView=60;
         player.root.position=new Vector3(60,FighterGroundY,0);enemy.root.position=new Vector3(60,FighterGroundY,25);
+        if(System.Array.IndexOf(System.Environment.GetCommandLineArgs(),"--rain-soak")>=0){forcedWeather=2;forcedDay=1;SelectRoundClimate();}
         UpdateCamera(10); // Match the normal match-start camera snap after test spawn placement.
         var frames=new List<float>();double begin=Time.realtimeSinceStartupAsDouble,last=begin;
         int fired=0,partialReloads=0,emptyReloads=0,boostFrames=0,jumpStarts=0,peakShots=0,nextCapture=0;

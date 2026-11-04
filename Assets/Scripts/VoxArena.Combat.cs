@@ -1,15 +1,15 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public sealed partial class VoxArena
 {
-    const float PrimaryFireInterval=.18f,PrimaryReloadSeconds=1.5f;
+    const float PrimaryFireInterval=.18f/.65f,PrimaryReloadSeconds=2.5f;
     sealed class Shot
     {
         public Transform visual; public Fighter owner; public Vector3 velocity,heading;
         public float life,damage,radius,age,tracking,blast,fuse=-1,arm,wave;
-        public bool stopAndExplode,mine;
+        public bool stopAndExplode,mine,loadoutVisual;public int artSlot;
         public LineRenderer warning;
     }
     sealed class Pending { public float delay; public Action action; }
@@ -37,14 +37,14 @@ public sealed partial class VoxArena
     {
         if(delay<=0) action(); else pending.Add(new Pending{delay=delay,action=action});
     }
-    Shot Fire(Fighter owner,Vector3 direction,float damage,float speed,float radius,float range,float tracking=0,float blast=0,bool stop=false,float wave=0)
+    Shot Fire(Fighter owner,Vector3 direction,float damage,float speed,float radius,float range,float tracking=0,float blast=0,bool stop=false,float wave=0,bool loadoutVisual=false)
     {
         direction=direction.normalized;
-        Vector3 muzzle=owner.root.position+direction*(owner.Radius+.25f);
+        Vector3 muzzle=!smoke&&owner.weaponVisuals!=null?WeaponMuzzle(owner):owner.root.position+direction*(owner.Radius+.25f);
         float physicalRadius=radius*bulletSizeScale;
         if(ObstacleOnSegment(owner.root.position,muzzle,physicalRadius,out _)) return null;
         speed*=bulletSpeedScale;
-        Shot s=new Shot{owner=owner,velocity=direction*speed,heading=direction,damage=damage,
+        Shot s=new Shot{owner=owner,loadoutVisual=loadoutVisual,artSlot=Mathf.Clamp(owner.weaponSlot-1,0,3),velocity=direction*speed,heading=direction,damage=damage,
             radius=physicalRadius,life=range/speed,tracking=tracking,blast=blast,stopAndExplode=stop,wave=wave};
         s.visual=BuildProjectileVisual(s,muzzle);
         s.visual.rotation=Quaternion.LookRotation(direction);
@@ -62,15 +62,7 @@ public sealed partial class VoxArena
     {
         if(!smoke)
         {
-            if(Finished||owner.lockTime>0||owner.rushTime>0) return;
-            if(owner.weaponSlot!=1) return;
-            if(owner.reloadTime>0||owner.magazine<=0||owner.weaponTimer>0||!InArc(owner,direction)) return;
-            owner.weaponTimer=PrimaryFireInterval*weaponCooldownScale/Mathf.Max(.2f,owner.spec.rightArmHandling); owner.magazine--; owner.shotIdleTime=0;
-            PlaySound(SoundKind.Fire,owner.root.position,.32f,1.45f);
-            float spread=owner.spec.aimSpreadDegrees/Mathf.Max(.2f,owner.spec.rightArmStability);
-            Vector3 fired=Quaternion.Euler(0,UnityEngine.Random.Range(-spread,spread),0)*direction;
-            Fire(owner,fired,7,132,.24f,82);
-            if(owner.magazine<=0) owner.reloadTime=PrimaryReloadSeconds;
+            FireEquippedWeapon(owner,target,direction);
             return;
         }
         if(Finished||owner.weaponTimer>0||owner.lockTime>0||owner.rushTime>0||!InArc(owner,direction)) return;
@@ -264,7 +256,7 @@ public sealed partial class VoxArena
             if(hit)
             {
                 Vector3 impact=from+(to-from).normalized*targetDistance;
-                if(s.blast>0) Explode(s,impact); else Hit(target,from,s.damage);
+                if(s.blast>0) Explode(s,impact); else Hit(target,from,s.damage,impact);
                 RemoveShot(i); continue;
             }
             s.visual.position=to;

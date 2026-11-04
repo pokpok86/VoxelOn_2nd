@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public sealed partial class VoxArena
 {
@@ -30,7 +30,7 @@ public sealed partial class VoxArena
     Vector3 AimLead(Fighter shooter,Fighter target)
     {
         Vector3 delta=target.root.position-shooter.root.position;
-        float projectileSpeed=smoke?shooter.spec.projectileSpeed:132;
+        float projectileSpeed=smoke?shooter.spec.projectileSpeed:EquippedProfile(shooter).speed;
         float time=Mathf.Clamp(delta.magnitude/(projectileSpeed*bulletSpeedScale),0,1.2f);
         Vector3 point=target.root.position+shooter.smoothedTargetVelocity*time*(difficulty==0?.28f:difficulty==1?.52f:.65f);
         Vector3 aim=(point-shooter.root.position).normalized;
@@ -146,6 +146,8 @@ public sealed partial class VoxArena
             if(f.jumpHeld && f.jumpHeight<=.02f && f.jumpVelocity<=0)
             { f.jumpOriginY=f.root.position.y; f.jumpVelocity=jumpSpeed*f.spec.jumpImpulseScale/Mathf.Sqrt(Mathf.Max(.5f,f.spec.jumpWeightFactor)); }
         }
+        if(!smoke)UpdateCoverRoute(f,target);
+        if(!smoke&&!f.aiCoverRouting&&f.reloadTime>0&&distance<35){f.aiMove=EscapeHeading(f,f.root.position-target.root.position);f.aiState="RELOAD / REPOSITION";}
         Vector3 movement=f.aiMove;
         // Practice rivals pause between maneuvers, while still escaping blocked routes.
         // Practice keeps drifting between decisions instead of appearing to stall.
@@ -156,10 +158,10 @@ public sealed partial class VoxArena
         if(testRival && !aiAttackEnabled) return;
         if(f.aiClock<(difficulty==0?2.8f:1.3f)) return;
         bool lineClear=!ObstacleOnSegment(f.root.position,target.root.position,.2f,out _);
+        if(!smoke) ChooseAIWeapon(f,distance);
         Vector3 aim=AimLead(f,target);
-        if(!smoke) f.weaponSlot=1;
-        if(!smoke&&f.magazine<=0&&f.reloadTime<=0) f.reloadTime=PrimaryReloadSeconds;
-        float attackRange=smoke?f.spec.range:82;
+        if(!smoke&&f.magazine<=0&&f.reloadTime<=0) StartWeaponReload(f);
+        float attackRange=smoke?f.spec.range:EquippedProfile(f).range;
         if(lineClear && distance<attackRange && f.weaponTimer<=0 && (smoke||f.reloadTime<=0))
         {
             Attack(f,target,aim);

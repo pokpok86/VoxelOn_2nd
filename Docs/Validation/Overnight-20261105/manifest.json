@@ -1,0 +1,56 @@
+[
+  {
+    "file": "Final-Hangar-Guide-Build.txt",
+    "source": "Logs/Final-Hangar-Guide-Build.log",
+    "sha256": "f7f9b226f2423e8c2ee3e0ae3058686464af0e1e0abf38ad6aad18d2fdcec0fa",
+    "bytes": 260527
+  },
+  {
+    "file": "Final-20261105-Final-Smoke.txt",
+    "source": "Logs/Final-20261105-Final-Smoke.log",
+    "sha256": "a14ffcf7f0805fb279ad4bb5909e32c6725e1151cfbcf31b27d10004925c8d25",
+    "bytes": 875568
+  },
+  {
+    "file": "Final-20261105-Shell.txt",
+    "source": "Logs/Final-20261105-Shell.log",
+    "sha256": "d058cc4c31cae98246e50399187fb8fea79b2a88b96e75820433c5afbe7866d6",
+    "bytes": 32477
+  },
+  {
+    "file": "Final-20261105-Hangar-Roster.txt",
+    "source": "Logs/Final-20261105-Hangar-Roster.log",
+    "sha256": "23b70ef9e84a140da93eb25431b2bb3f5e887d3beccbdaf1cf4dd5521a9021c0",
+    "bytes": 32953
+  },
+  {
+    "file": "Final-20261105-Canyon-Current-Prototypes.txt",
+    "source": "Logs/Final-20261105-Canyon-Current-Prototypes.log",
+    "sha256": "e8895675c2c21b69845933ae9f2019ff0036f6871ab06f5122fc64999e153093",
+    "bytes": 70808
+  },
+  {
+    "file": "Final-20261105-Canyon-Current-Corners.txt",
+    "source": "Logs/Final-20261105-Canyon-Current-Corners.log",
+    "sha256": "44619454ac82034d75c65f44fd0d695690b77f731b04fd2dba03227b36b7f610",
+    "bytes": 99605
+  },
+  {
+    "file": "Final-20261105-Current-Weather.txt",
+    "source": "Logs/Final-20261105-Current-Weather.log",
+    "sha256": "4ed60ffb50d02d586c855917ee897381eb7f72f031b704dbb83c4bfb628f1a47",
+    "bytes": 79122
+  },
+  {
+    "file": "Chassis-Capsule-AnchorFix-chassis-motion.txt",
+    "source": "Logs/Chassis-Capsule-AnchorFix-chassis-motion.log",
+    "sha256": "07ded3d2685dfe4077920c7457136ccda9a1f6107373668f9cb973979ed4589d",
+    "bytes": 39566
+  },
+  {
+    "file": "Radar-Storm-Before-Capture.txt",
+    "source": "Logs/Radar-Storm-Before-Capture.log",
+    "sha256": "f84a504e9b04b8d9b0a05b2a8864356c50fba154e6c0608bad9b94db8d6a6cd0",
+    "bytes": 29636
+  }
+]

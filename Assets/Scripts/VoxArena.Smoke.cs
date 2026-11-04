@@ -10,6 +10,10 @@ public sealed partial class VoxArena
         yield return new WaitForSecondsRealtime(.2f);
         yield return new WaitForEndOfFrame();
         if(!SaveGameplayUIFrame("WISP-only-hangar.png")) yield break;
+        if(System.Array.IndexOf(System.Environment.GetCommandLineArgs(),"--capture-hangar-roster")>=0)
+        {
+            for(int roster=1;roster<3;roster++){selectedCraft=roster;ApplySelectableCharacter(player,roster);yield return null;yield return new WaitForEndOfFrame();if(!SaveGameplayUIFrame(CraftCatalog.Selectable[roster].name+"-hangar.png"))yield break;}
+        }
         TestSetupSelectable(0,0); inMenu=false; smoke=false; spectatorMode=false;
         player.root.position=new Vector3(0,FighterGroundY,0); enemy.root.position=new Vector3(0,FighterGroundY,30);
         player.facing=Vector3.forward; player.velocity=Vector3.zero; canShoot=true; targetLock=false;
@@ -287,8 +291,8 @@ public sealed partial class VoxArena
             CraftCatalog.Selectable[0].name=="WISP" && CraftCatalog.Selectable[1].name=="BASTION" &&
             CraftCatalog.Selectable[2].name=="TARANTULA" && CraftCatalog.Selectable[3].name=="HOUND",
             "four prototype definitions remain archived for future unlocks");
-        Check(CraftCatalog.UnlockedCount==1&&CraftCatalog.Selectable[0].name=="WISP"&&player.spec.name=="WISP"&&enemy.spec.name=="WISP",
-            "hangar and initial rival expose WISP only");
+        Check(CraftCatalog.UnlockedCount==3&&CraftCatalog.Selectable[0].name=="WISP"&&bastionModelSource!=null&&tarantulaModelSource!=null,
+            "hangar exposes three authored prototypes while HOUND stays locked");
         Check(!CraftCatalog.Selectable[0].supportsLockOn && CraftCatalog.Selectable[1].supportsLockOn &&
             CraftCatalog.Selectable[2].supportsLockOn && !CraftCatalog.Selectable[3].supportsLockOn,
             "lock-on availability matches official WISP/BASTION/TARANTULA/HOUND concept");
@@ -321,9 +325,9 @@ public sealed partial class VoxArena
                 "WISP has oversized head, compact torso and short SD limbs");
         Check(enemy.treadLinks!=null && enemy.treadLinks.Length==2 && enemy.treadLinks[0].Length>=20,
             "BASTION has two continuous animated track runs");
-        Check(enemy.corePart.Find("Bastion square sensor turret")!=null &&
-            enemy.leftArm.Find("Bastion shoulder missile tray")!=null && enemy.pelvisPart.gameObject.activeSelf==false,
-            "BASTION reads as a tracked siege chassis with twin command pods and missile trays");
+        Check(enemy.importedChassis && enemy.importedTreadRest!=null &&
+            FindJoint(enemy.legsPart,"Wheel_0_0")!=null && enemy.headPart.gameObject.activeInHierarchy,
+            "BASTION imports WISP upper body and actual tracked Blender undercarriage");
         Vector3 firstTread=enemy.treadLinks[0][0].localPosition;
         enemy.velocity=Vector3.forward*4f; AnimateTreads(enemy,.1f);
         Check((enemy.treadLinks[0][0].localPosition-firstTread).sqrMagnitude>.01f,
@@ -332,12 +336,12 @@ public sealed partial class VoxArena
         Check(player.quadrupedLegs!=null && player.quadrupedLegs.Length==4 && player.quadrupedKnees.Length==4 &&
             player.spec.jumpHeightScale>1.4f && jumpMaxHeight*player.spec.jumpHeightScale>9f,
             "TARANTULA four-leg rig and raised jump ceiling");
-        Check(player.armsPart!=null&&!player.armsPart.gameObject.activeSelf&&player.weaponPart.parent==player.legsPart&&player.gun.gameObject.activeInHierarchy,
-            "TARANTULA keeps its gun on a visible chassis mount");
-        Check(player.legsPart.Find("Tarantula rear abdomen shell")!=null &&
-            player.headPart.Find("Tarantula optic array")!=null &&
-            player.quadrupedLegs[0].Find("Upper leg armor").localRotation!=Quaternion.identity,
-            "TARANTULA has a low spider carapace, sensor cluster and splayed limbs");
+        Check(player.importedChassis&&player.armsPart.gameObject.activeInHierarchy&&player.weaponPart.IsChildOf(player.armsPart)&&player.gun.gameObject.activeInHierarchy,
+            "TARANTULA keeps the reused upper-body gun socket active");
+        Check(player.importedHipRest!=null &&
+            player.quadrupedKnees[0].parent==player.quadrupedLegs[0] &&
+            player.quadrupedAnkles[0].parent==player.quadrupedKnees[0],
+            "TARANTULA FBX has four connected hip-knee-foot chains");
         Check(enemy.quadrupedLegs!=null && enemy.quadrupedLegs.Length==4 && enemy.spec.name=="HOUND",
             "HOUND canine four-leg rig");
         Check(enemy.headPart.Find("Hound muzzle")!=null && enemy.headPart.Find("Hound upright ear")!=null &&
@@ -365,8 +369,9 @@ public sealed partial class VoxArena
         for(int rival=0;rival<CraftCatalog.Selectable.Length;rival++)
         {
             rivalSelection=rival; selectedCraft=rival; BeginMatch();
-            Check(enemyCraft==0&&selectedCraft==0&&enemy.spec!=CraftCatalog.Selectable[0]&&
-                enemy.spec.name=="WISP"&&player.spec.name=="WISP","locked player and rival selection resolves to WISP "+rival);
+            int expected=Mathf.Min(rival,CraftCatalog.UnlockedCount-1);
+            Check(enemyCraft==expected&&selectedCraft==expected&&enemy.spec!=CraftCatalog.Selectable[expected]&&
+                enemy.spec.name==CraftCatalog.Selectable[expected].name&&player.spec.name==CraftCatalog.Selectable[expected].name,"selection resolves to available prototype and clamps HOUND "+rival);
         }
         rivalSelection=-1;
         bool validRandom=true;
@@ -742,9 +747,13 @@ public sealed partial class VoxArena
                     player.rightArm.Find("Right_elbow/RIGHT_SHIELD_SOCKET/WISP right shield (guard pose)")!=null&&
                     !player.saber.gameObject.activeSelf,
                     "WISP archived sword remains connected and right-hand shield is attached");
+                if(player.simpleShell)Check(SimplePaletteReady(player),"new shell uses plain ivory/orange/dark materials and emissive small eyes without atlas noise");
+                else
+                {
                 Check(visor!=null&&visor.sharedMaterial.mainTexture==wispBaseColorTexture&&
                     wispRuntimeMaterial!=null&&wispRuntimeMaterial.GetTexture("_EmissionMap")==wispEmissionTexture,
                     "WISP base-color and emission texture atlas maps are assigned (base="+(visor!=null&&visor.sharedMaterial.mainTexture!=null?visor.sharedMaterial.mainTexture.name:"null")+" shader="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.shader!=null?wispRuntimeMaterial.shader.name:"null")+" main="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.GetTexture("_MainTex")!=null?wispRuntimeMaterial.GetTexture("_MainTex").name:"null")+" emission="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.GetTexture("_EmissionMap")!=null?wispRuntimeMaterial.GetTexture("_EmissionMap").name:"null")+")");
+                }
                 Check(oldChest!=null&&oldChest.GetComponent<Renderer>().enabled==false,
                     "WISP duplicate procedural torso armor is hidden");
                 Animate(player);
@@ -775,8 +784,9 @@ public sealed partial class VoxArena
                 Check(hasWispBounds&&Mathf.Abs(wispBounds.min.y-GroundSurfaceY)<.01f&&
                     Mathf.Abs(player.body.localPosition.y)<.001f,
                     "WISP sole vertices rest on the arena floor without idle hover (minY="+wispBounds.min.y.ToString("F3")+" floor="+GroundSurfaceY.ToString("F3")+")");
-                Check(wispModelSource.name=="WISP_v005"?Mathf.Abs(wispBounds.size.y-3.778f)<.025f:wispBounds.size.y>3.8f&&wispBounds.size.y<4.6f,
+                Check((wispModelSource.name=="WISP_v007"||wispModelSource.name=="WISP_v008"||wispModelSource.name=="WISP_v009"||wispModelSource.name=="WISP_v010"||wispModelSource.name=="WISP_v011")?Mathf.Abs(wispBounds.size.y-3.5105f)<.025f:(wispModelSource.name=="WISP_v005"||wispModelSource.name=="WISP_v006")?Mathf.Abs(wispBounds.size.y-3.778f)<.025f:wispBounds.size.y>3.8f&&wispBounds.size.y<4.6f,
                     "WISP imported visual keeps arena robot scale (height="+wispBounds.size.y.ToString("F3")+")");
+                if(wispModelSource.name=="WISP_v011")Check(HoseFollowsKnee(player),"Blender service hose blends torso to real knee and its endpoint follows rotation");
                 Vector3 restingShield=player.guardShield.position;
                 player.guarding=true; player.guardBlend=1; Animate(player);
                 Check(Vector3.Dot(player.guardShield.forward,player.root.forward)>.99f&&
@@ -793,8 +803,8 @@ public sealed partial class VoxArena
                     foreach(SkinnedMeshRenderer skin in artist.GetComponentsInChildren<SkinnedMeshRenderer>())
                         foreach(BoneWeight weight in skin.sharedMesh.boneWeights)
                             if(weight.weight0>.99f&&skin.bones[weight.boneIndex0]==knee) { driven=skin; break; }
-                    Check(driven!=null&&artist.GetComponentsInChildren<SkinnedMeshRenderer>().Length==112,
-                        "WISP v003 has actual weighted mechanical joint meshes");
+                    Check(driven!=null&&artist.GetComponentsInChildren<SkinnedMeshRenderer>().Length==((wispModelSource.name=="WISP_v010"||wispModelSource.name=="WISP_v011")?97:(wispModelSource.name=="WISP_v008"||wispModelSource.name=="WISP_v009")?96:wispModelSource.name=="WISP_v007"?87:wispModelSource.name=="WISP_v006"?116:112),
+                        "WISP weighted joint meshes include the expected authored shoulder housings");
                     if(driven!=null)
                     {
                         Mesh a=new Mesh(),b=new Mesh(); driven.BakeMesh(a);
@@ -1026,7 +1036,7 @@ public sealed partial class VoxArena
         yield return new WaitForEndOfFrame(); SavePreview("CoverPreview.png");
         SaveWeaponStudy();
         bool originalSmoke=smoke; smoke=false; TestSetup(0,1);
-        Check(player.weaponSlot==1&&player.magazine==30,"all frames start with only the slot-one gun");
+        Check(player.weaponSlot==1&&player.magazine==30,"all frames start on their slot-one rifle");
         player.root.position=new Vector3(100,1.1f,100); enemy.root.position=new Vector3(104,1.1f,100);
         FaceOpponent(player,enemy); FaceOpponent(enemy,player);
         player.weaponTimer=0; player.magazine=30;
@@ -1036,8 +1046,9 @@ public sealed partial class VoxArena
         player.magazine=1; player.reloadTime=0; player.weaponTimer=0;
         Attack(player,enemy,(enemy.root.position-player.root.position).normalized);
         Check(player.magazine==0&&player.reloadTime>0,"empty magazine starts automatic reload");
-        TestStep(1.7f);
+        TestStep(4.1f);
         Check(player.magazine==30&&player.reloadTime==0,"automatic reload refills the 30-round magazine");
+        ChassisChecks(Check);CombatRevisionChecks(Check);LiveWeaponLabChecks(Check);AimRevisionChecks(Check);ClimateChecks(Check);VisualEffectChecks(Check);AIRevisionChecks(Check);
         WispOvernightChecks(Check);
         smoke=originalSmoke;
         Debug.Log(passed?"VOXSKY_SMOKE_PASS "+count+" checks: ground, modular robots, camera, slot-one gun, mobility, practice AI, aim assist, audio":"VOXSKY_SMOKE_FAIL");

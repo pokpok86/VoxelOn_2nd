@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public sealed partial class VoxArena
 {
@@ -8,6 +8,7 @@ public sealed partial class VoxArena
         float r=shot.radius;
         Color team=TeamColor(shot.owner), shell=Color.Lerp(team,new Color(.16f,.21f,.25f),.5f);
         Color core=Color.Lerp(team,Color.white,.6f);
+        if(shot.loadoutVisual&&!legacyProjectileReview)return BuildImportedProjectile(root,shot,shell,core);
         // The colored silhouette stays within the gameplay radius transversely.
         // Trails are cosmetic and do not enlarge the collision sphere.
         if(shot.stopAndExplode)

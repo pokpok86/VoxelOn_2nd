@@ -38,3 +38,6 @@ Thumbs.db
 .aws/
 
 # Keep Assets and all Unity .meta files under version control.
+
+# Local Blender automatic save copies; versioned .blend sources remain tracked.
+*.blend[1-9]*

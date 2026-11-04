@@ -29,6 +29,7 @@ public sealed partial class VoxArena
     }
     void BuildVisualEnvironment()
     {
+        if(arenaMap==ArenaMapKind.OpenPlains)return;
         if(arenaMap==ArenaMapKind.OutdoorCanyon) { BuildOutdoorVista(); return; }
         if(PlaceEnvironment("FoundryBackdrop",null,new Vector3(0,GroundSurfaceY,0),Vector3.one)!=null) return;
         Transform root=new GameObject("Visual environment - no collision").transform;

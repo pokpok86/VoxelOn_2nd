@@ -2,11 +2,11 @@ using UnityEngine;
 
 public sealed partial class VoxArena
 {
-    bool finishCleaned;
+    bool finishCleaned;float finishPresentationTime;
     void ClearBattlePresentation()
     {
         ClearCombat();
-        foreach(Spark spark in sparks) Destroy(spark.visual.gameObject);
+        foreach(Spark spark in sparks) ReleasePDPart(spark.visual);
         sparks.Clear(); StopSounds();
         foreach(Fighter fighter in new[]{player,enemy})
         {
@@ -18,6 +18,7 @@ public sealed partial class VoxArena
     }
     void ReturnToHangar()
     {
+        RestorePDVisuals();
         ResetMouseLookCapture();
         inMenu=true; paused=false; showTuning=false; showGuide=false; resumeAfterGuide=false;
         Cursor.lockState=CursorLockMode.None; Cursor.visible=true; view.orthographic=true;
@@ -34,7 +35,8 @@ public sealed partial class VoxArena
     void FinishPresentation()
     {
         if(finishCleaned) return;
-        finishCleaned=true; ClearBattlePresentation();
+        finishCleaned=true;finishPresentationTime=Time.time; ClearBattlePresentation();
+        if(enemy.hp<=0)BreakRobotModules(enemy);if(player.hp<=0)BreakRobotModules(player);
         PlaySound(SoundKind.Explosion,enemy.hp<=0?enemy.root.position:player.root.position,.7f);
     }
 }

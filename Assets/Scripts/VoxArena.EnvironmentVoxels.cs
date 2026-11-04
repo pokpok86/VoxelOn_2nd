@@ -24,7 +24,8 @@ public sealed partial class VoxArena
     }
     void BuildVoxelCover(Transform root,Vector3 size,int kind)
     {
-        float bottom=GroundSurfaceY-root.position.y,top=size.y*.5f;
+        float bottom=SurfaceHeight(root.position)-root.position.y,top=size.y*.5f;
+        if(arenaMap!=ArenaMapKind.IndoorFactory){SpawnNaturalRock(root,new Vector3(0,bottom,0),new Vector3(size.x,top-bottom,size.z));return;}
         string asset=arenaMap==ArenaMapKind.OutdoorCanyon?"CanyonRock":kind%3==0?"FoundryCargo":kind%3==1?"FoundryGenerator":"FoundryBarricade";
         PlaceEnvironment(asset,root,new Vector3(0,bottom,0),new Vector3(size.x,top-bottom,size.z));
     }

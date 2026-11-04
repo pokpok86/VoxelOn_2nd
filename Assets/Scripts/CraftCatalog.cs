@@ -30,6 +30,7 @@ public sealed class CraftSpec
     // Leg assembly parameters; step-up height is deliberately below tall jump-only platforms.
     public float stepHeight=.45f, slopeLimitDegrees=32f;
     public float leftArmHandling=1f,leftArmStability=1f,rightArmHandling=1f,rightArmStability=1f;
+    public float footprintRadius=0,shieldEquipMovePenalty=.02f,shieldGuardMovePenalty=.06f,radarRange=85f;
     public float damage, weaponCooldown, range, projectileSpeed, projectileRadius, size, specialCooldown;
     public PrimaryKind primary;
     public SpecialKind special;
@@ -99,7 +100,7 @@ public static class CraftCatalog
     };
     // Four current prototype choices. Runtime copies keep the archived eight-frame
     // catalog available for combat regression checks and future reference.
-    public const int UnlockedCount=1; // WISP playtest; archived prototypes unlock with their finished visuals/motion.
+    public const int UnlockedCount=3; // WISP playtest; archived prototypes unlock with their finished visuals/motion.
     public static CraftSpec[] CreateFourFormPrototypes()
     {
         CraftSpec runner=All[2].RuntimeCopy();
@@ -117,14 +118,14 @@ public static class CraftCatalog
         runner.jumpImpulseScale=1.45f; runner.jumpHeightScale=1.3f;
         runner.verticalBoostScale=1.4f; runner.fallGravityFactor=1.5f;
         tank.color=new Color(.38f,.47f,.27f);
-        tank.role="TRACKED SIEGE FRAME";
+        tank.role="TRACKED SIEGE FRAME";tank.size=.95f;tank.footprintRadius=1.90f;
         tank.supportsLockOn=true;
         tank.forwardSpeedFactor=1f; tank.reverseSpeedFactor=.4f;
         tank.leftSpeedFactor=tank.rightSpeedFactor=.6f;
         tank.jumpHeightScale=.72f;
         spider.name="TARANTULA"; spider.mobility=MobilityKind.Quadruped;
         spider.color=new Color(.61f,.31f,.83f);
-        spider.role="SPIDER QUADRUPED";
+        spider.role="SPIDER QUADRUPED";spider.size=.95f;spider.footprintRadius=2.25f;
         spider.supportsLockOn=true;
         spider.usePrototypeMovement=true;
         spider.prototypeBaseSpeed=13.8f;

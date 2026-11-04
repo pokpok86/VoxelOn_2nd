@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 // All geometry below is local to a detachable module. Gameplay stats stay in CraftSpec
 // until the assembly system is introduced; visual changes never silently change balance.
@@ -24,7 +24,7 @@ public sealed partial class VoxArena
     }
     bool ProjectedWispHeadCoversReticle()
     {
-        if(!wispHeadBoundsReady||player.spec.name!="WISP")return false;
+        if(!wispHeadBoundsReady||player.headPart==null)return false;
         Vector2 min=Vector2.one*float.PositiveInfinity,max=Vector2.one*float.NegativeInfinity;
         for(int i=0;i<8;i++)
         {
@@ -97,7 +97,7 @@ public sealed partial class VoxArena
         bool heavy=f.spec.mobility==MobilityKind.Tank;
         bool runner=f.spec.mobility==MobilityKind.Runner;
         float phase=roundTime*(heavy?7f:runner?16f:11f);
-        if(f.spec.mobility==MobilityKind.Quadruped && f.quadrupedLegs!=null)
+        if(!f.importedChassis&&f.spec.mobility==MobilityKind.Quadruped && f.quadrupedLegs!=null)
         {
             bool spider=f.spec.name=="TARANTULA";
             for(int i=0;i<f.quadrupedLegs.Length;i++)
@@ -256,11 +256,13 @@ public sealed partial class VoxArena
     }
     void ApplyImportedWisp(Fighter f)
     {
-        if(wispModelSource==null || f.spec.name!="WISP") return;
+        GameObject model=f.spec.name=="WISP"?wispModelSource:f.selectableIndex>=0&&f.spec.name=="BASTION"?bastionModelSource:f.selectableIndex>=0&&f.spec.name=="TARANTULA"?tarantulaModelSource:null;
+        if(model==null)return;
 
         Transform legacyCore=f.corePart,legacyHead=f.headPart,legacyArms=f.armsPart,legacyLegs=f.legsPart;
-        GameObject imported=Instantiate(wispModelSource,f.body);
-        bool articulated=IsArticulatedWisp;
+        GameObject imported=Instantiate(model,f.body);
+        bool articulated=IsArticulatedWisp||f.spec.name!="WISP";
+        f.importedChassis=f.spec.name!="WISP";f.simpleShell=SimpleShellModel(model);
         imported.name=articulated?"WISP artist model v003":"WISP artist model v001";
         Transform root=imported.transform.Find(articulated?"WISP_Rig_v003/Root":"Root");
         Transform arms=root!=null?root.Find("Arms"):null;
@@ -321,12 +323,15 @@ public sealed partial class VoxArena
         f.weaponPart.SetParent(articulated?leftHand:leftShoulder,false);
         f.weaponPart.localPosition=articulated?new Vector3(0,-.015f,.1f):new Vector3(-.07f,-.81f,.115f);
         f.weaponPart.localRotation=Quaternion.identity;
-        f.weaponPart.localScale=Vector3.one;
+        f.weaponPart.localScale=Vector3.one*(f.importedChassis?.55f:1f);
         // Keep the existing saber rush functional, now rooted at the imported left hand.
         Transform proceduralSaber=f.saber;
         proceduralSaber.gameObject.SetActive(false);
         f.shield.SetParent(f.body,false);
 
+        if(f.simpleShell)ApplySimpleShellMaterials(imported.transform);
+        else
+        {
         Transform[] importedModules=articulated?new[]{imported.transform}:new[]{arms,core,head,legs};
         if(wispRuntimeMaterial==null)
         {
@@ -334,7 +339,7 @@ public sealed partial class VoxArena
             foreach(Transform module in importedModules)
                 foreach(Renderer renderer in module.GetComponentsInChildren<Renderer>(true))
                 {
-                    if(renderer.transform.IsChildOf(f.weaponPart)) continue;
+                    if(renderer.transform.IsChildOf(f.weaponPart)||renderer.name.StartsWith("PROTO_")) continue;
                     foreach(Material material in renderer.sharedMaterials)
                         if(material!=null) { source=material; break; }
                     if(source!=null) break;
@@ -356,7 +361,7 @@ public sealed partial class VoxArena
                 {
                     wispRuntimeMaterial.SetTexture("_EmissionMap",wispEmissionTexture);
                     wispRuntimeMaterial.EnableKeyword("_EMISSION");
-                    if(wispRuntimeMaterial.HasProperty("_EmissionColor")) wispRuntimeMaterial.SetColor("_EmissionColor",Color.white*((wispModelSource.name.Contains("v004")||wispModelSource.name.Contains("v005"))?.9f:2.5f));
+                    if(wispRuntimeMaterial.HasProperty("_EmissionColor")) wispRuntimeMaterial.SetColor("_EmissionColor",Color.white*((wispModelSource.name.Contains("v004")||wispModelSource.name.Contains("v005")||wispModelSource.name.Contains("v006"))?.9f:2.5f));
                 }
                 if(wispRuntimeMaterial.HasProperty("_Metallic")) wispRuntimeMaterial.SetFloat("_Metallic",.05f);
                 if(wispRuntimeMaterial.HasProperty("_Glossiness")) wispRuntimeMaterial.SetFloat("_Glossiness",.14f);
@@ -367,11 +372,12 @@ public sealed partial class VoxArena
             foreach(Transform module in importedModules)
             foreach(Renderer renderer in module.GetComponentsInChildren<Renderer>(true))
             {
-                if(renderer.transform.IsChildOf(f.weaponPart)) continue;
+                if(renderer.transform.IsChildOf(f.weaponPart)||renderer.name.StartsWith("PROTO_")) continue;
                 Material[] materials=renderer.sharedMaterials;
                 for(int i=0;i<materials.Length;i++) materials[i]=wispRuntimeMaterial;
                 renderer.sharedMaterials=materials;
             }
+        }
         }
         Transform swordSocket=rightHand.Find("SWORD_SOCKET");
         if(wispSwordSource!=null && swordSocket!=null)
@@ -393,7 +399,7 @@ public sealed partial class VoxArena
         Transform shieldSocket=Module("RIGHT_SHIELD_SOCKET",f.guardElbow,shieldOffset);
         if(wispShieldSource!=null && shieldSocket!=null)
         {
-            GameObject shieldMesh=Instantiate(wispShieldSource,shieldSocket,false);
+            GameObject shieldMesh=new GameObject("Guard wrapper");shieldMesh.transform.SetParent(shieldSocket,false);Instantiate(wispShieldSource,shieldMesh.transform,false);if(f.simpleShell)ApplySimpleShellMaterials(shieldMesh.transform);
             shieldMesh.name="WISP right shield (guard pose)";
             shieldMesh.transform.localPosition=Vector3.zero;
             shieldMesh.transform.localRotation=Quaternion.identity;
@@ -406,6 +412,7 @@ public sealed partial class VoxArena
             Debug.LogWarning("WISP sword FBX was supplied, but the documented SWORD_SOCKET was not found.");
         if(wispShieldSource!=null && shieldSocket==null)
             Debug.LogWarning("WISP shield FBX was supplied, but the documented SHIELD_SOCKET was not found.");
+        if(f.importedChassis)ConnectImportedChassis(f,root);
         CacheWispHeadBounds(f);
         if(f==player) RegisterCameraFadeRenderers(f);
         Debug.Log("WISP_ART_MODEL_APPLIED "+wispModelSource.name+"; base="+(wispBaseColorTexture!=null)+" emission="+(wispEmissionTexture!=null)+" shader="+(wispRuntimeMaterial!=null?wispRuntimeMaterial.shader.name:"none")+" emissionProperty="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.HasProperty("_EmissionMap"))+" emissionMapped="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.GetTexture("_EmissionMap")!=null));
@@ -499,6 +506,7 @@ public sealed partial class VoxArena
     }
     void AnimateTreads(Fighter f,float dt)
     {
+        if(f.importedChassis){AnimateImportedChassis(f,1f,dt);return;}
         if(f.treadLinks==null || f.treadPerimeter<=0f) return;
         // Track travel follows chassis forward, not the independently aimed root/upper body.
         Vector3 chassis=Vector3.ProjectOnPlane(f.chassisForward,Vector3.up);
@@ -526,6 +534,7 @@ public sealed partial class VoxArena
     }
     void BuildRobot(Fighter f)
     {
+        f.capsuleTreads=false;f.importedTrackTravel=null;f.importedRoadWheels=null;f.importedTreadRotations=null;f.importedWheelRest=null;f.importedWheelTurns=null;f.simpleShell=false;f.importedChassis=false;f.importedRadius=0;f.importedTreadRest=null;f.importedHipRest=null;
         f.treadLinks=null; f.treadPerimeter=0f; f.treadPhase=0f;
         f.treadSidePhases=null; f.previousTreadHeading=f.chassisForward;
         f.quadrupedLegs=null; f.quadrupedKnees=null; f.quadrupedAnkles=null;
@@ -951,7 +960,7 @@ public sealed partial class VoxArena
             }
         }
         AddFrameIdentity(f,armor,hull,dark,edge);
-        ApplyImportedWisp(f);
+        ApplyImportedWisp(f);SetupWeaponVisuals(f);SetupBoostVisual(f);if(f==player)RegisterCameraFadeRenderers(f);
     }
     RenderTexture[] framePortraits;
     void BuildPortraits()

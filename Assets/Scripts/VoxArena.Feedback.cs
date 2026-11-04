@@ -1,11 +1,11 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public sealed partial class VoxArena
 {
     bool assistEngaged;
     float hitConfirmTime,hitConfirmDamage,damageDealt,damageTaken;
     bool lastHitShield;
-    float DisplayedPrimaryRange()=>smoke?player.spec.range:82f;
+    float DisplayedPrimaryRange()=>smoke?player.spec.range:EquippedProfile(player).range;
     string AimStatus()
     {
         if(!canShoot) return "OUTSIDE FIRING ARC";
@@ -37,11 +37,11 @@ public sealed partial class VoxArena
     {
         if(paused||Finished) return;
         float distance=Vector3.Distance(player.root.position,enemy.root.position);
-        Text(28,574,370,$"DIST {distance:0} / RANGE {DisplayedPrimaryRange():0}",small);
+        Text(28,574,370,(HasSensorContact(player,enemy)?"DIST "+distance.ToString("0"):"DIST --")+" / RANGE "+DisplayedPrimaryRange().ToString("0"),small);
         DrawOccludedPilot();
         Vector3 point=view.WorldToViewportPoint(enemy.root.position);
         float x=point.x*1280,y=(1-point.y)*720;
-        if(player.spec.name!="WISP"&&point.z>0&&x>40&&x<1240&&y>140&&y<540)
+        if(targetLock&&player.spec.name!="WISP"&&point.z>0&&x>40&&x<1240&&y>140&&y<540)
         {
             Color color=hitConfirmTime>0?Color.white:assistEngaged?Cyan:new Color(1,.55f,.28f);
             float r=24*enemy.spec.size;

@@ -35,12 +35,12 @@ public sealed partial class VoxArena
         check(peak>3.1f&&airTime<1.4f,"WISP tap jump rises higher and completes its faster arc (peak="+peak.ToString("F2")+" time="+airTime.ToString("F2")+")");
         TestSetupSelectable(0,0);smoke=false;
         Attack(player,enemy,Vector3.forward);int rounds=player.magazine;Attack(player,enemy,Vector3.forward);
-        check(rounds==29&&player.magazine==29&&player.weaponTimer>=.17f,"rapid gun uses the slower 0.18 second firing interval");
+        check(rounds==29&&player.magazine==29&&Mathf.Abs(player.weaponTimer-PrimaryFireInterval)<.001f,"rifle trial frequency is 35 percent lower than the 0.18s baseline");
         for(int tick=0;tick<80;tick++)Move(player,Vector3.zero,.025f);
         check(player.magazine==29&&player.reloadTime<=0,"partial magazine stays available during the shooting pause");
         for(int tick=0;tick<14;tick++)Move(player,Vector3.zero,.025f);
         check(player.magazine==29&&player.reloadTime>0,"partial magazine auto reload begins after 2.2 idle seconds");
-        for(int tick=0;tick<64;tick++)Move(player,Vector3.zero,.025f);
+        for(int tick=0;tick<104;tick++)Move(player,Vector3.zero,.025f);
         check(player.magazine==30&&player.reloadTime==0,"idle reload completes without requiring an empty magazine");
         CameraMotionChecks(check);
         smoke=savedSmoke;TestSetup();
@@ -110,7 +110,7 @@ public sealed partial class VoxArena
         enemy.root.gameObject.SetActive(false);enemy.shadow.gameObject.SetActive(false);
         SaveEnvironmentView(map+"-clearance-wall.png",player.root.position+new Vector3(-7,3,-9),player.root.position+Vector3.up*.7f);
         TestSetupSelectable(0,0);ResetRound();inMenu=false;
-        return vertices>1000&&coreVertices>0&&all.size.y>3.7f&&all.size.y<4.3f&&maxSkinError<.005f;
+        return vertices>1000&&coreVertices>0&&(player.simpleShell?Mathf.Abs(all.size.y-3.5105f)<.03f:all.size.y>3.7f&&all.size.y<4.3f)&&maxSkinError<.005f;
     }
     void SaveFoundryLightingStudy()
     {

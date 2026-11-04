@@ -1,18 +1,18 @@
-using System;
+﻿using System;
 using System.Reflection;
 using UnityEngine;
 
 // Runtime-only tuning overlay. Values never modify CraftCatalog presets or disk saves.
 public sealed partial class VoxArena
 {
-    bool testLabOpen;
+    bool testLabOpen,testPickupTools;
     bool testLabEnabled=true;
     bool aiMoveEnabled=true,aiAttackEnabled=true,aiJumpEnabled=true,aiBoostEnabled=true;
     int testSide, testCategory;
     Vector2 testScroll;
     readonly string[][] testFields={
         // HEAD: sensors, tracking, precision
-        new[]{"lockRange","occludedLockRange","occludedLockSeconds","aimSpreadDegrees"},
+        new[]{"radarRange","lockRange","occludedLockRange","occludedLockSeconds","aimSpreadDegrees"},
         // CORE: durability, boost system, defense
         new[]{"health","armor","boostCapacity","boostDrain","boostSpeed","pulseDuration"},
         // LEFT ARM: individual aim/handling and weapon mounts
@@ -20,8 +20,8 @@ public sealed partial class VoxArena
         // RIGHT ARM
         new[]{"rightArmHandling","rightArmStability"},
         // LEGS + PELVIS: mobility, impact resistance, terrain
-        new[]{"speed","forwardSpeedFactor","strafeSpeedFactor","reverseSpeedFactor",
-            "stepHeight","slopeLimitDegrees","fallGravityFactor","knockdownResistance","recoverySpeed"},
+        new[]{"speed","forwardSpeedFactor","leftSpeedFactor","rightSpeedFactor","reverseSpeedFactor",
+            "shieldEquipMovePenalty","shieldGuardMovePenalty","stepHeight","slopeLimitDegrees","fallGravityFactor","knockdownResistance","recoverySpeed"},
         // WEAPONS: all current shared primary/special values
         new[]{"damage","weaponCooldown","range","projectileSpeed","projectileRadius","specialCooldown"},
         // VISUAL: model scale (not mass)
@@ -43,10 +43,11 @@ public sealed partial class VoxArena
     {
         switch(field)
         {
+            case "shieldEquipMovePenalty":case "shieldGuardMovePenalty":return .3f;
             case "armor": return .85f;
             case "aimSpreadDegrees": return 15f;
             case "occludedLockSeconds": return 12f;
-            case "forwardSpeedFactor": case "strafeSpeedFactor": case "reverseSpeedFactor": return 2f;
+            case "forwardSpeedFactor": case "strafeSpeedFactor": case "leftSpeedFactor": case "rightSpeedFactor": case "reverseSpeedFactor": return 2f;
             case "fallGravityFactor": case "knockdownResistance": case "recoverySpeed": return 3f;
             case "leftArmHandling": case "rightArmHandling":
             case "leftArmStability": case "rightArmStability": return 2f;
@@ -62,6 +63,7 @@ public sealed partial class VoxArena
     }
     float SliderMin(string field)
     {
+        if(field=="shieldEquipMovePenalty"||field=="shieldGuardMovePenalty")return 0;
         if(field=="armor" || field=="aimSpreadDegrees" || field=="occludedLockSeconds" ||
             field=="stepHeight" || field=="slopeLimitDegrees" || field=="pulseDuration") return 0;
         if(field=="size") return .5f;
@@ -78,6 +80,8 @@ public sealed partial class VoxArena
     {
         if(!testLabOpen || inMenu || testSide<0 || player==null || enemy==null) return;
         Panel(new Rect(175,52,930,615),new Color(.025f,.045f,.075f,.97f));
+        DrawClimateControls();
+        if(GUI.Button(new Rect(200,632,240,25),"BASE MOVE TRIAL "+Mathf.RoundToInt(normalTravelScale*100)+"%"))normalTravelScale=normalTravelScale<.94f?.95f:normalTravelScale<.99f?1f:.9f;
         Text(199,66,780,"VOXELON / LIVE PART TEST LAB  (F2 CLOSE)",title);
         if(GUI.Button(new Rect(970,67,108,34),"CLOSE F2")) { testLabOpen=false; SetTestCursor(); }
         if(GUI.Button(new Rect(200,112,155,31),testSide==0?"PILOT  [EDIT]":"PILOT")) {testSide=0;testScroll=Vector2.zero;}
@@ -85,7 +89,7 @@ public sealed partial class VoxArena
         if(GUI.Button(new Rect(537,112,170,31),"RESET THIS FRAME"))
         {
             Fighter f=TestFighter;
-            f.spec=PresetFor(f).RuntimeCopy();
+            f.spec=PresetFor(f).RuntimeCopy();f.weaponProfiles=NewWeaponProfiles();
             f.body.localScale=Vector3.one*f.spec.size;
             f.hp=Mathf.Min(f.hp,f.spec.health);
             f.boostEnergy=Mathf.Min(f.boostEnergy,f.spec.boostCapacity);
@@ -93,7 +97,7 @@ public sealed partial class VoxArena
         if(GUI.Button(new Rect(718,112,170,31),"REFILL HULL / FUEL"))
         {
             Fighter f=TestFighter; f.hp=f.spec.health; f.boostEnergy=f.spec.boostCapacity;
-            f.shieldEnergy=f.spec.ShieldMax; f.magazine=30; f.reloadTime=0;
+            f.shieldEnergy=f.spec.ShieldMax; f.weapons=NewWeaponStates();
         }
         Text(200,156,740,"AI CONTROLS / applied to rival during live play",small);
         aiMoveEnabled=GUI.Toggle(new Rect(200,181,150,28),aiMoveEnabled,"MOVE");
@@ -101,7 +105,7 @@ public sealed partial class VoxArena
         aiJumpEnabled=GUI.Toggle(new Rect(500,181,150,28),aiJumpEnabled,"JUMP");
         aiBoostEnabled=GUI.Toggle(new Rect(650,181,150,28),aiBoostEnabled,"BOOST");
         Text(200,213,750,"Changes are runtime-only. No mass or weight parameters are used by this lab.",small);
-        if(testCategory==5)
+        if(testCategory==5&&testPickupTools)
         {
             GUI.Label(new Rect(910,154,170,24),"SALVAGE TEST");
             if(GUI.Button(new Rect(904,180,170,25),"REFILL OBJECTS")) ResetSalvage();
@@ -116,10 +120,8 @@ public sealed partial class VoxArena
         Fighter selected=TestFighter;
         if(testCategory==5)
         {
-            if(GUI.Button(new Rect(199,313,210,25),"PRIMARY: "+selected.spec.primary))
-                selected.spec.primary=(PrimaryKind)(((int)selected.spec.primary+1)%Enum.GetValues(typeof(PrimaryKind)).Length);
-            if(GUI.Button(new Rect(417,313,210,25),"SPECIAL: "+selected.spec.special))
-                selected.spec.special=(SpecialKind)(((int)selected.spec.special+1)%Enum.GetValues(typeof(SpecialKind)).Length);
+            if(GUI.Button(new Rect(904,282,170,25),testPickupTools?"SHOW 4 WEAPONS":"PICKUP TOOLS"))testPickupTools=!testPickupTools;
+            if(!testPickupTools){DrawLiveWeaponLab(selected);return;}
         }
         if(testCategory==1 && GUI.Button(new Rect(199,313,210,25),"BOOST: "+selected.spec.boost))
             selected.spec.boost=(BoostKind)(((int)selected.spec.boost+1)%Enum.GetValues(typeof(BoostKind)).Length);
@@ -135,8 +137,8 @@ public sealed partial class VoxArena
             DrawSalvageSlider("SHIELD DURABILITY",ref shieldDurability,10f,300f,ref y);
             return;
         }
-        GUI.BeginGroup(new Rect(199,333,865,310));
-        testScroll=GUI.BeginScrollView(new Rect(0,0,865,310),testScroll,new Rect(0,0,836,testFields[testCategory].Length*53+15));
+        GUI.BeginGroup(new Rect(199,333,865,220));
+        testScroll=GUI.BeginScrollView(new Rect(0,0,865,220),testScroll,new Rect(0,0,836,testFields[testCategory].Length*53+15));
         string[] fields=testFields[testCategory];
         for(int i=0;i<fields.Length;i++)
         {
@@ -144,7 +146,7 @@ public sealed partial class VoxArena
             FieldInfo field=typeof(CraftSpec).GetField(key,BindingFlags.Instance|BindingFlags.Public);
             if(field==null || field.FieldType!=typeof(float)) continue;
             float value=(float)field.GetValue(selected.spec);
-            float min=SliderMin(key),max=SliderMax(key,value);
+            float min=SliderMin(key),max=SliderMax(key,(float)field.GetValue(PresetFor(selected)));
             GUI.Label(new Rect(8,i*53,420,25),key+"  "+value.ToString("0.00"));
             float next=GUI.HorizontalSlider(new Rect(430,i*53+8,380,23),value,min,max);
             if(Mathf.Abs(next-value)>.0001f)

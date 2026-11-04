@@ -4,6 +4,7 @@ public sealed partial class VoxArena
 {
     void BuildGround()
     {
+        if(arenaMap==ArenaMapKind.OpenPlains){starRoot=SpawnPDPart("PlainsTerrain",null,new Vector3(0,GroundSurfaceY,0),Vector3.one);CachePlainsSurface();return;}
         // Repeating grid follows the camera in whole-cell increments. No hard arena walls.
         starRoot=new GameObject("Ground tile field").transform;
         Box("Endless ground",starRoot,new Vector3(0,GroundSurfaceY-(arenaMap==ArenaMapKind.OutdoorCanyon?.15f:.125f),0),new Vector3(900,.25f,900),new Color(.16f,.205f,.22f));

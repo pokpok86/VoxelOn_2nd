@@ -1,0 +1,343 @@
+Mono path[0] = 'D:/Codex/VoxSky/Builds/WorkLatest/Builds/Windows/Voxel-On_Data/Managed'
+Mono config path = 'D:/Codex/VoxSky/Builds/WorkLatest/Builds/Windows/MonoBleedingEdge/etc'
+CodeReloadManager initialized
+Found 1 interfaces on host : 0) 192.168.123.100
+Player connection [34024]  Target information:
+
+Player connection [34024]  * "[IP] 192.168.123.100 [Port] 55000 [Flags] 2 [Guid] 3924305609 [EditorId] 3285657833 [Version] 1048832 [Id] WindowsPlayer(2,DESKTOP-R5DBQMC) [Debug] 0 [PackageName] WindowsPlayer [ProjectName] Voxel-On" 
+
+Player connection [34024] Started UDP target info broadcast (1) on [225.0.0.222:54997].
+
+Input System module state changed to: Initialized.
+[Physics::Module] Initialized fallback backend.
+[Physics::Module] Id: 0xdecafbad
+Initialize engine version: 6000.6.7f1 (b22767f04f04)
+[EntityIdStore] init: VM path (explicit commit), pageSize=4096, blockCount=262144, entitiesPerBlock=1024, blocksPerSlotPage=0, slots reserved=4294967296 bytes
+[Subsystems] Discovering subsystems at path D:/Codex/VoxSky/Builds/WorkLatest/Builds/Windows/Voxel-On_Data/UnitySubsystems
+[D3D12 Device Filter] Vendor Name: NVIDIA
+[D3D12 Device Filter] Device Name: NVIDIA GeForce RTX 3070
+[D3D12 Device Filter] Driver Version: 32.0.15.9186
+[D3D12 Device Filter] Feature Level: 12.2
+[D3D12 Device Filter] Graphics Memory: 8018 MB
+[D3D12 Device Filter] Processor Count: 12
+[D3D12 Device Filter] Device Type: Discrete
+GfxDevice: creating device client; kGfxThreadingModeSplitJobs
+d3d12: failed to query info queue interface (0x80004002).
+Direct3D:
+    Version:         Direct3D 12 [level 12.2]
+    Renderer:        NVIDIA GeForce RTX 3070 (ID=0x2484)
+    Vendor:          NVIDIA
+    VRAM:            8018 MB
+    App VRAM Budget: 7250 MB
+    Driver:          32.0.15.9186
+Begin MonoManager ReloadAssembly
+- Finished resetting the current domain, in  0.005 seconds
+[Physics::Module] Selected backend (deferred post-plugins).
+[Physics::Module] Name: PhysX
+[Physics::Module] Id: 0xf2b8ea05
+[Physics::Module] SDK Version: 4.1.2
+[Physics::Module] Integration Version: 1.0.0
+[Physics::Module] Threading Mode: Multi-Threaded
+<RI> Initializing input.
+<RI> Input initialized.
+UnloadTime: 0.740500 ms
+WISP_ART_MODEL_APPLIED WISP_v011; base=True emission=True shader=none emissionProperty=False emissionMapped=False
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/build/output/unity/unity/Runtime/Export/Scripting/StackTrace.cs:23)
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[]) (at C:/build/output/unity/unity/Runtime/Export/Logging/DebugLogHandler.cs:9)
+UnityEngine.Logger:Log (UnityEngine.LogType,object) (at C:/build/output/unity/unity/Runtime/Export/Logging/Logger.cs:60)
+UnityEngine.Debug:Log (object) (at C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs:130)
+VoxArena:ApplyImportedWisp (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:418)
+VoxArena:BuildRobot (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:963)
+VoxArena:ApplyCharacterPreset (VoxArena/Fighter,CraftSpec,int,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:233)
+VoxArena:ApplySelectableCharacter (VoxArena/Fighter,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:222)
+VoxArena:Start () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:157)
+
+(Filename: C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs Line: 130)
+
+IMPORTED_CHASSIS_READY TARANTULA footprint=3.030799
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/build/output/unity/unity/Runtime/Export/Scripting/StackTrace.cs:23)
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[]) (at C:/build/output/unity/unity/Runtime/Export/Logging/DebugLogHandler.cs:9)
+UnityEngine.Logger:Log (UnityEngine.LogType,object) (at C:/build/output/unity/unity/Runtime/Export/Logging/Logger.cs:60)
+UnityEngine.Debug:Log (object) (at C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs:130)
+VoxArena:ConnectImportedChassis (VoxArena/Fighter,UnityEngine.Transform) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Chassis.cs:50)
+VoxArena:ApplyImportedWisp (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:415)
+VoxArena:BuildRobot (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:963)
+VoxArena:ApplyCharacterPreset (VoxArena/Fighter,CraftSpec,int,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:233)
+VoxArena:ApplySelectableCharacter (VoxArena/Fighter,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:222)
+VoxArena:Start () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:157)
+
+(Filename: C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs Line: 130)
+
+WISP_ART_MODEL_APPLIED WISP_v011; base=True emission=True shader=none emissionProperty=False emissionMapped=False
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/build/output/unity/unity/Runtime/Export/Scripting/StackTrace.cs:23)
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[]) (at C:/build/output/unity/unity/Runtime/Export/Logging/DebugLogHandler.cs:9)
+UnityEngine.Logger:Log (UnityEngine.LogType,object) (at C:/build/output/unity/unity/Runtime/Export/Logging/Logger.cs:60)
+UnityEngine.Debug:Log (object) (at C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs:130)
+VoxArena:ApplyImportedWisp (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:418)
+VoxArena:BuildRobot (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:963)
+VoxArena:ApplyCharacterPreset (VoxArena/Fighter,CraftSpec,int,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:233)
+VoxArena:ApplySelectableCharacter (VoxArena/Fighter,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:222)
+VoxArena:Start () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:157)
+
+(Filename: C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs Line: 130)
+
+WISP_ART_MODEL_APPLIED WISP_v011; base=True emission=True shader=none emissionProperty=False emissionMapped=False
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/build/output/unity/unity/Runtime/Export/Scripting/StackTrace.cs:23)
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[]) (at C:/build/output/unity/unity/Runtime/Export/Logging/DebugLogHandler.cs:9)
+UnityEngine.Logger:Log (UnityEngine.LogType,object) (at C:/build/output/unity/unity/Runtime/Export/Logging/Logger.cs:60)
+UnityEngine.Debug:Log (object) (at C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs:130)
+VoxArena:ApplyImportedWisp (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:418)
+VoxArena:BuildRobot (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:963)
+VoxArena:ApplyCharacterPreset (VoxArena/Fighter,CraftSpec,int,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:233)
+VoxArena:ApplySelectableCharacter (VoxArena/Fighter,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:222)
+VoxArena:BuildPortraits () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:976)
+VoxArena:Start () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:158)
+
+(Filename: C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs Line: 130)
+
+IMPORTED_CHASSIS_READY BASTION footprint=2.293584
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/build/output/unity/unity/Runtime/Export/Scripting/StackTrace.cs:23)
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[]) (at C:/build/output/unity/unity/Runtime/Export/Logging/DebugLogHandler.cs:9)
+UnityEngine.Logger:Log (UnityEngine.LogType,object) (at C:/build/output/unity/unity/Runtime/Export/Logging/Logger.cs:60)
+UnityEngine.Debug:Log (object) (at C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs:130)
+VoxArena:ConnectImportedChassis (VoxArena/Fighter,UnityEngine.Transform) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Chassis.cs:50)
+VoxArena:ApplyImportedWisp (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:415)
+VoxArena:BuildRobot (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:963)
+VoxArena:ApplyCharacterPreset (VoxArena/Fighter,CraftSpec,int,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:233)
+VoxArena:ApplySelectableCharacter (VoxArena/Fighter,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:222)
+VoxArena:BuildPortraits () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:976)
+VoxArena:Start () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:158)
+
+(Filename: C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs Line: 130)
+
+WISP_ART_MODEL_APPLIED WISP_v011; base=True emission=True shader=none emissionProperty=False emissionMapped=False
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/build/output/unity/unity/Runtime/Export/Scripting/StackTrace.cs:23)
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[]) (at C:/build/output/unity/unity/Runtime/Export/Logging/DebugLogHandler.cs:9)
+UnityEngine.Logger:Log (UnityEngine.LogType,object) (at C:/build/output/unity/unity/Runtime/Export/Logging/Logger.cs:60)
+UnityEngine.Debug:Log (object) (at C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs:130)
+VoxArena:ApplyImportedWisp (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:418)
+VoxArena:BuildRobot (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:963)
+VoxArena:ApplyCharacterPreset (VoxArena/Fighter,CraftSpec,int,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:233)
+VoxArena:ApplySelectableCharacter (VoxArena/Fighter,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:222)
+VoxArena:BuildPortraits () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:976)
+VoxArena:Start () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:158)
+
+(Filename: C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs Line: 130)
+
+IMPORTED_CHASSIS_READY TARANTULA footprint=3.030799
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/build/output/unity/unity/Runtime/Export/Scripting/StackTrace.cs:23)
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[]) (at C:/build/output/unity/unity/Runtime/Export/Logging/DebugLogHandler.cs:9)
+UnityEngine.Logger:Log (UnityEngine.LogType,object) (at C:/build/output/unity/unity/Runtime/Export/Logging/Logger.cs:60)
+UnityEngine.Debug:Log (object) (at C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs:130)
+VoxArena:ConnectImportedChassis (VoxArena/Fighter,UnityEngine.Transform) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Chassis.cs:50)
+VoxArena:ApplyImportedWisp (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:415)
+VoxArena:BuildRobot (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:963)
+VoxArena:ApplyCharacterPreset (VoxArena/Fighter,CraftSpec,int,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:233)
+VoxArena:ApplySelectableCharacter (VoxArena/Fighter,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:222)
+VoxArena:BuildPortraits () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:976)
+VoxArena:Start () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:158)
+
+(Filename: C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs Line: 130)
+
+WISP_ART_MODEL_APPLIED WISP_v011; base=True emission=True shader=none emissionProperty=False emissionMapped=False
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/build/output/unity/unity/Runtime/Export/Scripting/StackTrace.cs:23)
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[]) (at C:/build/output/unity/unity/Runtime/Export/Logging/DebugLogHandler.cs:9)
+UnityEngine.Logger:Log (UnityEngine.LogType,object) (at C:/build/output/unity/unity/Runtime/Export/Logging/Logger.cs:60)
+UnityEngine.Debug:Log (object) (at C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs:130)
+VoxArena:ApplyImportedWisp (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:418)
+VoxArena:BuildRobot (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:963)
+VoxArena:ApplyCharacterPreset (VoxArena/Fighter,CraftSpec,int,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:233)
+VoxArena:ApplySelectableCharacter (VoxArena/Fighter,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:222)
+VoxArena:BuildPortraits () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:976)
+VoxArena:Start () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:158)
+
+(Filename: C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs Line: 130)
+
+WISP_GAMEPLAY_UI_CAPTURE_PASS D:\Codex\VoxSky\Builds\WorkLatest\Docs\Models\Foundry-WISP-only-hangar.png
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/build/output/unity/unity/Runtime/Export/Scripting/StackTrace.cs:23)
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[]) (at C:/build/output/unity/unity/Runtime/Export/Logging/DebugLogHandler.cs:9)
+UnityEngine.Logger:Log (UnityEngine.LogType,object) (at C:/build/output/unity/unity/Runtime/Export/Logging/Logger.cs:60)
+UnityEngine.Debug:Log (object) (at C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs:130)
+VoxArena:SaveGameplayUIFrame (string) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Smoke.cs:60)
+VoxArena/<CaptureGameplayUI>d__295:MoveNext () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Smoke.cs:12)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/build/output/unity/unity/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs Line: 130)
+
+IMPORTED_CHASSIS_READY BASTION footprint=2.293584
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/build/output/unity/unity/Runtime/Export/Scripting/StackTrace.cs:23)
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[]) (at C:/build/output/unity/unity/Runtime/Export/Logging/DebugLogHandler.cs:9)
+UnityEngine.Logger:Log (UnityEngine.LogType,object) (at C:/build/output/unity/unity/Runtime/Export/Logging/Logger.cs:60)
+UnityEngine.Debug:Log (object) (at C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs:130)
+VoxArena:ConnectImportedChassis (VoxArena/Fighter,UnityEngine.Transform) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Chassis.cs:50)
+VoxArena:ApplyImportedWisp (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:415)
+VoxArena:BuildRobot (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:963)
+VoxArena:ApplyCharacterPreset (VoxArena/Fighter,CraftSpec,int,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:233)
+VoxArena:ApplySelectableCharacter (VoxArena/Fighter,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:222)
+VoxArena/<CaptureGameplayUI>d__295:MoveNext () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Smoke.cs:15)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/build/output/unity/unity/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs Line: 130)
+
+WISP_ART_MODEL_APPLIED WISP_v011; base=True emission=True shader=none emissionProperty=False emissionMapped=False
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/build/output/unity/unity/Runtime/Export/Scripting/StackTrace.cs:23)
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[]) (at C:/build/output/unity/unity/Runtime/Export/Logging/DebugLogHandler.cs:9)
+UnityEngine.Logger:Log (UnityEngine.LogType,object) (at C:/build/output/unity/unity/Runtime/Export/Logging/Logger.cs:60)
+UnityEngine.Debug:Log (object) (at C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs:130)
+VoxArena:ApplyImportedWisp (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:418)
+VoxArena:BuildRobot (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:963)
+VoxArena:ApplyCharacterPreset (VoxArena/Fighter,CraftSpec,int,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:233)
+VoxArena:ApplySelectableCharacter (VoxArena/Fighter,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:222)
+VoxArena/<CaptureGameplayUI>d__295:MoveNext () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Smoke.cs:15)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/build/output/unity/unity/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs Line: 130)
+
+WISP_GAMEPLAY_UI_CAPTURE_PASS D:\Codex\VoxSky\Builds\WorkLatest\Docs\Models\Foundry-BASTION-hangar.png
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/build/output/unity/unity/Runtime/Export/Scripting/StackTrace.cs:23)
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[]) (at C:/build/output/unity/unity/Runtime/Export/Logging/DebugLogHandler.cs:9)
+UnityEngine.Logger:Log (UnityEngine.LogType,object) (at C:/build/output/unity/unity/Runtime/Export/Logging/Logger.cs:60)
+UnityEngine.Debug:Log (object) (at C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs:130)
+VoxArena:SaveGameplayUIFrame (string) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Smoke.cs:60)
+VoxArena/<CaptureGameplayUI>d__295:MoveNext () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Smoke.cs:15)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/build/output/unity/unity/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs Line: 130)
+
+IMPORTED_CHASSIS_READY TARANTULA footprint=3.030799
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/build/output/unity/unity/Runtime/Export/Scripting/StackTrace.cs:23)
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[]) (at C:/build/output/unity/unity/Runtime/Export/Logging/DebugLogHandler.cs:9)
+UnityEngine.Logger:Log (UnityEngine.LogType,object) (at C:/build/output/unity/unity/Runtime/Export/Logging/Logger.cs:60)
+UnityEngine.Debug:Log (object) (at C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs:130)
+VoxArena:ConnectImportedChassis (VoxArena/Fighter,UnityEngine.Transform) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Chassis.cs:50)
+VoxArena:ApplyImportedWisp (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:415)
+VoxArena:BuildRobot (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:963)
+VoxArena:ApplyCharacterPreset (VoxArena/Fighter,CraftSpec,int,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:233)
+VoxArena:ApplySelectableCharacter (VoxArena/Fighter,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:222)
+VoxArena/<CaptureGameplayUI>d__295:MoveNext () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Smoke.cs:15)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/build/output/unity/unity/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs Line: 130)
+
+WISP_ART_MODEL_APPLIED WISP_v011; base=True emission=True shader=none emissionProperty=False emissionMapped=False
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/build/output/unity/unity/Runtime/Export/Scripting/StackTrace.cs:23)
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[]) (at C:/build/output/unity/unity/Runtime/Export/Logging/DebugLogHandler.cs:9)
+UnityEngine.Logger:Log (UnityEngine.LogType,object) (at C:/build/output/unity/unity/Runtime/Export/Logging/Logger.cs:60)
+UnityEngine.Debug:Log (object) (at C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs:130)
+VoxArena:ApplyImportedWisp (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:418)
+VoxArena:BuildRobot (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:963)
+VoxArena:ApplyCharacterPreset (VoxArena/Fighter,CraftSpec,int,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:233)
+VoxArena:ApplySelectableCharacter (VoxArena/Fighter,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:222)
+VoxArena/<CaptureGameplayUI>d__295:MoveNext () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Smoke.cs:15)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/build/output/unity/unity/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs Line: 130)
+
+WISP_GAMEPLAY_UI_CAPTURE_PASS D:\Codex\VoxSky\Builds\WorkLatest\Docs\Models\Foundry-TARANTULA-hangar.png
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/build/output/unity/unity/Runtime/Export/Scripting/StackTrace.cs:23)
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[]) (at C:/build/output/unity/unity/Runtime/Export/Logging/DebugLogHandler.cs:9)
+UnityEngine.Logger:Log (UnityEngine.LogType,object) (at C:/build/output/unity/unity/Runtime/Export/Logging/Logger.cs:60)
+UnityEngine.Debug:Log (object) (at C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs:130)
+VoxArena:SaveGameplayUIFrame (string) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Smoke.cs:60)
+VoxArena/<CaptureGameplayUI>d__295:MoveNext () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Smoke.cs:15)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/build/output/unity/unity/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs Line: 130)
+
+WISP_ART_MODEL_APPLIED WISP_v011; base=True emission=True shader=none emissionProperty=False emissionMapped=False
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/build/output/unity/unity/Runtime/Export/Scripting/StackTrace.cs:23)
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[]) (at C:/build/output/unity/unity/Runtime/Export/Logging/DebugLogHandler.cs:9)
+UnityEngine.Logger:Log (UnityEngine.LogType,object) (at C:/build/output/unity/unity/Runtime/Export/Logging/Logger.cs:60)
+UnityEngine.Debug:Log (object) (at C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs:130)
+VoxArena:ApplyImportedWisp (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:418)
+VoxArena:BuildRobot (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:963)
+VoxArena:ApplyCharacterPreset (VoxArena/Fighter,CraftSpec,int,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:233)
+VoxArena:ApplySelectableCharacter (VoxArena/Fighter,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:222)
+VoxArena:TestSetupSelectable (int,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Smoke.cs:234)
+VoxArena/<CaptureGameplayUI>d__295:MoveNext () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Smoke.cs:17)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/build/output/unity/unity/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs Line: 130)
+
+WISP_ART_MODEL_APPLIED WISP_v011; base=True emission=True shader=none emissionProperty=False emissionMapped=False
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/build/output/unity/unity/Runtime/Export/Scripting/StackTrace.cs:23)
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[]) (at C:/build/output/unity/unity/Runtime/Export/Logging/DebugLogHandler.cs:9)
+UnityEngine.Logger:Log (UnityEngine.LogType,object) (at C:/build/output/unity/unity/Runtime/Export/Logging/Logger.cs:60)
+UnityEngine.Debug:Log (object) (at C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs:130)
+VoxArena:ApplyImportedWisp (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:418)
+VoxArena:BuildRobot (VoxArena/Fighter) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Robot.cs:963)
+VoxArena:ApplyCharacterPreset (VoxArena/Fighter,CraftSpec,int,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:233)
+VoxArena:ApplySelectableCharacter (VoxArena/Fighter,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.cs:222)
+VoxArena:TestSetupSelectable (int,int) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Smoke.cs:234)
+VoxArena/<CaptureGameplayUI>d__295:MoveNext () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Smoke.cs:17)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/build/output/unity/unity/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs Line: 130)
+
+WISP_GAMEPLAY_UI_CAPTURE_PASS D:\Codex\VoxSky\Builds\WorkLatest\Docs\Models\Foundry-WISP-crosshair-camera.png
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/build/output/unity/unity/Runtime/Export/Scripting/StackTrace.cs:23)
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[]) (at C:/build/output/unity/unity/Runtime/Export/Logging/DebugLogHandler.cs:9)
+UnityEngine.Logger:Log (UnityEngine.LogType,object) (at C:/build/output/unity/unity/Runtime/Export/Logging/Logger.cs:60)
+UnityEngine.Debug:Log (object) (at C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs:130)
+VoxArena:SaveGameplayUIFrame (string) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Smoke.cs:60)
+VoxArena/<CaptureGameplayUI>d__295:MoveNext () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Smoke.cs:24)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/build/output/unity/unity/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs Line: 130)
+
+WISP_GAMEPLAY_UI_CAPTURE_PASS D:\Codex\VoxSky\Builds\WorkLatest\Docs\Models\Foundry-WISP-guard-gameplay.png
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace () (at C:/build/output/unity/unity/Runtime/Export/Scripting/StackTrace.cs:23)
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[]) (at C:/build/output/unity/unity/Runtime/Export/Logging/DebugLogHandler.cs:9)
+UnityEngine.Logger:Log (UnityEngine.LogType,object) (at C:/build/output/unity/unity/Runtime/Export/Logging/Logger.cs:60)
+UnityEngine.Debug:Log (object) (at C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs:130)
+VoxArena:SaveGameplayUIFrame (string) (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Smoke.cs:60)
+VoxArena/<CaptureGameplayUI>d__295:MoveNext () (at D:/Codex/VoxSky/Builds/WorkLatest/Assets/Scripts/VoxArena.Smoke.cs:28)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr) (at C:/build/output/unity/unity/Runtime/Export/Scripting/Coroutines.cs:17)
+
+(Filename: C:/build/output/unity/unity/Runtime/Export/Debug/Debug.bindings.cs Line: 130)
+
+[Physics::Module] Cleanup current backend.
+[Physics::Module] Id: 0xf2b8ea05
+Input System module state changed to: ShutdownInProgress.
+Input Polling Thread exited.
+Input System module state changed to: Shutdown.
+CodeReloadManager destroyed
+PlayerConnection::Cleanup##utp:{"type":"MemoryLeaks","version":2,"phase":"Immediate","time":1793823175539,"processId":38544,"allocatedMemory":188431,"memoryLabels":[{"Default":102136},{"NewDelete":760},{"Thread":17344},{"Manager":8727},{"Shader":1152},{"GfxDevice":2448},{"GfxThread":29184},{"Serialization":16792},{"BaseObject":11488},{"String":464},{"PoolAlloc":96},{"ScriptManager":5696},{"CodeReload":440},{"CloudService":144},{"VR":1928},{"Video":144},{"Subsystems":96},{"CoreBusinessMetrics":128}]}
