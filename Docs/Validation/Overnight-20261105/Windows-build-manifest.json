@@ -1,5 +1,5 @@
 {
-  "build_log": "Final-Hangar-Guide-Build.log",
+  "build_log": "Module-Recovery-RenderSync-Build.log",
   "files": [
     {
       "file": "D3D12/D3D12Core.dll",
@@ -144,7 +144,7 @@
     {
       "file": "Voxel-On_Data/boot.config",
       "bytes": 323,
-      "sha256": "3717a9a942433e6f20dc436b114a34e384adb4af3c1d836aa130dcb410348b2e"
+      "sha256": "df14cdd6999efeebd17a53a3eb01a376181b83defb4b505a6542c266d50066e7"
     },
     {
       "file": "Voxel-On_Data/globalgamemanagers",
@@ -168,13 +168,13 @@
     },
     {
       "file": "Voxel-On_Data/Managed/Assembly-CSharp.dll",
-      "bytes": 318976,
-      "sha256": "4d1c283e2b03ee694952e498abf054ce560c5c8a9d7851c04c403236989ceb9e"
+      "bytes": 324096,
+      "sha256": "e26080ee6b64f136fb400a9266bfe5def2678e67781e11df799c190a8cd85647"
     },
     {
       "file": "Voxel-On_Data/Managed/Assembly-CSharp.pdb",
-      "bytes": 103504,
-      "sha256": "7a1b87cb717ed7475d1e408e68f297d81d9641768fc69f576b2f9d25537bf320"
+      "bytes": 105064,
+      "sha256": "0ff4a58e7adddcb3eea95ba2a9000cea229c4ea21b6cd2a5325081e871aa44dc"
     },
     {
       "file": "Voxel-On_Data/Managed/Mono.Security.dll",

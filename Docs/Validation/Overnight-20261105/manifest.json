@@ -52,5 +52,35 @@
     "source": "Logs/Radar-Storm-Before-Capture.log",
     "sha256": "f84a504e9b04b8d9b0a05b2a8864356c50fba154e6c0608bad9b94db8d6a6cd0",
     "bytes": 29636
+  },
+  {
+    "file": "Module-Recovery-20261105-Build.txt",
+    "source": "Logs/Module-Recovery-20261105-Build.log",
+    "sha256": "0ffa8a3d61e2660540ef3b22169d012c0221c395284b50a86a961280cdfc9836",
+    "bytes": 263258
+  },
+  {
+    "file": "Module-Recovery-20261105-Actual.txt",
+    "source": "Logs/Module-Recovery-20261105-Actual.log",
+    "sha256": "2e033675623ab3232f4fe7d093ba600334966b3894344e7bcdcd10910d02ae08",
+    "bytes": 76674
+  },
+  {
+    "file": "Module-Recovery-RenderSync-Build.txt",
+    "source": "Logs/Module-Recovery-RenderSync-Build.log",
+    "sha256": "9191a2fef6a5b86963c651c1aeaaad506bba13e2d9591f070707eadb78c43f1b",
+    "bytes": 260793
+  },
+  {
+    "file": "Module-Recovery-RenderSync-Actual.txt",
+    "source": "Logs/Module-Recovery-RenderSync-Actual.log",
+    "sha256": "2504c32ed03099e976c48b4ef07724be20e9e80cfbceb4d53f7a7263ebb0a554",
+    "bytes": 83445
+  },
+  {
+    "file": "Module-Recovery-Final-Smoke.txt",
+    "source": "Logs/Module-Recovery-Final-Smoke.log",
+    "sha256": "c4e2fa85d099162108066417b932c8f77bf606f0eb6d7266425b24896017d125",
+    "bytes": 875570
   }
 ]

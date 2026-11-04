@@ -26,3 +26,5 @@ TARANTULA는 다리 전체를 담는 3.6 orthographic 전신 뷰, 1·2번은 2.5
 ![Canyon 저녁 우천](Canyon-Rain-Evening.png)
 
 조명 전후는 [기존/1차/2차 같은 각도](../PD14-Lighting/README.md), 탄환은 [4종 실제 발사체 확대 검사](../PD14-Projectiles/README.md), 효과는 [부위 연기·파괴·공중 분사](../PD14-Effects-Iteration04/)에서 봅니다. 확대 검사 사진을 정상 게임 화면 크기로 해석하지 않습니다. 최종 갤러리는 서로 다른 검증 장면의 대표 화면이며 수동 플레이 승인 증거는 아닙니다.
+
+추가 복원 검증9장: [3기체 실제 사망·재시작 전후](../PD14-Module-Recovery/README.md). 대표 갤러리26장과 별도이며, 최초 즉시 렌더 probe를 성공으로 오인하지 않고 정상 프레임 후 실루엣 일치까지 확인했습니다.

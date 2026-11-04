@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.IO;
 using UnityEngine;
@@ -6,6 +6,7 @@ public sealed partial class VoxArena
 {
     IEnumerator EffectCapture()
     {
+        if(Array.IndexOf(Environment.GetCommandLineArgs(),"--module-roster")>=0){yield return ModuleRecoveryStudy();yield break;}
         string dir=Path.Combine(Directory.GetCurrentDirectory(),"Docs","Screenshots","PD14-Effects-Iteration04");Directory.CreateDirectory(dir);
         int captures=0;bool pass=true;TestSetupSelectable(0,1);smoke=false;inMenu=false;muted=true;targetLock=false;spectatorMode=false;cameraYaw=0;cameraPitch=DefaultThirdPersonPitch;
         player.root.position=new Vector3(0,FighterGroundY,0);enemy.root.position=new Vector3(10,FighterGroundY,20);player.facing=Vector3.forward;Animate(player);Animate(enemy);
