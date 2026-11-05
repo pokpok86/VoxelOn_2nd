@@ -4,7 +4,17 @@ public sealed partial class VoxArena
 {
     bool showTuning;
     void Panel(Rect r, Color color) { GUI.color = color; GUI.DrawTexture(r, Texture2D.whiteTexture); GUI.color = Color.white; }
-    void Text(float x, float y, float w, string value, GUIStyle style) => GUI.Label(new Rect(x, y, w, 35), value, style);
+    readonly System.Collections.Generic.Dictionary<GUIStyle,GUIStyle> localizedBalanceLabels=new System.Collections.Generic.Dictionary<GUIStyle,GUIStyle>();
+    void Text(float x,float y,float w,string value,GUIStyle style)
+    {
+        bool localized=false;if(value!=null)foreach(char c in value)if(c>=0x2E80){localized=true;break;}
+        if(localized)
+        {
+            if(balanceFont==null)balanceFont=Font.CreateDynamicFontFromOSFont(new[]{"Malgun Gothic","맑은 고딕","Arial"},17);
+            if(!localizedBalanceLabels.TryGetValue(style,out GUIStyle translated)){translated=new GUIStyle(style){font=balanceFont};localizedBalanceLabels.Add(style,translated);}style=translated;
+        }
+        GUI.Label(new Rect(x,y,w,35),value,style);
+    }
     void Bar(float x, float y, float w, float fraction, Color color)
     {
         Panel(new Rect(x, y, w, 8), new Color(.12f, .18f, .24f));
@@ -16,6 +26,33 @@ public sealed partial class VoxArena
     Vector2 lockScreenPosition;
     bool lockVisualInitialized;
     bool ShowAimReticle=>!inMenu&&!paused&&!Finished&&!spectatorMode;
+    bool TryGetTargetScreenRect(out Rect rect)
+    {
+        rect=default;
+        if(view==null||enemy==null||enemy.body==null)return false;
+        Bounds world=default;bool found=false;
+        foreach(Renderer renderer in enemy.body.GetComponentsInChildren<Renderer>())
+        {
+            if(!renderer.enabled||!renderer.gameObject.activeInHierarchy)continue;
+            bool equipment=false;
+            if(enemy.weaponVisuals!=null)foreach(Transform visual in enemy.weaponVisuals)if(visual!=null&&(renderer.transform==visual||renderer.transform.IsChildOf(visual))){equipment=true;break;}
+            if(!equipment&&enemy.guardShield!=null&&(renderer.transform==enemy.guardShield||renderer.transform.IsChildOf(enemy.guardShield)))equipment=true;
+            if(equipment)continue;
+            if(!found){world=renderer.bounds;found=true;}else world.Encapsulate(renderer.bounds);
+        }
+        if(!found)return false;
+        Vector3 min=new Vector3(float.PositiveInfinity,float.PositiveInfinity,float.PositiveInfinity),max=new Vector3(float.NegativeInfinity,float.NegativeInfinity,float.NegativeInfinity);
+        for(int i=0;i<8;i++)
+        {
+            Vector3 corner=world.center+Vector3.Scale(world.extents,new Vector3((i&1)==0?-1:1,(i&2)==0?-1:1,(i&4)==0?-1:1));
+            Vector3 point=view.WorldToScreenPoint(corner);if(point.z<=0)return false;
+            Vector2 ui=new Vector2(point.x*1280f/Screen.width,(Screen.height-point.y)*720f/Screen.height);
+            min=Vector3.Min(min,ui);max=Vector3.Max(max,ui);
+        }
+        float pad=Mathf.Clamp(Mathf.Max(max.x-min.x,max.y-min.y)*.08f,8,24);
+        rect=Rect.MinMaxRect(min.x-pad,min.y-pad,max.x+pad,max.y+pad);
+        return rect.xMax>=0&&rect.xMin<=1280&&rect.yMax>=0&&rect.yMin<=720;
+    }
     void DrawAimReticle()
     {
         if(!ShowAimReticle) return;
@@ -33,20 +70,14 @@ public sealed partial class VoxArena
     void DrawLockReticle()
     {
         if(spectatorMode || Finished || paused || view==null || enemy==null) return;
-        Vector3 projected=view.WorldToScreenPoint(enemy.root.position+Vector3.up*1.3f);
-        bool onScreen=projected.z>0 && projected.x>=0 && projected.x<=Screen.width &&
-            projected.y>=0 && projected.y<=Screen.height;
-        float target=targetLock && onScreen?1f:0f;
+        bool onScreen=TryGetTargetScreenRect(out Rect targetRect);
+        float target=targetLock&&onScreen?1f:0f;
         lockVisual=Mathf.MoveTowards(lockVisual,target,Time.unscaledDeltaTime*(target>lockVisual?5.5f:2.8f));
-        if(lockVisual<=.001f) { lockVisualInitialized=false; return; }
-        Vector2 screenPos=new Vector2(projected.x*1280f/Screen.width,(Screen.height-projected.y)*720f/Screen.height);
-        if(onScreen)
-        {
-            if(!lockVisualInitialized) { lockScreenPosition=screenPos; lockVisualInitialized=true; }
-            lockScreenPosition=Vector2.Lerp(lockScreenPosition,screenPos,1-Mathf.Exp(-15f*Time.unscaledDeltaTime));
-        }
+        if(lockVisual<=.001f){lockVisualInitialized=false;return;}
+        if(onScreen){lockScreenPosition=targetRect.center;lockVisualInitialized=true;}
+        float targetSize=onScreen?Mathf.Max(targetRect.width,targetRect.height):108f;
         float eased=lockVisual*lockVisual*(3-2*lockVisual);
-        float size=Mathf.Lerp(108f,48f,eased);
+        float size=Mathf.Lerp(Mathf.Max(48f,targetSize),Mathf.Max(36f,targetSize*.48f),eased);
         float alpha=Mathf.Lerp(.04f,.94f,eased);
         Color color=Color.Lerp(new Color(.45f,.72f,.84f,alpha),new Color(.2f,1f,.94f,alpha),eased);
         color.a=alpha;
@@ -76,6 +107,8 @@ public sealed partial class VoxArena
             title = new GUIStyle(label) { fontSize = 28 };
         }
         GUI.matrix = Matrix4x4.Scale(new Vector3(Screen.width / 1280f, Screen.height / 720f, 1));
+        if(inMenu&&balanceEditorOpen){DrawBalanceEditor();return;}
+        if(inMenu&&weaponGalleryOpen) { DrawWeaponGallery(); return; }
         if(testLabOpen) { DrawTestLab(); return; }
         if(showGuide) { DrawGuide(); return; }
         if (inMenu) { GUI.enabled=!showTuning; DrawHangar(); GUI.enabled=true; if(showTuning) DrawTuning(); return; }
@@ -99,7 +132,7 @@ public sealed partial class VoxArena
         Bar(422, 643, 220, player.boostEnergy / player.spec.boostCapacity, Cyan);
         Text(420,652,300,"SHIFT BOOST / SPACE JUMP",small);
         Bar(422, 675, 220, 1-player.weaponTimer/(EquippedProfile(player).interval*weaponCooldownScale/Mathf.Max(.2f,player.spec.rightArmHandling)), new Color(1,.70f,.30f));
-        Text(420,687,300,spectatorMode?"AI SPECTATOR / 360 ORBIT":player.spec.name=="WISP"?"RMB GUARD / F1 HELP":"RMB LOCK-ON / F1 HELP",small);
+        Text(420,687,300,spectatorMode?"AI SPECTATOR / 360 ORBIT":player.spec.name=="WISP"?(HasEquippedGuard(player)?"RMB GUARD / F1 HELP":"MANUAL AIM / F1 HELP"):"RMB LOCK-ON / F1 HELP",small);
         if (!Finished && !paused)
             Text(405, 574, 650, player.lockTime>0?"SPECIAL FIRING / MOVEMENT LOCKED":player.rushTime>0?"SABER RUSH":player.boostLocked ? "BOOST EMPTY / RELEASE SHIFT TO REARM" : AimStatus(), small);
         DrawCombatFeedback();
@@ -121,35 +154,37 @@ public sealed partial class VoxArena
         Panel(new Rect(0, 0, 1280, 720), new Color(.025f, .045f, .075f, .98f));
         Text(32, 22, 500, "Voxel-On  —  HANGAR", title);
         Text(34, 65, 1000, "THIRD PERSON DUEL   /   THREE CHASSIS PROTOTYPES / FOUR WEAPON SLOTS", small);
-        if(GUI.Button(new Rect(1040,28,208,38),"WEAPON TUNING")) showTuning=true;
+        if(GUI.Button(new Rect(1040,76,208,29),"WEAPON GALLERY / F3")){weaponGalleryOpen=true;ShowWeaponPreview(weaponPreviewIndex);}
+        if(GUI.Button(new Rect(1040,28,208,38),"WEAPON / PART OPTIONS")) OpenBalanceEditor();
         if(GUI.Button(new Rect(600,28,200,38),"MAP: "+(arenaMap==ArenaMapKind.IndoorFactory?"FOUNDRY":arenaMap==ArenaMapKind.OutdoorCanyon?"CANYON":"PLAINS"))) SwitchArenaMap();
         if(GUI.Button(new Rect(820,28,200,38),"HOW TO PLAY / F1")) ToggleGuide();
-        for (int i = 0; i < CraftCatalog.UnlockedCount; i++)
+        int[] lineup={0,1,2};
+        float[] cardX={42,450,858};
+        for(int order=0;order<lineup.Length;order++)
         {
-            CraftSpec spec = CraftCatalog.Selectable[i];
-            Rect card = new Rect(32 + i % 4 * 308, 113 + i / 4 * 178, 292, 162);
-            bool selected = selectedCraft == i;
-            Panel(card, selected ? new Color(.10f,.22f,.29f) : new Color(.065f,.095f,.14f));
-            Panel(new Rect(card.x, card.y, 4, card.height), spec.color);
-            if(framePortraits!=null) GUI.DrawTexture(new Rect(card.x+183,card.y+35,105,123),framePortraits[i],ScaleMode.ScaleToFit);
-            Text(card.x + 16, card.y + 12, 240, (i+1)+"  /  "+spec.name, label);
-            Text(card.x + 16, card.y + 43, 255, spec.role, small);
-            Text(card.x+16,card.y+76,175,"1-4 WEAPON SLOTS",small);
-            Text(card.x+16,card.y+95,175,spec.name=="WISP"?"RMB GUARD":"RMB LOCK-ON",small);
-            Text(card.x + 16, card.y + 124, 260, $"BOOST {(spec.name=="WISP"?"RUN/SLIDE":spec.boost.ToString())} / {spec.boostSpeed:0.#}   HP {spec.health}", small);
-            if (GUI.Button(card, GUIContent.none, GUIStyle.none))
+            int i=lineup[order];if(i>=CraftCatalog.UnlockedCount)continue;
+            CraftSpec spec=CraftCatalog.Selectable[i];
+            if(activeBalance!=null){spec=spec.RuntimeCopy();foreach(BalancePart part in activeBalance.parts)if(part.frame==spec.name)foreach(BalanceNumber n in part.numbers)if(n.implemented)typeof(CraftSpec).GetField(n.key).SetValue(spec,n.value);}
+            bool selected=selectedCraft==i;Rect card=new Rect(cardX[order],112,380,356);
+            Panel(card,selected?new Color(.10f,.22f,.29f,.96f):new Color(.045f,.075f,.11f,.92f));
+            Panel(new Rect(card.x,card.y,4,card.height),spec.color);
+            Text(card.x+18,card.y+8,345,(i+1)+"  /  "+(i==0?"WISP · SD RUNNER":i==1?"BASTION · TRACKED":"TARANTULA · QUADRUPED"),label);
+            if(framePortraits!=null&&i<framePortraits.Length&&framePortraits[i]!=null)GUI.DrawTexture(new Rect(card.x+62,card.y+47,256,250),framePortraits[i],ScaleMode.ScaleToFit,true);
+            string[] loadout=i==0?new[]{"AR / HANDGUN","LAUNCHER / RIFLE"}:i==1?new[]{"LMG / ROCKET","GATLING / LAUNCHER"}:new[]{"BEAM / SHOTGUN","GRENADE / SNIPER"};
+            Text(card.x+14,card.y+298,350,loadout[0]+"   ·   "+loadout[1],small);
+            if(GUI.Button(new Rect(card.x+18,card.y+324,164,26),selected?"선택됨 · 커스터마이징":"커스터마이징"))
             {
-                selectedCraft = i;
-                ApplySelectableCharacter(player, selectedCraft);
+                selectedCraft=i;balanceFrameIndex=i;balanceTab=0;balanceMountIndex=0;ApplySelectableCharacter(player,selectedCraft);OpenBalanceEditor();
             }
+            if(GUI.Button(new Rect(card.x+198,card.y+324,164,26),"기체 선택")){selectedCraft=i;ApplySelectableCharacter(player,selectedCraft);}
         }
         CraftSpec chosen = CraftCatalog.Selectable[selectedCraft];
-        Panel(new Rect(32, 487, 1216, 105), new Color(.065f,.095f,.14f));
+        Panel(new Rect(32, 482, 1216, 112), new Color(.065f,.095f,.14f));
         GUI.color = chosen.color;
-        Text(50, 500, 1100, chosen.name + "  /  " + chosen.role, label);
+        Text(50, 492, 1100, chosen.name + "  /  " + chosen.role, label);
         GUI.color = Color.white;
-        Text(50, 558, 1150,"MODULES: HEAD / CORE / ARMS / LEGS / WEAPON  -  ASSEMBLY COMING LATER",small);
-        Text(50, 533, 1150, $"ARMOR {chosen.armor*100:0}%   SHIELD {chosen.ShieldMax:0}   MOVE {chosen.speed:0.#} / BOOST {chosen.boostSpeed:0.#}   STORED CONCEPT: {chosen.description}", small);
+        Text(50, 567, 1150,"현재 기체 외형과 무장 구성을 비교한 뒤 커스터마이징을 여세요.",small);
+        Text(50, 531, 1150, $"ARMOR {chosen.armor*100:0}%   SHIELD {chosen.ShieldMax:0}   MOVE {chosen.speed:0.#} / BOOST {chosen.boostSpeed:0.#}   STORED CONCEPT: {chosen.description}", small);
         Text(34, 618, 850, "WASD / mouse look / 1-4 weapons / RMB "+
             (chosen.name=="WISP"?"shield pose":chosen.supportsLockOn?"lock-on":"no lock-on")+" / LMB fire", label);
         string mobilityHelp=chosen.name=="WISP"?"Shift: forward run / side-back slide. Space: jump / hold for lift.":chosen.name=="TARANTULA"?"Shift: frame booster. Hold and release Space: charged jump.":"Shift: frame booster. Space: low jump.";
@@ -163,7 +198,7 @@ public sealed partial class VoxArena
         else if(GUI.Button(new Rect(690,686,270,25),"RIVAL: "+(rivalSelection<0?"RANDOM":CraftCatalog.Selectable[rivalSelection].name)))
             rivalSelection=rivalSelection>=CraftCatalog.UnlockedCount-1?-1:rivalSelection+1;
         if(GUI.Button(new Rect(972,686,155,25),"MODE: "+(spectatorMode?"AI VIEW":"PILOT"))) spectatorMode=!spectatorMode;
-        if(GUI.Button(new Rect(34,686,150,25),muted?"SOUND OFF / V":"SOUND ON / V")) ToggleMute();
+        if(GUI.Button(new Rect(34,686,150,25),muted?"SOUND OFF":"SOUND ON")) ToggleMute();
         GUI.backgroundColor = chosen.color;
         if (GUI.Button(new Rect(984, 615, 264, 67), spectatorMode?"START AI SIM / ENTER":"START DUEL / ENTER")) BeginMatch();
         GUI.backgroundColor = Color.white;

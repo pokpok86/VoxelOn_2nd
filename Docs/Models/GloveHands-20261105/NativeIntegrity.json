@@ -1,0 +1,23 @@
+[
+  {
+    "model": "WISP",
+    "before": "v011",
+    "after": "v012",
+    "identical_bones_and_bind_matrices": 24,
+    "identical_nonhand_vertices": 2118
+  },
+  {
+    "model": "BASTION",
+    "before": "v006",
+    "after": "v007",
+    "identical_bones_and_bind_matrices": 115,
+    "identical_nonhand_vertices": 4024
+  },
+  {
+    "model": "TARANTULA",
+    "before": "v005",
+    "after": "v006",
+    "identical_bones_and_bind_matrices": 36,
+    "identical_nonhand_vertices": 2184
+  }
+]

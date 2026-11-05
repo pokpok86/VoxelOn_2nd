@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
@@ -18,22 +18,24 @@ public static class VoxBuild
         arena.cameraFadeShader=Shader.Find("VoxelOn/CameraHeadFade");
         if(arena.cameraFadeShader==null)throw new Exception("Camera head fade shader unavailable");
         if (arena.hullShader == null) throw new Exception("Standard shader unavailable");
-        var modelImporter=AssetImporter.GetAtPath("Assets/Art/Robots/WISP/WISP_v011.fbx") as ModelImporter;
+        var modelImporter=AssetImporter.GetAtPath("Assets/Art/Robots/WISP/WISP_v014.fbx") as ModelImporter;
         if(modelImporter!=null&&!modelImporter.isReadable) { modelImporter.isReadable=true;modelImporter.preserveHierarchy=true;modelImporter.optimizeGameObjects=false;modelImporter.SaveAndReimport(); }
-        arena.wispModelSource=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/WISP/WISP_v011.fbx");
+        arena.referenceHandsBaseline=new[]{AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/WISP/WISP_v012.fbx"),AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/BASTION/BASTION_v007.fbx"),AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/TARANTULA/TARANTULA_v006.fbx")};
+        arena.gloveReviewBaseline=new[]{AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/WISP/WISP_v011.fbx"),AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/BASTION/BASTION_v006.fbx"),AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/TARANTULA/TARANTULA_v005.fbx")};
+        arena.wispModelSource=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/WISP/WISP_v014.fbx");
         foreach(string name in new[]{"BASTION","TARANTULA"})
         {
-            string path="Assets/Art/Robots/"+name+"/"+name+(name=="BASTION"?"_v006.fbx":"_v005.fbx");
+            string path="Assets/Art/Robots/"+name+"/"+name+(name=="BASTION"?"_v010.fbx":"_v008.fbx");
             var importer=AssetImporter.GetAtPath(path) as ModelImporter;
             if(importer!=null&&(!importer.isReadable||!importer.preserveHierarchy)){importer.isReadable=true;importer.preserveHierarchy=true;importer.optimizeGameObjects=false;importer.SaveAndReimport();}
         }
         foreach(string name in new[]{"BASTION","TARANTULA"})
         {
-            string folder="Assets/Art/Robots/"+name;string version=name=="BASTION"?"_v006":"_v005";string path=folder+"/"+name+version+".prefab";
+            string folder="Assets/Art/Robots/"+name;string version=name=="BASTION"?"_v010":"_v008";string path=folder+"/"+name+version+".prefab";
             if(AssetDatabase.LoadAssetAtPath<GameObject>(path)==null){GameObject source=AssetDatabase.LoadAssetAtPath<GameObject>(folder+"/"+name+version+".fbx");if(source!=null){GameObject instance=UnityEngine.Object.Instantiate(source);instance.name=name+version;PrefabUtility.SaveAsPrefabAsset(instance,path);UnityEngine.Object.DestroyImmediate(instance);}}
         }
-        arena.bastionModelSource=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/BASTION/BASTION_v006.fbx");
-        arena.tarantulaModelSource=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/TARANTULA/TARANTULA_v005.fbx");
+        arena.bastionModelSource=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/BASTION/BASTION_v010.fbx");
+        arena.tarantulaModelSource=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/TARANTULA/TARANTULA_v008.fbx");
         arena.wispSwordSource=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/WISP/WISP_Sword_v001.fbx");
         arena.wispShieldSource=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Robots/WISP/WISP_Shield_v003.fbx");
         arena.wispBaseColorTexture=AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Art/Robots/WISP/Textures/WISP_BaseColor_v004.png");

@@ -1,0 +1,23 @@
+[
+  {
+    "model": "WISP_v014",
+    "before": "WISP_v013",
+    "change": "Smooth hand normals only; geometry, pose keys and original rig unchanged",
+    "hand_vertices": 2304,
+    "skin_mesh_count": 75
+  },
+  {
+    "model": "BASTION_v009",
+    "before": "BASTION_v008",
+    "change": "Smooth hand normals only; geometry, pose keys and original rig unchanged",
+    "hand_vertices": 2304,
+    "skin_mesh_count": 154
+  },
+  {
+    "model": "TARANTULA_v008",
+    "before": "TARANTULA_v007",
+    "change": "Smooth hand normals only; geometry, pose keys and original rig unchanged",
+    "hand_vertices": 2304,
+    "skin_mesh_count": 84
+  }
+]

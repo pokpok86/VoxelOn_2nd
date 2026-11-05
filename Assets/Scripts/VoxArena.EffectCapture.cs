@@ -6,6 +6,12 @@ public sealed partial class VoxArena
 {
     IEnumerator EffectCapture()
     {
+        if(Array.IndexOf(Environment.GetCommandLineArgs(),"--reference-hand-study")>=0){yield return ReferenceHandStudy();yield break;}
+        if(Array.IndexOf(Environment.GetCommandLineArgs(),"--glove-review")>=0){yield return GloveReview();yield break;}
+        if(Array.IndexOf(Environment.GetCommandLineArgs(),"--balance-editor-study")>=0){yield return BalanceEditorStudy();yield break;}
+        if(Array.IndexOf(Environment.GetCommandLineArgs(),"--weapon-gallery")>=0){yield return CaptureWeaponLibrary();yield break;}
+        if(Array.IndexOf(Environment.GetCommandLineArgs(),"--ai-stall-study")>=0){yield return AIStallStudy();yield break;}
+        if(Array.IndexOf(Environment.GetCommandLineArgs(),"--control-review")>=0){yield return ControlReview();yield break;}
         if(Array.IndexOf(Environment.GetCommandLineArgs(),"--module-roster")>=0){yield return ModuleRecoveryStudy();yield break;}
         string dir=Path.Combine(Directory.GetCurrentDirectory(),"Docs","Screenshots","PD14-Effects-Iteration04");Directory.CreateDirectory(dir);
         int captures=0;bool pass=true;TestSetupSelectable(0,1);smoke=false;inMenu=false;muted=true;targetLock=false;spectatorMode=false;cameraYaw=0;cameraPitch=DefaultThirdPersonPitch;

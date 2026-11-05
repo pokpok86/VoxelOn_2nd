@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 // All geometry below is local to a detachable module. Gameplay stats stay in CraftSpec
 // until the assembly system is introduced; visual changes never silently change balance.
@@ -962,22 +962,52 @@ public sealed partial class VoxArena
         AddFrameIdentity(f,armor,hull,dark,edge);
         ApplyImportedWisp(f);SetupWeaponVisuals(f);SetupBoostVisual(f);if(f==player)RegisterCameraFadeRenderers(f);
     }
-    RenderTexture[] framePortraits;
+    RenderTexture[] framePortraits;float portraitYaw;
     void BuildPortraits()
     {
+        if(framePortraits!=null)foreach(RenderTexture old in framePortraits)if(old!=null){old.Release();Destroy(old);}
         framePortraits=new RenderTexture[CraftCatalog.Selectable.Length];
         Fighter model=MakeFighter("Portrait studio robot",Cyan); model.root.position=new Vector3(0,60,0);
         Camera camera=new GameObject("Portrait studio camera").AddComponent<Camera>();
-        camera.enabled=false; camera.orthographic=true; camera.orthographicSize=2.9f; camera.clearFlags=CameraClearFlags.SolidColor;
+        camera.enabled=false; camera.orthographic=true; camera.orthographicSize=3.65f; camera.clearFlags=CameraClearFlags.SolidColor;
         camera.backgroundColor=new Color(.065f,.095f,.14f,1); camera.cullingMask=1<<8;
-        camera.transform.position=model.root.position+new Vector3(5,3.5f,7); camera.transform.LookAt(model.root.position+Vector3.up*.1f);
+        camera.transform.position=model.root.position+new Vector3(5,4.1f,7); camera.transform.LookAt(model.root.position+Vector3.up*.60f);
+        string[][] displayWeapons={
+            new[]{"Military_AR","Military_HG","Future_Launcher","Military_SR"},
+            new[]{"Military_LMG","Military_RL","Future_Gatling","Future_Launcher"},
+            new[]{"Future_Beam","Military_SG","Military_GL","Future_Sniper"}
+        };
         for(int i=0;i<CraftCatalog.Selectable.Length;i++)
         {
-            ApplySelectableCharacter(model,i); model.body.localPosition=Vector3.up*.4f;
-            model.gun.gameObject.SetActive(true); model.fist.gameObject.SetActive(false);
-            foreach(Transform t in model.body.GetComponentsInChildren<Transform>()) t.gameObject.layer=8;
-            framePortraits[i]=new RenderTexture(192,224,16); camera.targetTexture=framePortraits[i]; camera.Render();
+            ApplySelectableCharacter(model,i); model.body.localPosition=Vector3.up*.4f;camera.orthographicSize=i==1?4.35f:3.65f;
+            if(i<displayWeapons.Length&&model.weaponVisuals!=null)
+            {
+                foreach(Transform old in model.weaponVisuals)if(old!=null)old.gameObject.SetActive(false);
+                model.weaponArtIds=(string[])displayWeapons[i].Clone();SetupWeaponVisuals(model);
+            }
+            for(int side=0;side<2;side++)if(model.weaponVisuals!=null&&model.weaponVisuals[side]!=null)model.weaponVisuals[side].gameObject.SetActive(true);
+            camera.transform.position=model.root.position+Quaternion.Euler(0,portraitYaw,0)*new Vector3(5,4.1f,7);camera.transform.LookAt(model.root.position+Vector3.up*.60f);
+            model.fist.gameObject.SetActive(false);
+            foreach(Transform t in model.root.GetComponentsInChildren<Transform>(true)) t.gameObject.layer=8;
+            framePortraits[i]=new RenderTexture(384,512,16); camera.targetTexture=framePortraits[i]; camera.Render();
         }
         camera.targetTexture=null; Destroy(camera.gameObject); Destroy(model.root.gameObject); Destroy(model.thruster.gameObject); Destroy(model.shadow.gameObject);
     }
-}
+    System.Collections.IEnumerator CaptureCustomizationLineup()
+    {
+        string dir=System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(),"Docs","Screenshots","Customization-20261106");System.IO.Directory.CreateDirectory(dir);
+        for(int i=0;i<4;i++)yield return null;
+        yield return new WaitForEndOfFrame();Texture2D image=ScreenCapture.CaptureScreenshotAsTexture();
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(dir,"Three-Frame-Hangar-Lineup.png"),image.EncodeToPNG());Destroy(image);
+        Debug.Log("CUSTOMIZATION_LINEUP_CAPTURED 3 frames / distinct weapon silhouettes");Application.Quit(0);
+    }
+
+    System.Collections.IEnumerator CaptureBastionCustomization()
+    {
+        string dir=System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(),"Docs","Screenshots","Customization-20261106");System.IO.Directory.CreateDirectory(dir);
+        for(int i=0;i<120&&!balanceIconsReady;i++)yield return null;
+        yield return new WaitForEndOfFrame();Texture2D image=ScreenCapture.CaptureScreenshotAsTexture();
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(dir,"Bastion-Customization-Actual-v002.png"),image.EncodeToPNG());Destroy(image);
+        Debug.Log("BASTION_CUSTOMIZATION_CAPTURED actual build UI + BASTION_v010");Application.Quit(0);
+    }}
+

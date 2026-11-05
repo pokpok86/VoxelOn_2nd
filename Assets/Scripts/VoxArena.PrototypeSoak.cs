@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.IO;
 using System.Collections.Generic;
@@ -8,6 +8,7 @@ public sealed partial class VoxArena
     IEnumerator PrototypeSoak()
     {
         int checks=0;bool passed=true;string folder=Path.Combine(Directory.GetCurrentDirectory(),"Docs","Screenshots","PD14-Three-Prototypes",arenaMap.ToString());Directory.CreateDirectory(folder);
+        if(Array.IndexOf(Environment.GetCommandLineArgs(),"--weapon-art-review")>=0){folder=Path.Combine(Directory.GetCurrentDirectory(),"Docs","Screenshots","Weapons-20261105","Combat",arenaMap.ToString());Directory.CreateDirectory(folder);}
         void Check(bool ok,string label){checks++;passed&=ok;Debug.Log("PROTOTYPE_CHECK "+label+" "+(ok?"PASS":"FAIL"));}
         for(int id=0;id<3;id++)
         {
@@ -38,6 +39,7 @@ public sealed partial class VoxArena
             frameTimes.Sort();float sum=0;foreach(float ms in frameTimes)sum+=ms;if(frameTimes.Count>0)Debug.Log("PROTOTYPE_PERF "+arenaMap+" "+player.spec.name+" frames="+frameTimes.Count+" avgMs="+(sum/frameTimes.Count).ToString("F2")+" p95Ms="+frameTimes[(int)(frameTimes.Count*.95f)].ToString("F2"));
             Check(frameTimes.Count>120,"actual rendered timing sample "+id);
             Debug.Log("PROTOTYPE_AI_TRAVEL "+id+" distance="+enemyTravel.ToString("F2")+" longestStill="+maxStill.ToString("F2"));
+            Check(maxStill<1.8f,"actual rival avoids sustained movement stalls "+id);
             Check(enemyTravel>5,"actual rival AI follows moving opponent "+id);Check(finite,"finite movement "+id);Check(travel>30,"actual movement/boost "+id);Check(peak>.6f,"actual jump "+id);Check(fired>5&&Array.TrueForAll(firedBySlot,n=>n>0),"four-slot actual firing "+id+" counts="+string.Join(",",firedBySlot));Check(captures==2,"actual rear gameplay captures "+id);
         }
         Debug.Log(passed?"PROTOTYPE_SOAK_PASS "+checks+" checks":"PROTOTYPE_SOAK_FAIL "+checks+" checks");Application.Quit(passed?0:2);

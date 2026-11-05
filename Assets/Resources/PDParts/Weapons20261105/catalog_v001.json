@@ -1,0 +1,1472 @@
+{
+  "models": [
+    {
+      "id": "Military_AR",
+      "title": "AR",
+      "family": "military",
+      "kind": "firearm",
+      "resource": "PDParts/Weapons20261105/Military_AR_v001",
+      "version": 1,
+      "vertexCount": 1624,
+      "meshCount": 2,
+      "min": [
+        -0.23749999701976776,
+        -0.5921065807342529,
+        -0.9100000262260437
+      ],
+      "max": [
+        0.23749999701976776,
+        0.5139625072479248,
+        1.2899999618530273
+      ],
+      "sockets": {
+        "MAGAZINE_RELEASE": [
+          0,
+          -0.2,
+          0.15
+        ],
+        "GRIP_MAIN": [
+          0,
+          -0.23,
+          -0.08
+        ],
+        "GRIP_SUPPORT": [
+          0,
+          -0.19,
+          0.49
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ],
+        "OPTIC_MOUNT": [
+          0,
+          0.23,
+          -0.03
+        ],
+        "MUZZLE": [
+          0,
+          0.015,
+          1.29
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER",
+        "MAGAZINE",
+        "BARREL"
+      ]
+    },
+    {
+      "id": "Military_LMG",
+      "title": "LMG",
+      "family": "military",
+      "kind": "firearm",
+      "resource": "PDParts/Weapons20261105/Military_LMG_v001",
+      "version": 1,
+      "vertexCount": 2312,
+      "meshCount": 3,
+      "min": [
+        -0.550000011920929,
+        -0.7400001287460327,
+        -0.9100000262260437
+      ],
+      "max": [
+        0.445000022649765,
+        0.48000001907348633,
+        1.2899999618530273
+      ],
+      "sockets": {
+        "MAGAZINE_RELEASE": [
+          0,
+          -0.2,
+          0.15
+        ],
+        "GRIP_MAIN": [
+          0,
+          -0.23,
+          -0.08
+        ],
+        "GRIP_SUPPORT": [
+          0,
+          -0.19,
+          0.49
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ],
+        "OPTIC_MOUNT": [
+          0,
+          0.23,
+          -0.03
+        ],
+        "MUZZLE": [
+          0,
+          0.015,
+          1.29
+        ],
+        "BIPOD_HINGE": [
+          0,
+          -0.13,
+          0.79
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER",
+        "MAGAZINE",
+        "BARREL",
+        "BIPOD"
+      ]
+    },
+    {
+      "id": "Military_SR",
+      "title": "SR",
+      "family": "military",
+      "kind": "firearm",
+      "resource": "PDParts/Weapons20261105/Military_SR_v001",
+      "version": 1,
+      "vertexCount": 1768,
+      "meshCount": 3,
+      "min": [
+        -0.4450000524520874,
+        -0.7400001287460327,
+        -0.9100000262260437
+      ],
+      "max": [
+        0.445000022649765,
+        0.5139625072479248,
+        1.590000033378601
+      ],
+      "sockets": {
+        "MAGAZINE_RELEASE": [
+          0,
+          -0.2,
+          0.15
+        ],
+        "GRIP_MAIN": [
+          0,
+          -0.23,
+          -0.08
+        ],
+        "GRIP_SUPPORT": [
+          0,
+          -0.19,
+          0.49
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ],
+        "OPTIC_MOUNT": [
+          0,
+          0.23,
+          -0.03
+        ],
+        "MUZZLE": [
+          0,
+          0.015,
+          1.59
+        ],
+        "BIPOD_HINGE": [
+          0,
+          -0.13,
+          0.79
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER",
+        "MAGAZINE",
+        "BARREL",
+        "BIPOD"
+      ]
+    },
+    {
+      "id": "Military_SG",
+      "title": "SG",
+      "family": "military",
+      "kind": "firearm",
+      "resource": "PDParts/Weapons20261105/Military_SG_v001",
+      "version": 1,
+      "vertexCount": 2144,
+      "meshCount": 2,
+      "min": [
+        -0.2688519358634949,
+        -0.5921065807342529,
+        -0.9100000262260437
+      ],
+      "max": [
+        0.23749999701976776,
+        0.48000001907348633,
+        1.2899999618530273
+      ],
+      "sockets": {
+        "MAGAZINE_RELEASE": [
+          0,
+          -0.2,
+          0.15
+        ],
+        "GRIP_MAIN": [
+          0,
+          -0.23,
+          -0.08
+        ],
+        "GRIP_SUPPORT": [
+          0,
+          -0.19,
+          0.49
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ],
+        "OPTIC_MOUNT": [
+          0,
+          0.23,
+          -0.03
+        ],
+        "MUZZLE": [
+          0,
+          0.015,
+          1.29
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER",
+        "MAGAZINE",
+        "BARREL"
+      ]
+    },
+    {
+      "id": "Military_GL",
+      "title": "GL",
+      "family": "military",
+      "kind": "firearm",
+      "resource": "PDParts/Weapons20261105/Military_GL_v001",
+      "version": 1,
+      "vertexCount": 1552,
+      "meshCount": 2,
+      "min": [
+        -0.310407817363739,
+        -0.6100000143051147,
+        -0.9100000262260437
+      ],
+      "max": [
+        0.310407817363739,
+        0.5139625072479248,
+        1.3700000047683716
+      ],
+      "sockets": {
+        "GRIP_MAIN": [
+          0,
+          -0.23,
+          -0.08
+        ],
+        "GRIP_SUPPORT": [
+          0,
+          -0.19,
+          0.49
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ],
+        "OPTIC_MOUNT": [
+          0,
+          0.23,
+          -0.03
+        ],
+        "MAGAZINE_RELEASE": [
+          0,
+          -0.2,
+          0.15
+        ],
+        "MUZZLE": [
+          0,
+          0.025,
+          1.38
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER",
+        "MAGAZINE"
+      ]
+    },
+    {
+      "id": "Military_RL",
+      "title": "RL",
+      "family": "military",
+      "kind": "firearm",
+      "resource": "PDParts/Weapons20261105/Military_RL_v001",
+      "version": 1,
+      "vertexCount": 1136,
+      "meshCount": 1,
+      "min": [
+        -0.31411904096603394,
+        -0.42939335107803345,
+        -0.7799999713897705
+      ],
+      "max": [
+        0.31411904096603394,
+        0.5139625072479248,
+        1.3799999952316284
+      ],
+      "sockets": {
+        "GRIP_MAIN": [
+          0,
+          -0.23,
+          -0.08
+        ],
+        "GRIP_SUPPORT": [
+          0,
+          -0.19,
+          0.49
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ],
+        "OPTIC_MOUNT": [
+          0,
+          0.23,
+          -0.03
+        ],
+        "MUZZLE": [
+          0,
+          0.08,
+          1.39
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER"
+      ]
+    },
+    {
+      "id": "Military_HG",
+      "title": "HG",
+      "family": "military",
+      "kind": "firearm",
+      "resource": "PDParts/Weapons20261105/Military_HG_v001",
+      "version": 1,
+      "vertexCount": 904,
+      "meshCount": 1,
+      "min": [
+        -0.23749999701976776,
+        -0.42939335107803345,
+        -0.3199999928474426
+      ],
+      "max": [
+        0.23749999701976776,
+        0.23749999701976776,
+        0.6800000071525574
+      ],
+      "sockets": {
+        "GRIP_MAIN": [
+          0,
+          -0.23,
+          -0.08
+        ],
+        "GRIP_SUPPORT": [
+          0,
+          -0.19,
+          0.49
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ],
+        "OPTIC_MOUNT": [
+          0,
+          0.23,
+          -0.03
+        ],
+        "MUZZLE": [
+          0,
+          0.015,
+          0.6799999999999999
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER",
+        "BARREL"
+      ]
+    },
+    {
+      "id": "Military_SMG",
+      "title": "SMG",
+      "family": "military",
+      "kind": "firearm",
+      "resource": "PDParts/Weapons20261105/Military_SMG_v001",
+      "version": 1,
+      "vertexCount": 1616,
+      "meshCount": 2,
+      "min": [
+        -0.23749999701976776,
+        -0.5921065807342529,
+        -0.9100000262260437
+      ],
+      "max": [
+        0.23749999701976776,
+        0.48000001907348633,
+        1.059999942779541
+      ],
+      "sockets": {
+        "MAGAZINE_RELEASE": [
+          0,
+          -0.2,
+          0.15
+        ],
+        "GRIP_MAIN": [
+          0,
+          -0.23,
+          -0.08
+        ],
+        "GRIP_SUPPORT": [
+          0,
+          -0.19,
+          0.49
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ],
+        "OPTIC_MOUNT": [
+          0,
+          0.23,
+          -0.03
+        ],
+        "MUZZLE": [
+          0,
+          0.015,
+          1.06
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER",
+        "MAGAZINE",
+        "BARREL"
+      ]
+    },
+    {
+      "id": "Military_FL",
+      "title": "FL",
+      "family": "military",
+      "kind": "firearm",
+      "resource": "PDParts/Weapons20261105/Military_FL_v001",
+      "version": 1,
+      "vertexCount": 1640,
+      "meshCount": 1,
+      "min": [
+        -0.6340000033378601,
+        -0.57978755235672,
+        -0.46000003814697266
+      ],
+      "max": [
+        0.23749999701976776,
+        0.4400000274181366,
+        1.0825001001358032
+      ],
+      "sockets": {
+        "GRIP_MAIN": [
+          0,
+          -0.23,
+          -0.08
+        ],
+        "GRIP_SUPPORT": [
+          0,
+          -0.19,
+          0.49
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ],
+        "OPTIC_MOUNT": [
+          0,
+          0.23,
+          -0.03
+        ],
+        "MUZZLE": [
+          0,
+          0.015,
+          1.12
+        ],
+        "FUEL_CONNECTOR": [
+          -0.4,
+          -0.36,
+          -0.23
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER",
+        "BARREL"
+      ]
+    },
+    {
+      "id": "Future_Rifle",
+      "title": "Rifle",
+      "family": "future",
+      "kind": "firearm",
+      "resource": "PDParts/Weapons20261105/Future_Rifle_v001",
+      "version": 1,
+      "vertexCount": 1616,
+      "meshCount": 2,
+      "min": [
+        -0.23749999701976776,
+        -0.5921065807342529,
+        -0.9100000262260437
+      ],
+      "max": [
+        0.23749999701976776,
+        0.5139625072479248,
+        1.275999903678894
+      ],
+      "sockets": {
+        "MAGAZINE_RELEASE": [
+          0,
+          -0.2,
+          0.15
+        ],
+        "GRIP_MAIN": [
+          0,
+          -0.23,
+          -0.08
+        ],
+        "GRIP_SUPPORT": [
+          0,
+          -0.19,
+          0.49
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ],
+        "OPTIC_MOUNT": [
+          0,
+          0.23,
+          -0.03
+        ],
+        "MUZZLE": [
+          0,
+          0.025,
+          1.29
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER",
+        "MAGAZINE"
+      ]
+    },
+    {
+      "id": "Future_Gatling",
+      "title": "Gatling",
+      "family": "future",
+      "kind": "firearm",
+      "resource": "PDParts/Weapons20261105/Future_Gatling_v001",
+      "version": 1,
+      "vertexCount": 1176,
+      "meshCount": 2,
+      "min": [
+        -0.5799999833106995,
+        -0.42939335107803345,
+        -0.3199999928474426
+      ],
+      "max": [
+        0.37671107053756714,
+        0.41671106219291687,
+        1.2799999713897705
+      ],
+      "sockets": {
+        "GRIP_MAIN": [
+          0,
+          -0.23,
+          -0.08
+        ],
+        "GRIP_SUPPORT": [
+          0,
+          -0.19,
+          0.49
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ],
+        "OPTIC_MOUNT": [
+          0,
+          0.23,
+          -0.03
+        ],
+        "MUZZLE_0": [
+          1.1634144591899856e-17,
+          0.23,
+          1.29
+        ],
+        "MUZZLE_1": [
+          -0.1645448267190434,
+          -0.054999999999999875,
+          1.29
+        ],
+        "MUZZLE_2": [
+          0.1645448267190433,
+          -0.055000000000000084,
+          1.29
+        ],
+        "MUZZLE": [
+          0,
+          0.04,
+          1.29
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER",
+        "BARREL"
+      ]
+    },
+    {
+      "id": "Future_Launcher",
+      "title": "Launcher",
+      "family": "future",
+      "kind": "firearm",
+      "resource": "PDParts/Weapons20261105/Future_Launcher_v001",
+      "version": 1,
+      "vertexCount": 1448,
+      "meshCount": 1,
+      "min": [
+        -0.45500001311302185,
+        -0.42939335107803345,
+        -0.9100000262260437
+      ],
+      "max": [
+        0.45500001311302185,
+        0.48000001907348633,
+        1.0149999856948853
+      ],
+      "sockets": {
+        "GRIP_MAIN": [
+          0,
+          -0.23,
+          -0.08
+        ],
+        "GRIP_SUPPORT": [
+          0,
+          -0.19,
+          0.49
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ],
+        "OPTIC_MOUNT": [
+          0,
+          0.23,
+          -0.03
+        ],
+        "MUZZLE": [
+          0,
+          0.06,
+          1.03
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER"
+      ]
+    },
+    {
+      "id": "Future_Sniper",
+      "title": "Sniper",
+      "family": "future",
+      "kind": "firearm",
+      "resource": "PDParts/Weapons20261105/Future_Sniper_v001",
+      "version": 1,
+      "vertexCount": 1704,
+      "meshCount": 2,
+      "min": [
+        -0.23749999701976776,
+        -0.5921065807342529,
+        -0.9100000262260437
+      ],
+      "max": [
+        0.23749999701976776,
+        0.5139625072479248,
+        1.659999966621399
+      ],
+      "sockets": {
+        "MAGAZINE_RELEASE": [
+          0,
+          -0.2,
+          0.15
+        ],
+        "GRIP_MAIN": [
+          0,
+          -0.23,
+          -0.08
+        ],
+        "GRIP_SUPPORT": [
+          0,
+          -0.19,
+          0.49
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ],
+        "OPTIC_MOUNT": [
+          0,
+          0.23,
+          -0.03
+        ],
+        "MUZZLE": [
+          0,
+          0.015,
+          1.6600000000000001
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER",
+        "MAGAZINE",
+        "BARREL"
+      ]
+    },
+    {
+      "id": "Future_Beam",
+      "title": "Beam",
+      "family": "future",
+      "kind": "firearm",
+      "resource": "PDParts/Weapons20261105/Future_Beam_v001",
+      "version": 1,
+      "vertexCount": 1712,
+      "meshCount": 2,
+      "min": [
+        -0.25,
+        -0.5921065807342529,
+        -0.9100000262260437
+      ],
+      "max": [
+        0.25,
+        0.5139625072479248,
+        1.4339998960494995
+      ],
+      "sockets": {
+        "MAGAZINE_RELEASE": [
+          0,
+          -0.2,
+          0.15
+        ],
+        "GRIP_MAIN": [
+          0,
+          -0.23,
+          -0.08
+        ],
+        "GRIP_SUPPORT": [
+          0,
+          -0.19,
+          0.49
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ],
+        "OPTIC_MOUNT": [
+          0,
+          0.23,
+          -0.03
+        ],
+        "MUZZLE": [
+          0,
+          0.025,
+          1.44
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER",
+        "MAGAZINE"
+      ]
+    },
+    {
+      "id": "Future_Shotgun",
+      "title": "Shotgun",
+      "family": "future",
+      "kind": "firearm",
+      "resource": "PDParts/Weapons20261105/Future_Shotgun_v001",
+      "version": 1,
+      "vertexCount": 1904,
+      "meshCount": 2,
+      "min": [
+        -0.36000001430511475,
+        -0.5921065807342529,
+        -0.9100000262260437
+      ],
+      "max": [
+        0.23749999701976776,
+        0.5139625072479248,
+        1.275999903678894
+      ],
+      "sockets": {
+        "MAGAZINE_RELEASE": [
+          0,
+          -0.2,
+          0.15
+        ],
+        "GRIP_MAIN": [
+          0,
+          -0.23,
+          -0.08
+        ],
+        "GRIP_SUPPORT": [
+          0,
+          -0.19,
+          0.49
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ],
+        "OPTIC_MOUNT": [
+          0,
+          0.23,
+          -0.03
+        ],
+        "MUZZLE": [
+          0,
+          0.025,
+          1.29
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER",
+        "MAGAZINE"
+      ]
+    },
+    {
+      "id": "Future_Sword",
+      "title": "Sword",
+      "family": "future",
+      "kind": "special",
+      "resource": "PDParts/Weapons20261105/Future_Sword_v001",
+      "version": 1,
+      "vertexCount": 92,
+      "meshCount": 1,
+      "min": [
+        -0.2849999964237213,
+        -0.125,
+        -0.6000000238418579
+      ],
+      "max": [
+        0.2849999964237213,
+        0.20000000298023224,
+        1.8300000429153442
+      ],
+      "sockets": {
+        "GRIP_MAIN": [
+          0,
+          0,
+          -0.33
+        ],
+        "TIP": [
+          0,
+          0,
+          1.84
+        ],
+        "MOUNT": [
+          0,
+          0,
+          -0.33
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER"
+      ]
+    },
+    {
+      "id": "Future_Hammer",
+      "title": "Hammer",
+      "family": "future",
+      "kind": "special",
+      "resource": "PDParts/Weapons20261105/Future_Hammer_v001",
+      "version": 1,
+      "vertexCount": 216,
+      "meshCount": 1,
+      "min": [
+        -0.6559999585151672,
+        -0.33000001311302185,
+        -0.44999995827674866
+      ],
+      "max": [
+        0.6559999585151672,
+        0.33000001311302185,
+        1.3399999141693115
+      ],
+      "sockets": {
+        "GRIP_MAIN": [
+          0,
+          0,
+          -0.25
+        ],
+        "TIP": [
+          0,
+          0,
+          1.34
+        ],
+        "MOUNT": [
+          0,
+          0,
+          -0.25
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER"
+      ]
+    },
+    {
+      "id": "Future_Shield",
+      "title": "Shield",
+      "family": "future",
+      "kind": "special",
+      "resource": "PDParts/Weapons20261105/Future_Shield_v001",
+      "version": 1,
+      "vertexCount": 248,
+      "meshCount": 1,
+      "min": [
+        -0.5299999713897705,
+        -0.800000011920929,
+        -0.2200000286102295
+      ],
+      "max": [
+        0.5299999713897705,
+        0.800000011920929,
+        0.24500000476837158
+      ],
+      "sockets": {
+        "GRIP_MAIN": [
+          0,
+          0,
+          -0.18
+        ],
+        "MOUNT": [
+          0,
+          0,
+          -0.18
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER"
+      ]
+    },
+    {
+      "id": "Future_HoloShield",
+      "title": "HoloShield",
+      "family": "future",
+      "kind": "special",
+      "resource": "PDParts/Weapons20261105/Future_HoloShield_v001",
+      "version": 1,
+      "vertexCount": 9816,
+      "meshCount": 1,
+      "min": [
+        -0.7527461647987366,
+        -0.9900000095367432,
+        -0.2200000286102295
+      ],
+      "max": [
+        0.7527461647987366,
+        0.9900000095367432,
+        0.3310000002384186
+      ],
+      "sockets": {
+        "GRIP_MAIN": [
+          0,
+          0,
+          -0.18
+        ],
+        "MOUNT": [
+          0,
+          0,
+          -0.18
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER"
+      ]
+    },
+    {
+      "id": "Future_Drone",
+      "title": "Drone",
+      "family": "future",
+      "kind": "special",
+      "resource": "PDParts/Weapons20261105/Future_Drone_v001",
+      "version": 1,
+      "vertexCount": 472,
+      "meshCount": 1,
+      "min": [
+        -0.6699999570846558,
+        -0.5800000429153442,
+        -0.27000001072883606
+      ],
+      "max": [
+        0.6699999570846558,
+        0.5800000429153442,
+        0.40400001406669617
+      ],
+      "sockets": {
+        "GRIP_MAIN": [
+          0,
+          0,
+          -0.3
+        ],
+        "MOUNT": [
+          0,
+          0,
+          -0.3
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER"
+      ]
+    },
+    {
+      "id": "Throwable_Grenade",
+      "title": "Grenade",
+      "family": "throwable",
+      "kind": "special",
+      "resource": "PDParts/Weapons20261105/Throwable_Grenade_v001",
+      "version": 1,
+      "vertexCount": 744,
+      "meshCount": 1,
+      "min": [
+        -0.25,
+        -0.24000000953674316,
+        -0.2500000298023224
+      ],
+      "max": [
+        0.25,
+        0.42693331837654114,
+        0.2500000298023224
+      ],
+      "sockets": {
+        "GRIP_MAIN": [
+          0,
+          0,
+          0
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER"
+      ]
+    },
+    {
+      "id": "Throwable_Smoke",
+      "title": "Smoke",
+      "family": "throwable",
+      "kind": "special",
+      "resource": "PDParts/Weapons20261105/Throwable_Smoke_v001",
+      "version": 1,
+      "vertexCount": 120,
+      "meshCount": 1,
+      "min": [
+        -0.1599999964237213,
+        -0.27000001072883606,
+        -0.11999999731779099
+      ],
+      "max": [
+        0.1599999964237213,
+        0.39000001549720764,
+        0.15600000321865082
+      ],
+      "sockets": {
+        "GRIP_MAIN": [
+          0,
+          0,
+          0
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER"
+      ]
+    },
+    {
+      "id": "Throwable_EMP",
+      "title": "EMP",
+      "family": "throwable",
+      "kind": "special",
+      "resource": "PDParts/Weapons20261105/Throwable_EMP_v001",
+      "version": 1,
+      "vertexCount": 120,
+      "meshCount": 1,
+      "min": [
+        -0.1599999964237213,
+        -0.27000001072883606,
+        -0.11999999731779099
+      ],
+      "max": [
+        0.1599999964237213,
+        0.39000001549720764,
+        0.15600000321865082
+      ],
+      "sockets": {
+        "GRIP_MAIN": [
+          0,
+          0,
+          0
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER"
+      ]
+    },
+    {
+      "id": "Throwable_Incendiary",
+      "title": "Incendiary",
+      "family": "throwable",
+      "kind": "special",
+      "resource": "PDParts/Weapons20261105/Throwable_Incendiary_v001",
+      "version": 1,
+      "vertexCount": 120,
+      "meshCount": 1,
+      "min": [
+        -0.1599999964237213,
+        -0.27000001072883606,
+        -0.11999999731779099
+      ],
+      "max": [
+        0.1599999964237213,
+        0.39000001549720764,
+        0.15600000321865082
+      ],
+      "sockets": {
+        "GRIP_MAIN": [
+          0,
+          0,
+          0
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER"
+      ]
+    },
+    {
+      "id": "Module_Scope",
+      "title": "Scope",
+      "family": "module",
+      "kind": "module",
+      "resource": "PDParts/Weapons20261105/Module_Scope_v001",
+      "version": 1,
+      "vertexCount": 176,
+      "meshCount": 1,
+      "min": [
+        -0.13396252691745758,
+        0.20999999344348907,
+        -0.23000000417232513
+      ],
+      "max": [
+        0.17499999701976776,
+        0.5139625072479248,
+        0.22499999403953552
+      ],
+      "sockets": {
+        "GRIP_MAIN": [
+          0,
+          0,
+          0
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER"
+      ]
+    },
+    {
+      "id": "Module_DotSight",
+      "title": "DotSight",
+      "family": "module",
+      "kind": "module",
+      "resource": "PDParts/Weapons20261105/Module_DotSight_v001",
+      "version": 1,
+      "vertexCount": 168,
+      "meshCount": 1,
+      "min": [
+        -0.14499999582767487,
+        0.20999999344348907,
+        -0.1599999964237213
+      ],
+      "max": [
+        0.14499999582767487,
+        0.48000001907348633,
+        0.09999999403953552
+      ],
+      "sockets": {
+        "GRIP_MAIN": [
+          0,
+          0,
+          0
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER"
+      ]
+    },
+    {
+      "id": "Module_HoloSight",
+      "title": "HoloSight",
+      "family": "module",
+      "kind": "module",
+      "resource": "PDParts/Weapons20261105/Module_HoloSight_v001",
+      "version": 1,
+      "vertexCount": 216,
+      "meshCount": 1,
+      "min": [
+        -0.20999999344348907,
+        0.20999999344348907,
+        -0.1599999964237213
+      ],
+      "max": [
+        0.20999999344348907,
+        0.5099999904632568,
+        0.09999999403953552
+      ],
+      "sockets": {
+        "GRIP_MAIN": [
+          0,
+          0,
+          0
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER"
+      ]
+    },
+    {
+      "id": "Module_Laser",
+      "title": "Laser",
+      "family": "module",
+      "kind": "module",
+      "resource": "PDParts/Weapons20261105/Module_Laser_v001",
+      "version": 1,
+      "vertexCount": 128,
+      "meshCount": 1,
+      "min": [
+        -0.11999999731779099,
+        -0.10999999940395355,
+        -0.26499998569488525
+      ],
+      "max": [
+        0.11999999731779099,
+        0.16499999165534973,
+        0.35100001096725464
+      ],
+      "sockets": {
+        "GRIP_MAIN": [
+          0,
+          0,
+          0
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER"
+      ]
+    },
+    {
+      "id": "Module_ExtendedMag",
+      "title": "ExtendedMag",
+      "family": "module",
+      "kind": "module",
+      "resource": "PDParts/Weapons20261105/Module_ExtendedMag_v001",
+      "version": 1,
+      "vertexCount": 312,
+      "meshCount": 1,
+      "min": [
+        -0.10999999940395355,
+        -0.7169693112373352,
+        -0.06271332502365112
+      ],
+      "max": [
+        0.10999999940395355,
+        -0.1574999988079071,
+        0.2750000059604645
+      ],
+      "sockets": {
+        "MAGAZINE_RELEASE": [
+          0,
+          -0.2,
+          0.15
+        ],
+        "GRIP_MAIN": [
+          0,
+          0,
+          0
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ]
+      },
+      "movingRoots": [
+        "MAGAZINE",
+        "RECEIVER"
+      ]
+    },
+    {
+      "id": "Module_DrumMag",
+      "title": "DrumMag",
+      "family": "module",
+      "kind": "module",
+      "resource": "PDParts/Weapons20261105/Module_DrumMag_v001",
+      "version": 1,
+      "vertexCount": 144,
+      "meshCount": 1,
+      "min": [
+        -0.2549999952316284,
+        -0.6100000143051147,
+        -0.1900000274181366
+      ],
+      "max": [
+        0.18000002205371857,
+        -0.06999999284744263,
+        0.3500000238418579
+      ],
+      "sockets": {
+        "MAGAZINE_RELEASE": [
+          0,
+          -0.2,
+          0.15
+        ],
+        "GRIP_MAIN": [
+          0,
+          0,
+          0
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ]
+      },
+      "movingRoots": [
+        "MAGAZINE",
+        "RECEIVER"
+      ]
+    },
+    {
+      "id": "Module_Suppressor",
+      "title": "Suppressor",
+      "family": "module",
+      "kind": "module",
+      "resource": "PDParts/Weapons20261105/Module_Suppressor_v001",
+      "version": 1,
+      "vertexCount": 168,
+      "meshCount": 1,
+      "min": [
+        -0.17000000178813934,
+        -0.17000000178813934,
+        -0.4749999940395355
+      ],
+      "max": [
+        0.17000000178813934,
+        0.17000000178813934,
+        0.5099999904632568
+      ],
+      "sockets": {
+        "GRIP_MAIN": [
+          0,
+          0,
+          0
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER"
+      ]
+    },
+    {
+      "id": "Module_FlashHider",
+      "title": "FlashHider",
+      "family": "module",
+      "kind": "module",
+      "resource": "PDParts/Weapons20261105/Module_FlashHider_v001",
+      "version": 1,
+      "vertexCount": 352,
+      "meshCount": 1,
+      "min": [
+        -0.21420617401599884,
+        -0.19022193551063538,
+        -0.2199999988079071
+      ],
+      "max": [
+        0.21420617401599884,
+        0.19022193551063538,
+        0.2199999988079071
+      ],
+      "sockets": {
+        "GRIP_MAIN": [
+          0,
+          0,
+          0
+        ],
+        "MOUNT": [
+          0,
+          0,
+          0
+        ]
+      },
+      "movingRoots": [
+        "RECEIVER"
+      ]
+    }
+  ]
+}

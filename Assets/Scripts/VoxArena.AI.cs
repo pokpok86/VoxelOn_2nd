@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public sealed partial class VoxArena
 {
@@ -36,6 +36,11 @@ public sealed partial class VoxArena
         Vector3 aim=(point-shooter.root.position).normalized;
         return Quaternion.Euler(0,Mathf.Sin(shooter.aiClock*2.7f)*(difficulty==0?8:difficulty==1?4:1.7f),0)*aim;
     }
+    bool AIEndpointInsideArena(Vector3 point,float radius)
+    {
+        float limit=Mathf.Max(.1f,ArenaLimit-radius-.02f);
+        return Mathf.Abs(point.x)<=limit&&Mathf.Abs(point.z)<=limit;
+    }
     Vector3 EscapeHeading(Fighter f,Vector3 goal)
     {
         Vector3 best=Vector3.zero; float bestScore=float.NegativeInfinity;
@@ -46,7 +51,7 @@ public sealed partial class VoxArena
         {
             Vector3 direction=Quaternion.Euler(0,i*15f,0)*Vector3.forward;
             Vector3 end=f.root.position+direction*distances[ring];
-            if(Occupied(end,f.Radius)) continue;
+            if(!AIEndpointInsideArena(end,f.Radius)||Occupied(end,f.Radius)) continue;
             if(!startsInside&&ObstacleOnSegment(f.root.position,end,f.Radius*.7f,out _)) continue;
             float clearance=8f;
             foreach(Bounds obstacle in obstacles)
@@ -71,8 +76,10 @@ public sealed partial class VoxArena
         float personality=(f.frameIndex*0.618f+f.teamId*.37f)%1f;
         float preferred=Mathf.Clamp(f.spec.range*(.31f+personality*.24f),10,38);
         if(f.orbitTime<=0) { f.orbitTime=1.5f+personality*2.8f; f.orbitSign=-f.orbitSign; }
-        bool blockedMove=f.aiMove.sqrMagnitude<.01f || f.velocity.magnitude<.6f&&f.aiMove.sqrMagnitude>.1f;
-        if(blockedMove) f.stuckTime+=dt; else if(f.velocity.magnitude>.6f) f.stuckTime=0;
+        // Vertical jumping against a wall is not progress along a walking route.
+        float planarSpeed=Vector3.ProjectOnPlane(f.velocity,Vector3.up).magnitude;
+        bool blockedMove=f.aiMove.sqrMagnitude<.01f || planarSpeed<.6f&&f.aiMove.sqrMagnitude>.1f;
+        if(blockedMove) f.stuckTime+=dt; else if(planarSpeed>.6f) f.stuckTime=0;
         if(f.aiReaction<=0)
         {
             f.aiReaction=(difficulty==0?.60f:difficulty==1?.34f:.23f)*(.85f+personality*.5f);
@@ -89,7 +96,7 @@ public sealed partial class VoxArena
             {
                 Vector3 candidate=Quaternion.Euler(0,i*15,0)*Vector3.forward;
                 Vector3 end=f.root.position+candidate*f.spec.speed*.5f;
-                if(ObstacleOnSegment(f.root.position,end,f.Radius+.1f,out _)) continue;
+                if(!AIEndpointInsideArena(end,f.Radius)||ObstacleOnSegment(f.root.position,end,f.Radius+.1f,out _)) continue;
                 float score=Vector3.Dot(candidate,goal.normalized)*6;
                 float newDistance=Vector3.Distance(end,target.root.position);
                 score-=Mathf.Abs(newDistance-preferred)*.12f;
@@ -105,7 +112,7 @@ public sealed partial class VoxArena
             if(best.sqrMagnitude<.01f || recovering)
             {
                 Vector3 escape=EscapeHeading(f,goal);
-                if(escape.sqrMagnitude>.01f) { best=escape; f.stuckTime=0; }
+                if(escape.sqrMagnitude>.01f) { best=escape; } // Only actual planar movement clears the stall timer.
             }
             f.aiMove=best;
             f.aiState=currentThreat>3?"EVADE":obscured?"FLANK":distance>preferred+4?"CHASE":"ORBIT";

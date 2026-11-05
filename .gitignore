@@ -41,3 +41,5 @@ Thumbs.db
 
 # Local Blender automatic save copies; versioned .blend sources remain tracked.
 *.blend[1-9]*
+Data/Balance/*.json.bak
+Data/Balance/*.json.tmp

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 public sealed partial class VoxArena
 {
@@ -66,35 +66,9 @@ public sealed partial class VoxArena
             return;
         }
         if(f.importedHipRest==null)return;
-        bool air=f.jumpHeight>.08f;
-        for(int i=0;i<4;i++)
-        {
-            float phase=roundTime*9f+((i==0||i==3)?0:Mathf.PI);
-            float cycle=Mathf.Sin(phase)*stride,lift=Mathf.Max(0,cycle)*.10f;
-            Transform hip=f.quadrupedLegs[i],knee=f.quadrupedKnees[i],foot=f.quadrupedAnkles[i];
-            hip.localPosition=f.importedHipRest[i]+Vector3.up*(air?.04f:lift);
-            hip.localRotation=Quaternion.Euler(air?8:cycle*7,0,0);
-            knee.localRotation=Quaternion.Euler(air?15:Mathf.Max(0,cycle)*9,0,0);
-            foot.localRotation=Quaternion.Inverse(hip.localRotation*knee.localRotation);
-            if(!air)
-            {
-                // Solve from the authored rest offsets, keeping the hip attached to the chassis.
-                hip.localRotation=knee.localRotation=Quaternion.identity;
-                Vector3 target=foot.position;float scale=foot.lossyScale.y;
-                float floor=LandingHeight(new Vector3(target.x,f.root.position.y,target.z),.08f,f.root.position.y)-FighterSupportOffset;
-                target.y=floor+.075f*scale+lift*scale;
-                Vector3 start=hip.position,first=knee.position-start,second=foot.position-knee.position,d=target-start;
-                float l1=first.magnitude,l2=second.magnitude,length=Mathf.Clamp(d.magnitude,Mathf.Abs(l1-l2)+.001f,l1+l2-.001f);
-                Vector3 axis=d.normalized,bend=Vector3.ProjectOnPlane(first,axis).normalized;
-                if(bend.sqrMagnitude<.01f)bend=Vector3.ProjectOnPlane(Vector3.up,axis).normalized;
-                float along=(l1*l1-l2*l2+length*length)/(2*length),height=Mathf.Sqrt(Mathf.Max(0,l1*l1-along*along));
-                Vector3 kneeTarget=start+axis*along+bend*height;
-                hip.rotation=Quaternion.FromToRotation(first,kneeTarget-start)*hip.rotation;
-                knee.rotation=Quaternion.FromToRotation(foot.position-knee.position,target-knee.position)*knee.rotation;
-                foot.rotation=Quaternion.LookRotation(f.facing,Vector3.up);
-            }
-        }
+        AnimateQuadrupedGait(f,stride,dt);
     }
+
     void ChassisChecks(Action<bool,string> check)
     {
         bool prior=smoke;smoke=false;

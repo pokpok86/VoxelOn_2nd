@@ -1,0 +1,82 @@
+[
+  {
+    "path": "Docs/Validation/Equipment-20261105/Balance-Editor-02-Balance.txt",
+    "sha256": "15db1cb2309a741c2cff9543a2d133d85b9a5a436836e15767fcde6a57907808"
+  },
+  {
+    "path": "Docs/Validation/Equipment-20261105/Balance-Editor-Build.txt",
+    "sha256": "629dbafb5fd59e6acf07cc2c077b8c0fb3f680d91fd9c0ca275b6378097e4ea3"
+  },
+  {
+    "path": "Docs/Validation/Equipment-20261105/Equipment-HUD-Final-Balance.txt",
+    "sha256": "9ceb24b7f4fc3465425545addc6e5efb4752739ccbda3e0a03a433c7894fd30c"
+  },
+  {
+    "path": "Docs/Validation/Equipment-20261105/Equipment-HUD-Final-Build.txt",
+    "sha256": "2a53027b6bacc83480acc13a3da958bc2972b2aaef14ece13a4ae7f54fc574fd"
+  },
+  {
+    "path": "Docs/Validation/Equipment-20261105/Equipment-HUD-Final-Smoke.txt",
+    "sha256": "0cf3de0bf3ba2f1a9c0f6e7cd95b96c607d7399e55605af4c05791b8ef948233"
+  },
+  {
+    "path": "Docs/Validation/Equipment-20261105/Equipment-HUD-Final-UI.txt",
+    "sha256": "982123f29e0a4ab4d717665bb8ea5eac063b1390dd5580ada099345bb824ca44"
+  },
+  {
+    "path": "Docs/Validation/Equipment-20261105/Equipment-Verified-Balance.txt",
+    "sha256": "0737b4b669a41d2ba888a4cd76fff5f1cbad18fdeb2bb07b0e08858340ee24c6"
+  },
+  {
+    "path": "Docs/Validation/Equipment-20261105/Equipment-Verified-Build.txt",
+    "sha256": "9883b480372a0deaf050ccaede41a45d6fca86f0407cf07d02775a711816838c"
+  },
+  {
+    "path": "Docs/Validation/Equipment-20261105/Equipment-Verified-Gloves.txt",
+    "sha256": "a99b5b39bcf0cd997b48d24db3447d1542bf7af55de981c4b8d75d9d83408cf0"
+  },
+  {
+    "path": "Docs/Validation/Equipment-20261105/Equipment-Verified-Smoke.txt",
+    "sha256": "dad7462394130d2a8846d36d078150d3379e68e79d0cae1a48d3fdb587c30b39"
+  },
+  {
+    "path": "Docs/Validation/Equipment-20261105/GloveHands-Blender.txt",
+    "sha256": "331325e5299fc7284d06baf120a741f27ceb706ec80b551b57813036faa1f64a"
+  },
+  {
+    "path": "Docs/Validation/Equipment-20261105/GloveHands-NativeIntegrity.txt",
+    "sha256": "7e054f57c0e3dc689dc5e4f76bc11f1a46f548dd6b0ec3bf378bc16ef50503b0"
+  },
+  {
+    "path": "Docs/Validation/Equipment-20261105/Shoulder-Linked-Controls.txt",
+    "sha256": "82b62ea9e259d499bb9c2dd72aac5ed8c23b7bd0d3de6911467123efba5fe20f"
+  },
+  {
+    "path": "Docs/Validation/Equipment-20261105/Shoulder-Linked-Indoor.txt",
+    "sha256": "b3d19311d8b5ae510d587ccf668e8cbe138520535cba6fec71e129279a806169"
+  },
+  {
+    "path": "Docs/Validation/Equipment-20261105/Shoulder-Linked-Outdoor.txt",
+    "sha256": "974e12485fd06574f36d3b2087cfd47bc692ca6458236643f6e5f33a1197cc23"
+  },
+  {
+    "path": "Docs/Validation/Equipment-20261105/Shoulder-Linked-Smoke.txt",
+    "sha256": "1022b04fc947499a8ac9d42ff380638c1043755a11f68bdabaeb47b6c8ce8965"
+  },
+  {
+    "path": "Docs/Validation/Equipment-20261105/Shoulder-Linked-Weapons.txt",
+    "sha256": "138faba892b2bb7397e1bdb8da76ce136fe021bc5fa3d4b57bb15bd010e8ffa5"
+  },
+  {
+    "path": "Docs/Validation/Equipment-20261105/WeaponLibrary-v003.txt",
+    "sha256": "2c7369696ced8d692b43f3d4e394e75e916d2cf24ad45c96cdfc669e25c09f4d"
+  },
+  {
+    "path": "Docs/Validation/Equipment-20261105/Weapons-v002-Indoor.txt",
+    "sha256": "3cd7db20a89deb97824fc64890cae00020c774e3890cb55e19fe1d6704730810"
+  },
+  {
+    "path": "Docs/Validation/Equipment-20261105/Weapons-v003-Indoor-Diagnostic.txt",
+    "sha256": "19caa93720b1e5d4bdf365bfea174e603d8b977619c2e505224ba32f5bdbaad1"
+  }
+]

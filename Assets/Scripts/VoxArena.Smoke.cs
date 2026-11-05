@@ -22,7 +22,7 @@ public sealed partial class VoxArena
         yield return new WaitForSecondsRealtime(.4f);
         yield return new WaitForEndOfFrame();
         if(!SaveGameplayUIFrame("WISP-crosshair-camera.png")) yield break;
-        player.guarding=true;
+        EquipGuardForReview(player);player.guarding=true;
         for(int frame=0;frame<35;frame++) { Animate(player); yield return null; }
         yield return new WaitForEndOfFrame();
         if(!SaveGameplayUIFrame("WISP-guard-gameplay.png")) yield break;
@@ -762,6 +762,10 @@ public sealed partial class VoxArena
                     foreach(Renderer partRenderer in module.GetComponentsInChildren<Renderer>(true))
                         if(partRenderer.enabled&&partRenderer.gameObject.activeInHierarchy)
                         {
+                            // Imported-body scale excludes equipment now parented under real shoulder bones.
+                            // Keep the original body-height tolerance; validate equipment separately below.
+                            bool equipment=player.weaponVisuals!=null&&System.Array.Exists(player.weaponVisuals,m=>m!=null&&partRenderer.transform.IsChildOf(m));
+                            if(equipment||player.guardShield!=null&&partRenderer.transform.IsChildOf(player.guardShield))continue;
                             if(partRenderer is SkinnedMeshRenderer skin)
                             {
                                 Vector3[] vertices=skin.sharedMesh.vertices;
@@ -784,11 +788,15 @@ public sealed partial class VoxArena
                 Check(hasWispBounds&&Mathf.Abs(wispBounds.min.y-GroundSurfaceY)<.01f&&
                     Mathf.Abs(player.body.localPosition.y)<.001f,
                     "WISP sole vertices rest on the arena floor without idle hover (minY="+wispBounds.min.y.ToString("F3")+" floor="+GroundSurfaceY.ToString("F3")+")");
-                Check((wispModelSource.name=="WISP_v007"||wispModelSource.name=="WISP_v008"||wispModelSource.name=="WISP_v009"||wispModelSource.name=="WISP_v010"||wispModelSource.name=="WISP_v011")?Mathf.Abs(wispBounds.size.y-3.5105f)<.025f:(wispModelSource.name=="WISP_v005"||wispModelSource.name=="WISP_v006")?Mathf.Abs(wispBounds.size.y-3.778f)<.025f:wispBounds.size.y>3.8f&&wispBounds.size.y<4.6f,
+                Check((wispModelSource.name=="WISP_v007"||wispModelSource.name=="WISP_v008"||wispModelSource.name=="WISP_v009"||wispModelSource.name=="WISP_v010"||(wispModelSource.name=="WISP_v011"||(wispModelSource.name=="WISP_v012"||(wispModelSource.name=="WISP_v013"||wispModelSource.name=="WISP_v014"))))?Mathf.Abs(wispBounds.size.y-3.5105f)<.025f:(wispModelSource.name=="WISP_v005"||wispModelSource.name=="WISP_v006")?Mathf.Abs(wispBounds.size.y-3.778f)<.025f:wispBounds.size.y>3.8f&&wispBounds.size.y<4.6f,
                     "WISP imported visual keeps arena robot scale (height="+wispBounds.size.y.ToString("F3")+")");
-                if(wispModelSource.name=="WISP_v011")Check(HoseFollowsKnee(player),"Blender service hose blends torso to real knee and its endpoint follows rotation");
-                Vector3 restingShield=player.guardShield.position;
+                Bounds equipmentEnvelope=wispBounds;
+                foreach(Transform mount in player.weaponVisuals)foreach(Renderer gear in mount.GetComponentsInChildren<Renderer>())if(gear.enabled&&gear.gameObject.activeInHierarchy)equipmentEnvelope.Encapsulate(gear.bounds);
+                Check(Finite(equipmentEnvelope.size)&&equipmentEnvelope.size.y<=wispBounds.size.y+2f,"moving equipped weapons keep finite, bounded visual dimensions");
+                if((wispModelSource.name=="WISP_v011"||(wispModelSource.name=="WISP_v012"||(wispModelSource.name=="WISP_v013"||wispModelSource.name=="WISP_v014"))))Check(HoseFollowsKnee(player),"Blender service hose blends torso to real knee and its endpoint follows rotation");
+                EquipGuardForReview(player);Animate(player);Vector3 restingShield=player.guardShield.position;
                 player.guarding=true; player.guardBlend=1; Animate(player);
+                Debug.Log("GUARD_METRIC normal="+Vector3.Dot(player.guardShield.forward,player.root.forward)+" forward="+Vector3.Dot(player.guardShield.position-restingShield,player.root.forward)+" shoulder="+Quaternion.Angle(player.rightArm.localRotation,Quaternion.identity));
                 Check(Vector3.Dot(player.guardShield.forward,player.root.forward)>.99f&&
                     Vector3.Dot(player.guardShield.position-restingShield,player.root.forward)>.1f&&
                     Quaternion.Angle(player.rightArm.localRotation,Quaternion.identity)>30f,
@@ -803,7 +811,7 @@ public sealed partial class VoxArena
                     foreach(SkinnedMeshRenderer skin in artist.GetComponentsInChildren<SkinnedMeshRenderer>())
                         foreach(BoneWeight weight in skin.sharedMesh.boneWeights)
                             if(weight.weight0>.99f&&skin.bones[weight.boneIndex0]==knee) { driven=skin; break; }
-                    Check(driven!=null&&artist.GetComponentsInChildren<SkinnedMeshRenderer>().Length==((wispModelSource.name=="WISP_v010"||wispModelSource.name=="WISP_v011")?97:(wispModelSource.name=="WISP_v008"||wispModelSource.name=="WISP_v009")?96:wispModelSource.name=="WISP_v007"?87:wispModelSource.name=="WISP_v006"?116:112),
+                    Check(driven!=null&&artist.GetComponentsInChildren<SkinnedMeshRenderer>().Length==((wispModelSource.name=="WISP_v013"||wispModelSource.name=="WISP_v014")?75:(wispModelSource.name=="WISP_v010"||(wispModelSource.name=="WISP_v011"||(wispModelSource.name=="WISP_v012"||(wispModelSource.name=="WISP_v013"||wispModelSource.name=="WISP_v014"))))?97:(wispModelSource.name=="WISP_v008"||wispModelSource.name=="WISP_v009")?96:wispModelSource.name=="WISP_v007"?87:wispModelSource.name=="WISP_v006"?116:112),
                         "WISP weighted joint meshes include the expected authored shoulder housings");
                     if(driven!=null)
                     {

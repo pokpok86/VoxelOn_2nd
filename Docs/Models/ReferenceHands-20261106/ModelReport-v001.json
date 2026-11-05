@@ -1,0 +1,110 @@
+[
+  {
+    "model": "WISP_v013",
+    "before": "WISP_v012",
+    "original_bones_preserved": 24,
+    "new_grip_socket_bones": 2,
+    "bone_count": 26,
+    "skin_mesh_count": 75,
+    "nonhand_vertices_preserved": 2118,
+    "removed_hand_meshes": 24,
+    "hands": [
+      {
+        "side": "Left",
+        "vertices": 1152,
+        "components": 48,
+        "finger_segments": 12,
+        "thumb_segments": 2,
+        "socket_rig_position": [
+          0.8050204515457153,
+          0.6751804351806641,
+          0.17530003190040588
+        ]
+      },
+      {
+        "side": "Right",
+        "vertices": 1152,
+        "components": 48,
+        "finger_segments": 12,
+        "thumb_segments": 2,
+        "socket_rig_position": [
+          -0.8050204515457153,
+          0.6751804351806641,
+          0.17530003190040588
+        ]
+      }
+    ]
+  },
+  {
+    "model": "BASTION_v008",
+    "before": "BASTION_v007",
+    "original_bones_preserved": 115,
+    "new_grip_socket_bones": 2,
+    "bone_count": 117,
+    "skin_mesh_count": 154,
+    "nonhand_vertices_preserved": 4024,
+    "removed_hand_meshes": 24,
+    "hands": [
+      {
+        "side": "Left",
+        "vertices": 1152,
+        "components": 48,
+        "finger_segments": 12,
+        "thumb_segments": 2,
+        "socket_rig_position": [
+          1.2550203800201416,
+          0.6751804351806641,
+          0.17530003190040588
+        ]
+      },
+      {
+        "side": "Right",
+        "vertices": 1152,
+        "components": 48,
+        "finger_segments": 12,
+        "thumb_segments": 2,
+        "socket_rig_position": [
+          -1.2550203800201416,
+          0.6751804351806641,
+          0.17530003190040588
+        ]
+      }
+    ]
+  },
+  {
+    "model": "TARANTULA_v007",
+    "before": "TARANTULA_v006",
+    "original_bones_preserved": 36,
+    "new_grip_socket_bones": 2,
+    "bone_count": 38,
+    "skin_mesh_count": 84,
+    "nonhand_vertices_preserved": 2184,
+    "removed_hand_meshes": 24,
+    "hands": [
+      {
+        "side": "Left",
+        "vertices": 1152,
+        "components": 48,
+        "finger_segments": 12,
+        "thumb_segments": 2,
+        "socket_rig_position": [
+          0.8050204515457153,
+          0.6751804351806641,
+          0.17530003190040588
+        ]
+      },
+      {
+        "side": "Right",
+        "vertices": 1152,
+        "components": 48,
+        "finger_segments": 12,
+        "thumb_segments": 2,
+        "socket_rig_position": [
+          -0.8050204515457153,
+          0.6751804351806641,
+          0.17530003190040588
+        ]
+      }
+    ]
+  }
+]

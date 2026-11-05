@@ -14,3 +14,10 @@
 
 # Preserve exact captured runtime log bytes for SHA256 evidence.
 Docs/Validation/Overnight-20261105/*.txt -text
+
+# Preserve exact control-fix validation evidence bytes.
+Docs/Validation/Controls-20261105/*.txt -text
+
+# Preserve exact AI navigation validation evidence.
+Docs/Validation/AI-Stall-20261105/*.txt -text
+Docs/Validation/Equipment-20261105/*.txt -text

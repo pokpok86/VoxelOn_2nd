@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 public sealed partial class VoxArena
 {
     readonly Dictionary<Material,Material> simpleShellMaterials=new Dictionary<Material,Material>();
-    bool SimpleShellModel(GameObject model)=>model!=null&&(model.name=="WISP_v007"||model.name=="WISP_v008"||model.name=="WISP_v009"||model.name=="WISP_v010"||model.name=="WISP_v011"||model.name=="BASTION_v002"||model.name=="BASTION_v003"||model.name=="BASTION_v004"||model.name=="BASTION_v005"||model.name=="BASTION_v006"||model.name=="TARANTULA_v002"||model.name=="TARANTULA_v003"||model.name=="TARANTULA_v004"||model.name=="TARANTULA_v005");
+    bool SimpleShellModel(GameObject model)=>model!=null&&(model.name=="WISP_v007"||model.name=="WISP_v008"||model.name=="WISP_v009"||model.name=="WISP_v010"||model.name=="WISP_v014"||model.name=="WISP_v013"||model.name=="WISP_v012"||model.name=="WISP_v011"||model.name=="BASTION_v002"||model.name=="BASTION_v003"||model.name=="BASTION_v004"||model.name=="BASTION_v005"||model.name=="BASTION_v009"||model.name=="BASTION_v010"||model.name=="BASTION_v008"||model.name=="BASTION_v007"||model.name=="BASTION_v006"||model.name=="TARANTULA_v002"||model.name=="TARANTULA_v003"||model.name=="TARANTULA_v004"||model.name=="TARANTULA_v008"||model.name=="TARANTULA_v007"||model.name=="TARANTULA_v006"||model.name=="TARANTULA_v005");
     void ApplySimpleShellMaterials(Transform root)
     {
         foreach(Renderer renderer in root.GetComponentsInChildren<Renderer>(true))

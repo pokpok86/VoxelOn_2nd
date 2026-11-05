@@ -39,26 +39,18 @@ public sealed partial class VoxArena
         float distance=Vector3.Distance(player.root.position,enemy.root.position);
         Text(28,574,370,(HasSensorContact(player,enemy)?"DIST "+distance.ToString("0"):"DIST --")+" / RANGE "+DisplayedPrimaryRange().ToString("0"),small);
         DrawOccludedPilot();
-        Vector3 point=view.WorldToViewportPoint(enemy.root.position);
-        float x=point.x*1280,y=(1-point.y)*720;
-        if(targetLock&&player.spec.name!="WISP"&&point.z>0&&x>40&&x<1240&&y>140&&y<540)
+        if(targetLock&&player.spec.supportsLockOn&&TryGetTargetScreenRect(out Rect targetRect))
         {
+            float x=targetRect.center.x,y=targetRect.center.y;
             Color color=hitConfirmTime>0?Color.white:assistEngaged?Cyan:new Color(1,.55f,.28f);
-            float r=24*enemy.spec.size;
-            for(int side=-1;side<=1;side+=2)
+            float corner=Mathf.Clamp(Mathf.Min(targetRect.width,targetRect.height)*.20f,8,18),thick=2;
+            for(int side=-1;side<=1;side+=2)for(int vertical=-1;vertical<=1;vertical+=2)
             {
-                Panel(new Rect(x+side*r-(side>0?8:0),y-r,8,2),color);
-                Panel(new Rect(x+side*r,y-r,2,8),color);
-                Panel(new Rect(x+side*r-(side>0?8:0),y+r,8,2),color);
-                Panel(new Rect(x+side*r,y+r-6,2,8),color);
+                float cx=side<0?targetRect.xMin:targetRect.xMax-corner,cy=vertical<0?targetRect.yMin:targetRect.yMax-thick;
+                Panel(new Rect(cx,cy,corner,thick),color);
+                Panel(new Rect(side<0?targetRect.xMin:targetRect.xMax-thick,vertical<0?targetRect.yMin:targetRect.yMax-corner,thick,corner),color);
             }
-            if(assistEngaged)
-            {
-                Vector3 above=view.WorldToViewportPoint(enemy.root.position+Vector3.up*(2.4f*enemy.spec.size));
-                float labelY=Mathf.Max(100,(1-above.y)*720-22);
-                Panel(new Rect(x-33,labelY,66,20),new Color(.025f,.045f,.075f,.86f));
-                GUI.color=Cyan; Text(x-25,labelY-1,80,"ASSIST",small); GUI.color=Color.white;
-            }
+            if(assistEngaged){Panel(new Rect(x-33,Mathf.Max(100,targetRect.yMin-22),66,20),new Color(.025f,.045f,.075f,.86f));GUI.color=Cyan;Text(x-25,Mathf.Max(99,targetRect.yMin-23),80,"ASSIST",small);GUI.color=Color.white;}
         }
         if(hitConfirmTime>0)
         {

@@ -1,0 +1,77 @@
+[
+  {
+    "file": "Controls-Before-Retry-Build.txt",
+    "source": "Logs/Controls-Before-Retry-Build.log",
+    "sha256": "31bb1768ba9cbc4c7463b646b31c453d27d01162bfdf856124d7c963f2caf0a1"
+  },
+  {
+    "file": "Controls-Before-Actual-Retry.txt",
+    "source": "Logs/Controls-Before-Actual-Retry.log",
+    "sha256": "a0463320f6b96239aa84ae4a2ef7d79208158b0ccba6639afa2a9e55ed8f06db"
+  },
+  {
+    "file": "Controls-Fix-Actual.txt",
+    "source": "Logs/Controls-Fix-Actual.log",
+    "sha256": "f4da203853596979a589ae84ac828e21fc98cfc0ca6e4e974f1d634ea562e713"
+  },
+  {
+    "file": "Controls-Fix-Smoke.txt",
+    "source": "Logs/Controls-Fix-Smoke.log",
+    "sha256": "6b49562f95981b9034ce5acf5112c44f0319854a9e55a300a63b44db2740fcd8"
+  },
+  {
+    "file": "Controls-GuardFix-Smoke.txt",
+    "source": "Logs/Controls-GuardFix-Smoke.log",
+    "sha256": "5b480db0ce184c9c00fe1403d492f578cfac7fe96b5a25193447959c9ec2b2f0"
+  },
+  {
+    "file": "Controls-Fix-Chassis.txt",
+    "source": "Logs/Controls-Fix-Chassis.log",
+    "sha256": "129c139d620b8b7a0e9cca57e04fc89141a86cf4925d42e9680c4dd76d8015f8"
+  },
+  {
+    "file": "Controls-GuardOrder-Build.txt",
+    "source": "Logs/Controls-GuardOrder-Build.log",
+    "sha256": "693dd661c969ad32fb83e717b4b4a0774d7bdac05b9aade7f1bb39f01cf2d2cc"
+  },
+  {
+    "file": "Controls-GuardOrder-Smoke.txt",
+    "source": "Logs/Controls-GuardOrder-Smoke.log",
+    "sha256": "731d865e6d1e8cd03ef13c617c50d9b891ea592b583f21af1a1b407962317feb"
+  },
+  {
+    "file": "Controls-Final-Review.txt",
+    "source": "Logs/Controls-Final-Review.log",
+    "sha256": "6275a6e33bf67d13ef6b347b7cbea06e03cff88116cd383c886603fea3167e9b"
+  },
+  {
+    "file": "Controls-Final-Guard-Camera.txt",
+    "source": "Logs/Controls-Final-Guard-Camera.log",
+    "sha256": "1533eb001e56a0a637fc20fae65a87dbbafd2fd105efe9adfe5de78f95c4152c"
+  },
+  {
+    "file": "Controls-Final-Prototype.txt",
+    "source": "Logs/Controls-Final-Prototype.log",
+    "sha256": "fb149cdab99f8b0de6f5739297d8accebf5f5da4bbc40c8e0b8f3ae29b0958d2"
+  },
+  {
+    "file": "Controls-Final-Recovery.txt",
+    "source": "Logs/Controls-Final-Recovery.log",
+    "sha256": "38cdbd2b1947cabd1474afe90fa6fa4f2efc68965b64c9638dcee8da90061bfb"
+  },
+  {
+    "file": "Controls-ScaleCache-Build.txt",
+    "source": "Logs/Controls-ScaleCache-Build.log",
+    "sha256": "53504b4cbf3789d3b2e5a102fd924b2a07aa195f736bc96ad6e5dc1d43eb495a"
+  },
+  {
+    "file": "Controls-ScaleCache-Review.txt",
+    "source": "Logs/Controls-ScaleCache-Review.log",
+    "sha256": "e83f49567fbb89abe03c8658710daad03c72b71b0415d4ad347502e248ca7ceb"
+  },
+  {
+    "file": "Controls-ScaleCache-Smoke.txt",
+    "source": "Logs/Controls-ScaleCache-Smoke.log",
+    "sha256": "a404b81e7b045e4be6edf7a306a3fd4de2572b27600a2e0cfefe89216a43bd67"
+  }
+]

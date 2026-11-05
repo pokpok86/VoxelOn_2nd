@@ -24,18 +24,37 @@ public sealed partial class VoxArena
     {
         if(f.fist!=null)f.fist.gameObject.SetActive(false);
         if(f.gun!=null)f.gun.gameObject.SetActive(false);
-        f.weaponVisuals=new Transform[4];
-        f.weaponVisuals[0]=SpawnPDPart("WeaponRifle",f.weaponPart,Vector3.zero,Vector3.one*.8f);
+        f.modernWeaponArt=System.Array.IndexOf(System.Environment.GetCommandLineArgs(),"--legacy-weapon-art")<0;
+        f.shoulderWeaponRest=new Quaternion[2];f.shoulderWeaponOffsets=new Vector3[2];
+        f.weaponVisuals=new Transform[4];f.weaponGripPoints=new Transform[4];f.weaponMuzzlePoints=new Transform[4];
         Transform hand=f.rightArm.Find("Right_elbow/Right_hand");if(hand==null)hand=f.rightArm;
-        f.weaponVisuals[1]=SpawnPDPart("WeaponCannon",hand,new Vector3(0,-.03f,.12f),Vector3.one*.62f);
-        f.weaponVisuals[2]=SpawnPDPart("WeaponRocket",f.corePart,new Vector3(-.55f,.65f,-.30f),Vector3.one*.65f);
-        f.weaponVisuals[3]=SpawnPDPart("WeaponRail",f.corePart,new Vector3(.55f,.65f,-.30f),Vector3.one*.65f);
-        f.gun=f.weaponVisuals[0];
+        string[] old={"WeaponRifle","WeaponCannon","WeaponRocket","WeaponRail"};
+        Transform[] parents={f.weaponPart,hand,f.modernWeaponArt?f.leftArm:f.corePart,f.modernWeaponArt?f.rightArm:f.corePart};
+        Vector3[] offsets={Vector3.zero,new Vector3(0,-.03f,.12f),new Vector3(-.55f,.65f,-.30f),new Vector3(.55f,.65f,-.30f)};
+        for(int i=0;i<4;i++)
+        {
+            if(i>=2)
+            {
+                Transform shoulder=parents[i];float sign=i==2?-1:1;
+                f.shoulderWeaponRest[i-2]=Quaternion.Inverse(shoulder.rotation)*f.root.rotation;
+                f.shoulderWeaponOffsets[i-2]=Quaternion.Inverse(shoulder.rotation)*(f.root.right*(sign*.10f)+Vector3.up*.08f-f.root.forward*.48f);
+            }
+            if(f.weaponProfiles[i].isShield||f.weaponProfiles[i].isUnarmed)
+            {
+                f.weaponVisuals[i]=Module("Empty or shield inventory slot",parents[i],Vector3.zero);f.weaponGripPoints[i]=f.weaponProfiles[i].isShield?f.guardShield:f.weaponVisuals[i];f.weaponMuzzlePoints[i]=f.weaponGripPoints[i];continue;
+            }
+            string name=f.modernWeaponArt?WeaponArtResource(f.weaponArtIds!=null?f.weaponArtIds[i]:EquippedArtIds[i]).Substring(8):old[i];
+            float scale=f.modernWeaponArt?(i<2?.95f:.75f):(i==0?.8f:i==1?.62f:.65f);
+            if(f.modernWeaponArt&&i==0)scale/=Mathf.Max(.01f,f.weaponPart.localScale.x);
+            Transform mount=SpawnPDPart(name,parents[i],offsets[i],Vector3.one*scale);f.weaponVisuals[i]=mount;
+            if(f.modernWeaponArt){f.weaponGripPoints[i]=FindArtSocket(mount,"GRIP_MAIN");f.weaponMuzzlePoints[i]=FindArtSocket(mount,"MUZZLE");PrepareWeaponMaterials(mount);}
+        }
+        f.gun=f.weaponVisuals[0];ConnectArmGrips(f);
     }
     Vector3 WeaponMuzzle(Fighter f)
     {
         if(f.weaponVisuals==null)return f.root.position+f.facing*(f.Radius+.25f);
-        int i=WeaponIndex(f);float tip=i==0?1.05f:i==1?1.2f:i==2?.53f:1.48f;
+        int i=WeaponIndex(f);if(f.modernWeaponArt&&f.weaponMuzzlePoints[i]!=null)return f.weaponMuzzlePoints[i].position;float tip=i==0?1.05f:i==1?1.2f:i==2?.53f:1.48f;
         return f.weaponVisuals[i].TransformPoint(Vector3.forward*tip);
     }
     float SurfaceHeight(Vector3 p)=>arenaMap==ArenaMapKind.OpenPlains?PlainsSurface(p):GroundSurfaceY;

@@ -1,0 +1,42 @@
+[
+  {
+    "file": "AI-Stall-Before-Build.txt",
+    "source": "Logs/AI-Stall-Before-Build.log",
+    "sha256": "7117ed36674dab7584e041f6b436fc92dee00867d8cd846a7b9d39a452224995"
+  },
+  {
+    "file": "AI-Stall-Before-Actual.txt",
+    "source": "Logs/AI-Stall-Before-Actual.log",
+    "sha256": "fb2945e41e6ec2a863f140aa3fbddab6cb965a9be570f636775304c9eaacfcb7"
+  },
+  {
+    "file": "AI-Stall-Fix-Build.txt",
+    "source": "Logs/AI-Stall-Fix-Build.log",
+    "sha256": "8ba0f55e2644a062c6906a66878729a6667b2c0b60af762ac76009f5366567da"
+  },
+  {
+    "file": "AI-Stall-Fix-Actual.txt",
+    "source": "Logs/AI-Stall-Fix-Actual.log",
+    "sha256": "37b6f6c33e3ce93eaaa6d1ce64252bae7a9c2a4ed02e58be3084221d8a6fde0f"
+  },
+  {
+    "file": "AI-Stall-Final-Smoke.txt",
+    "source": "Logs/AI-Stall-Final-Smoke.log",
+    "sha256": "321ab0f5078eec669cd663d34d20a50a82e4570390abbba6ffd01735e86953f0"
+  },
+  {
+    "file": "AI-Stall-Final-Corner.txt",
+    "source": "Logs/AI-Stall-Final-Corner.log",
+    "sha256": "8fe4c89e12550b2494d702c12baf2b00b7ee7c53276fb689c6940861a82ab04b"
+  },
+  {
+    "file": "AI-Stall-Final-Indoor.txt",
+    "source": "Logs/AI-Stall-Final-Indoor.log",
+    "sha256": "3060888a3dc5e482bf70eddf335b764c2016fccf9b2a3c05bc63997d2716b3d1"
+  },
+  {
+    "file": "AI-Stall-Final-Outdoor.txt",
+    "source": "Logs/AI-Stall-Final-Outdoor.log",
+    "sha256": "505fc15a2a28a6f7c372c7b5d33896cb25786fea87c60967060c2a1be2819c4b"
+  }
+]

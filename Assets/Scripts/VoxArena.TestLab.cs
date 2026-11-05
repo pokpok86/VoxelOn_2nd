@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using UnityEngine;
 
@@ -97,7 +97,7 @@ public sealed partial class VoxArena
         if(GUI.Button(new Rect(718,112,170,31),"REFILL HULL / FUEL"))
         {
             Fighter f=TestFighter; f.hp=f.spec.health; f.boostEnergy=f.spec.boostCapacity;
-            f.shieldEnergy=f.spec.ShieldMax; f.weapons=NewWeaponStates();
+            f.shieldEnergy=f.spec.ShieldMax; f.weapons=NewWeaponStates(f.weaponProfiles);
         }
         Text(200,156,740,"AI CONTROLS / applied to rival during live play",small);
         aiMoveEnabled=GUI.Toggle(new Rect(200,181,150,28),aiMoveEnabled,"MOVE");
@@ -159,5 +159,9 @@ public sealed partial class VoxArena
         }
         GUI.EndScrollView();
         GUI.EndGroup();
+        if(testCategory==6)
+        {
+            float y=390;DrawSalvageSlider("QUAD WALK STRIDE",ref quadWalkStride,.7f,2.5f,ref y);DrawSalvageSlider("QUAD RUN STRIDE",ref quadRunStride,2.8f,7,ref y);DrawSalvageSlider("QUAD STEP HEIGHT",ref quadStepHeight,.1f,.5f,ref y);Text(209,y,700,"Visual gait only / both actors / no movement-speed changes",small);
+        }
     }
 }

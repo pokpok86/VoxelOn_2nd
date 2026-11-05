@@ -1,0 +1,12 @@
+GLOVE_INTEGRITY_PASS {'model': 'WISP', 'before': 'v011', 'after': 'v012', 'identical_bones_and_bind_matrices': 24, 'identical_nonhand_vertices': 2118}
+GLOVE_INTEGRITY_PASS {'model': 'BASTION', 'before': 'v006', 'after': 'v007', 'identical_bones_and_bind_matrices': 115, 'identical_nonhand_vertices': 4024}
+GLOVE_INTEGRITY_PASS {'model': 'TARANTULA', 'before': 'v005', 'after': 'v006', 'identical_bones_and_bind_matrices': 36, 'identical_nonhand_vertices': 2184}
+Blender 4.5.15 LTS (hash 5afeabba6097 built 2026-10-22 01:35:27)
+Read blend: "D:\Codex\VoxSky\Builds\WorkLatest\Assets\Art\Robots\WISP\Source\WISP_v011.blend"
+Read blend: "D:\Codex\VoxSky\Builds\WorkLatest\Assets\Art\Robots\WISP\Source\WISP_v012.blend"
+Read blend: "D:\Codex\VoxSky\Builds\WorkLatest\Assets\Art\Robots\BASTION\Source\BASTION_v006.blend"
+Read blend: "D:\Codex\VoxSky\Builds\WorkLatest\Assets\Art\Robots\BASTION\Source\BASTION_v007.blend"
+Read blend: "D:\Codex\VoxSky\Builds\WorkLatest\Assets\Art\Robots\TARANTULA\Source\TARANTULA_v005.blend"
+Read blend: "D:\Codex\VoxSky\Builds\WorkLatest\Assets\Art\Robots\TARANTULA\Source\TARANTULA_v006.blend"
+
+Blender quit

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -42,7 +42,11 @@ public sealed partial class VoxArena
         direction=direction.normalized;
         Vector3 muzzle=!smoke&&owner.weaponVisuals!=null?WeaponMuzzle(owner):owner.root.position+direction*(owner.Radius+.25f);
         float physicalRadius=radius*bulletSizeScale;
-        if(ObstacleOnSegment(owner.root.position,muzzle,physicalRadius,out _)) return null;
+        if(ObstacleOnSegment(owner.root.position,muzzle,physicalRadius,out float mountHit))
+        {
+            if(Array.IndexOf(Environment.GetCommandLineArgs(),"--prototype-soak")>=0)Debug.Log("SHOT_MOUNT_BLOCKED "+owner.spec.name+" slot="+owner.weaponSlot+" root="+owner.root.position.ToString("F3")+" muzzle="+muzzle.ToString("F3")+" radius="+owner.Radius+" hit="+mountHit);
+            return null;
+        }
         speed*=bulletSpeedScale;
         Shot s=new Shot{owner=owner,loadoutVisual=loadoutVisual,artSlot=Mathf.Clamp(owner.weaponSlot-1,0,3),velocity=direction*speed,heading=direction,damage=damage,
             radius=physicalRadius,life=range/speed,tracking=tracking,blast=blast,stopAndExplode=stop,wave=wave};

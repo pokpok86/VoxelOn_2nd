@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 public sealed partial class VoxArena
 {
@@ -12,17 +12,21 @@ public sealed partial class VoxArena
     }
     bool CanWeakAssist(Fighter shooter,Fighter target,Vector3 requested)
     {
-        if(!aimAssist||weakAssistDegrees<=0||shooter==null||target==null||target.hp<=0)return false;
+        if(shooter==null)return false;
+        bool Reject(){shooter.assistTrackedTarget=null;return false;}
+        if(!aimAssist||weakAssistDegrees<=0||target==null||target.hp<=0||requested.sqrMagnitude<.001f||!Finite(requested))return Reject();
+        bool retained=shooter.assistTrackedTarget==target;
         Vector3 delta=target.root.position-(!smoke&&shooter.weaponVisuals!=null?WeaponMuzzle(shooter):shooter.root.position);
-        if(delta.magnitude>EquippedProfile(shooter).range||Vector3.Angle(requested,delta)>1.8f)return false;
-        if(ObstacleOnSegment(shooter.root.position,target.root.position,.08f,out _))return false;
+        if(delta.magnitude>EquippedProfile(shooter).range||Vector3.Angle(requested,delta)>(retained?2.3f:1.8f))return Reject();
+        if(ObstacleOnSegment(shooter.root.position,target.root.position,.08f,out _))return Reject();
         if(shooter==player&&!spectatorMode)
         {
             Vector3 p=view.WorldToViewportPoint(target.root.position);
-            if(p.z<=0||Mathf.Abs(p.x-.5f)>.045f||Mathf.Abs(p.y-.5f)>.065f||ObstacleOnSegment(view.transform.position,target.root.position,.02f,out _))return false;
+            if(p.z<=0||Mathf.Abs(p.x-.5f)>(retained?.06f:.045f)||Mathf.Abs(p.y-.5f)>(retained?.08f:.065f)||ObstacleOnSegment(view.transform.position,target.root.position,.02f,out _))return Reject();
         }
-        return true;
+        shooter.assistTrackedTarget=target;return true;
     }
+
     Vector3 WeakAssist(Fighter shooter,Fighter target,Vector3 requested)
     {
         if(!CanWeakAssist(shooter,target,requested))return requested;

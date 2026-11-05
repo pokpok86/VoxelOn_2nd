@@ -1,0 +1,357 @@
+Blender 4.5.15 LTS (hash 5afeabba6097 built 2026-10-22 01:35:27)
+Fra:1 Mem:49.87M (Peak 49.87M) | Time:00:00.56 | Rendering 1 / 64 samples
+Fra:1 Mem:49.87M (Peak 49.87M) | Time:00:00.75 | Rendering 25 / 64 samples
+Fra:1 Mem:49.87M (Peak 49.87M) | Time:00:00.90 | Rendering 50 / 64 samples
+Fra:1 Mem:49.87M (Peak 49.87M) | Time:00:01.04 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Military_AR.png'
+Time: 00:01.29 (Saving: 00:00.11)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Military_AR_v003.fbx'
+export finished in 0.0401 sec.
+WEAPON_MODEL_PASS Military_AR vertices 1680
+Fra:1 Mem:51.41M (Peak 51.41M) | Time:00:00.05 | Rendering 1 / 64 samples
+Fra:1 Mem:51.41M (Peak 51.41M) | Time:00:00.08 | Rendering 25 / 64 samples
+Fra:1 Mem:51.41M (Peak 51.41M) | Time:00:00.12 | Rendering 50 / 64 samples
+Fra:1 Mem:51.41M (Peak 51.41M) | Time:00:00.16 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Military_LMG.png'
+Time: 00:00.23 (Saving: 00:00.04)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Military_LMG_v003.fbx'
+export finished in 0.0231 sec.
+WEAPON_MODEL_PASS Military_LMG vertices 2048
+Fra:1 Mem:52.67M (Peak 52.67M) | Time:00:00.05 | Rendering 1 / 64 samples
+Fra:1 Mem:52.67M (Peak 52.67M) | Time:00:00.12 | Rendering 25 / 64 samples
+Fra:1 Mem:52.67M (Peak 52.67M) | Time:00:00.17 | Rendering 50 / 64 samples
+Fra:1 Mem:52.67M (Peak 52.67M) | Time:00:00.21 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Military_SR.png'
+Time: 00:00.29 (Saving: 00:00.05)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Military_SR_v003.fbx'
+export finished in 0.0270 sec.
+WEAPON_MODEL_PASS Military_SR vertices 1800
+Fra:1 Mem:54.23M (Peak 54.23M) | Time:00:00.04 | Rendering 1 / 64 samples
+Fra:1 Mem:54.23M (Peak 54.23M) | Time:00:00.09 | Rendering 25 / 64 samples
+Fra:1 Mem:54.23M (Peak 54.23M) | Time:00:00.14 | Rendering 50 / 64 samples
+Fra:1 Mem:54.23M (Peak 54.23M) | Time:00:00.18 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Military_SG.png'
+Time: 00:00.26 (Saving: 00:00.05)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Military_SG_v003.fbx'
+export finished in 0.0231 sec.
+WEAPON_MODEL_PASS Military_SG vertices 2120
+Fra:1 Mem:55.11M (Peak 55.11M) | Time:00:00.03 | Rendering 1 / 64 samples
+Fra:1 Mem:55.11M (Peak 55.11M) | Time:00:00.07 | Rendering 25 / 64 samples
+Fra:1 Mem:55.11M (Peak 55.11M) | Time:00:00.12 | Rendering 50 / 64 samples
+Fra:1 Mem:55.11M (Peak 55.11M) | Time:00:00.15 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Military_GL.png'
+Time: 00:00.23 (Saving: 00:00.04)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Military_GL_v003.fbx'
+export finished in 0.0230 sec.
+WEAPON_MODEL_PASS Military_GL vertices 1584
+Fra:1 Mem:55.77M (Peak 55.77M) | Time:00:00.03 | Rendering 1 / 64 samples
+Fra:1 Mem:55.77M (Peak 55.77M) | Time:00:00.07 | Rendering 25 / 64 samples
+Fra:1 Mem:55.77M (Peak 55.77M) | Time:00:00.12 | Rendering 50 / 64 samples
+Fra:1 Mem:55.77M (Peak 55.77M) | Time:00:00.15 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Military_RL.png'
+Time: 00:00.24 (Saving: 00:00.04)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Military_RL_v003.fbx'
+export finished in 0.0765 sec.
+WEAPON_MODEL_PASS Military_RL vertices 1192
+Fra:1 Mem:56.33M (Peak 56.33M) | Time:00:00.03 | Rendering 1 / 64 samples
+Fra:1 Mem:56.33M (Peak 56.33M) | Time:00:00.07 | Rendering 25 / 64 samples
+Fra:1 Mem:56.33M (Peak 56.33M) | Time:00:00.12 | Rendering 50 / 64 samples
+Fra:1 Mem:56.33M (Peak 56.33M) | Time:00:00.14 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Military_HG.png'
+Time: 00:00.22 (Saving: 00:00.05)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Military_HG_v003.fbx'
+export finished in 0.1760 sec.
+WEAPON_MODEL_PASS Military_HG vertices 904
+Fra:1 Mem:57.68M (Peak 57.68M) | Time:00:00.03 | Rendering 1 / 64 samples
+Fra:1 Mem:57.68M (Peak 57.68M) | Time:00:00.08 | Rendering 25 / 64 samples
+Fra:1 Mem:57.68M (Peak 57.68M) | Time:00:00.12 | Rendering 50 / 64 samples
+Fra:1 Mem:57.68M (Peak 57.68M) | Time:00:00.15 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Military_SMG.png'
+Time: 00:00.24 (Saving: 00:00.04)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Military_SMG_v003.fbx'
+export finished in 0.0380 sec.
+WEAPON_MODEL_PASS Military_SMG vertices 1592
+Fra:1 Mem:58.82M (Peak 58.82M) | Time:00:00.04 | Rendering 1 / 64 samples
+Fra:1 Mem:58.82M (Peak 58.82M) | Time:00:00.09 | Rendering 25 / 64 samples
+Fra:1 Mem:58.82M (Peak 58.82M) | Time:00:00.13 | Rendering 50 / 64 samples
+Fra:1 Mem:58.82M (Peak 58.82M) | Time:00:00.17 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Military_FL.png'
+Time: 00:00.26 (Saving: 00:00.05)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Military_FL_v003.fbx'
+export finished in 0.0210 sec.
+WEAPON_MODEL_PASS Military_FL vertices 1640
+Fra:1 Mem:60.10M (Peak 60.10M) | Time:00:00.04 | Rendering 1 / 64 samples
+Fra:1 Mem:60.10M (Peak 60.10M) | Time:00:00.09 | Rendering 25 / 64 samples
+Fra:1 Mem:60.10M (Peak 60.10M) | Time:00:00.14 | Rendering 50 / 64 samples
+Fra:1 Mem:60.10M (Peak 60.10M) | Time:00:00.17 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Future_Rifle.png'
+Time: 00:00.25 (Saving: 00:00.04)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Future_Rifle_v003.fbx'
+export finished in 0.0210 sec.
+WEAPON_MODEL_PASS Future_Rifle vertices 1648
+Fra:1 Mem:60.78M (Peak 60.78M) | Time:00:00.04 | Rendering 1 / 64 samples
+Fra:1 Mem:60.78M (Peak 60.78M) | Time:00:00.08 | Rendering 25 / 64 samples
+Fra:1 Mem:60.78M (Peak 60.78M) | Time:00:00.12 | Rendering 50 / 64 samples
+Fra:1 Mem:60.78M (Peak 60.78M) | Time:00:00.15 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Future_Gatling.png'
+Time: 00:00.23 (Saving: 00:00.04)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Future_Gatling_v003.fbx'
+export finished in 0.0315 sec.
+WEAPON_MODEL_PASS Future_Gatling vertices 1176
+Fra:1 Mem:61.76M (Peak 61.76M) | Time:00:00.04 | Rendering 1 / 64 samples
+Fra:1 Mem:61.76M (Peak 61.76M) | Time:00:00.08 | Rendering 25 / 64 samples
+Fra:1 Mem:61.76M (Peak 61.76M) | Time:00:00.13 | Rendering 50 / 64 samples
+Fra:1 Mem:61.76M (Peak 61.76M) | Time:00:00.16 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Future_Launcher.png'
+Time: 00:00.24 (Saving: 00:00.04)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Future_Launcher_v003.fbx'
+export finished in 0.0230 sec.
+WEAPON_MODEL_PASS Future_Launcher vertices 1424
+Fra:1 Mem:63.02M (Peak 63.02M) | Time:00:00.03 | Rendering 1 / 64 samples
+Fra:1 Mem:63.02M (Peak 63.02M) | Time:00:00.08 | Rendering 25 / 64 samples
+Fra:1 Mem:63.02M (Peak 63.02M) | Time:00:00.12 | Rendering 50 / 64 samples
+Fra:1 Mem:63.02M (Peak 63.02M) | Time:00:00.15 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Future_Sniper.png'
+Time: 00:00.22 (Saving: 00:00.04)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Future_Sniper_v003.fbx'
+export finished in 0.0205 sec.
+WEAPON_MODEL_PASS Future_Sniper vertices 1736
+Fra:1 Mem:64.27M (Peak 64.27M) | Time:00:00.03 | Rendering 1 / 64 samples
+Fra:1 Mem:64.27M (Peak 64.27M) | Time:00:00.08 | Rendering 25 / 64 samples
+Fra:1 Mem:64.27M (Peak 64.27M) | Time:00:00.13 | Rendering 50 / 64 samples
+Fra:1 Mem:64.27M (Peak 64.27M) | Time:00:00.16 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Future_Beam.png'
+Time: 00:00.24 (Saving: 00:00.04)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Future_Beam_v003.fbx'
+export finished in 0.0220 sec.
+WEAPON_MODEL_PASS Future_Beam vertices 1792
+Fra:1 Mem:65.51M (Peak 65.51M) | Time:00:00.05 | Rendering 1 / 64 samples
+Fra:1 Mem:65.51M (Peak 65.51M) | Time:00:00.11 | Rendering 25 / 64 samples
+Fra:1 Mem:65.51M (Peak 65.51M) | Time:00:00.17 | Rendering 50 / 64 samples
+Fra:1 Mem:65.51M (Peak 65.51M) | Time:00:00.20 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Future_Shotgun.png'
+Time: 00:00.29 (Saving: 00:00.04)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Future_Shotgun_v003.fbx'
+export finished in 0.0315 sec.
+WEAPON_MODEL_PASS Future_Shotgun vertices 1936
+Fra:1 Mem:65.28M (Peak 65.28M) | Time:00:00.04 | Rendering 1 / 64 samples
+Fra:1 Mem:65.28M (Peak 65.28M) | Time:00:00.09 | Rendering 25 / 64 samples
+Fra:1 Mem:65.28M (Peak 65.28M) | Time:00:00.14 | Rendering 50 / 64 samples
+Fra:1 Mem:65.28M (Peak 65.28M) | Time:00:00.17 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Future_Sword.png'
+Time: 00:00.25 (Saving: 00:00.04)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Future_Sword_v003.fbx'
+export finished in 0.0160 sec.
+WEAPON_MODEL_PASS Future_Sword vertices 92
+Fra:1 Mem:65.57M (Peak 65.57M) | Time:00:00.04 | Rendering 1 / 64 samples
+Fra:1 Mem:65.57M (Peak 65.57M) | Time:00:00.09 | Rendering 25 / 64 samples
+Fra:1 Mem:65.57M (Peak 65.57M) | Time:00:00.14 | Rendering 50 / 64 samples
+Fra:1 Mem:65.57M (Peak 65.57M) | Time:00:00.17 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Future_Hammer.png'
+Time: 00:00.25 (Saving: 00:00.05)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Future_Hammer_v003.fbx'
+export finished in 0.0160 sec.
+WEAPON_MODEL_PASS Future_Hammer vertices 216
+Fra:1 Mem:65.79M (Peak 65.79M) | Time:00:00.04 | Rendering 1 / 64 samples
+Fra:1 Mem:65.79M (Peak 65.79M) | Time:00:00.09 | Rendering 25 / 64 samples
+Fra:1 Mem:65.79M (Peak 65.79M) | Time:00:00.14 | Rendering 50 / 64 samples
+Fra:1 Mem:65.79M (Peak 65.79M) | Time:00:00.17 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Future_Shield.png'
+Time: 00:00.24 (Saving: 00:00.04)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Future_Shield_v003.fbx'
+export finished in 0.0160 sec.
+WEAPON_MODEL_PASS Future_Shield vertices 248
+Fra:1 Mem:70.96M (Peak 70.96M) | Time:00:00.11 | Rendering 1 / 64 samples
+Fra:1 Mem:70.96M (Peak 70.96M) | Time:00:00.24 | Rendering 25 / 64 samples
+Fra:1 Mem:70.96M (Peak 70.96M) | Time:00:00.29 | Rendering 50 / 64 samples
+Fra:1 Mem:70.96M (Peak 70.96M) | Time:00:00.33 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Future_HoloShield.png'
+Time: 00:00.40 (Saving: 00:00.05)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Future_HoloShield_v003.fbx'
+export finished in 0.0615 sec.
+WEAPON_MODEL_PASS Future_HoloShield vertices 9816
+Fra:1 Mem:70.71M (Peak 70.71M) | Time:00:00.03 | Rendering 1 / 64 samples
+Fra:1 Mem:70.71M (Peak 70.71M) | Time:00:00.08 | Rendering 25 / 64 samples
+Fra:1 Mem:70.71M (Peak 70.71M) | Time:00:00.13 | Rendering 50 / 64 samples
+Fra:1 Mem:70.71M (Peak 70.71M) | Time:00:00.16 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Future_Drone.png'
+Time: 00:00.25 (Saving: 00:00.05)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Future_Drone_v003.fbx'
+export finished in 0.1310 sec.
+WEAPON_MODEL_PASS Future_Drone vertices 472
+Fra:1 Mem:71.09M (Peak 71.09M) | Time:00:00.03 | Rendering 1 / 64 samples
+Fra:1 Mem:71.09M (Peak 71.09M) | Time:00:00.08 | Rendering 25 / 64 samples
+Fra:1 Mem:71.09M (Peak 71.09M) | Time:00:00.12 | Rendering 50 / 64 samples
+Fra:1 Mem:71.09M (Peak 71.09M) | Time:00:00.15 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Throwable_Grenade.png'
+Time: 00:00.23 (Saving: 00:00.05)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Throwable_Grenade_v003.fbx'
+export finished in 0.0165 sec.
+WEAPON_MODEL_PASS Throwable_Grenade vertices 744
+Fra:1 Mem:71.31M (Peak 71.31M) | Time:00:00.03 | Rendering 1 / 64 samples
+Fra:1 Mem:71.31M (Peak 71.31M) | Time:00:00.07 | Rendering 25 / 64 samples
+Fra:1 Mem:71.31M (Peak 71.31M) | Time:00:00.12 | Rendering 50 / 64 samples
+Fra:1 Mem:71.31M (Peak 71.31M) | Time:00:00.15 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Throwable_Smoke.png'
+Time: 00:00.24 (Saving: 00:00.05)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Throwable_Smoke_v003.fbx'
+export finished in 0.0160 sec.
+WEAPON_MODEL_PASS Throwable_Smoke vertices 120
+Fra:1 Mem:71.45M (Peak 71.45M) | Time:00:00.03 | Rendering 1 / 64 samples
+Fra:1 Mem:71.45M (Peak 71.45M) | Time:00:00.08 | Rendering 25 / 64 samples
+Fra:1 Mem:71.45M (Peak 71.45M) | Time:00:00.12 | Rendering 50 / 64 samples
+Fra:1 Mem:71.45M (Peak 71.45M) | Time:00:00.15 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Throwable_EMP.png'
+Time: 00:00.23 (Saving: 00:00.05)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Throwable_EMP_v003.fbx'
+export finished in 0.0165 sec.
+WEAPON_MODEL_PASS Throwable_EMP vertices 120
+Fra:1 Mem:71.57M (Peak 71.57M) | Time:00:00.03 | Rendering 1 / 64 samples
+Fra:1 Mem:71.57M (Peak 71.57M) | Time:00:00.08 | Rendering 25 / 64 samples
+Fra:1 Mem:71.57M (Peak 71.57M) | Time:00:00.12 | Rendering 50 / 64 samples
+Fra:1 Mem:71.57M (Peak 71.57M) | Time:00:00.15 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Throwable_Incendiary.png'
+Time: 00:00.25 (Saving: 00:00.05)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Throwable_Incendiary_v003.fbx'
+export finished in 0.0160 sec.
+WEAPON_MODEL_PASS Throwable_Incendiary vertices 120
+Fra:1 Mem:71.84M (Peak 71.84M) | Time:00:00.03 | Rendering 1 / 64 samples
+Fra:1 Mem:71.84M (Peak 71.84M) | Time:00:00.07 | Rendering 25 / 64 samples
+Fra:1 Mem:71.84M (Peak 71.84M) | Time:00:00.11 | Rendering 50 / 64 samples
+Fra:1 Mem:71.84M (Peak 71.84M) | Time:00:00.14 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Module_Scope.png'
+Time: 00:00.21 (Saving: 00:00.04)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Module_Scope_v003.fbx'
+export finished in 0.0170 sec.
+WEAPON_MODEL_PASS Module_Scope vertices 232
+Fra:1 Mem:71.97M (Peak 71.97M) | Time:00:00.04 | Rendering 1 / 64 samples
+Fra:1 Mem:71.97M (Peak 71.97M) | Time:00:00.08 | Rendering 25 / 64 samples
+Fra:1 Mem:71.97M (Peak 71.97M) | Time:00:00.12 | Rendering 50 / 64 samples
+Fra:1 Mem:71.97M (Peak 71.97M) | Time:00:00.15 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Module_DotSight.png'
+Time: 00:00.22 (Saving: 00:00.04)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Module_DotSight_v003.fbx'
+export finished in 0.0310 sec.
+WEAPON_MODEL_PASS Module_DotSight vertices 168
+Fra:1 Mem:72.20M (Peak 72.20M) | Time:00:00.03 | Rendering 1 / 64 samples
+Fra:1 Mem:72.20M (Peak 72.20M) | Time:00:00.07 | Rendering 25 / 64 samples
+Fra:1 Mem:72.20M (Peak 72.20M) | Time:00:00.11 | Rendering 50 / 64 samples
+Fra:1 Mem:72.20M (Peak 72.20M) | Time:00:00.14 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Module_HoloSight.png'
+Time: 00:00.21 (Saving: 00:00.04)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Module_HoloSight_v003.fbx'
+export finished in 0.1565 sec.
+WEAPON_MODEL_PASS Module_HoloSight vertices 216
+Fra:1 Mem:72.35M (Peak 72.35M) | Time:00:00.03 | Rendering 1 / 64 samples
+Fra:1 Mem:72.35M (Peak 72.35M) | Time:00:00.07 | Rendering 25 / 64 samples
+Fra:1 Mem:72.35M (Peak 72.35M) | Time:00:00.15 | Rendering 50 / 64 samples
+Fra:1 Mem:72.35M (Peak 72.35M) | Time:00:00.18 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Module_Laser.png'
+Time: 00:00.25 (Saving: 00:00.04)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Module_Laser_v003.fbx'
+export finished in 0.0165 sec.
+WEAPON_MODEL_PASS Module_Laser vertices 128
+Fra:1 Mem:72.61M (Peak 72.61M) | Time:00:00.03 | Rendering 1 / 64 samples
+Fra:1 Mem:72.61M (Peak 72.61M) | Time:00:00.07 | Rendering 25 / 64 samples
+Fra:1 Mem:72.61M (Peak 72.61M) | Time:00:00.11 | Rendering 50 / 64 samples
+Fra:1 Mem:72.61M (Peak 72.61M) | Time:00:00.15 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Module_ExtendedMag.png'
+Time: 00:00.22 (Saving: 00:00.04)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Module_ExtendedMag_v003.fbx'
+export finished in 0.1145 sec.
+WEAPON_MODEL_PASS Module_ExtendedMag vertices 312
+Fra:1 Mem:72.83M (Peak 72.83M) | Time:00:00.03 | Rendering 1 / 64 samples
+Fra:1 Mem:72.83M (Peak 72.83M) | Time:00:00.08 | Rendering 25 / 64 samples
+Fra:1 Mem:72.83M (Peak 72.83M) | Time:00:00.12 | Rendering 50 / 64 samples
+Fra:1 Mem:72.83M (Peak 72.83M) | Time:00:00.15 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Module_DrumMag.png'
+Time: 00:00.24 (Saving: 00:00.04)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Module_DrumMag_v003.fbx'
+export finished in 0.0165 sec.
+WEAPON_MODEL_PASS Module_DrumMag vertices 144
+Fra:1 Mem:72.99M (Peak 72.99M) | Time:00:00.03 | Rendering 1 / 64 samples
+Fra:1 Mem:72.99M (Peak 72.99M) | Time:00:00.08 | Rendering 25 / 64 samples
+Fra:1 Mem:72.99M (Peak 72.99M) | Time:00:00.12 | Rendering 50 / 64 samples
+Fra:1 Mem:72.99M (Peak 72.99M) | Time:00:00.16 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Module_Suppressor.png'
+Time: 00:00.23 (Saving: 00:00.04)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Module_Suppressor_v003.fbx'
+export finished in 0.0270 sec.
+WEAPON_MODEL_PASS Module_Suppressor vertices 168
+Fra:1 Mem:73.20M (Peak 73.20M) | Time:00:00.03 | Rendering 1 / 64 samples
+Fra:1 Mem:73.20M (Peak 73.20M) | Time:00:00.07 | Rendering 25 / 64 samples
+Fra:1 Mem:73.20M (Peak 73.20M) | Time:00:00.12 | Rendering 50 / 64 samples
+Fra:1 Mem:73.20M (Peak 73.20M) | Time:00:00.14 | Rendering 64 / 64 samples
+Saved: 'D:\Codex\VoxSky\Builds\WorkLatest\Docs\Screenshots\Weapons-20261105\Blender\v003\Module_FlashHider.png'
+Time: 00:00.23 (Saving: 00:00.04)
+
+
+FBX export starting... 'D:\\Codex\\VoxSky\\Builds\\WorkLatest\\Assets/Resources/PDParts/Weapons20261105\\Module_FlashHider_v003.fbx'
+export finished in 0.0160 sec.
+WEAPON_MODEL_PASS Module_FlashHider vertices 352
+Info: Saved as "WeaponLibrary_v003.blend"
+WEAPON_LIBRARY_PASS 32 models 37940 native vertices
+
+Blender quit

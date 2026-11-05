@@ -1,0 +1,47 @@
+[
+  {
+    "path": "Assets/Scripts/VoxArena.ReferenceHands.cs",
+    "bytes": 2447,
+    "sha256": "a362f1d39152c63c53b225881a8af0f5cecd83b8561a648e3797cae32331e4b3"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.ReferenceHandStudy.cs",
+    "bytes": 10319,
+    "sha256": "56a7535db87cd35bdeb10eace5cf4dfdf4be6779f7b7aa2f6752ce8d7f70c340"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.ArmGrips.cs",
+    "bytes": 6722,
+    "sha256": "69794db3ca27a6f5013b847446bd0387d36297d458b0fbb584065fbaece28f73"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.PDArt.cs",
+    "bytes": 4819,
+    "sha256": "e259cf7418fae29fa25be3fce3aee2c4530f127388f05a288980bd508564939e"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.WeaponArt.cs",
+    "bytes": 14691,
+    "sha256": "f644e0d493251097d0c6515ec15680d46b3828c74fffdee7761c00b242dea5b2"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.BalanceEditorStudy.cs",
+    "bytes": 13987,
+    "sha256": "7897aa90bb25d637467a88a322d5c0fe2f5f4cd4eaddd3d065fab4d90855682b"
+  },
+  {
+    "path": "Assets/Editor/ReferenceHandsBuild.cs",
+    "bytes": 1293,
+    "sha256": "54a99b98a06cc7f31651401718be7c8f43ccfc8961c76a39922705ce6f1bb9d4"
+  },
+  {
+    "path": "Assets/Editor/VoxBuild.cs",
+    "bytes": 5736,
+    "sha256": "89329777c430fe93bbda8199610640a9a99774f6bc718721645586be38643a5e"
+  },
+  {
+    "path": "Builds/Windows/Voxel-On.exe",
+    "bytes": 667136,
+    "sha256": "3726509af94bdacbfe23f85da13109a7e70fb7d61913506e98690bd3208b2fd7"
+  }
+]

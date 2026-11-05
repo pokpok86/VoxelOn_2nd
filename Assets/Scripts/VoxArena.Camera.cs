@@ -6,6 +6,7 @@ using UnityEngine.Rendering;
 public sealed partial class VoxArena
 {
     bool mouseLookCaptured;
+    bool lockViewInitialized,wasInputTargetLock;float lockPitchOrigin,lockElevationOrigin;
     int discardMouseLookFrames;
     float cameraBodyOpacity=1;
     bool cameraBodyFadeApplied;
@@ -31,9 +32,13 @@ public sealed partial class VoxArena
         if(targetLock)
         {
             Vector3 toward=enemy.root.position-player.root.position;
-            cameraYaw=Mathf.LerpAngle(cameraYaw,Mathf.Atan2(toward.x,toward.z)*Mathf.Rad2Deg,1-Mathf.Exp(-8*dt));
-            cameraPitch=Mathf.Lerp(cameraPitch,DefaultThirdPersonPitch,1-Mathf.Exp(-8*dt));
+            float elevation=Mathf.Atan2(toward.y,new Vector2(toward.x,toward.z).magnitude)*Mathf.Rad2Deg;
+            if(!lockViewInitialized){lockViewInitialized=true;lockPitchOrigin=cameraPitch;lockElevationOrigin=elevation;}
+            float step=Mathf.Clamp(dt,0,.05f);
+            cameraYaw=Mathf.MoveTowardsAngle(cameraYaw,Mathf.Atan2(toward.x,toward.z)*Mathf.Rad2Deg,120*step);
+            cameraPitch=Mathf.MoveTowards(cameraPitch,Mathf.Clamp(lockPitchOrigin-(elevation-lockElevationOrigin),-5,45),75*step);
         }
+        else lockViewInitialized=false;
         Quaternion requested=Quaternion.Euler(cameraPitch,cameraYaw,0);
         Vector3 boom=-(requested*Vector3.forward)*12.5f;
         float highPivot=2.8f;

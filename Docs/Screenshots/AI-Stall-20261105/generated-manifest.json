@@ -1,0 +1,92 @@
+[
+  {
+    "original": "Docs/Screenshots/PD14-Corner-Recovery/1-case-0.png",
+    "newCapture": "Docs/Screenshots/AI-Stall-20261105/Generated/Docs/Screenshots/PD14-Corner-Recovery/1-case-0.png",
+    "sha256": "caf1a0ab7d9b9e258ae30f05bef67d87d018daff5cf1256ccc4dcc2baaecf3a5"
+  },
+  {
+    "original": "Docs/Screenshots/PD14-Corner-Recovery/1-case-1.png",
+    "newCapture": "Docs/Screenshots/AI-Stall-20261105/Generated/Docs/Screenshots/PD14-Corner-Recovery/1-case-1.png",
+    "sha256": "d553ba17ba6ffd46e4c3004c9b66047d9355794d04e93c1a5472f6e1b57b07e4"
+  },
+  {
+    "original": "Docs/Screenshots/PD14-Corner-Recovery/2-case-0.png",
+    "newCapture": "Docs/Screenshots/AI-Stall-20261105/Generated/Docs/Screenshots/PD14-Corner-Recovery/2-case-0.png",
+    "sha256": "fa5f23a3e5908c0813bc6f66bb9695a133b125e9a610f998e0fc8129721ac237"
+  },
+  {
+    "original": "Docs/Screenshots/PD14-Corner-Recovery/2-case-1.png",
+    "newCapture": "Docs/Screenshots/AI-Stall-20261105/Generated/Docs/Screenshots/PD14-Corner-Recovery/2-case-1.png",
+    "sha256": "65ec99481a0c00b01e9fc746a7ec61f34f884297f6f6029ef5c0defe9488f810"
+  },
+  {
+    "original": "Docs/Screenshots/PD14-Corner-Recovery/3-case-0.png",
+    "newCapture": "Docs/Screenshots/AI-Stall-20261105/Generated/Docs/Screenshots/PD14-Corner-Recovery/3-case-0.png",
+    "sha256": "8009bf81143a36668f5ce48a5ed14d23106f486576dbfe0eb2e5d8154baa558f"
+  },
+  {
+    "original": "Docs/Screenshots/PD14-Corner-Recovery/3-case-1.png",
+    "newCapture": "Docs/Screenshots/AI-Stall-20261105/Generated/Docs/Screenshots/PD14-Corner-Recovery/3-case-1.png",
+    "sha256": "22627eb345f3720413d978134763251b58b80601450b14d404a0b9aaf11ef64a"
+  },
+  {
+    "original": "Docs/Screenshots/PD14-Three-Prototypes/IndoorFactory/1-WISP-0.png",
+    "newCapture": "Docs/Screenshots/AI-Stall-20261105/Generated/Docs/Screenshots/PD14-Three-Prototypes/IndoorFactory/1-WISP-0.png",
+    "sha256": "4cec39c7a3eab55a2302bd14e4baba2d0ad458afefaf0d0513127260e382f64f"
+  },
+  {
+    "original": "Docs/Screenshots/PD14-Three-Prototypes/IndoorFactory/1-WISP-1.png",
+    "newCapture": "Docs/Screenshots/AI-Stall-20261105/Generated/Docs/Screenshots/PD14-Three-Prototypes/IndoorFactory/1-WISP-1.png",
+    "sha256": "465cffd6b32faa5c5b25cd1a95eed1b1a3d6342697257e90fb2124c56004e71b"
+  },
+  {
+    "original": "Docs/Screenshots/PD14-Three-Prototypes/IndoorFactory/2-BASTION-0.png",
+    "newCapture": "Docs/Screenshots/AI-Stall-20261105/Generated/Docs/Screenshots/PD14-Three-Prototypes/IndoorFactory/2-BASTION-0.png",
+    "sha256": "24e973acbb55692b92a8a81a4fa85c9918cb3c6776dc8ce330cfd64d02e2c1bd"
+  },
+  {
+    "original": "Docs/Screenshots/PD14-Three-Prototypes/IndoorFactory/2-BASTION-1.png",
+    "newCapture": "Docs/Screenshots/AI-Stall-20261105/Generated/Docs/Screenshots/PD14-Three-Prototypes/IndoorFactory/2-BASTION-1.png",
+    "sha256": "85b3b822f9ea190bd760d95772f594ed32bb35b2888c59afd5cc4fe2b3efc18f"
+  },
+  {
+    "original": "Docs/Screenshots/PD14-Three-Prototypes/IndoorFactory/3-TARANTULA-0.png",
+    "newCapture": "Docs/Screenshots/AI-Stall-20261105/Generated/Docs/Screenshots/PD14-Three-Prototypes/IndoorFactory/3-TARANTULA-0.png",
+    "sha256": "7eeeeeae2b37c25af71caa6e3e195cc4b284b31c79d7b2c730169a9304eacabd"
+  },
+  {
+    "original": "Docs/Screenshots/PD14-Three-Prototypes/IndoorFactory/3-TARANTULA-1.png",
+    "newCapture": "Docs/Screenshots/AI-Stall-20261105/Generated/Docs/Screenshots/PD14-Three-Prototypes/IndoorFactory/3-TARANTULA-1.png",
+    "sha256": "02dada16d1ec38701ece5a8700dfe799135477d5b7d79ac64afb33e51669cbf9"
+  },
+  {
+    "original": "Docs/Screenshots/PD14-Three-Prototypes/OutdoorCanyon/1-WISP-0.png",
+    "newCapture": "Docs/Screenshots/AI-Stall-20261105/Generated/Docs/Screenshots/PD14-Three-Prototypes/OutdoorCanyon/1-WISP-0.png",
+    "sha256": "79efe13be19420799479b075d9fe8baea0526516bea58af99b1495e7fa78e567"
+  },
+  {
+    "original": "Docs/Screenshots/PD14-Three-Prototypes/OutdoorCanyon/1-WISP-1.png",
+    "newCapture": "Docs/Screenshots/AI-Stall-20261105/Generated/Docs/Screenshots/PD14-Three-Prototypes/OutdoorCanyon/1-WISP-1.png",
+    "sha256": "0a3e87800e2ed39bef335f5f039a5fd35dda41d40bf22c74f6a58b35eac4468c"
+  },
+  {
+    "original": "Docs/Screenshots/PD14-Three-Prototypes/OutdoorCanyon/2-BASTION-0.png",
+    "newCapture": "Docs/Screenshots/AI-Stall-20261105/Generated/Docs/Screenshots/PD14-Three-Prototypes/OutdoorCanyon/2-BASTION-0.png",
+    "sha256": "7a04037245dce0b9766ab0cc4012c91f237f7e5e20bfe7081879dcbe802765d8"
+  },
+  {
+    "original": "Docs/Screenshots/PD14-Three-Prototypes/OutdoorCanyon/2-BASTION-1.png",
+    "newCapture": "Docs/Screenshots/AI-Stall-20261105/Generated/Docs/Screenshots/PD14-Three-Prototypes/OutdoorCanyon/2-BASTION-1.png",
+    "sha256": "503a6c48c9ed42bcb97b993c2848399dc6a9f691fe241e00916349ebe11ef9dd"
+  },
+  {
+    "original": "Docs/Screenshots/PD14-Three-Prototypes/OutdoorCanyon/3-TARANTULA-0.png",
+    "newCapture": "Docs/Screenshots/AI-Stall-20261105/Generated/Docs/Screenshots/PD14-Three-Prototypes/OutdoorCanyon/3-TARANTULA-0.png",
+    "sha256": "55c85b367f38e5c36c28227eb995df19b5d1ce990fe9b889165cb99638b5a8f0"
+  },
+  {
+    "original": "Docs/Screenshots/PD14-Three-Prototypes/OutdoorCanyon/3-TARANTULA-1.png",
+    "newCapture": "Docs/Screenshots/AI-Stall-20261105/Generated/Docs/Screenshots/PD14-Three-Prototypes/OutdoorCanyon/3-TARANTULA-1.png",
+    "sha256": "5a9ce31100c5e018126538d59fb02dd6ae477d17671c5beabf78715f2ccdf1d2"
+  }
+]

@@ -1,0 +1,398 @@
+[
+  {
+    "path": "Assets/Scripts/BalanceData.cs",
+    "sha256": "4f40ebba6cb315b57d65e3cc86ecb4a43f376ca2f727f01c6373016fcb0fbf44"
+  },
+  {
+    "path": "Assets/Scripts/CraftCatalog.cs",
+    "sha256": "334a4a1c0870b8027c2850771baa060dfe9cfcd0d04e886c0ea57d795c32fb7a"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.Accessibility.cs",
+    "sha256": "5267e473dd983f58949d83de92932c511864aa1b7e70f665b7b1eccefadf6774"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.AI.cs",
+    "sha256": "6abd2b2ad8914c0f89d1f23d03271ee04fc711ecc4426c2b8f171c506a60d8d0"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.AICoverRoute.cs",
+    "sha256": "204406b7e49a01578336896b0a24de4491d227d7362e2a7be91d59cd7a64365f"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.AIStallStudy.cs",
+    "sha256": "c89f8511f751f54c87ae6982974e0a93925ea7d1d3e71f9a2c51f9272e9379aa"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.ArmGrips.cs",
+    "sha256": "3a8a6612256765cea493da53f8914fbc99eb6a3325ac13538cce14d68f9e150f"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.Audio.cs",
+    "sha256": "14bf77f4e08e012ba9dc37e42c50864f35aa1148f6a890fe340bfcd6227f50fe"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.BalanceEditor.cs",
+    "sha256": "fcbd228c9727667ae9cd3058d62f57c4d115382e8f0ff7a07c967cb74b1aa2aa"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.BalanceEditorStudy.cs",
+    "sha256": "30b2ac9ecbbd5b47b2bf9d768c5ee74a92a2716ea6a97df16d4341e83e883286"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.BalanceStudy.cs",
+    "sha256": "26135cb31c0ac278529cf03b43d2f15c8433083db49fad4f86bf23bc2d53f92c"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.Camera.cs",
+    "sha256": "0986659d91f4154872298b10654a9ee3f4c87e688e5e973762ebfbebe42f7832"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.CapsuleTreads.cs",
+    "sha256": "053b95cd09db8a97743bf4c8a42063f7af23409eec57f6b8d1e80311a2f95980"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.Chassis.cs",
+    "sha256": "61113343c14f04c11f4d8bb5cf6841afcd6bf9f509b56aaca89ac14b6545319f"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.ChassisMotionStudy.cs",
+    "sha256": "2405259b2a1204cdfd66e1da08d57e3647006510a69916c0df39f2098efa1c88"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.Climate.cs",
+    "sha256": "06cec6b812112f86c1ca77b77b421b7e01a93083dafb0854d31af6ca79a41df6"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.ClimateSmoke.cs",
+    "sha256": "0840e9cff567dec06f828e6d51f47e63ffd1d288d1f5e04e78cb99fed8909793"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.Combat.cs",
+    "sha256": "54f184e0d4c3341323d1d56f5e7efe9eca3cb2d3b7cfe9470d8335b9ab8ec269"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.ControlReview.cs",
+    "sha256": "dc9da26e7454a35f3e89eb0f230faab343c7b4fcaf3108139716972227e528af"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.CornerSoak.cs",
+    "sha256": "7d8c2347b8c45c6800ad52e1b71cfb9284ec1d67062426176d6bfc19ef1bcf0c"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.cs",
+    "sha256": "6361d1d5f577e8b7aab859edfabc1a4d395e9dddb9dc16a4486fdc5dad5dc888"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.EffectCapture.cs",
+    "sha256": "bca47f75226f4e84dd121f69c98047a0619380f7bffc6a54b65678c9e68660a5"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.EnvironmentVoxels.cs",
+    "sha256": "2cb168bb18f57a9cd3811489575d7ec34cad2693ec14401670f0c48520c78ed3"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.Feedback.cs",
+    "sha256": "d60498d71e0208a6ee00d0443b99eb96670fa9e94401e6dabd910ea20e4f5dc9"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.FrameIdentity.cs",
+    "sha256": "e069cd38155fc914d177a6ebbec704637f11c539f89d7e768ce45eec24951d96"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.GloveReview.cs",
+    "sha256": "99eb921d2f612f7d5acb466bac0197198befb39e22db71489dc71abcf2158ba9"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.Ground.cs",
+    "sha256": "4bb3595026312d1660823e8fe7f0e7ce25cf1f36980ec544c1f9e2c26890019c"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.Guide.cs",
+    "sha256": "e8a25f9d83be7cb7550213d89ed3aa2a306af5416f97ec713d15b5f254dfead6"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.ImportedProjectiles.cs",
+    "sha256": "e0c41205295700e208c53743ed11cd201b6f2d7b6f507116af2416a5ceee8feb"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.Lifecycle.cs",
+    "sha256": "7d741b9f913c8f0b54dd4d126714ed9cf6bd2b68b29131304faea3696516ff1a"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.LiveWeaponLab.cs",
+    "sha256": "ca776a0781f1111c50d980163930e6c718b13ed06b0dbf9c37d351132442291b"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.ModuleRecoveryStudy.cs",
+    "sha256": "334233ba056411c5d0d172694652f694e5999ea6b670dfbd2274c765d39bc667"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.OvernightChecks.cs",
+    "sha256": "02968e29ba5d8651715c248de1c3a98d0cebd57aad65f7ab2f4e3e7822343de4"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.PartBudget.cs",
+    "sha256": "f2ddb9b20c584fba04df3688ce0f539f229c313959788b11b306f32a07d1def1"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.PDArt.cs",
+    "sha256": "3aa038cda0d501936f59ed32b0c09f2182948eae6bbe3ad2189fc048739eace1"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.PDVisualFX.cs",
+    "sha256": "6ef6863d345ef7ce7f2c086553a84c26c756229a4764f2569e2eaa918ac9e400"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.Performance.cs",
+    "sha256": "3dc579ded52640828a71fa21e748569b8c1a5c71f1a7c77e6956867faa58a666"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.PreferenceProbe.cs",
+    "sha256": "0fcb823b9b3ee31d1374f399688786aa007c9ec574224d271909b922f64657d3"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.Preferences.cs",
+    "sha256": "05acb1a3efafb0f077ecc44247ad1b12476842f60452589685355b2579b9eb2b"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.ProjectileVisuals.cs",
+    "sha256": "d3da1101915cf033e2f148e50c9e387fff67d214d76d5f23f2437bc454fda323"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.PrototypeSoak.cs",
+    "sha256": "1106e0a24b8a65938de3d7721ca9d091d87c4ec591290bf5c96a244b976ca21d"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.Punch.cs",
+    "sha256": "21851850f91e4b2ff47a068a7ce0741b99df8eb4ea341a530fbed6f5837084d9"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.QuadrupedGait.cs",
+    "sha256": "a167bc291e5cce97c5e4bc66db48dc919b49a857d21f868bbaaafc4837a87bde"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.RadarCapture.cs",
+    "sha256": "fa3861196609723ed23bb43585c868fabe72975bc328ff2cbe0fb72752c5b6c0"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.Robot.cs",
+    "sha256": "686d2e081d7241497f768188fee7645db21eea6b7cc67e5875def916daff3c9b"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.Salvage.cs",
+    "sha256": "d79e9911e93fbf49705e4379c49c1fc8bda2fcbc8867023bd187ad7dcc21f421"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.ShellComparison.cs",
+    "sha256": "1d444ed47e9aff73941b7f232684ceafefc60bdda150bf6d61c56f633f9b38f0"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.SimpleShell.cs",
+    "sha256": "41041c694b0912224901ca2cbf1586c0c14c983d5e5046a388d408da9b8c6e8e"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.Smoke.cs",
+    "sha256": "d958b08f45074f4740859c618fc9a0e93e840828da8083dbaa88af959a3a643b"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.TestLab.cs",
+    "sha256": "9a5860a159bc4e18edd23e439b3e2e432aad9b467398a2fb596e3d1cc8455001"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.UI.cs",
+    "sha256": "2a1c23b6dbdd8efdd59704c6f8090ad58062e81c18eda6ae0ade446e6160abe7"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.VisualEnvironment.cs",
+    "sha256": "f2df3fc82f656638f52892968f8e97c1b09ed1d374ba5dd7c3c8e2def9a3f787"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.WeakAim.cs",
+    "sha256": "0cf4cffff3064250328c99e10c4c0566b1f14fb650b42657abd2237d80cfbb88"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.WeaponArt.cs",
+    "sha256": "8dc167eb1e0486b82f68fa192eb0ff3286b3fd7f2b015066bb8f6e91a0a876fa"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.WeaponsV2.cs",
+    "sha256": "c512854228ac9a5707a51fd22c1d16bbc61e2849cb2f5ddfe1703ade390eddda"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.WispSoak.cs",
+    "sha256": "3f497adfb9a1b977fe7534a80bb0037402b91df6c269bebf1647231acaee0624"
+  },
+  {
+    "path": "Assets/Scripts/VoxArena.World.cs",
+    "sha256": "46c0f24f050ae0de13e6c7a63c5f994295f5e36ae7501a2aa16043a2d1cc049e"
+  },
+  {
+    "path": "Assets/Scripts/WeaponArtSurface.cs",
+    "sha256": "0e8c3506714ab543833805b1d88078c0cc82a3f8163638fa429d1eda299b6861"
+  },
+  {
+    "path": "Assets/Editor/BalanceAuthoringBuild.cs",
+    "sha256": "0ba851ee5ce406ddbeb0a7236e747d2ab884a318a4a6aa72394eb9bbc60caa21"
+  },
+  {
+    "path": "Assets/Editor/VoxBuild.cs",
+    "sha256": "a7bbc0387eac7f7d3c76f2053a10bc6e32b2b552627ffff5dcf00c28c17f19e9"
+  },
+  {
+    "path": "Assets/Editor/WeaponArtImporter.cs",
+    "sha256": "ac28cb522683f15e230d3d1fd7d7e618a0670f9aeac74f7ee61be4d94d68a31b"
+  },
+  {
+    "path": "Assets/Editor/WispRigInspect.cs",
+    "sha256": "6dcf63b774dd9b765e4043bffb249a5c89e9400aedfeb0e61f6552827d29e003"
+  },
+  {
+    "path": "Assets/Art/Robots/WISP/WISP_v012.fbx",
+    "sha256": "2949346e7cff31393ba0aa049001e5a0c64dddd286f3f4d44d69dead5660909f"
+  },
+  {
+    "path": "Assets/Art/Robots/BASTION/BASTION_v007.fbx",
+    "sha256": "d4c10382963e5c141de57d6c2fae671d9dd5ed1709acb68b126c4cf3a7a51cdb"
+  },
+  {
+    "path": "Assets/Art/Robots/TARANTULA/TARANTULA_v006.fbx",
+    "sha256": "c1bb4722f02edfd6e25e60f4581495ede1caa1f63dfcdb7e4e87640820b08d67"
+  },
+  {
+    "path": "Data/Balance/PD-Balance.json",
+    "sha256": "4e995025032d0087a1e6751b82122b37990307b5e4001b8730c76f227c4a5e6f"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/catalog_v003.json",
+    "sha256": "fc925e8140ce1471edb43b9f9236eccfb24f67565c1e6908b9904e0b92fa1afd"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Future_Beam_v003.fbx",
+    "sha256": "0baa38e6a0fe3d7b6ba1f198dc4c16fa7b82caa230c535086c8385a2149f0bd3"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Future_Drone_v003.fbx",
+    "sha256": "ac50c82c377f9fd3f6af95230117da1f650e3ee2f08df423077c1c2a00bce80d"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Future_Gatling_v003.fbx",
+    "sha256": "30b1f8333b8b0909027fa043f250897c786ea3cc3b940da7e7f5c0ac98b04f4f"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Future_Hammer_v003.fbx",
+    "sha256": "2f3afaa012e66fda4bc0b376c3b5ca3c4886f903c24baead7afafce5aa9d3459"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Future_HoloShield_v003.fbx",
+    "sha256": "427fb461945a65728aed700e07e37597e5edf3a7ea1c3aab95720b85eae41828"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Future_Launcher_v003.fbx",
+    "sha256": "be803dd4d40e5db82660c64a7a077a3a94f18e082f7b1e138d47fed71fa0b731"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Future_Rifle_v003.fbx",
+    "sha256": "002535ef7937b9ef05fdd583ca02f42844d731a5166f31f0ca25fd2243ee694a"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Future_Shield_v003.fbx",
+    "sha256": "5fb0e126be4361526660d03a028ea06c58d6986613092f1139158926f64c387a"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Future_Shotgun_v003.fbx",
+    "sha256": "8ae12b40132a9a5d13776f1e331092878b33b33de916c2c6cb0279f8b5600d81"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Future_Sniper_v003.fbx",
+    "sha256": "5c1a5923f61748a173a80c90852f265df08829f449fdae3ab3629cecea907f40"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Future_Sword_v003.fbx",
+    "sha256": "92817d14629191afeab00849fca5bae633d033486c0bee81a6e128fc0f4a998b"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Military_AR_v003.fbx",
+    "sha256": "935007f7cfc64ebaa524a2f3b95d0fb508ee8d222c6951f8fa9d94e72eaa6214"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Military_FL_v003.fbx",
+    "sha256": "133d7c59b242239e1b07edb0fce8ed5994a794cdb633302a05bab430ca0f3b1c"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Military_GL_v003.fbx",
+    "sha256": "704105373d882980ea97bdc673e5a7cdfb633f3db763c4556f514fed7df0e857"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Military_HG_v003.fbx",
+    "sha256": "2d3498c04eb22eb3f92b5ae42c49aedc8355feeaf824514e9922e2bbe1ef7511"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Military_LMG_v003.fbx",
+    "sha256": "5b8e0010b278c3b28e932375a22c7f3ba4d1d6508231294c043f4fc9def20b81"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Military_RL_v003.fbx",
+    "sha256": "c3e07f179245fb727e0be38dcf53d84291c93e9af71a90cc085664c616a32481"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Military_SG_v003.fbx",
+    "sha256": "4bf2867011553091d9f08f2caa13d725902e67a7fab45879da9b7805aec1cc0f"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Military_SMG_v003.fbx",
+    "sha256": "8b4f9914214dee84e584f1df1233134cad504fad1ec2ae624e4fc612521967db"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Military_SR_v003.fbx",
+    "sha256": "380a6458fe7e7e813364725378ae8f5e6fff686605a0d162ef2c334ad860b8a4"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Module_DotSight_v003.fbx",
+    "sha256": "8f595227c69fd47b56d75b3863a8c60f1d9995e219244f71974f54f7322574a5"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Module_DrumMag_v003.fbx",
+    "sha256": "82ecfe4fe0734da77f3947aa179ae0713cd24ad81df682f8a6e44437650d40ec"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Module_ExtendedMag_v003.fbx",
+    "sha256": "9d53738aff430c9fd13b5573388d014bdf47da032679c09e106d303c775843e7"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Module_FlashHider_v003.fbx",
+    "sha256": "6c70e19701ac786517cdf43e54e87a991f825fa2b7f68168b45d77355fbedb32"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Module_HoloSight_v003.fbx",
+    "sha256": "16be0449ad57199c826cc11e1d30da2794357f0c3caac4b55d2a0b9629bd3e53"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Module_Laser_v003.fbx",
+    "sha256": "ae69416a0ffa2f2ff73a48b9fe7b1e43af551170f6fd16f76bed50b6c67bdbc1"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Module_Scope_v003.fbx",
+    "sha256": "8cd2051fcc7a3ae5e5c9679124ea6c1aa280f56d570cc89db1dd1f7403c1e694"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Module_Suppressor_v003.fbx",
+    "sha256": "d2705d3a9f391beec58e9e41408f8b55c39532ba1a9661e5bec14c4481f2cda7"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Throwable_EMP_v003.fbx",
+    "sha256": "9377df8d79e93428422373b6f2a8bebf67bb7a6cc7950997a55cffefb0806b9e"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Throwable_Grenade_v003.fbx",
+    "sha256": "60fbc15c4121ab1acc59074cda173029172ab923770092c3ca680ded2c206dd8"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Throwable_Incendiary_v003.fbx",
+    "sha256": "f7bce0fae50b7bcf7db5db0d296b16d69be55eef3c1b7055a9516e026c74351b"
+  },
+  {
+    "path": "Assets/Resources/PDParts/Weapons20261105/Throwable_Smoke_v003.fbx",
+    "sha256": "dafbd1786c004fea52e9c1ed0d47b2566ad43a0de29b7d9ba9c4a276c3b043f1"
+  }
+]
