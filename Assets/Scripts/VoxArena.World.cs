@@ -263,7 +263,11 @@ public sealed partial class VoxArena
             // Collision bounds and the visual translate together.
             obstacles[i]=DebrisBounds(p,d.size);
         }
-        if(player!=null) { ResolveOverlap(player); ResolveOverlap(enemy); }
+        if(fighterRoster.Count>0)
+        {
+            foreach(Fighter fighter in fighterRoster) ResolveOverlap(fighter);
+        }
+        else if(player!=null) { ResolveOverlap(player); ResolveOverlap(enemy); }
     }
     void ScatterCoverFragments(Debris source,Vector3 impact)
     {

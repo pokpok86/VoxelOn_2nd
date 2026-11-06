@@ -99,6 +99,7 @@ public sealed partial class VoxArena : MonoBehaviour
     Vector3 aimDirection;
     bool canShoot,paused,smoke,inMenu=true;
     bool spectatorMode;
+    bool multiAiPerformanceMode;
     float cameraShakeTime,cameraShakeStrength;
     bool targetLock;
     float occludedLockTimer;
@@ -149,13 +150,15 @@ public sealed partial class VoxArena : MonoBehaviour
         bool prototypeSoak=Array.IndexOf(Environment.GetCommandLineArgs(),"--prototype-soak")>=0;
         bool wispSoak=Array.IndexOf(Environment.GetCommandLineArgs(),"--wisp-soak")>=0;
         bool performance=Array.IndexOf(Environment.GetCommandLineArgs(),"--performance-test")>=0;
+        bool multiAIPerformance=Array.IndexOf(Environment.GetCommandLineArgs(),"--multi-ai-performance")>=0;
+        multiAiPerformanceMode=multiAIPerformance;
         bool captureGallery=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-docs-gallery")>=0;
         bool captureVisualTargets=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-visual-targets")>=0;
         bool environmentSmoke=Array.IndexOf(Environment.GetCommandLineArgs(),"--environment-smoke")>=0;
         bool captureLineup=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-customization-lineup")>=0;
         captureCustomizationEditor=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-bastion-customization")>=0;
         captureGameplayPreview=captureCustomizationEditor||captureLineup||motionStudy||projectileGallery||labCapture||radarCapture||cornerSoak||shellCapture||effectCapture||balanceStudy||climateSmoke||prototypeSoak||Array.IndexOf(Environment.GetCommandLineArgs(),"--camera-review")>=0||wispSoak||Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-gameplay-ui")>=0;
-        smoke=captureLineup||motionStudy||projectileGallery||labCapture||radarCapture||cornerSoak||shellCapture||effectCapture||balanceStudy||climateSmoke||prototypeSoak||wispSoak||performance||captureGallery||captureVisualTargets||environmentSmoke||Array.IndexOf(Environment.GetCommandLineArgs(),"--smoke-test")>=0;
+        smoke=captureLineup||motionStudy||projectileGallery||labCapture||radarCapture||cornerSoak||shellCapture||effectCapture||balanceStudy||climateSmoke||prototypeSoak||wispSoak||performance||multiAIPerformance||captureGallery||captureVisualTargets||environmentSmoke||Array.IndexOf(Environment.GetCommandLineArgs(),"--smoke-test")>=0;
         // Plains prototype is archived at PD request; ordinary play exposes bounded maps only.
         arenaMap=Array.IndexOf(Environment.GetCommandLineArgs(),"--outdoor")>=0?ArenaMapKind.OutdoorCanyon:
             smoke?ArenaMapKind.IndoorFactory:(ArenaMapKind)Mathf.Clamp(PlayerPrefs.GetInt(PreferencePrefix+"Map",0),0,1);
@@ -186,6 +189,7 @@ public sealed partial class VoxArena : MonoBehaviour
         else if(wispSoak) StartCoroutine(WispSoak());
         else if(environmentSmoke) StartCoroutine(EnvironmentSmoke());
         else if(captureGameplayPreview) StartCoroutine(CaptureGameplayUI());
+        else if(multiAIPerformance) StartCoroutine(MultiAIPerformanceTest());
         else if(performance) StartCoroutine(PerformanceTest());
         else if(captureGallery) StartCoroutine(CaptureDocumentationGallery());
         else if(captureVisualTargets) StartCoroutine(CapturePrototypeVisuals());
@@ -355,6 +359,14 @@ public sealed partial class VoxArena : MonoBehaviour
     void UpdateCamera(float dt)
     {
         if(paused&&!inMenu&&!smoke&&!spectatorMode)return;
+        if(multiAiPerformanceMode&&!inMenu)
+        {
+            Quaternion loadView=Quaternion.Euler(48,35,0);
+            view.orthographic=true;view.orthographicSize=29f;
+            view.transform.position=-(loadView*Vector3.forward)*82f;
+            view.transform.LookAt(Vector3.zero);
+            return;
+        }
         if(spectatorMode&&!inMenu)
         {
             Vector3 spectatorCenter=(player.root.position+enemy.root.position)*.5f;
