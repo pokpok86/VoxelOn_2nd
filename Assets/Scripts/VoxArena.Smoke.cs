@@ -1058,8 +1058,25 @@ public sealed partial class VoxArena
         Check(player.magazine==30&&player.reloadTime==0,"automatic reload refills the 30-round magazine");
         ChassisChecks(Check);CombatRevisionChecks(Check);LiveWeaponLabChecks(Check);AimRevisionChecks(Check);ClimateChecks(Check);VisualEffectChecks(Check);AIRevisionChecks(Check);
         WispOvernightChecks(Check);
+        bool priorGalleryState=weaponGalleryOpen;weaponGalleryOpen=true;CloseWeaponGallery();Check(!weaponGalleryOpen,"weapon library BACK closes to the hangar");weaponGalleryOpen=priorGalleryState;
+        bool priorTimedMode=timedFragMode;timedFragMode=true;TestSetup(0,1);StartMatchRules();
+        float savedPilotHp=player.hp;player.hp=0;Check(!Finished,"timed frag continues through a pilot knockout");player.hp=savedPilotHp;
+        enemy.hp=1;enemy.shieldEnergy=0;enemy.invulnerableTime=0;Hit(enemy,player.root.position,10000,enemy.corePart.position,player);
+        Check(FragScore(0)==1&&enemy.deadVisual&&enemy.root.gameObject.activeSelf==false,"frag awards attacker and hides destroyed fighter");
+        RespawnTimedFragFighter(enemy);
+        Check(!enemy.deadVisual&&enemy.hp==enemy.spec.health&&enemy.invulnerableTime>0,"fighter returns at full health with brief spawn protection");
+        player.hp=1;player.shieldEnergy=0;player.invulnerableTime=0;Hit(player,enemy.root.position,10000,player.corePart.position,enemy);
+        Check(playerRespawnPrompt&&respawnDesignOptions.Length==8,"pilot death opens all eight saved-design choices");
+        respawnDesignSelection=0;playerRespawnPrompt=false;RespawnTimedFragFighter(player);
+        Check(!player.deadVisual&&player.hp==player.spec.health&&activeBalance!=null,"selected saved design is applied on respawn");
+        fragTimeRemaining=0;Check(Finished,"timed frag resolves at the match clock limit");
+        timedFragMode=priorTimedMode;TestSetup(0,1);StartMatchRules();float duelPilotHp=player.hp;player.hp=0;Check(Finished,"legacy duel still ends on knockout");player.hp=duelPilotHp;
         smoke=originalSmoke;
         Debug.Log(passed?"VOXSKY_SMOKE_PASS "+count+" checks: ground, modular robots, camera, slot-one gun, mobility, practice AI, aim assist, audio":"VOXSKY_SMOKE_FAIL");
         yield return new WaitForSeconds(.3f); Application.Quit(passed?0:2);
     }
 }
+
+
+
+

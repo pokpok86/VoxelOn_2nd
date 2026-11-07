@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public sealed partial class VoxArena
@@ -25,7 +26,7 @@ public sealed partial class VoxArena
     float lockVisual;
     Vector2 lockScreenPosition;
     bool lockVisualInitialized;
-    bool ShowAimReticle=>!inMenu&&!paused&&!Finished&&!spectatorMode;
+    bool ShowAimReticle=>!inMenu&&!paused&&!Finished&&!spectatorMode&&!player.deadVisual;
     bool TryGetTargetScreenRect(out Rect rect)
     {
         rect=default;
@@ -69,7 +70,7 @@ public sealed partial class VoxArena
     }
     void DrawLockReticle()
     {
-        if(spectatorMode || Finished || paused || view==null || enemy==null) return;
+        if(spectatorMode || Finished || paused || view==null || enemy==null || enemy.deadVisual) return;
         bool onScreen=TryGetTargetScreenRect(out Rect targetRect);
         float target=targetLock&&onScreen?1f:0f;
         lockVisual=Mathf.MoveTowards(lockVisual,target,Time.unscaledDeltaTime*(target>lockVisual?5.5f:2.8f));
@@ -123,7 +124,7 @@ public sealed partial class VoxArena
         Text(672, 36, 310, $"HULL {Mathf.CeilToInt(enemy.hp)} / {enemy.spec.health}"+(enemy.spec.ShieldMax>0?$"   SHIELD {Mathf.CeilToInt(enemy.shieldEnergy)}":""), small);
         Bar(672, 59, 240, enemy.hp / enemy.spec.health, Orange);
         if(enemy.spec.ShieldMax>0) Bar(672, 73, 240, enemy.shieldEnergy / enemy.spec.ShieldMax, new Color(.48f,.67f,1));
-        Text(1010, 18, 250, $"{(int)roundTime / 60:00}:{(int)roundTime % 60:00}     W {wins} / L {losses}", label);
+        Text(1010, 18, 250, timedFragMode?$"FRAG {FragScore(0)}-{FragScore(1)}  {Mathf.CeilToInt(fragTimeRemaining/60):00}:{Mathf.CeilToInt(fragTimeRemaining%60):00}":$"{(int)roundTime / 60:00}:{(int)roundTime % 60:00}     W {wins} / L {losses}", label);
         Panel(new Rect(0, 616, 1280, 104), new Color(.025f, .045f, .075f, .96f));
         Text(28, 626, 360, player.spec.name + " / " + player.spec.role, label);
         Text(28,658,360,EquippedProfile(player).mount+" / "+EquippedProfile(player).name,small);
@@ -138,11 +139,11 @@ public sealed partial class VoxArena
         DrawCombatFeedback();
         DrawRadar();
         DrawLockReticle();
-        DrawAimReticle();DrawAssistEcho();DrawWeaponLoadout();
+        DrawAimReticle();DrawAssistEcho();DrawWeaponLoadout();DrawRespawnSelection();
         if (paused || Finished&&Time.time-finishPresentationTime>1.2f)
         {
             Panel(new Rect(385, 245, 510, 205), new Color(.025f, .045f, .075f, .96f));
-            Text(425, 268, 450, paused ? "PAUSED" : spectatorMode ? (enemy.hp<=0?"BLUE AI WON":"ORANGE AI WON") : enemy.hp <= 0 ? "DUEL WON" : "DUEL LOST", title);
+            Text(425, 268, 450, paused ? "PAUSED" : timedFragMode ? (FragWinnerTeam()<0?"FRAG DRAW":FragWinnerTeam()==0?"BLUE FRAG WIN":"ORANGE FRAG WIN") : spectatorMode ? (enemy.hp<=0?"BLUE AI WON":"ORANGE AI WON") : enemy.hp <= 0 ? "DUEL WON" : "DUEL LOST", title);
             Text(425, 321, 440, paused ? "ESC to continue" : rivalSelection<0?"R to rematch with a random rival":"R to retry this matchup", label);
             Text(425,349,440,$"DAMAGE DEALT {damageDealt:0}  /  TAKEN {damageTaken:0}",small);
             if (GUI.Button(new Rect(425, 375, 225, 42), "M / RETURN TO HANGAR")) ReturnToHangar();
@@ -154,7 +155,7 @@ public sealed partial class VoxArena
         Panel(new Rect(0, 0, 1280, 720), new Color(.025f, .045f, .075f, .98f));
         Text(32, 22, 500, "Voxel-On  —  HANGAR", title);
         Text(34, 65, 1000, "THIRD PERSON DUEL   /   THREE CHASSIS PROTOTYPES / FOUR WEAPON SLOTS", small);
-        if(GUI.Button(new Rect(1040,76,208,29),"WEAPON GALLERY / F3")){weaponGalleryOpen=true;ShowWeaponPreview(weaponPreviewIndex);}
+        if(GUI.Button(new Rect(34,76,208,29),"MODE: "+(timedFragMode?"TIMED FRAG":"DUEL")))timedFragMode=!timedFragMode;
         if(GUI.Button(new Rect(1040,28,208,38),"WEAPON / PART OPTIONS")) OpenBalanceEditor();
         if(GUI.Button(new Rect(600,28,200,38),"MAP: "+(arenaMap==ArenaMapKind.IndoorFactory?"FOUNDRY":arenaMap==ArenaMapKind.OutdoorCanyon?"CANYON":"PLAINS"))) SwitchArenaMap();
         if(GUI.Button(new Rect(820,28,200,38),"HOW TO PLAY / F1")) ToggleGuide();
@@ -164,7 +165,7 @@ public sealed partial class VoxArena
         {
             int i=lineup[order];if(i>=CraftCatalog.UnlockedCount)continue;
             CraftSpec spec=CraftCatalog.Selectable[i];
-            if(activeBalance!=null){spec=spec.RuntimeCopy();foreach(BalancePart part in activeBalance.parts)if(part.frame==spec.name)foreach(BalanceNumber n in part.numbers)if(n.implemented)typeof(CraftSpec).GetField(n.key).SetValue(spec,n.value);}
+            if(activeBalance!=null){spec=spec.RuntimeCopy();BalanceDesign configured=Array.Find(activeBalance.designs,x=>x.id==activeBalance.activeDesignId&&x.chassisId==spec.name);BalancePart[] parts=configured!=null?configured.parts:activeBalance.parts;foreach(BalancePart part in parts)if(part.frame==spec.name)foreach(BalanceNumber n in part.numbers)if(n.implemented)typeof(CraftSpec).GetField(n.key).SetValue(spec,n.value);}
             bool selected=selectedCraft==i;Rect card=new Rect(cardX[order],112,380,356);
             Panel(card,selected?new Color(.10f,.22f,.29f,.96f):new Color(.045f,.075f,.11f,.92f));
             Panel(new Rect(card.x,card.y,4,card.height),spec.color);
@@ -200,7 +201,7 @@ public sealed partial class VoxArena
         if(GUI.Button(new Rect(972,686,155,25),"MODE: "+(spectatorMode?"AI VIEW":"PILOT"))) spectatorMode=!spectatorMode;
         if(GUI.Button(new Rect(34,686,150,25),muted?"SOUND OFF":"SOUND ON")) ToggleMute();
         GUI.backgroundColor = chosen.color;
-        if (GUI.Button(new Rect(984, 615, 264, 67), spectatorMode?"START AI SIM / ENTER":"START DUEL / ENTER")) BeginMatch();
+        if (GUI.Button(new Rect(984, 615, 264, 67), spectatorMode?"START AI SIM / ENTER":timedFragMode?"START FRAG / ENTER":"START DUEL / ENTER")) BeginMatch();
         GUI.backgroundColor = Color.white;
     }
 
@@ -228,3 +229,10 @@ public sealed partial class VoxArena
     }
     void DrawRadar(){DrawSensorRadar();}
 }
+
+
+
+
+
+
+

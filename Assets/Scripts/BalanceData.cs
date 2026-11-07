@@ -17,15 +17,31 @@ using UnityEngine;
 }
 [Serializable] public sealed class BalancePart {public string id,frame,category,name,notes="";public BalanceNumber[] numbers;}
 [Serializable] public sealed class BalanceFrame {public string id;public string[] slots;}
+[Serializable] public sealed class BalanceDesign {public string id,name,chassisId;public string[] slots;public BalancePart[] parts;}
 [Serializable] public sealed class BalanceDocument
 {
-    public int formatVersion=1;public string name="PD Balance 01",notes="";public BalanceWeapon[] weapons;public BalancePart[] parts;public BalanceFrame[] frames;
+    public int formatVersion=4;public string name="PD Balance 01",notes="",activeDesignId="DESIGN_01";public BalanceWeapon[] weapons;public BalancePart[] parts;public BalanceFrame[] frames;public BalanceDesign[] designs;
 }
 public static class BalanceData
 {
     [Serializable] sealed class ArtEntry {public string id,title,family,kind;}
     [Serializable] sealed class ArtCatalog {public ArtEntry[] models;}
     public static BalanceDocument Copy(BalanceDocument d)=>JsonUtility.FromJson<BalanceDocument>(JsonUtility.ToJson(d));
+    public static BalanceDesign CopyDesign(BalanceDesign source)=>source==null?null:JsonUtility.FromJson<BalanceDesign>(JsonUtility.ToJson(source));
+    public static void PasteDesign(BalanceDesign source,BalanceDesign destination)
+    {
+        if(source==null||destination==null)throw new ArgumentNullException("설계 슬롯");
+        BalanceDesign copy=CopyDesign(source);destination.name=copy.name;destination.chassisId=copy.chassisId;destination.slots=(string[])copy.slots.Clone();destination.parts=CopyParts(copy.parts);
+    }
+    public static void ResetDesign(BalanceDocument document,string designId)
+    {
+        if(document==null)throw new ArgumentNullException(nameof(document));
+        int index=Array.FindIndex(document.designs??new BalanceDesign[0],x=>x!=null&&x.id==designId);
+        if(index<0)throw new InvalidDataException("초기화할 설계 슬롯을 찾을 수 없습니다.");
+        BalanceDesign defaults=Defaults().designs[index];
+        BalancePart[] customDefaults=(document.parts??new BalancePart[0]).Where(p=>p!=null&&p.id!=null&&p.id.StartsWith("CUSTOM_",StringComparison.Ordinal)).Select(p=>CopyParts(new[]{p})[0]).ToArray();
+        PasteDesign(defaults,document.designs[index]);document.designs[index].parts=document.designs[index].parts.Concat(customDefaults).ToArray();
+    }
     public static BalanceDocument Defaults()
     {
         TextAsset text=Resources.Load<TextAsset>("PDParts/Weapons20261105/catalog_v003");if(text==null)throw new InvalidOperationException("Missing weapon catalog");
@@ -77,25 +93,85 @@ public static class BalanceData
                 parts.Add(new BalancePart{id=f.name+"_"+category,frame=f.name,category=category,name=name,numbers=all.ToArray()});
             }
         }
-        return new BalanceDocument{weapons=weapons.ToArray(),parts=parts.ToArray(),frames=frames.ToArray()};
+        BalanceFrame[] frameData=frames.ToArray();
+        BalancePart[] partData=parts.ToArray();BalanceDesign[] designs=DefaultDesigns(frameData);
+        foreach(BalanceDesign design in designs)design.parts=CopyParts(partData);
+        return new BalanceDocument{formatVersion=4,activeDesignId="DESIGN_01",weapons=weapons.ToArray(),parts=partData,frames=frameData,designs=designs};
+    }
+    public static BalancePart[] CopyParts(BalancePart[] parts)=>parts==null?null:JsonUtility.FromJson<PartArray>(JsonUtility.ToJson(new PartArray{items=parts})).items;
+    [Serializable] sealed class PartArray {public BalancePart[] items;}
+    public static BalanceWeapon AddCustomFirearm(BalanceDocument document,string id,string name)
+    {
+        if(document==null||document.weapons==null||!ValidCustomId(id)||document.weapons.Any(w=>w!=null&&w.id==id)||(document.parts??new BalancePart[0]).Any(p=>p!=null&&p.id==id))throw new InvalidDataException("사용자 화기 ID가 비어 있거나 이미 등록되어 있습니다.");
+        if(document.weapons.Count(w=>w!=null&&w.id.StartsWith("CUSTOM_",StringComparison.Ordinal))>=32)throw new InvalidDataException("사용자 화기 정의는 32개까지 등록할 수 있습니다.");
+        BalanceWeapon source=document.weapons.FirstOrDefault(w=>w!=null&&w.id=="Military_AR");if(source==null)throw new InvalidDataException("기본 Military_AR 정의가 없습니다.");
+        string safeName=Text(name,80);if(string.IsNullOrWhiteSpace(safeName))throw new InvalidDataException("사용자 화기 이름이 비어 있습니다.");
+        BalanceWeapon added=JsonUtility.FromJson<BalanceWeapon>(JsonUtility.ToJson(source));added.id=id;added.name=safeName;added.family="custom";added.kind="firearm";added.icon="CUSTOM";added.notes="기본 화기 수치 구조에서 시작한 사용자 정의 화기입니다.";
+        document.weapons=document.weapons.Concat(new[]{added}).ToArray();return added;
+    }
+    public static BalancePart AddCustomPart(BalanceDocument document,string designId,string id,string name)
+    {
+        if(document==null||document.parts==null||!ValidCustomId(id)||document.parts.Any(p=>p!=null&&p.id==id)||(document.weapons??new BalanceWeapon[0]).Any(w=>w!=null&&w.id==id))throw new InvalidDataException("사용자 파츠 ID가 비어 있거나 이미 등록되어 있습니다.");
+        if(document.parts.Count(p=>p!=null&&p.id.StartsWith("CUSTOM_",StringComparison.Ordinal))>=32)throw new InvalidDataException("사용자 파츠 정의는 32개까지 등록할 수 있습니다.");
+        BalanceDesign selected=(document.designs??new BalanceDesign[0]).FirstOrDefault(d=>d!=null&&d.id==designId);if(selected==null)throw new InvalidDataException("대상 설계를 찾을 수 없습니다.");
+        BalancePart source=document.parts.FirstOrDefault(p=>p!=null&&p.frame==selected.chassisId&&p.category=="CORE"&&!p.id.StartsWith("CUSTOM_",StringComparison.Ordinal));if(source==null)throw new InvalidDataException("선택 기체에 기본 CORE 파츠가 없습니다.");
+        string safeName=Text(name,80);if(string.IsNullOrWhiteSpace(safeName))throw new InvalidDataException("사용자 파츠 이름이 비어 있습니다.");
+        if(document.designs==null||document.designs.Length!=8||document.designs.Any(d=>d==null||d.parts!=null&&d.parts.Any(p=>p!=null&&p.id==id)))throw new InvalidDataException("설계 슬롯 목록이 잘못되었거나 파츠 ID가 이미 사용 중입니다.");
+        BalancePart added=CopyParts(new[]{source})[0];added.id=id;added.name=safeName;added.notes="기본 코어 수치 구조를 복제한 사용자 파츠입니다.";document.parts=document.parts.Concat(new[]{CopyParts(new[]{added})[0]}).ToArray();
+        foreach(BalanceDesign design in document.designs)
+        {
+            if(design.parts==null)design.parts=new BalancePart[0];if(design.parts.Any(p=>p!=null&&p.id==id))throw new InvalidDataException("설계 슬롯에 사용자 파츠가 이미 있습니다: "+design.id);
+            design.parts=design.parts.Concat(new[]{CopyParts(new[]{added})[0]}).ToArray();
+        }
+        return added;
+    }
+    static BalanceDesign[] DefaultDesigns(BalanceFrame[] frames)
+    {
+        var designs=new BalanceDesign[8];
+        for(int i=0;i<designs.Length;i++)
+        {
+            BalanceFrame source=frames[i<frames.Length?i:0];
+            designs[i]=new BalanceDesign{id="DESIGN_"+(i+1).ToString("00"),name=source.id+(i<frames.Length?"":" / "+(i+1)),chassisId=source.id,slots=(string[])source.slots.Clone()};
+        }
+        return designs;
     }
     public static BalanceDocument ValidateAndNormalize(BalanceDocument raw)
     {
-        if(raw==null||raw.formatVersion!=1)throw new InvalidDataException("지원하지 않는 설계 파일 버전입니다.");
+        if(raw==null||raw.formatVersion<1||raw.formatVersion>4)throw new InvalidDataException("지원하지 않는 설계 파일 버전입니다.");
+        int sourceVersion=raw.formatVersion;
         BalanceDocument result=Defaults();
-        if(raw.weapons==null||raw.parts==null||raw.frames==null||raw.weapons.Length!=result.weapons.Length||raw.parts.Length!=result.parts.Length||raw.frames.Length!=result.frames.Length)throw new InvalidDataException("무기·파츠·기체 목록이 누락되었습니다.");
+        if(raw.weapons==null||raw.parts==null||raw.frames==null||raw.weapons.Length<result.weapons.Length||raw.weapons.Length>result.weapons.Length+32||raw.parts.Length<result.parts.Length||raw.parts.Length>result.parts.Length+32||raw.frames.Length!=result.frames.Length)throw new InvalidDataException("무기·파츠·기체 목록이 누락되었거나 확장 한도를 벗어났습니다.");
         result.name=Text(raw.name,80);result.notes=Text(raw.notes,2000);
         var seen=new HashSet<string>();
+        var weaponRegistry=new List<BalanceWeapon>(result.weapons);
         foreach(BalanceWeapon w in raw.weapons)
         {
             if(w==null||w.id==null||!seen.Add(w.id))throw new InvalidDataException("무기 ID가 중복되거나 비어 있습니다.");
-            BalanceWeapon dest=result.weapons.FirstOrDefault(x=>x.id==w.id);if(dest==null)throw new InvalidDataException("알 수 없는 무기 ID: "+w.id);
+            BalanceWeapon dest=weaponRegistry.FirstOrDefault(x=>x.id==w.id);
+            if(dest==null)
+            {
+                if(!ValidCustomId(w.id)||w.kind!="firearm"||raw.parts.Any(p=>p!=null&&p.id==w.id))throw new InvalidDataException("새 무기는 고유한 CUSTOM_ ID와 firearm 종류를 사용해야 합니다: "+w.id);
+                dest=JsonUtility.FromJson<BalanceWeapon>(JsonUtility.ToJson(weaponRegistry.First(x=>x.id=="Military_AR")));dest.id=w.id;dest.family="custom";dest.kind="firearm";weaponRegistry.Add(dest);
+            }
             dest.name=Text(w.name,80);dest.notes=Text(w.notes,2000);dest.icon=Text(w.icon,40);dest.hands=w.hands;dest.shoulders=w.shoulders;dest.left=w.left;dest.right=w.right;Numbers(dest.numbers,w.numbers,w.id);
         }
-        seen.Clear();foreach(BalancePart p in raw.parts)
+        foreach(BalanceWeapon required in result.weapons)if(!seen.Contains(required.id))throw new InvalidDataException("기본 무기 정의를 제거할 수 없습니다: "+required.id);
+        result.weapons=weaponRegistry.ToArray();
+        var partRegistry=new List<BalancePart>(result.parts);seen.Clear();foreach(BalancePart p in raw.parts)
         {
-            if(p==null||p.id==null||!seen.Add(p.id))throw new InvalidDataException("파츠 ID가 중복되거나 비어 있습니다.");BalancePart dest=result.parts.FirstOrDefault(x=>x.id==p.id);if(dest==null)throw new InvalidDataException("알 수 없는 파츠 ID");dest.notes=Text(p.notes,2000);Numbers(dest.numbers,p.numbers,p.id);
+            if(p==null||p.id==null||!seen.Add(p.id))throw new InvalidDataException("파츠 ID가 중복되거나 비어 있습니다.");BalancePart dest=partRegistry.FirstOrDefault(x=>x.id==p.id);
+            if(dest==null)
+            {
+                if(!ValidCustomId(p.id)||string.IsNullOrWhiteSpace(p.frame)||weaponRegistry.Any(w=>w.id==p.id))throw new InvalidDataException("새 파츠는 무기와 중복되지 않는 CUSTOM_ ID와 기존 기체를 지정해야 합니다: "+p.id);
+                BalancePart template=partRegistry.FirstOrDefault(x=>x.frame==p.frame&&x.category==p.category);if(template==null)throw new InvalidDataException("새 파츠는 기존 기체·파츠 분류를 사용해야 합니다: "+p.id);
+                dest=CopyParts(new[]{template})[0];dest.id=p.id;partRegistry.Add(dest);
+            }
+            if(p.frame!=dest.frame||p.category!=dest.category)throw new InvalidDataException("파츠의 기체/분류를 바꿀 수 없습니다: "+p.id);
+            dest.name=Text(p.name,80);dest.notes=Text(p.notes,2000);Numbers(dest.numbers,p.numbers,p.id);
         }
+        foreach(BalancePart required in result.parts)if(!seen.Contains(required.id))throw new InvalidDataException("기본 파츠 정의를 제거할 수 없습니다: "+required.id);
+        result.parts=partRegistry.ToArray();foreach(BalanceDesign design in result.designs)design.parts=CopyParts(result.parts);
+        if(sourceVersion<4)foreach(BalanceDesign design in result.designs)design.parts=CopyParts(result.parts);
         seen.Clear();foreach(BalanceFrame f in raw.frames)
         {
             if(f==null||f.id==null||!seen.Add(f.id)||f.slots==null||f.slots.Length!=4)throw new InvalidDataException("기체별 무장 4개가 필요합니다.");
@@ -106,7 +182,59 @@ public static class BalanceData
                 if(w==null||!CanEquip(w,i,f.id))throw new InvalidDataException(f.id+"의 "+(i+1)+"번 슬롯에 장착할 수 없는 무기입니다.");dest.slots[i]=w.id;
             }
         }
+        if(sourceVersion==1)
+        {
+            // V1 stored one loadout per chassis. Preserve those exactly in the first three stable slots.
+            for(int i=0;i<result.frames.Length;i++)
+            {
+                BalanceFrame frame=result.frames[i];BalanceDesign design=result.designs[i];
+                design.name=frame.id;design.chassisId=frame.id;design.slots=(string[])frame.slots.Clone();
+            }
+        }
+        else
+        {
+            if(raw.designs==null||raw.designs.Length!=8)throw new InvalidDataException("설계 파일에는 8개의 저장 슬롯이 필요합니다.");
+            seen.Clear();foreach(BalanceDesign design in raw.designs)
+            {
+                if(design==null||string.IsNullOrWhiteSpace(design.id)||!seen.Add(design.id))throw new InvalidDataException("설계 슬롯 ID가 중복되거나 비어 있습니다.");
+                BalanceDesign dest=result.designs.FirstOrDefault(x=>x.id==design.id);if(dest==null)throw new InvalidDataException("알 수 없는 설계 슬롯 ID: "+design.id);
+                BalanceFrame frame=result.frames.FirstOrDefault(x=>x.id==design.chassisId);if(frame==null)throw new InvalidDataException(design.id+": 알 수 없는 기체 ID");
+                if(design.slots==null||design.slots.Length!=4)throw new InvalidDataException(design.id+": 무장 4개가 필요합니다.");
+                dest.name=Text(design.name,80);dest.chassisId=design.chassisId;
+                for(int i=0;i<4;i++)
+                {
+                    BalanceWeapon w=result.weapons.FirstOrDefault(x=>x.id==design.slots[i]);
+                    if(w==null||!CanEquip(w,i,frame.id))throw new InvalidDataException(design.id+"의 "+(i+1)+"번 슬롯에 장착할 수 없는 무기입니다.");dest.slots[i]=w.id;
+                }
+                if(sourceVersion>=4)CopyValidatedParts(dest,design.parts,result.parts,new HashSet<string>());
+            }
+        }
+        if(sourceVersion>=3)
+        {
+            if(string.IsNullOrWhiteSpace(raw.activeDesignId)||!result.designs.Any(x=>x.id==raw.activeDesignId))throw new InvalidDataException("현재 선택 설계 ID를 찾을 수 없습니다.");
+            result.activeDesignId=raw.activeDesignId;
+        }
+        else result.activeDesignId="DESIGN_01";
+        result.formatVersion=4;
         return result;
+    }
+    static void CopyValidatedParts(BalanceDesign design,BalancePart[] input,BalancePart[] expected,HashSet<string> seen)
+    {
+        int required=expected.Count(p=>!p.id.StartsWith("CUSTOM_",StringComparison.Ordinal));if(input==null||input.Length<required||input.Length>expected.Length)throw new InvalidDataException(design.id+": 파츠 수치 목록이 누락되었거나 확장 한도를 벗어났습니다.");
+        seen.Clear();foreach(BalancePart part in input)
+        {
+            if(part==null||string.IsNullOrWhiteSpace(part.id)||!seen.Add(part.id))throw new InvalidDataException(design.id+": 파츠 ID 중복");
+            BalancePart dest=design.parts.FirstOrDefault(x=>x.id==part.id);if(dest==null)throw new InvalidDataException(design.id+": 알 수 없는 파츠 ID "+part.id);
+            if(part.frame!=dest.frame||part.category!=dest.category)throw new InvalidDataException(design.id+": 파츠의 기체/종류 ID를 바꿀 수 없습니다.");
+            dest.notes=Text(part.notes,2000);Numbers(dest.numbers,part.numbers,design.id+"/"+part.id);
+        }
+        foreach(BalancePart part in expected)if(!part.id.StartsWith("CUSTOM_",StringComparison.Ordinal)&&!seen.Contains(part.id))throw new InvalidDataException(design.id+": 기본 파츠가 누락되었습니다: "+part.id);
+    }
+    static bool ValidCustomId(string id)
+    {
+        if(string.IsNullOrEmpty(id)||id.Length>64||!id.StartsWith("CUSTOM_",StringComparison.Ordinal)||id.EndsWith("_",StringComparison.Ordinal))return false;
+        for(int i=0;i<id.Length;i++){char c=id[i];if(!(c>='A'&&c<='Z'||c>='0'&&c<='9'||c=='_'))return false;}
+        return id.Length>7;
     }
     static string Text(string value,int max){if(value==null)return "";if(value.Length>max)throw new InvalidDataException("이름 또는 메모가 너무 깁니다.");return value;}
     static void Numbers(BalanceNumber[] expected,BalanceNumber[] input,string owner)

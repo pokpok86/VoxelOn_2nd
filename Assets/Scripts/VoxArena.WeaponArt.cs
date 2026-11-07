@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -21,6 +21,8 @@ public sealed partial class VoxArena
     string WeaponArtResource(string id)
     {
         foreach(WeaponArtEntry e in WeaponCatalog().models)if(e.id==id)return e.resource;
+        if(id!=null&&id.StartsWith("CUSTOM_",StringComparison.Ordinal))
+            foreach(WeaponArtEntry e in WeaponCatalog().models)if(e.id=="Military_AR")return e.resource;
         throw new InvalidOperationException("Unknown weapon art "+id);
     }
     static Transform FindArtSocket(Transform root,string socket)
@@ -83,10 +85,11 @@ public sealed partial class VoxArena
             for(int i=0;i<player.weaponArtIds.Length;i++)if(player.weaponArtIds[i]==id)slots.Add((i+1).ToString());
         return slots.Count==0?"ART PREVIEW / NOT EQUIPPED ON CURRENT FRAME":"CURRENT FRAME / EQUIPPED SLOTS "+string.Join(", ",slots);
     }
+    void CloseWeaponGallery(){weaponGalleryOpen=false;}
     void DrawWeaponGallery()
     {
         Panel(new Rect(0,0,1280,720),new Color(.025f,.045f,.075f,.99f));Text(30,22,1000,"WEAPON ART LIBRARY / BLENDER",title);
-        if(GUI.Button(new Rect(1110,22,140,35),"BACK / ESC")){weaponGalleryOpen=false;return;}
+        if(GUI.Button(new Rect(1110,22,140,35),"BACK / ESC")){CloseWeaponGallery();return;}
         WeaponArtEntry[] entries=WeaponCatalog().models;
         weaponGalleryScroll=GUI.BeginScrollView(new Rect(25,85,310,580),weaponGalleryScroll,new Rect(0,0,285,entries.Length*36));
         for(int i=0;i<entries.Length;i++)if(GUI.Button(new Rect(0,i*36,280,32),(i==weaponPreviewIndex?"> ":"")+entries[i].id.Replace('_',' ')))ShowWeaponPreview(i);

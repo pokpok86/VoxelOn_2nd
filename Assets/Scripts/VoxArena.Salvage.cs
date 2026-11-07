@@ -85,7 +85,7 @@ public sealed partial class VoxArena
         if(to.magnitude<=meleeRange+enemy.Radius && Vector3.Dot(player.facing,to.normalized)>.2f &&
             !ObstacleOnSegment(player.root.position+Vector3.up,enemy.root.position+Vector3.up,.1f,out _))
         {
-            Hit(enemy,player.root.position,damage);
+            Hit(enemy,player.root.position,damage,null,player);
             Flash(enemy.root.position,TeamColor(player),.5f,.15f);
         }
     }
@@ -101,7 +101,7 @@ public sealed partial class VoxArena
             Vector3 next=before+s.velocity*dt;
             bool blocked=ObstacleOnSegment(before,next,.15f,out _);
             bool hit=(next-enemy.root.position-Vector3.up*.8f).magnitude<enemy.Radius+1f;
-            if(hit && !blocked) Hit(enemy,before,thrownDamage);
+            if(hit && !blocked) Hit(enemy,before,thrownDamage,null,player);
             if(hit || blocked || next.y<1.4f || s.flightTime<=0)
             {
                 s.spent=true; s.visual.gameObject.SetActive(false);
@@ -121,3 +121,4 @@ public sealed partial class VoxArena
         return true;
     }
 }
+

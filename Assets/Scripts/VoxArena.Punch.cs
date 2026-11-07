@@ -12,7 +12,8 @@ public sealed partial class VoxArena
             if(delta.magnitude>p.range+target.Radius||Mathf.Abs(delta.y)>1.8f||Vector3.Dot(attacker.facing,delta.normalized)<.6f)return;
             Vector3 origin=attacker.gripRig!=null&&attacker.gripRig[side]!=null?attacker.gripRig[side].hand.position:attacker.root.position;
             if(ObstacleOnSegment(origin,target.root.position,p.radius,out _))return;
-            Hit(target,attacker.root.position,p.damage,target.corePart.position);Flash(origin,TeamColor(attacker),.28f,.1f);
+            Hit(target,attacker.root.position,p.damage,target.corePart.position,attacker);Flash(origin,TeamColor(attacker),.28f,.1f);
         });
     }
 }
+

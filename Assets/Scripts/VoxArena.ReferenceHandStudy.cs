@@ -7,12 +7,14 @@ public sealed partial class VoxArena
 {
     IEnumerator ReferenceHandStudy()
     {
-        string dir=Path.Combine(Directory.GetCurrentDirectory(),"Docs","Screenshots","ReferenceHands-20261106","Unity-v003-Angles");Directory.CreateDirectory(dir);EnsureWeaponStudio();
+        string dir=Path.Combine(Directory.GetCurrentDirectory(),"Docs","Screenshots","ReferenceHands-20261106","Unity-v004-SchemaV3-Iteration2");Directory.CreateDirectory(dir);EnsureWeaponStudio();
         GameObject[] current={wispModelSource,bastionModelSource,tarantulaModelSource};int checks=0,captures=0;bool pass=true;
         void Check(bool ok,string text){checks++;pass&=ok;Debug.Log("REFERENCE_HAND_CHECK "+text+" "+(ok?"PASS":"FAIL"));}
         activeBalance=BalanceData.Defaults();foreach(BalanceFrame frame in activeBalance.frames){frame.slots[0]=frame.slots[1]="Military_AR";}
+        foreach(BalanceDesign design in activeBalance.designs)design.slots[0]=design.slots[1]="Military_AR";
         for(int frame=0;frame<3;frame++)
         {
+            BalanceDesign selectedDesign=Array.Find(activeBalance.designs,x=>x.chassisId==CraftCatalog.Selectable[frame].name);activeBalance.activeDesignId=selectedDesign.id;
             if(frame==0)wispModelSource=referenceHandsBaseline[frame];else if(frame==1)bastionModelSource=referenceHandsBaseline[frame];else tarantulaModelSource=referenceHandsBaseline[frame];
             TestSetupSelectable(frame,(frame+1)%3);smoke=false;inMenu=false;Setup();Animate(player);yield return null;yield return new WaitForEndOfFrame();yield return Shot(frame+"-Before-Box-Hand.png",0,true,false);
             if(frame==0)wispModelSource=current[frame];else if(frame==1)bastionModelSource=current[frame];else tarantulaModelSource=current[frame];
@@ -32,10 +34,10 @@ public sealed partial class VoxArena
             Check(MaxPointDelta(relaxed,closed)>.08f&&fistBounds.size.y<relaxedBounds.size.y*.80f,"fist folds fingers into a compact shape frame "+frame);
             Check(Vector3.Distance(socket,player.gripRig[0].gripSocket.position)<.001f,"finger poses do not move wrist/palm connection frame "+frame);
             Check(Finite(fistBounds.size)&&fistBounds.size.magnitude>.15f&&fistBounds.size.magnitude<1.5f,"fist retains meter-scale proportions frame "+frame);yield return Shot(frame+"-After-Fist-Hand.png",0,true,false);
-            activeBalance.frames[frame].slots[0]="UNARMED";TestSetupSelectable(frame,(frame+1)%3);smoke=false;inMenu=false;Setup();player.weaponSlot=1;Animate(player);FireEquippedWeapon(player,enemy,Vector3.forward);
+            selectedDesign.slots[0]="UNARMED";TestSetupSelectable(frame,(frame+1)%3);smoke=false;inMenu=false;Setup();player.weaponSlot=1;Animate(player);FireEquippedWeapon(player,enemy,Vector3.forward);
             float until=Time.realtimeSinceStartup+.12f;while(Time.realtimeSinceStartup<until){yield return null;TickWeapons(player,Mathf.Min(Time.deltaTime,.04f));Animate(player);}
             ReferenceHandPose punching=player.handPoses[0];Check(punching.skin.GetBlendShapeWeight(punching.fist)>90&&player.punchTimer>0,"real punch animation closes selected empty hand frame "+frame);yield return Shot(frame+"-After-Live-Punch.png",0,false,false);
-            Check(Finite(player.gripRig[0].hand.position)&&Vector3.Distance(player.gripRig[0].hand.position,player.leftArm.position)<3,"punch keeps arm rig finite frame "+frame);activeBalance.frames[frame].slots[0]="Military_AR";
+            Check(Finite(player.gripRig[0].hand.position)&&Vector3.Distance(player.gripRig[0].hand.position,player.leftArm.position)<3,"punch keeps arm rig finite frame "+frame);selectedDesign.slots[0]="Military_AR";
         }
         wispModelSource=current[0];bastionModelSource=current[1];tarantulaModelSource=current[2];activeBalance=null;
         Debug.Log((pass?"REFERENCE_HAND_STUDY_PASS ":"REFERENCE_HAND_STUDY_FAIL ")+checks+" checks; "+captures+" actual images");Application.Quit(pass?0:2);

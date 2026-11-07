@@ -163,7 +163,7 @@ public sealed partial class VoxArena
         if(SegmentSphere(from,to,target.root.position,target.Radius+2.5f,out _))
         {
             if(!ObstacleOnSegment(to,target.root.position,.1f,out _))
-            { Hit(target,to,58); f.rushHit=true; PlaySound(SoundKind.Hit,to,.8f); }
+            { Hit(target,to,58,null,f); f.rushHit=true; PlaySound(SoundKind.Hit,to,.8f); }
         }
         f.saber.localRotation=Quaternion.Euler(0,Mathf.Lerp(-65,70,1-f.rushTime/.5f),0);
     }
@@ -186,7 +186,7 @@ public sealed partial class VoxArena
     {
         Fighter target=Opponent(s.owner);
         if(Vector3.Distance(position,target.root.position)<=s.blast+target.Radius &&
-            !ObstacleOnSegment(position,target.root.position,.02f,out _)) Hit(target,position,s.damage);
+            !ObstacleOnSegment(position,target.root.position,.02f,out _)) Hit(target,position,s.damage,null,s.owner);
         var ring=new RingEffect{line=Line("Explosion",TeamColor(s.owner),.22f),center=position,radius=s.blast,life=.42f};
         rings.Add(ring); Flash(position,TeamColor(s.owner),s.blast*.6f,.22f); Burst(position,TeamColor(s.owner),8); PlaySound(SoundKind.Explosion,position,.6f);
     }
@@ -260,7 +260,7 @@ public sealed partial class VoxArena
             if(hit)
             {
                 Vector3 impact=from+(to-from).normalized*targetDistance;
-                if(s.blast>0) Explode(s,impact); else Hit(target,from,s.damage,impact);
+                if(s.blast>0) Explode(s,impact); else Hit(target,from,s.damage,impact,s.owner);
                 RemoveShot(i); continue;
             }
             s.visual.position=to;
@@ -292,9 +292,13 @@ public sealed partial class VoxArena
             {
                 if(!b.sounded) { PlaySound(SoundKind.Laser,from,.75f); b.sounded=true; }
                 Fighter target=Opponent(b.owner);
-                if(SegmentSphere(from,to,target.root.position,target.Radius+b.width/2,out _)) Hit(target,from,b.dps*active);
+                if(SegmentSphere(from,to,target.root.position,target.Radius+b.width/2,out _)) Hit(target,from,b.dps*active,null,b.owner);
             }
             if(b.age>=b.charge+b.duration) { Destroy(b.visual.gameObject); beams.RemoveAt(i); }
         }
     }
 }
+
+
+
+

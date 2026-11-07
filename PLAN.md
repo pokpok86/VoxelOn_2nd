@@ -1,8 +1,11 @@
-# VoxSky 개발 계획
+
+## 2026-11-07 iteration 8 — match flow and hangar navigation
+
+The work snapshot now includes a playable timed individual frag prototype with saved-design selection on player respawn; legacy 1v1 remains the default. The weapon gallery BACK issue was fixed after a player report: an unconditional hangar repaint reopened the gallery. Latest Windows build passed (`VOXSKY_BUILD_PASS 237285034 bytes`) and actual player smoke passed 366 checks. See [iteration 8 evidence](Docs/Development/SYSTEM-DESIGN-001-ITERATION8-20261107.md). Manual mouse click review is pending. General multi-participant lifecycle and team matches remain unimplemented.# VoxSky 개발 계획
 
 ## 2026-11-06 PD 시스템 확장 요청 — 현재 단계
 
-최신 시스템 요청은 `main`에 등록되어 있으며 `main`은 수정하지 않는다. 현재 `work` 구현 비교, 단계별 계획, 최신 Windows 빌드/스모크와 다수 AI 부하 시험 결과는 [SYSTEM-DESIGN-001 결과](Docs/Development/SYSTEM-DESIGN-001-RESULTS.md)에 기록했다. 현 단계는 데이터 확장성/8개 설계 슬롯 수직 슬라이스가 다음이며, 팀전·중력 장치·스킬은 아직 미구현이다.
+최신 시스템 요청은 `main`에 등록되어 있으며 `main`은 수정하지 않는다. 현재 `work` 구현 비교, 단계별 계획, Windows 빌드/스모크와 다수 AI 부하 시험 결과는 [SYSTEM-DESIGN-001 결과](Docs/Development/SYSTEM-DESIGN-001-RESULTS.md)에 기록했다. [1차 반복](Docs/Development/SYSTEM-DESIGN-001-ITERATION1-20261106.md)에서 v1→v2와 8개 데이터 슬롯, [2차 반복](Docs/Development/SYSTEM-DESIGN-001-ITERATION2-20261106.md)에서 v3 이전과 설계 선택/장비 편집 UI를 연결했다. 실제 Windows 빌드, 편집 51개, 전투 스모크 358개, 손 장착 36개 검사가 통과했다. 다음은 슬롯 복사/초기화와 설계별 파츠 수치 저장이며, 새 ID 확장 레지스트리·팀전·중력 장치·스킬은 아직 미구현이다.
 
 작성일: 2026-10-26
 
@@ -257,6 +260,13 @@
 - 세 번째와 네 번째 무기.
 
 ## 현재 진행 상태
+
+- [x] 행거의 8개 설계 슬롯 간 임시 복사/붙여넣기와 선택 슬롯 기본값 복원 추가. Windows 빌드, 편집기 검사 56개, smoke 358개 통과. 세부 증거는 `Docs/Development/SYSTEM-DESIGN-001-ITERATION3-20261106.md`.
+- [x] 18개 파츠 수치를 설계 슬롯마다 분리하고 v1~v3 파일을 v4로 이전. Windows 빌드, 편집기 검사 60개, smoke 358개 통과. 세부 증거는 `Docs/Development/SYSTEM-DESIGN-001-ITERATION4-20261106.md`.
+- [x] 고정 무기 목록에 `CUSTOM_` ID 화기 등록을 추가하고 JSON 저장/로드·실제 사격까지 검증. 기본 34개 유지, 아이콘 목록 표시 추가. 제한: 화기만, Military_AR 수치 틀과 외형 대체 사용. 근거: `Docs/Development/SYSTEM-DESIGN-001-ITERATION5-20261106.md`.
+- [x] `CUSTOM_` 파츠 ID를 기존 기체/분류의 수치 틀로 추가하고, 설계별 값·구형 슬롯 기본값 채움·복사/초기화·실제 기체 수치 적용을 검증. 제한: 새 분류/수치 틀/형상은 아직 없으며 JSON 정의 입력이 필요함. 근거: `Docs/Development/SYSTEM-DESIGN-001-ITERATION6-20261106.md`.
+- [x] 행거에서 사용자 화기와 코어 파츠 생성 버튼 추가. ID를 자동 부여하고 기본 코어 수치를 여덟 설계 슬롯에 등록. 근거: `Docs/Development/SYSTEM-DESIGN-001-ITERATION7-20261107.md`.
+- [ ] 기체별 코어/머리/팔/하체/부스터 템플릿 선택과 허용 목록 기반 아트 리소스 연결 지원.
 
 - [x] Unity Hub 설치 및 실행 확인.
 - [x] 사용자 Unity 계정 로그인 완료 보고.

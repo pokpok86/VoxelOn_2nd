@@ -54,7 +54,7 @@ public sealed partial class VoxArena : MonoBehaviour
         public bool guarding;
         public float guardBlend;
         // Stable team identity; multiple fighters can share a team in future modes.
-        public int teamId;
+        public int teamId,matchKills,matchDeaths; public float respawnTimer;
         public int frameIndex,selectableIndex=-1; public float hitFlash;
         public Transform[] quadrupedLegs,quadrupedKnees,quadrupedAnkles;
         public Transform[][] treadLinks;
@@ -98,7 +98,7 @@ public sealed partial class VoxArena : MonoBehaviour
     readonly Dictionary<Color,Material> materials=new Dictionary<Color,Material>();
     Vector3 aimDirection;
     bool canShoot,paused,smoke,inMenu=true;
-    bool spectatorMode;
+    bool spectatorMode,timedFragMode;
     bool multiAiPerformanceMode;
     float cameraShakeTime,cameraShakeStrength;
     bool targetLock;
@@ -110,7 +110,7 @@ public sealed partial class VoxArena : MonoBehaviour
     float roundTime;
     GUIStyle label,small,title;
     static readonly Color Cyan=new Color(.18f,.88f,.96f), Orange=new Color(1,.38f,.19f);
-    bool Finished=>player.hp<=0 || enemy.hp<=0;
+    bool Finished=>IsMatchFinished();
     // Shared roster/hostility queries are the first step toward multi-fighter matches.
     // Existing 1v1 modes still register exactly the pilot and rival.
     bool IsHostile(Fighter a,Fighter b)=>a!=null && b!=null && a!=b && a.teamId!=b.teamId;
@@ -269,7 +269,7 @@ public sealed partial class VoxArena : MonoBehaviour
         selectedCraft=Mathf.Clamp(selectedCraft,0,CraftCatalog.UnlockedCount-1);
         enemyCraft=ResolveRival(); SavePreferences();
         ApplySelectableCharacter(player,selectedCraft); ApplySelectableCharacter(enemy,enemyCraft);
-        ResetRound();SelectRoundClimate(); inMenu=false; view.orthographic=smoke||spectatorMode; view.fieldOfView=60;
+        ResetRound();StartMatchRules();SelectRoundClimate(); inMenu=false; view.orthographic=smoke||spectatorMode; view.fieldOfView=60;
         cameraPitch=spectatorMode?42:DefaultThirdPersonPitch;
         ResetMouseLookCapture();
         Cursor.lockState=spectatorMode?CursorLockMode.None:CursorLockMode.Locked; Cursor.visible=spectatorMode;
@@ -334,7 +334,7 @@ public sealed partial class VoxArena : MonoBehaviour
         // V is reserved for the later approved view selector; no mute hotkey.
         if(inMenu && balanceEditorOpen){if(Input.GetKeyDown(KeyCode.Escape))balanceEditorOpen=false;return;}
         if(inMenu && Input.GetKeyDown(KeyCode.F3)) { weaponGalleryOpen=!weaponGalleryOpen; if(weaponGalleryOpen) ShowWeaponPreview(weaponPreviewIndex); }
-        if(inMenu && weaponGalleryOpen) { if(Input.GetKeyDown(KeyCode.Escape)) weaponGalleryOpen=false; return; }
+        if(inMenu && weaponGalleryOpen) { if(Input.GetKeyDown(KeyCode.Escape)) CloseWeaponGallery(); return; }
         if(inMenu) { if(Input.GetKeyDown(KeyCode.Escape)) showTuning=false; if(Input.GetKeyDown(KeyCode.Return)&&!showTuning) BeginMatch(); return; }
         if(Input.GetKeyDown(KeyCode.M)) { ReturnToHangar(); return; }
         if(Input.GetKeyDown(KeyCode.Escape)) SetPaused(!paused);
@@ -346,13 +346,13 @@ public sealed partial class VoxArena : MonoBehaviour
         if(Finished) { FinishPresentation(); return; }
         if(paused || smoke) return;
         float dt=Mathf.Min(Time.deltaTime,.05f);
-        roundTime+=dt; hitConfirmTime=Mathf.Max(0,hitConfirmTime-dt); UpdateObstacles(dt);
-        if(!spectatorMode) PlayerInput(dt);
-        if(!testLabEnabled || aiMoveEnabled || aiAttackEnabled || aiJumpEnabled) EnemyAI(enemy,player,dt);
-        if(spectatorMode) EnemyAI(player,enemy,dt);
-        if(targetLock) FaceOpponent(player,enemy,dt);
-        FaceOpponent(enemy,player,dt);
-        UpdateCombat(dt); UpdateSalvage(dt); UpdateSparks(dt); Animate(player); Animate(enemy);
+        roundTime+=dt; hitConfirmTime=Mathf.Max(0,hitConfirmTime-dt); UpdateObstacles(dt); ProcessTimedFrag(dt);
+        if(!spectatorMode&&!player.deadVisual&&!playerRespawnPrompt) PlayerInput(dt);
+        if(!enemy.deadVisual&&(!testLabEnabled || aiMoveEnabled || aiAttackEnabled || aiJumpEnabled)) EnemyAI(enemy,player,dt);
+        if(spectatorMode&&!player.deadVisual&&!enemy.deadVisual) EnemyAI(player,enemy,dt);
+        if(targetLock&&!enemy.deadVisual) FaceOpponent(player,enemy,dt);
+        if(!enemy.deadVisual&&!player.deadVisual) FaceOpponent(enemy,player,dt);
+        UpdateCombat(dt); UpdateSalvage(dt); UpdateSparks(dt); if(!player.deadVisual)Animate(player); if(!enemy.deadVisual)Animate(enemy);
         if(Finished) FinishPresentation();
     }
     void LateUpdate() { if(player!=null && enemy!=null) UpdateCamera(Time.deltaTime); }
@@ -777,9 +777,9 @@ public sealed partial class VoxArena : MonoBehaviour
         if(f.rushTime>0 || f.saber.gameObject.activeSelf) CheckSaber(f,before,f.root.position);
         if(f.rushTime<=0) f.saber.gameObject.SetActive(false);
     }
-    void Hit(Fighter target,Vector3 source,float damage,Vector3? impactPoint=null)
+    void Hit(Fighter target,Vector3 source,float damage,Vector3? impactPoint=null,Fighter attacker=null)
     {
-        if(Finished || target.invulnerableTime>0) return;
+        if(Finished || target.deadVisual || target.hp<=0 || target.invulnerableTime>0) return;
         if(AbsorbSalvageShield(target,damage)) return;
         float before=target.hp+target.shieldEnergy;
         float incoming=damage*(1-target.spec.armor), absorbed=Mathf.Min(target.shieldEnergy,incoming);
@@ -801,7 +801,7 @@ public sealed partial class VoxArena : MonoBehaviour
         Burst(target.root.position,absorbed>0?Cyan:Orange,6);
         Flash(target.root.position,absorbed>0?Cyan:new Color(1,.65f,.22f),.85f,.12f);
         PlaySound(absorbed>0?SoundKind.Shield:SoundKind.Hit,target.root.position,.65f);
-        if(Finished) { if(enemy.hp<=0) wins++; else losses++; }
+        if(Finished&&!timedFragMode) { if(enemy.hp<=0) wins++; else losses++; } if(timedFragMode&&target.hp<=0) RegisterTimedFragDeath(attacker,target);
     }
     bool InArc(Fighter f,Vector3 direction)=>direction.sqrMagnitude>.01f&&Vector3.Angle(f.facing,direction)<=gunHalfAngle;
     void Burst(Vector3 p,Color color,int count)
@@ -906,3 +906,17 @@ public sealed partial class VoxArena : MonoBehaviour
         foreach(AudioClip clip in soundClips.Values) if(clip!=null) Destroy(clip);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

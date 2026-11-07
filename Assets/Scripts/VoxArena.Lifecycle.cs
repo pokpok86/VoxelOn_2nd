@@ -35,8 +35,9 @@ public sealed partial class VoxArena
     void FinishPresentation()
     {
         if(finishCleaned) return;
-        finishCleaned=true;finishPresentationTime=Time.time; ClearBattlePresentation();
+        finishCleaned=true;finishPresentationTime=Time.time; playerRespawnPrompt=false; ClearBattlePresentation();
         if(enemy.hp<=0)BreakRobotModules(enemy);if(player.hp<=0)BreakRobotModules(player);
         PlaySound(SoundKind.Explosion,enemy.hp<=0?enemy.root.position:player.root.position,.7f);
     }
 }
+
