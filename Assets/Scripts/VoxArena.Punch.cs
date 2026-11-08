@@ -5,7 +5,7 @@ public sealed partial class VoxArena
     {
         WeaponProfile p=EquippedProfile(attacker);if(!p.isUnarmed||WeaponIndex(attacker)>=2||attacker.punchTimer>0)return;
         int side=WeaponIndex(attacker);attacker.weaponTimer=p.interval*weaponCooldownScale/Mathf.Max(.2f,side==0?attacker.spec.leftArmHandling:attacker.spec.rightArmHandling);attacker.punchTimer=.32f;attacker.punchSide=side;
-        Schedule(.12f,()=>
+        Schedule(attacker,.12f,()=>
         {
             if(attacker.hp<=0||target==null||target.hp<=0||attacker.knockdownTime>0)return;
             Vector3 delta=target.root.position-attacker.root.position;

@@ -417,6 +417,222 @@ public sealed partial class VoxArena
         if(f==player) RegisterCameraFadeRenderers(f);
         Debug.Log("WISP_ART_MODEL_APPLIED "+wispModelSource.name+"; base="+(wispBaseColorTexture!=null)+" emission="+(wispEmissionTexture!=null)+" shader="+(wispRuntimeMaterial!=null?wispRuntimeMaterial.shader.name:"none")+" emissionProperty="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.HasProperty("_EmissionMap"))+" emissionMapped="+(wispRuntimeMaterial!=null&&wispRuntimeMaterial.GetTexture("_EmissionMap")!=null));
     }
+    void BuildBoosterVisualVariant(Fighter f,Color armor,Color dark,Color edge,Color highlight)
+    {
+        if(f==null||f.backPart==null)return;
+        string visual=BalanceData.NormalizePartVisualId(new BalancePart{category="BOOSTER",id=f.spec.name+"_BOOSTER"},f.boosterVisualId);
+        if(visual=="BOOSTER_TWIN")return;
+        if(visual=="BOOSTER_VECTOR")
+        {
+            for(int side=-1;side<=1;side+=2)
+            {
+                BeveledPlate("Vector booster outer nacelle",f.backPart,
+                    new Vector3(side*.68f,.04f,-.16f),new Vector3(.34f,.70f,.50f),dark,side*-7,.13f,.82f);
+                Transform fin=BeveledPlate("Vector booster stabilizer fin",f.backPart,
+                    new Vector3(side*.91f,.24f,-.15f),new Vector3(.12f,.86f,.42f),armor,side*-18,.10f,.74f);
+                fin.localRotation=Quaternion.Euler(0,0,side*17f);
+                Transform nozzle=Shape(PrimitiveType.Cylinder,"Vector gimballed nozzle",f.backPart,
+                    new Vector3(side*.68f,-.35f,-.37f),new Vector3(.28f,.14f,.28f),edge);
+                nozzle.localRotation=Quaternion.Euler(-90,0,side*8f);
+                Transform core=Shape(PrimitiveType.Cylinder,"Vector nozzle plasma core",f.backPart,
+                    new Vector3(side*.68f,-.35f,-.45f),new Vector3(.15f,.055f,.15f),highlight,true);
+                core.localRotation=nozzle.localRotation;
+                for(int rib=0;rib<3;rib++)
+                    Plate("Vector nacelle heat rib "+rib,f.backPart,
+                        new Vector3(side*.68f,.22f-rib*.16f,-.425f),new Vector3(.23f,.035f,.025f),edge);
+            }
+        }
+        else if(visual=="BOOSTER_CYCLONE")
+        {
+            BeveledPlate("Cyclone central turbine housing",f.backPart,
+                new Vector3(0,.06f,-.34f),new Vector3(.92f,.82f,.40f),dark,0,.14f,.86f);
+            Transform rim=Shape(PrimitiveType.Cylinder,"Cyclone turbine outer ring",f.backPart,
+                new Vector3(0,.05f,-.60f),new Vector3(.78f,.13f,.78f),edge);
+            rim.localRotation=Quaternion.Euler(-90,0,0);
+            Transform aperture=Shape(PrimitiveType.Cylinder,"Cyclone turbine aperture",f.backPart,
+                new Vector3(0,.05f,-.68f),new Vector3(.55f,.07f,.55f),armor,true);
+            aperture.localRotation=rim.localRotation;
+            Transform hub=Shape(PrimitiveType.Cylinder,"Cyclone turbine hub",f.backPart,
+                new Vector3(0,.05f,-.73f),new Vector3(.22f,.09f,.22f),highlight,true);
+            hub.localRotation=rim.localRotation;
+            for(int blade=0;blade<8;blade++)
+            {
+                float angle=blade*45f*Mathf.Deg2Rad;
+                Transform vane=Plate("Cyclone turbine vane "+blade,f.backPart,
+                    new Vector3(Mathf.Cos(angle)*.22f,.05f+Mathf.Sin(angle)*.22f,-.72f),
+                    new Vector3(.055f,.26f,.025f),edge);
+                vane.localRotation=Quaternion.Euler(0,0,blade*45f+28f);
+            }
+            for(int side=-1;side<=1;side+=2)
+                Plate("Cyclone side armor rail",f.backPart,new Vector3(side*.62f,.08f,-.34f),
+                    new Vector3(.11f,.72f,.39f),armor,side*-8f);
+        }
+    }
+    void BuildSelectableHeadVisualVariant(Fighter f,Color armor,Color dark,Color edge,Color highlight)
+    {
+        if(f==null||f.headPart==null)return;
+        string visual=BalanceData.NormalizePartVisualId(new BalancePart{category="HEAD",id=f.spec.name+"_HEAD"},f.headVisualId);
+        if(visual=="HEAD_RANGEFINDER")
+        {
+            BeveledPlate("Rangefinder dorsal sensor base",f.headPart,new Vector3(0,.27f,-.06f),
+                new Vector3(.30f,.12f,.28f),dark,0,.10f,.85f);
+            Plate("Rangefinder antenna mast",f.headPart,new Vector3(0,.40f,-.08f),
+                new Vector3(.045f,.22f,.055f),edge);
+            Plate("Rangefinder crossbar",f.headPart,new Vector3(0,.49f,-.08f),
+                new Vector3(.24f,.045f,.10f),armor);
+            Transform dish=Shape(PrimitiveType.Cylinder,"Rangefinder sensor dish",f.headPart,
+                new Vector3(0,.53f,-.08f),new Vector3(.22f,.055f,.22f),edge);
+            Shape(PrimitiveType.Sphere,"Rangefinder focus lens",f.headPart,
+                new Vector3(0,.56f,-.08f),new Vector3(.10f,.055f,.10f),highlight,true);
+            dish.localRotation=Quaternion.Euler(0,0,0);
+        }
+        else if(visual=="HEAD_OMNI")
+        {
+            BeveledPlate("Omni sensor crown",f.headPart,new Vector3(0,.25f,-.05f),
+                new Vector3(.48f,.14f,.32f),dark,0,.11f,.82f);
+            Plate("Omni sensor bridge",f.headPart,new Vector3(0,.31f,.02f),
+                new Vector3(.38f,.045f,.24f),armor);
+            for(int side=-1;side<=1;side++)
+            {
+                float x=side*.19f;
+                Transform lens=Shape(PrimitiveType.Sphere,"Omni optical lens "+(side+1),f.headPart,
+                    new Vector3(x,.27f,.19f),new Vector3(.11f,.09f,.06f),highlight,true);
+                if(side!=0)lens.localScale*=.82f;
+            }
+            for(int side=-1;side<=1;side+=2)
+            {
+                Transform cheek=BeveledPlate("Omni cheek sensor pod",f.headPart,
+                    new Vector3(side*.34f,.02f,-.04f),new Vector3(.14f,.30f,.23f),edge,side*-8f,.08f,.82f);
+                cheek.localRotation=Quaternion.Euler(0,side*-7f,side*-8f);
+                Shape(PrimitiveType.Sphere,"Omni side lens",f.headPart,
+                    new Vector3(side*.39f,.035f,.08f),Vector3.one*.065f,highlight,true);
+            }
+        }
+    }
+    void BuildSelectableCoreVisualVariant(Fighter f,Color armor,Color dark,Color edge,Color highlight)
+    {
+        if(f==null||f.corePart==null)return;
+        string visual=BalanceData.NormalizePartVisualId(new BalancePart{category="CORE",id=f.spec.name+"_CORE"},f.coreVisualId);
+        if(visual=="CORE_STANDARD")return;
+        Transform modelRoot=Module("Selectable core model "+visual,f.body,f.body.InverseTransformPoint(f.corePart.position));
+        modelRoot.localScale=Vector3.one*(f.corePart.lossyScale.x/Mathf.Max(.001f,f.body.lossyScale.x));
+        if(visual=="CORE_REACTOR")
+        {
+            Transform ring=Shape(PrimitiveType.Cylinder,"Reactor module outer ring",modelRoot,
+                new Vector3(0,.10f,.73f),new Vector3(.37f,.09f,.37f),edge);
+            ring.localRotation=Quaternion.Euler(90,0,0);
+            Transform lens=Shape(PrimitiveType.Sphere,"Reactor module core lens",modelRoot,
+                new Vector3(0,.10f,.80f),new Vector3(.29f,.11f,.29f),highlight,true);
+            lens.localRotation=Quaternion.identity;
+            for(int side=-1;side<=1;side+=2)
+            {
+                BeveledPlate("Reactor module heat shield",modelRoot,
+                    new Vector3(side*.43f,.10f,.60f),new Vector3(.18f,.39f,.20f),armor,side*-8,.08f,.82f);
+                Plate("Reactor module cooling slit",modelRoot,
+                    new Vector3(side*.44f,.10f,.72f),new Vector3(.12f,.035f,.025f),dark);
+            }
+        }
+        else if(visual=="CORE_BULWARK")
+        {
+            BeveledPlate("Bulwark chest side plate",modelRoot,
+                new Vector3(-.43f,.22f,.59f),new Vector3(.22f,.56f,.24f),armor,-8,.12f,.86f);
+            BeveledPlate("Bulwark chest center guard",modelRoot,
+                new Vector3(0,.12f,.72f),new Vector3(.50f,.30f,.18f),edge,0,.09f,.84f);
+            BeveledPlate("Bulwark chest side plate",modelRoot,
+                new Vector3(.43f,.22f,.59f),new Vector3(.22f,.56f,.24f),armor,8,.12f,.86f);
+            for(int side=-1;side<=1;side+=2)
+                Plate("Bulwark chest seam",modelRoot,new Vector3(side*.44f,.20f,.73f),
+                    new Vector3(.10f,.045f,.026f),dark,side*-8f);
+        }
+    }
+    Transform FindOptionalJoint(Transform root,string name)
+    {
+        if(root==null)return null;
+        foreach(Transform item in root.GetComponentsInChildren<Transform>(true))if(item.name==name)return item;
+        return null;
+    }
+    void BuildSelectableArmVisualVariant(Fighter f,bool left,Color armor,Color dark,Color edge,Color highlight)
+    {
+        if(f==null)return;
+        Transform arm=left?f.leftArm:f.rightArm;if(arm==null||!arm.gameObject.activeInHierarchy)return;
+        string visual=BalanceData.NormalizePartVisualId(new BalancePart{category=left?"LEFT_ARM":"RIGHT_ARM",id=f.spec.name+(left?"_LEFT_ARM":"_RIGHT_ARM")},left?f.leftArmVisualId:f.rightArmVisualId);
+        if(visual=="ARM_STANDARD")return;
+        Transform elbow=FindOptionalJoint(arm,left?"Left_elbow":"Right_elbow");bool importedElbow=elbow!=null;
+        Transform anchor=importedElbow?elbow:arm;
+        Vector3 position=importedElbow?new Vector3(0,-.04f,.015f):new Vector3(0,-.68f,.20f);
+        Transform model=Module("Selectable arm model "+visual,anchor,position);
+        float side=left?-1:1;
+        if(visual=="ARM_REINFORCED")
+        {
+            BeveledPlate("Reinforced forearm shell",model,Vector3.zero,new Vector3(.46f,.27f,.55f),armor,side*6,.12f,.84f);
+            Plate("Reinforced forearm edge",model,new Vector3(side*.235f,0,.10f),new Vector3(.035f,.18f,.37f),edge,side*5);
+            Plate("Reinforced wrist seam",model,new Vector3(0,-.12f,.30f),new Vector3(.34f,.035f,.035f),dark);
+        }
+        else if(visual=="ARM_PRECISION")
+        {
+            Plate("Precision wrist cuff",model,new Vector3(0,-.04f,.04f),new Vector3(.37f,.13f,.42f),dark);
+            Plate("Precision servo rail",model,new Vector3(side*.205f,.015f,.09f),new Vector3(.055f,.28f,.37f),edge,side*-8f);
+            Shape(PrimitiveType.Sphere,"Precision servo indicator",model,new Vector3(side*.20f,.04f,.29f),new Vector3(.08f,.06f,.08f),highlight,true);
+        }
+    }
+    void BuildSelectableLegVisualVariant(Fighter f,Color armor,Color dark,Color edge,Color highlight)
+    {
+        if(f==null||f.legsPart==null)return;
+        string visual=BalanceData.NormalizePartVisualId(new BalancePart{category="LEGS",id=f.spec.name+"_LEGS"},f.legsVisualId);
+        if(visual=="LEGS_STANDARD")return;
+        if(f.spec.mobility==MobilityKind.Tank)
+        {
+            for(int side=-1;side<=1;side+=2)
+            {
+                if(visual=="LEGS_ASSAULT")
+                    BeveledPlate("Assault tread fender",f.legsPart,new Vector3(side*.88f,-.48f,.10f),new Vector3(.19f,.58f,1.05f),armor,0,.10f,.82f);
+                else
+                {
+                    Transform beacon=Shape(PrimitiveType.Cylinder,"Scout track beacon",f.legsPart,new Vector3(side*.90f,-.47f,.12f),new Vector3(.14f,.07f,.14f),highlight,true);
+                    beacon.localRotation=Quaternion.Euler(90,0,0);
+                    Plate("Scout track service stripe",f.legsPart,new Vector3(side*.90f,-.28f,.12f),new Vector3(.055f,.22f,.56f),edge);
+                }
+            }
+            return;
+        }
+        if(f.spec.mobility==MobilityKind.Quadruped&&f.quadrupedKnees!=null)
+        {
+            for(int i=0;i<f.quadrupedKnees.Length;i++)
+            {
+                Transform knee=f.quadrupedKnees[i],ankle=f.quadrupedAnkles!=null&&i<f.quadrupedAnkles.Length?f.quadrupedAnkles[i]:null;
+                if(knee==null)continue;
+                if(visual=="LEGS_ASSAULT")
+                {
+                    BeveledPlate("Assault quadruped knee shell",knee,new Vector3(0,.015f,.13f),new Vector3(.37f,.32f,.18f),armor,0,.09f,.82f);
+                    Plate("Assault quadruped joint rail",knee,new Vector3(i%2==0?-.16f:.16f,0,-.02f),new Vector3(.055f,.31f,.13f),edge);
+                }
+                else if(ankle!=null)
+                {
+                    Shape(PrimitiveType.Sphere,"Scout paw locator",ankle,new Vector3(0,.11f,.22f),new Vector3(.13f,.07f,.06f),highlight,true);
+                    Plate("Scout ankle strut",knee,new Vector3(0,-.29f,-.12f),new Vector3(.08f,.38f,.09f),edge);
+                }
+            }
+            return;
+        }
+        Transform[] legs={f.leftLeg,f.rightLeg};string[] jointNames={"Left_knee","Right_knee"};
+        for(int i=0;i<legs.Length;i++)
+        {
+            Transform leg=legs[i];if(leg==null||!leg.gameObject.activeInHierarchy)continue;
+            Transform knee=FindOptionalJoint(leg,jointNames[i])??FindOptionalJoint(leg,i==0?"Left knee pivot":"Right knee pivot")??leg;
+            float side=i==0?-1:1;
+            if(visual=="LEGS_ASSAULT")
+            {
+                BeveledPlate("Assault shin guard",knee,new Vector3(0,-.27f,.18f),new Vector3(.48f,.48f,.18f),armor,side*-3,.09f,.82f);
+                Plate("Assault shin ridge",knee,new Vector3(side*.22f,-.27f,.29f),new Vector3(.045f,.37f,.035f),edge);
+            }
+            else
+            {
+                Plate("Scout shin servo rail",knee,new Vector3(side*.22f,-.28f,-.01f),new Vector3(.06f,.43f,.12f),edge);
+                Transform ankle=FindOptionalJoint(leg,i==0?"Left_ankle":"Right_ankle")??FindOptionalJoint(leg,i==0?"Left ankle pivot":"Right ankle pivot")??leg;
+                Shape(PrimitiveType.Sphere,"Scout ankle locator",ankle,new Vector3(0,.08f,.20f),new Vector3(.12f,.07f,.07f),highlight,true);
+            }
+        }
+    }
     void BuildTankTracks(Fighter f,Color armor,Color dark,Color edge)
     {
         f.pelvisPart.gameObject.SetActive(false);
@@ -960,7 +1176,7 @@ public sealed partial class VoxArena
             }
         }
         AddFrameIdentity(f,armor,hull,dark,edge);
-        ApplyImportedWisp(f);SetupWeaponVisuals(f);SetupBoostVisual(f);if(f==player)RegisterCameraFadeRenderers(f);
+        ApplyImportedWisp(f);BuildSelectableHeadVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableCoreVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableArmVisualVariant(f,true,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableArmVisualVariant(f,false,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableLegVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));BuildBoosterVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));SetupWeaponVisuals(f);SetupBoostVisual(f);if(f==player)RegisterCameraFadeRenderers(f);
     }
     RenderTexture[] framePortraits;float portraitYaw;
     void BuildPortraits()
@@ -971,22 +1187,12 @@ public sealed partial class VoxArena
         Camera camera=new GameObject("Portrait studio camera").AddComponent<Camera>();
         camera.enabled=false; camera.orthographic=true; camera.orthographicSize=3.65f; camera.clearFlags=CameraClearFlags.SolidColor;
         camera.backgroundColor=new Color(.065f,.095f,.14f,1); camera.cullingMask=1<<8;
-        camera.transform.position=model.root.position+new Vector3(5,4.1f,7); camera.transform.LookAt(model.root.position+Vector3.up*.60f);
-        string[][] displayWeapons={
-            new[]{"Military_AR","Military_HG","Future_Launcher","Military_SR"},
-            new[]{"Military_LMG","Military_RL","Future_Gatling","Future_Launcher"},
-            new[]{"Future_Beam","Military_SG","Military_GL","Future_Sniper"}
-        };
+        camera.transform.position=model.root.position+new Vector3(2.5f,4.1f,9f); camera.transform.LookAt(model.root.position+Vector3.up*.60f);
         for(int i=0;i<CraftCatalog.Selectable.Length;i++)
         {
             ApplySelectableCharacter(model,i); model.body.localPosition=Vector3.up*.4f;camera.orthographicSize=i==1?4.35f:3.65f;
-            if(i<displayWeapons.Length&&model.weaponVisuals!=null)
-            {
-                foreach(Transform old in model.weaponVisuals)if(old!=null)old.gameObject.SetActive(false);
-                model.weaponArtIds=(string[])displayWeapons[i].Clone();SetupWeaponVisuals(model);
-            }
             for(int side=0;side<2;side++)if(model.weaponVisuals!=null&&model.weaponVisuals[side]!=null)model.weaponVisuals[side].gameObject.SetActive(true);
-            camera.transform.position=model.root.position+Quaternion.Euler(0,portraitYaw,0)*new Vector3(5,4.1f,7);camera.transform.LookAt(model.root.position+Vector3.up*.60f);
+            camera.transform.position=model.root.position+Quaternion.Euler(0,portraitYaw,0)*new Vector3(2.5f,4.1f,9f);camera.transform.LookAt(model.root.position+Vector3.up*.60f);
             model.fist.gameObject.SetActive(false);
             foreach(Transform t in model.root.GetComponentsInChildren<Transform>(true)) t.gameObject.layer=8;
             framePortraits[i]=new RenderTexture(384,512,16); camera.targetTexture=framePortraits[i]; camera.Render();

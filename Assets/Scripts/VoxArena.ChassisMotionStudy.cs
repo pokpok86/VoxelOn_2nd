@@ -8,7 +8,8 @@ public sealed partial class VoxArena
     sealed class LowerSkinSample {public Vector3[] vertices;public BoneWeight[] weights;public Matrix4x4[] bind;public Transform[] bones;public bool[] lower;}
     IEnumerator ChassisMotionStudy()
     {
-        string folder=Path.Combine(Directory.GetCurrentDirectory(),"Docs","Screenshots","PD14-Chassis-Motion",Array.IndexOf(Environment.GetCommandLineArgs(),"--after-motion")>=0?"After":"Before");Directory.CreateDirectory(folder);
+        string revision=Array.IndexOf(Environment.GetCommandLineArgs(),"--gait-review")>=0?"Iteration33":Array.IndexOf(Environment.GetCommandLineArgs(),"--after-motion")>=0?"After":"Before";
+        string folder=Path.Combine(Directory.GetCurrentDirectory(),"Docs","Screenshots","PD14-Chassis-Motion",revision);Directory.CreateDirectory(folder);
         bool pass=true;int checks=0,captures=0;RenderTexture target=new RenderTexture(768,768,24);Texture2D image=new Texture2D(768,768,TextureFormat.RGB24,false);
         Transform studio=SpawnPDPart("Pond",null,new Vector3(0,GroundSurfaceY-.008f,0),new Vector3(7,1,7));SetPartMaterial(studio,Mat(new Color(.18f,.20f,.23f)));foreach(Transform t in studio.GetComponentsInChildren<Transform>())t.gameObject.layer=9;
         for(int id=1;id<3;id++)

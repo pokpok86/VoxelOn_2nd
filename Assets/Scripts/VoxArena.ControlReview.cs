@@ -10,6 +10,11 @@ public sealed partial class VoxArena
         string dir=Path.Combine(Directory.GetCurrentDirectory(),"Docs","Screenshots","Controls-20261105",before?"Before":"After");Directory.CreateDirectory(dir);
         if(Array.IndexOf(Environment.GetCommandLineArgs(),"--weapon-art-review")>=0){dir=Path.Combine(Directory.GetCurrentDirectory(),"Docs","Screenshots","Weapons-20261105","Controls");Directory.CreateDirectory(dir);}
         bool pass=true;int checks=0;void Check(bool ok,string name){checks++;pass&=ok;Debug.Log("CONTROL_CHECK "+name+" "+(ok?"PASS":"FAIL"));}
+        TestSetupSelectable(1,0);smoke=false;inMenu=false;paused=false;targetLock=false;player.root.position=new Vector3(80,FighterGroundY,70);enemy.root.position=player.root.position+Vector3.forward*30;player.facing=Vector3.forward;
+        view.orthographic=false;view.transform.position=player.root.position-Vector3.forward*10+Vector3.up*2;view.transform.LookAt(enemy.root.position+Vector3.up*.7f);
+        Vector3 softAim=(enemy.root.position-WeaponMuzzle(player)).normalized;assistEngaged=CanWeakAssist(player,enemy,softAim);
+        Check(assistEngaged&&!targetLock&&TryGetTargetScreenRect(out Rect softRect)&&ShouldDrawSoftAssistReticle(true),"unlocked radar assist has a separate subtle target cue");
+        yield return null;yield return new WaitForEndOfFrame();Texture2D softCue=ScreenCapture.CaptureScreenshotAsTexture();File.WriteAllBytes(Path.Combine(dir,"soft-aim-assist.png"),softCue.EncodeToPNG());Destroy(softCue);
         for(int id=1;id<3;id++)
         {
             TestSetupSelectable(id,0);smoke=false;inMenu=false;paused=false;targetLock=true;player.root.position=new Vector3(80,FighterGroundY,70);enemy.root.position=player.root.position+new Vector3(20,0,20);cameraYaw=-40;cameraPitch=12;

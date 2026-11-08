@@ -27,9 +27,7 @@ public sealed partial class VoxArena
         {
             foreach(Fighter old in additional)
             {
-                UnregisterFighter(old);
-                if(old.root!=null){old.root.gameObject.SetActive(false);Destroy(old.root.gameObject);}
-                if(old.shadow!=null){old.shadow.gameObject.SetActive(false);Destroy(old.shadow.gameObject);}
+                RemoveMatchParticipant(old);
             }
             additional.Clear();
             ApplySelectableCharacter(player,stage%CraftCatalog.Selectable.Length);
@@ -39,11 +37,8 @@ public sealed partial class VoxArena
             int count=populations[stage];
             for(int i=2;i<count;i++)
             {
-                Color accent=(i&1)==0?Cyan:Orange;
-                Fighter f=MakeFighter($"Load AI {i+1:00}",accent);
-                ApplySelectableCharacter(f,i%CraftCatalog.Selectable.Length);
-                f.teamId=i&1;
-                RegisterFighter(f);additional.Add(f);
+                Fighter f=AddMatchParticipant($"Load AI {i+1:00}",i%CraftCatalog.Selectable.Length,i&1);
+                additional.Add(f);
             }
 
             var actors=new List<Fighter>(fighterRoster);
@@ -103,9 +98,7 @@ public sealed partial class VoxArena
         }
         foreach(Fighter f in additional)
         {
-            UnregisterFighter(f);
-            if(f.root!=null)Destroy(f.root.gameObject);
-            if(f.shadow!=null)Destroy(f.shadow.gameObject);
+            RemoveMatchParticipant(f);
         }
         additional.Clear();difficulty=originalDifficulty;
         Debug.Log(valid?"VOXSKY_MULTIAI_MEASUREMENTS_COMPLETE stages=5 counts=2,4,8,16,32; performance thresholds are informational":"VOXSKY_MULTIAI_MEASUREMENTS_INCOMPLETE");

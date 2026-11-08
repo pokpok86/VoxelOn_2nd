@@ -342,6 +342,14 @@ public sealed partial class VoxArena
             player.quadrupedKnees[0].parent==player.quadrupedLegs[0] &&
             player.quadrupedAnkles[0].parent==player.quadrupedKnees[0],
             "TARANTULA FBX has four connected hip-knee-foot chains");
+        player.velocity=Vector3.zero;player.quadPose=null;AnimateImportedChassis(player,0,1f/60f);QuadPose gaitPose=player.quadPose;
+        int frontLeft=-1,frontRight=-1,rearLeft=-1,rearRight=-1;
+        for(int legIndex=0;legIndex<4;legIndex++){Vector3 p=player.root.InverseTransformPoint(player.quadrupedLegs[legIndex].position);bool front=p.z>=0,left=p.x<0;if(front&&left)frontLeft=legIndex;else if(front)frontRight=legIndex;else if(left)rearLeft=legIndex;else rearRight=legIndex;}
+        bool walkFootfalls=gaitPose!=null&&frontLeft>=0&&frontRight>=0&&rearLeft>=0&&rearRight>=0&&Mathf.Abs(gaitPose.phaseOffset[frontLeft]-0)<.01f&&Mathf.Abs(gaitPose.phaseOffset[frontRight]-.5f)<.01f&&Mathf.Abs(gaitPose.phaseOffset[rearLeft]-.75f)<.01f&&Mathf.Abs(gaitPose.phaseOffset[rearRight]-.25f)<.01f;
+        Check(walkFootfalls,"TARANTULA low-speed gait staggers all four footfalls in a walk sequence");
+        player.velocity=player.root.forward*player.spec.speed;AnimateImportedChassis(player,1,1f/60f);
+        bool trotFootfalls=gaitPose!=null&&Mathf.Abs(gaitPose.phaseOffset[frontLeft]-gaitPose.phaseOffset[rearRight])<.01f&&Mathf.Abs(gaitPose.phaseOffset[frontRight]-gaitPose.phaseOffset[rearLeft])<.01f&&Mathf.Abs(gaitPose.phaseOffset[frontLeft]-gaitPose.phaseOffset[frontRight])>.4f;
+        Check(trotFootfalls,"TARANTULA high-speed gait blends into an alternating diagonal trot");player.velocity=Vector3.zero;player.quadPose=null;
         Check(enemy.quadrupedLegs!=null && enemy.quadrupedLegs.Length==4 && enemy.spec.name=="HOUND",
             "HOUND canine four-leg rig");
         Check(enemy.headPart.Find("Hound muzzle")!=null && enemy.headPart.Find("Hound upright ear")!=null &&
@@ -394,14 +402,26 @@ public sealed partial class VoxArena
         Check(Opponent(player)==null && Opponent(enemy)==null,"same-team fighters are not opponents");
         enemy.teamId=savedRivalTeam;
         // A third fighter can join the roster without becoming the fixed rival.
-        Fighter extraHostile=new Fighter { teamId=1,root=new GameObject("Roster probe").transform };
+        Fighter extraHostile=AddMatchParticipant("Roster probe",0,1);
         extraHostile.root.position=player.root.position+Vector3.right*2;
-        RegisterFighter(extraHostile);
-        Check(fighterRoster.Count==3 && Opponent(player)==extraHostile,
-            "nearest hostile is selected from a multi-fighter roster");
-        UnregisterFighter(extraHostile);
-        Destroy(extraHostile.root.gameObject);
-        Check(fighterRoster.Count==2 && Opponent(player)==enemy,"unregister restores 1v1 roster");
+        Check(fighterRoster.Count==3&&extraHostile.spec.name==CraftCatalog.Selectable[0].name&&
+            Opponent(player)==extraHostile,"participant factory registers a selectable hostile fighter");
+        bool savedTimedFrag=timedFragMode,savedEnemyDead=enemy.deadVisual;
+        float savedEnemyHp=enemy.hp;timedFragMode=false;
+        enemy.hp=0;enemy.deadVisual=true;
+        Check(!Finished,"one rival knockout does not finish while another hostile teammate remains");
+        extraHostile.hp=0;extraHostile.deadVisual=true;
+        Check(Finished&&MatchWinnerTeam()==player.teamId,"roster elimination ends the match with the surviving team as winner");
+        enemy.hp=savedEnemyHp;enemy.deadVisual=savedEnemyDead;extraHostile.hp=100;extraHostile.deadVisual=false;timedFragMode=savedTimedFrag;
+        ResetRound();
+        Check(fighterRoster.Count==3&&extraHostile.root.gameObject.activeSelf&&
+            Vector3.Distance(extraHostile.root.position,enemy.root.position)>extraHostile.Radius+enemy.Radius,
+            "round reset preserves and separates registered participants");
+        Schedule(extraHostile,10,()=>{});
+        RemoveMatchParticipant(extraHostile);
+        bool staleParticipantAction=false;foreach(Pending action in pending)if(action.owner==extraHostile)staleParticipantAction=true;
+        Check(fighterRoster.Count==2&&Opponent(player)==enemy&&!staleParticipantAction,
+            "participant removal clears owned delayed actions and restores the 1v1 roster");
         Fighter originalPilot=player,originalRival=enemy;
         EnemyAI(player,enemy,.04f);
         Check(player==originalPilot && enemy==originalRival && player.aiClock>0 && enemy.aiClock==0,
@@ -564,8 +584,24 @@ public sealed partial class VoxArena
             Move(player,Vector3.zero,.025f);
             if(player.jumpHeight>heldMaxHeight) { heldMaxHeight=player.jumpHeight; fuelAtHeldMax=player.boostEnergy; }
         }
-        Check(heldMaxHeight>tapHeight && heldMaxHeight<=jumpMaxHeight+.02f && fuelAtHeldMax<jumpFuel,
-            "held jump climbs higher, spends fuel, and stays below the height cap");
+        Check(heldMaxHeight>tapHeight && heldMaxHeight>jumpMaxHeight && fuelAtHeldMax<jumpFuel,
+            "held vertical boost climbs past the unpowered jump ceiling and spends fuel");
+        TestSetup(0);
+        player.jumpOriginY=player.root.position.y;player.jumpVelocity=jumpSpeed;player.jumpHeld=true;
+        for(int i=0;i<120;i++)Move(player,Vector3.zero,.025f);
+        float lightFrameClimb=player.jumpHeight;
+        TestSetup(0);player.spec.jumpWeightFactor=2f;player.jumpOriginY=player.root.position.y;player.jumpVelocity=jumpSpeed;player.jumpHeld=true;
+        for(int i=0;i<120;i++)Move(player,Vector3.zero,.025f);
+        Check(lightFrameClimb>player.jumpHeight+.5f&&player.boostEnergy<player.spec.boostCapacity-jumpBoostDrain,
+            "heavier frames climb more slowly and spend more booster energy");
+        TestSetup(0);player.jumpOriginY=player.root.position.y;player.jumpVelocity=jumpSpeed;player.jumpHeld=true;
+        for(int i=0;i<440;i++)Move(player,Vector3.zero,.025f);
+        float standardCapacityHeight=player.jumpHeight;
+        TestSetup(0);player.spec.boostCapacity*=2;player.boostEnergy=player.spec.boostCapacity;
+        player.jumpOriginY=player.root.position.y;player.jumpVelocity=jumpSpeed;player.jumpHeld=true;
+        for(int i=0;i<440;i++)Move(player,Vector3.zero,.025f);
+        Check(player.jumpHeight>standardCapacityHeight+2&&player.boostEnergy>0,
+            "larger booster capacity sustains powered climb for longer");
         TestSetup(0);
         player.jumpVelocity=jumpSpeed; player.jumpHeld=true; player.boostHeld=true;
         float combinedFuel=player.boostEnergy;

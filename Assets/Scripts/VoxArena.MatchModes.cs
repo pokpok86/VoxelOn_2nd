@@ -15,10 +15,33 @@ public sealed partial class VoxArena
 
     bool IsMatchFinished()
     {
-        if(!timedFragMode) return player.hp<=0 || enemy.hp<=0;
+        if(!timedFragMode)
+        {
+            if(fighterRoster.Count==0) return player.hp<=0||enemy.hp<=0;
+            int activeTeam=-1;
+            foreach(Fighter fighter in fighterRoster)
+            {
+                if(fighter==null||fighter.deadVisual||fighter.hp<=0)continue;
+                if(activeTeam<0)activeTeam=fighter.teamId;
+                else if(activeTeam!=fighter.teamId)return false;
+            }
+            return true;
+        }
         if(fragTimeRemaining<=0) return true;
         foreach(var entry in teamFragScores) if(entry.Value>=TimedFragTarget) return true;
         return false;
+    }
+    int MatchWinnerTeam()
+    {
+        if(timedFragMode) return FragWinnerTeam();
+        int activeTeam=-1;
+        foreach(Fighter fighter in fighterRoster)
+        {
+            if(fighter==null||fighter.deadVisual||fighter.hp<=0)continue;
+            if(activeTeam<0)activeTeam=fighter.teamId;
+            else if(activeTeam!=fighter.teamId)return -1;
+        }
+        return activeTeam;
     }
     int FragScore(int team) => teamFragScores.TryGetValue(team,out int score)?score:0;
     int FragWinnerTeam()

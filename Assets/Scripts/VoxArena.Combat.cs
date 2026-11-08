@@ -12,7 +12,7 @@ public sealed partial class VoxArena
         public bool stopAndExplode,mine,loadoutVisual;public int artSlot;
         public LineRenderer warning;
     }
-    sealed class Pending { public float delay; public Action action; }
+    sealed class Pending { public Fighter owner; public float delay; public Action action; }
     sealed class Beam
     {
         public Fighter owner; public Vector3 direction; public float age,charge,duration,width,length,dps,sweep;
@@ -33,9 +33,9 @@ public sealed partial class VoxArena
         shots.Clear(); pending.Clear(); beams.Clear(); rings.Clear();
         foreach(FlashEffect fx in flashes) Destroy(fx.visual.gameObject); flashes.Clear();
     }
-    void Schedule(float delay,Action action)
+    void Schedule(Fighter owner,float delay,Action action)
     {
-        if(delay<=0) action(); else pending.Add(new Pending{delay=delay,action=action});
+        if(delay<=0) action(); else pending.Add(new Pending{owner=owner,delay=delay,action=action});
     }
     Shot Fire(Fighter owner,Vector3 direction,float damage,float speed,float radius,float range,float tracking=0,float blast=0,bool stop=false,float wave=0,bool loadoutVisual=false)
     {
@@ -81,14 +81,14 @@ public sealed partial class VoxArena
                 Fire(owner,Quaternion.Euler(0,-9,0)*direction,spec.damage,spec.projectileSpeed,spec.projectileRadius,spec.range);
                 Fire(owner,Quaternion.Euler(0,9,0)*direction,spec.damage,spec.projectileSpeed,spec.projectileRadius,spec.range);
                 Vector3 centerAim=FollowupAim(owner,target,direction,.16f,1.15f);
-                Schedule(.16f,()=>Fire(owner,centerAim,spec.damage*1.4f,spec.projectileSpeed*1.15f,spec.projectileRadius,spec.range)); break;
+                Schedule(owner,.16f,()=>Fire(owner,centerAim,spec.damage*1.4f,spec.projectileSpeed*1.15f,spec.projectileRadius,spec.range)); break;
             case PrimaryKind.Plasma:
                 Fire(owner,direction,spec.damage,spec.projectileSpeed,spec.projectileRadius,spec.range,0,3); break;
             case PrimaryKind.Gatling:
                 for(int i=0;i<6;i++)
                 {
                     Vector3 d=Quaternion.Euler(0,i%2==0?-1.5f:1.5f,0)*direction;
-                    Schedule(i*.075f,()=>Fire(owner,d,spec.damage,spec.projectileSpeed,spec.projectileRadius,spec.range));
+                    Schedule(owner,i*.075f,()=>Fire(owner,d,spec.damage,spec.projectileSpeed,spec.projectileRadius,spec.range));
                 }
                 break;
             case PrimaryKind.Missiles:
@@ -103,7 +103,7 @@ public sealed partial class VoxArena
                 for(int i=0;i<3;i++)
                 {
                     Vector3 d=Quaternion.Euler(0,-7+i*7,0)*direction;
-                    Schedule(i*.12f,()=>Fire(owner,d,spec.damage,spec.projectileSpeed,spec.projectileRadius,spec.range,0,0,false,5));
+                    Schedule(owner,i*.12f,()=>Fire(owner,d,spec.damage,spec.projectileSpeed,spec.projectileRadius,spec.range,0,0,false,5));
                 }
                 break;
             case PrimaryKind.Grenade:
@@ -129,7 +129,7 @@ public sealed partial class VoxArena
                 for(int i=0;i<9;i++)
                 {
                     Vector3 dir=Quaternion.Euler(0,-52+i*13,0)*d;
-                    Schedule(i*.04f,()=>Fire(owner,dir,13,40,.4f,72,1.2f,3));
+                    Schedule(owner,i*.04f,()=>Fire(owner,dir,13,40,.4f,72,1.2f,3));
                 }
                 break;
             case SpecialKind.Nova:

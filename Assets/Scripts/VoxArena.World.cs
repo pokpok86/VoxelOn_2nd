@@ -28,6 +28,7 @@ public sealed partial class VoxArena
     Transform starRoot;
     // Terrain blocks share the obstacle model so navigation, shots and landing agree.
     readonly List<Bounds> terrainSteps=new List<Bounds>();
+    readonly HashSet<Bounds> terrainStepLookup=new HashSet<Bounds>();
     float spaceClock;
 
     void BuildWorld()
@@ -105,7 +106,23 @@ public sealed partial class VoxArena
             obstacles.Add(new Bounds(new Vector3(side*(48+i*14),GroundSurfaceY+height*.5f,45+i%2*16),new Vector3(10,height,13)));
         }
         }
-        else if(arenaMap==ArenaMapKind.OutdoorCanyon){ /* PD: keep outdoor combat floor open; old block course stays archived. */ }
+        else if(arenaMap==ArenaMapKind.OutdoorCanyon)
+        {
+            // Keep the opening around the spawn area clear, then spread
+            // destructible cover across the canyon so movement and shots have
+            // meaningful obstruction throughout the arena.
+            AddDebris(new Vector3(-82,1.1f,48),new Vector3(8,3.2f,6),.4f);
+            AddDebris(new Vector3(88,1.1f,-52),new Vector3(7,2.6f,9),1.3f);
+            AddDebris(new Vector3(-112,1.1f,-76),new Vector3(9,4.0f,7),2.2f);
+            AddDebris(new Vector3(116,1.1f,78),new Vector3(8,3.0f,8),3.1f);
+            AddDebris(new Vector3(-36,1.1f,106),new Vector3(7,2.4f,10),4.0f);
+            AddDebris(new Vector3(42,1.1f,-108),new Vector3(10,3.6f,7),4.9f);
+            AddDebris(new Vector3(4,1.1f,72),new Vector3(6,2.2f,6),5.8f);
+            AddDebris(new Vector3(-8,1.1f,-74),new Vector3(7,3.4f,6),6.7f);
+            // Stepped ridges and shelves are also registered as terrain
+            // obstacles, so they block projectiles and resolve fighter motion.
+            BuildCanyonTerrain();
+        }
         else BuildPlainsCover();
         player=MakeFighter("Pilot frame",Cyan); enemy=MakeFighter("Rival frame",Orange);
         BuildClimate();
@@ -160,21 +177,23 @@ public sealed partial class VoxArena
     }
     void BuildCanyonTerrain()
     {
-        // Shallow stepped ridges above the base floor: no enclosed depressions.
-        // Each approach is built from 0.32m risers so a fighter can walk back out.
+        // Nine broad, traversable ridgelines add frequent changes in elevation
+        // while keeping each individual riser below every frame's step height.
         Color low=new Color(.34f,.30f,.25f),high=new Color(.43f,.37f,.29f);
-        for(int ridge=0;ridge<7;ridge++)
+        int[] stepCounts={8,11,14,9,13,10,15,9,12};
+        for(int ridge=0;ridge<stepCounts.Length;ridge++)
         {
-            float cx=-62f+ridge*21f;
+            int count=stepCounts[ridge];
+            float cx=-84f+ridge*21f;
             float cz=(ridge%2==0?24f:-27f);
-            for(int step=0;step<7;step++)
+            for(int step=0;step<count;step++)
             {
                 float h=.32f*(step+1);
-                float x=cx+(step-3)*2.6f;
+                float x=cx+(step-(count-1)*.5f)*2.1f;
                 AddTerrainBlock("Canyon climbable ridge "+ridge+" "+step,
                     new Vector3(x,GroundSurfaceY+h*.5f,cz+Mathf.Sin(step*.8f+ridge)*.65f),
-                    new Vector3(2.75f,h,14f+ridge%3*3f),
-                    Color.Lerp(low,high,step/6f));
+                    new Vector3(2f,h,14f+ridge%3*3f),
+                    Color.Lerp(low,high,Mathf.Round(step/(float)(count-1)*2f)*.5f));
             }
         }
         // Scattered broad shelves provide sightline variation without dense cover.
@@ -189,10 +208,13 @@ public sealed partial class VoxArena
     void AddTerrainBlock(string name,Vector3 center,Vector3 size,Color color)
     {
         Transform terrain=Module(name,null,center);
-        BuildVoxelCover(terrain,size,arenaMap==ArenaMapKind.OutdoorCanyon?100:2);
+        if(arenaMap==ArenaMapKind.OutdoorCanyon)
+            Box(name,terrain,Vector3.zero,size,color);
+        else BuildVoxelCover(terrain,size,2);
         Bounds bounds=new Bounds(center,size);
         obstacles.Add(bounds);
         terrainSteps.Add(bounds);
+        terrainStepLookup.Add(bounds);
     }
     void BuildElevationCourse()
     {
@@ -361,7 +383,8 @@ public sealed partial class VoxArena
     }
     bool Occupied(Vector3 p,float radius)
     {
-        foreach(Bounds b in obstacles) if(InsideObstacle(b,p,radius)) return true;
+        foreach(Bounds b in obstacles)
+            if(terrainStepLookup.Contains(b)?InsideTerrainObstacle(b,p,radius):InsideObstacle(b,p,radius)) return true;
         return false;
     }
     bool OverlapsFootprint(Bounds obstacle,Vector3 point,float radius)
@@ -377,6 +400,14 @@ public sealed partial class VoxArena
         return OverlapsFootprint(obstacle,point,radius) &&
             point.y>=obstacle.min.y && point.y<obstacle.max.y-.02f;
     }
+    bool InsideTerrainObstacle(Bounds obstacle,Vector3 point,float radius)
+    {
+        // Terrain bounds are stored at the visible rock height, while the
+        // fighter origin sits FighterSupportOffset above its feet.
+        float feet=point.y-FighterSupportOffset;
+        return OverlapsFootprint(obstacle,point,radius) &&
+            feet>=obstacle.min.y-.05f && feet<obstacle.max.y-.02f;
+    }
     void ResolveOverlap(Fighter f)
     {
         // Only eject a fighter when its collision center is actually inside a solid.
@@ -390,7 +421,7 @@ public sealed partial class VoxArena
             // Course blocks are handled by movement/landing, never by spawn
             // overlap ejection. Ejecting near a step top pushed a climber away
             // before TryStepUp could advance onto the next terrace.
-            if(terrainSteps.Contains(b)) continue;
+            if(terrainStepLookup.Contains(b)) continue;
             Vector3[] exits={
                 new Vector3(e.min.x-.04f,p.y,p.z),new Vector3(e.max.x+.04f,p.y,p.z),
                 new Vector3(p.x,p.y,e.min.z-.04f),new Vector3(p.x,p.y,e.max.z+.04f)};
@@ -454,7 +485,7 @@ public sealed partial class VoxArena
         }
         return false;
     }
-    void MoveWithObstacles(Fighter f,Vector3 displacement)
+    void MoveWithObstacles(Fighter f,Vector3 displacement,bool poweredClimb=false)
     {
         ResolveOverlap(f);
         int count=Mathf.Max(1,Mathf.CeilToInt(displacement.magnitude/.25f));
@@ -480,7 +511,7 @@ public sealed partial class VoxArena
             if(step.y>0)
             {
                 float jumpTop=f.jumpOriginY+jumpMaxHeight*Mathf.Max(.1f,f.spec.jumpHeightScale);
-                if(next.y>jumpTop) { next.y=jumpTop; p=next; f.jumpVelocity=0; }
+                if(!poweredClimb && p.y<=jumpTop && next.y>jumpTop) { next.y=jumpTop; p=next; f.jumpVelocity=0; }
                 else if(!Occupied(next,f.Radius)) p=next;
                 else f.jumpVelocity=Mathf.Min(0,f.jumpVelocity);
             }

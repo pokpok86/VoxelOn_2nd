@@ -267,6 +267,8 @@ The work snapshot now includes a playable timed individual frag prototype with s
 - [x] `CUSTOM_` 파츠 ID를 기존 기체/분류의 수치 틀로 추가하고, 설계별 값·구형 슬롯 기본값 채움·복사/초기화·실제 기체 수치 적용을 검증. 제한: 새 분류/수치 틀/형상은 아직 없으며 JSON 정의 입력이 필요함. 근거: `Docs/Development/SYSTEM-DESIGN-001-ITERATION6-20261106.md`.
 - [x] 행거에서 사용자 화기와 코어 파츠 생성 버튼 추가. ID를 자동 부여하고 기본 코어 수치를 여덟 설계 슬롯에 등록. 근거: `Docs/Development/SYSTEM-DESIGN-001-ITERATION7-20261107.md`.
 - [ ] 기체별 코어/머리/팔/하체/부스터 템플릿 선택과 허용 목록 기반 아트 리소스 연결 지원.
+- [~] 데이터 기반 무기 5종의 AI 가상 대전 100회 결과를 바탕으로 LMG 기본 공격력을 5에서 4로 1차 조정. 2차 시험에서는 LMG 29승 11패로 개선됐지만 저격총은 0승 40패였고, 아직 인간 밸런스 승인이나 전체 무기 조정 완료가 아니다. 다음에는 명중/피해 기록을 보강해 저격총과 혼합 장비를 조사한다. 근거: `Docs/Development/SYSTEM-DESIGN-001-ITERATION35-20261108.md`.
+- [~] 다리 모델 선택에 표준·돌격·정찰 외형을 추가하고 이족/4족 관절에 연결. 빌드 시 Unity가 라이선스 오류 198을 반환해 코드 컴파일과 실제 조립은 아직 검증되지 않았다. 라이선스 복구 후 행거 모델 스터디와 스모크를 실행한다. 근거: `Docs/Development/SYSTEM-DESIGN-001-ITERATION36-20261108.md`.
 
 - [x] Unity Hub 설치 및 실행 확인.
 - [x] 사용자 Unity 계정 로그인 완료 보고.

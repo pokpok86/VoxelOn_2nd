@@ -8,7 +8,7 @@ public sealed partial class VoxArena
         ClearCombat();
         foreach(Spark spark in sparks) ReleasePDPart(spark.visual);
         sparks.Clear(); StopSounds();
-        foreach(Fighter fighter in new[]{player,enemy})
+        foreach(Fighter fighter in fighterRoster)
         {
             fighter.thruster.gameObject.SetActive(false);
             fighter.saber.gameObject.SetActive(false);
@@ -36,8 +36,9 @@ public sealed partial class VoxArena
     {
         if(finishCleaned) return;
         finishCleaned=true;finishPresentationTime=Time.time; playerRespawnPrompt=false; ClearBattlePresentation();
-        if(enemy.hp<=0)BreakRobotModules(enemy);if(player.hp<=0)BreakRobotModules(player);
-        PlaySound(SoundKind.Explosion,enemy.hp<=0?enemy.root.position:player.root.position,.7f);
+        foreach(Fighter fighter in fighterRoster) if(fighter.hp<=0)BreakRobotModules(fighter);
+        Fighter firstEliminated=fighterRoster.Find(f=>f!=null&&f.hp<=0);
+        PlaySound(SoundKind.Explosion,firstEliminated!=null?firstEliminated.root.position:player.root.position,.7f);
     }
 }
 

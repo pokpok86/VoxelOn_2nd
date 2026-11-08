@@ -158,14 +158,39 @@ public sealed partial class VoxArena
                 focus=new Vector3(0,4,side*138);outside=new Vector3(0,4,side*150);
                 Check(Mathf.Abs(ConstrainCamera(focus,outside,.30f).z)<140,"camera remains inside authored canyon Z boundary "+side);
             }
-            Check(terrainSteps.Count>=50&&RenderSettings.fog,"outdoor canyon has climbable strata and daylight atmosphere");
+            float highestTerrain=GroundSurfaceY;
+            foreach(Bounds terrain in terrainSteps) highestTerrain=Mathf.Max(highestTerrain,terrain.max.y);
+            Check(terrainSteps.Count>=100&&highestTerrain>=GroundSurfaceY+4.7f&&RenderSettings.fog,
+                "outdoor canyon has many climbable ridges above 4.7m and daylight atmosphere");
+            TestSetupSelectable(0,0);
+            player.root.position=new Vector3(24.5f,FighterGroundY,24f);
+            float climbPeak=player.root.position.y;
+            for(int tick=0;tick<200;tick++)
+            {
+                MoveWithObstacles(player,Vector3.right*.18f);
+                climbPeak=Mathf.Max(climbPeak,player.root.position.y);
+            }
+            Check(climbPeak>=FighterGroundY+4.5f,
+                "fighter can walk up the tallest multi-step canyon ridge");
+            TestSetupSelectable(0,0);ResetRound();inMenu=false;
             Check(GameObject.Find("Blender FBX / CanyonVista")!=null&&GameObject.Find("Blender FBX / OutdoorGround")!=null,"outdoor floor and vista use authored FBXs");
             Renderer floor=GameObject.Find("Blender FBX / OutdoorGround").GetComponentInChildren<Renderer>();
             Check(floor!=null&&floor.bounds.size.y<.03f&&Mathf.Abs(floor.bounds.max.y-GroundSurfaceY)<.02f,
                 "outdoor FBX ground is horizontal and exactly at the playable floor");
-            Renderer rock=GameObject.Find("Canyon tall voxel cover 0").GetComponentInChildren<Renderer>();
-            Check(rock!=null&&Mathf.Abs(rock.bounds.min.y-GroundSurfaceY)<.02f&&Mathf.Abs(rock.bounds.size.y-4f)<.02f,
-                "outdoor Blender rock dimensions match their analytical collision");
+            Check(debris.Count>=8,"outdoor canyon places destructible cover around the combat area");
+            if(debris.Count>0)
+            {
+                Debris cover=debris[0];
+                Check(cover.visual!=null&&cover.visual.GetComponentInChildren<Renderer>()!=null,
+                    "outdoor cover has visible natural-rock art");
+                Check(Occupied(cover.origin,player.Radius)&&
+                    ObstacleOnSegment(cover.origin+Vector3.left*12,cover.origin+Vector3.right*12,.1f,out _),
+                    "outdoor cover blocks fighter movement and projectile paths");
+                Bounds expected=DebrisBounds(cover.origin,cover.size),actual=obstacles[0];
+                Check((actual.center-expected.center).sqrMagnitude<.001f&&
+                    (actual.size-expected.size).sqrMagnitude<.001f,
+                    "outdoor natural-rock art registers matching analytical bounds");
+            }
         }
         else
         {

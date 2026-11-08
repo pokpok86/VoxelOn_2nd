@@ -17,9 +17,11 @@ public sealed partial class VoxArena : MonoBehaviour
     public float boostRecovery = 40, recoveryDelay = .6f;
     [Header("Jump and vertical boost")]
     public float jumpSpeed = 10.6f, jumpGravity = 24f, jumpThrust = 34f, jumpBoostDrain = 24f;
+    [Tooltip("Steady upward speed while powered vertical boost is held, before frame tuning.")]
+    public float boostClimbSpeed=2.2f, boostClimbAcceleration=30f;
     [Tooltip("Landing hit-stun is disabled for current playtests; hard landings still use normal movement physics.")]
     public bool landingStaggerEnabled=false;
-    [Tooltip("Maximum vertical rise from takeoff, including held Space thrust.")]
+    [Tooltip("Maximum vertical rise of an unpowered jump from takeoff.")]
     public float jumpMaxHeight = 6.4f;
     [Tooltip("Extra gravity while descending so landings feel quicker.")]
     public float fallGravityMultiplier = 1.8f;
@@ -45,6 +47,7 @@ public sealed partial class VoxArena : MonoBehaviour
         public ReferenceHandPose[] handPoses;public bool handPoseInitialized;
         public Quaternion[] shoulderWeaponRest;public Vector3[] shoulderWeaponOffsets;
         public string[] weaponArtIds;public Transform[] weaponGripPoints,weaponMuzzlePoints;public bool modernWeaponArt;
+        public string headVisualId="HEAD_STANDARD",coreVisualId="CORE_STANDARD",leftArmVisualId="ARM_STANDARD",rightArmVisualId="ARM_STANDARD",legsVisualId="LEGS_STANDARD",boosterVisualId="BOOSTER_TWIN";
         public Transform[] weaponVisuals;public float aimSettled;
         public Fighter assistTrackedTarget;public ArmGrip[] gripRig;public QuadPose quadPose;
         public float aiWeaponReadyAt,aiCoverRetry;public bool aiCoverRouting;public Vector3 aiCoverWaypoint;
@@ -119,6 +122,31 @@ public sealed partial class VoxArena : MonoBehaviour
         if(f!=null && !fighterRoster.Contains(f)) fighterRoster.Add(f);
     }
     void UnregisterFighter(Fighter f) { fighterRoster.Remove(f); }
+    Fighter AddMatchParticipant(string name,int chassisIndex,int teamId)
+    {
+        int index=Mathf.Clamp(chassisIndex,0,Mathf.Max(0,CraftCatalog.UnlockedCount-1));
+        Fighter fighter=MakeFighter(string.IsNullOrWhiteSpace(name)?"Match participant":name,teamId==0?Cyan:Orange);
+        ApplySelectableCharacter(fighter,index);
+        fighter.teamId=teamId==0?0:1;
+        fighter.root.position=fighter.teamId==0?new Vector3(-15,FighterGroundY,-15):new Vector3(15,FighterGroundY,15);
+        fighter.hp=fighter.spec.health;fighter.boostEnergy=fighter.spec.boostCapacity;fighter.shieldEnergy=fighter.spec.ShieldMax;
+        fighter.weapons=NewWeaponStates(fighter.weaponProfiles);fighter.weaponSlot=1;
+        fighter.magazine=fighter.weaponProfiles[0].capacity;fighter.lastPosition=fighter.root.position;
+        fighter.root.gameObject.SetActive(true);
+        RegisterFighter(fighter);
+        return fighter;
+    }
+    void RemoveMatchParticipant(Fighter fighter)
+    {
+        if(fighter==null||fighter==player||fighter==enemy)return;
+        for(int i=shots.Count-1;i>=0;i--)if(shots[i].owner==fighter)RemoveShot(i);
+        for(int i=pending.Count-1;i>=0;i--)if(pending[i].owner==fighter)pending.RemoveAt(i);
+        for(int i=beams.Count-1;i>=0;i--)
+            if(beams[i].owner==fighter){Destroy(beams[i].visual.gameObject);beams.RemoveAt(i);}
+        UnregisterFighter(fighter);
+        if(fighter.root!=null){fighter.root.gameObject.SetActive(false);Destroy(fighter.root.gameObject);}
+        if(fighter.shadow!=null){fighter.shadow.gameObject.SetActive(false);Destroy(fighter.shadow.gameObject);}
+    }
     Fighter Opponent(Fighter f)
     {
         if(f==null) return null;
@@ -146,6 +174,7 @@ public sealed partial class VoxArena : MonoBehaviour
         bool shellCapture=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-shell")>=0;
         bool effectCapture=Array.IndexOf(Environment.GetCommandLineArgs(),"--fx-capture")>=0;
         bool balanceStudy=Array.IndexOf(Environment.GetCommandLineArgs(),"--balance-study")>=0;
+        bool weaponDuelStudy=Array.IndexOf(Environment.GetCommandLineArgs(),"--weapon-duel-study")>=0;
         bool climateSmoke=Array.IndexOf(Environment.GetCommandLineArgs(),"--climate-smoke")>=0;
         bool prototypeSoak=Array.IndexOf(Environment.GetCommandLineArgs(),"--prototype-soak")>=0;
         bool wispSoak=Array.IndexOf(Environment.GetCommandLineArgs(),"--wisp-soak")>=0;
@@ -157,8 +186,8 @@ public sealed partial class VoxArena : MonoBehaviour
         bool environmentSmoke=Array.IndexOf(Environment.GetCommandLineArgs(),"--environment-smoke")>=0;
         bool captureLineup=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-customization-lineup")>=0;
         captureCustomizationEditor=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-bastion-customization")>=0;
-        captureGameplayPreview=captureCustomizationEditor||captureLineup||motionStudy||projectileGallery||labCapture||radarCapture||cornerSoak||shellCapture||effectCapture||balanceStudy||climateSmoke||prototypeSoak||Array.IndexOf(Environment.GetCommandLineArgs(),"--camera-review")>=0||wispSoak||Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-gameplay-ui")>=0;
-        smoke=captureLineup||motionStudy||projectileGallery||labCapture||radarCapture||cornerSoak||shellCapture||effectCapture||balanceStudy||climateSmoke||prototypeSoak||wispSoak||performance||multiAIPerformance||captureGallery||captureVisualTargets||environmentSmoke||Array.IndexOf(Environment.GetCommandLineArgs(),"--smoke-test")>=0;
+        captureGameplayPreview=captureCustomizationEditor||captureLineup||motionStudy||projectileGallery||labCapture||radarCapture||cornerSoak||shellCapture||effectCapture||balanceStudy||weaponDuelStudy||climateSmoke||prototypeSoak||Array.IndexOf(Environment.GetCommandLineArgs(),"--camera-review")>=0||wispSoak||Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-gameplay-ui")>=0;
+        smoke=captureLineup||motionStudy||projectileGallery||labCapture||radarCapture||cornerSoak||shellCapture||effectCapture||balanceStudy||weaponDuelStudy||climateSmoke||prototypeSoak||wispSoak||performance||multiAIPerformance||captureGallery||captureVisualTargets||environmentSmoke||Array.IndexOf(Environment.GetCommandLineArgs(),"--smoke-test")>=0;
         // Plains prototype is archived at PD request; ordinary play exposes bounded maps only.
         arenaMap=Array.IndexOf(Environment.GetCommandLineArgs(),"--outdoor")>=0?ArenaMapKind.OutdoorCanyon:
             smoke?ArenaMapKind.IndoorFactory:(ArenaMapKind)Mathf.Clamp(PlayerPrefs.GetInt(PreferencePrefix+"Map",0),0,1);
@@ -184,6 +213,7 @@ public sealed partial class VoxArena : MonoBehaviour
         else if(shellCapture)StartCoroutine(CaptureShellComparison());
         else if(effectCapture)StartCoroutine(EffectCapture());
         else if(balanceStudy)StartCoroutine(BalanceStudy());
+        else if(weaponDuelStudy)StartCoroutine(WeaponDuelStudy());
         else if(climateSmoke)StartCoroutine(ClimateSmoke());
         else if(prototypeSoak)StartCoroutine(PrototypeSoak());
         else if(wispSoak) StartCoroutine(WispSoak());
@@ -246,12 +276,12 @@ public sealed partial class VoxArena : MonoBehaviour
     {
         if(f.deadVisual)RestorePDVisuals();
         f.spec=preset.RuntimeCopy();f.weaponProfiles=NewWeaponProfiles(); f.frameIndex=Mathf.Clamp(visualFrameIndex,0,CraftCatalog.All.Length-1);
-        f.selectableIndex=selectableIndex; ResetAllocations(f);ApplyBalanceParts(f);f.weaponProfiles=BalanceWeaponProfiles(f);
+        f.selectableIndex=selectableIndex; ResetAllocations(f);ApplyBalanceParts(f);f.weaponProfiles=BalanceWeaponProfiles(f);ApplyBalanceSkill(f);
         // Re-selecting a tank must not inherit the previous chassis heading.
         // Keep chassis yaw independent of the upper-body aiming direction after spawn.
         Vector3 initialChassis=Vector3.ProjectOnPlane(f.facing,Vector3.up);
         f.chassisForward=initialChassis.sqrMagnitude>.001f?initialChassis.normalized:Vector3.forward;
-        BuildRobot(f); f.body.localScale=Vector3.one*f.spec.size;
+        BuildRobot(f); f.body.localScale=Vector3.one*f.spec.size;if(f.guardShield!=null)f.guardShield.gameObject.SetActive(HasEquippedGuard(f));
         bool artistWisp=(f.spec.name=="WISP"&&wispModelSource!=null||f.importedChassis)&&f.headPart!=null;
         foreach(Renderer r in f.body.GetComponentsInChildren<Renderer>())
             if(r.name.StartsWith("Armor") || r.name=="Visor")
@@ -261,6 +291,7 @@ public sealed partial class VoxArena : MonoBehaviour
                     r.transform.IsChildOf(f.headPart)||r.transform.IsChildOf(f.legsPart));
                 if(!importedModule) r.sharedMaterial=r.name=="Visor"?Glow(f.spec.color):Mat(f.spec.color);
             }
+        ApplyBalanceDesignPaint(f);
         // Weapon silhouettes are built separately from arm modules.
         f.saber.gameObject.SetActive(false);
     }
@@ -285,11 +316,12 @@ public sealed partial class VoxArena : MonoBehaviour
         sparks.Clear();
         player.teamId=0;
         enemy.teamId=1;
-        fighterRoster.Clear();
         RegisterFighter(player);
         RegisterFighter(enemy);
         foreach(Fighter f in fighterRoster)
         {
+            f.deadVisual=false;f.respawnTimer=0;
+            f.root.gameObject.SetActive(true);
             f.hp=f.spec.health; f.boostEnergy=f.spec.boostCapacity; f.shieldEnergy=f.spec.ShieldMax;
             f.weaponTimer=f.specialTimer=f.recoveryTime=f.shieldRecoveryTime=f.shieldFlash=f.hitFlash=0;
             f.weapons=NewWeaponStates(f.weaponProfiles);f.aiWeaponReadyAt=0;f.weaponSlot=1; f.magazine=f.weaponProfiles[0].capacity; f.reloadTime=0; f.shotIdleTime=0;
@@ -307,8 +339,24 @@ public sealed partial class VoxArena : MonoBehaviour
             f.dashCostFactor=1f; // No mass-derived mobility modifiers in test baseline.
             f.orbitSign=1;
         }
-        player.root.position=new Vector3(-15,1.1f,-15); enemy.root.position=new Vector3(15,1.1f,15);
-        FaceOpponent(player,enemy); FaceOpponent(enemy,player);
+        Vector3 playerSpawn=new Vector3(-15,1.1f,-15),enemySpawn=new Vector3(15,1.1f,15);
+        player.root.position=playerSpawn;enemy.root.position=enemySpawn;
+        Dictionary<int,int> teamSpawnCounts=new Dictionary<int,int>{{0,1},{1,1}};
+        foreach(Fighter fighter in fighterRoster)
+        {
+            if(fighter==player||fighter==enemy)continue;
+            int ordinal=teamSpawnCounts.TryGetValue(fighter.teamId,out int count)?count:0;
+            Vector3 anchor=fighter.teamId==0?playerSpawn:enemySpawn;
+            float angle=(ordinal-1)*2.3999632f+(fighter.teamId==0?0:Mathf.PI);
+            float radius=8f+Mathf.Max(0,ordinal-1)*3f;
+            fighter.root.position=anchor+new Vector3(Mathf.Cos(angle)*radius,0,Mathf.Sin(angle)*radius);
+            teamSpawnCounts[fighter.teamId]=ordinal+1;
+        }
+        foreach(Fighter f in fighterRoster)
+        {
+            Fighter target=Opponent(f);
+            if(target!=null)FaceOpponent(f,target);
+        }
         // FaceOpponent changes aiming on round reset; initialize the independent
         // chassis heading only here, never on subsequent aim/lock updates.
         foreach(Fighter f in fighterRoster)
@@ -317,9 +365,9 @@ public sealed partial class VoxArena : MonoBehaviour
             f.chassisForward=heading.sqrMagnitude>.001f?heading.normalized:Vector3.forward;ResetCapsuleTreads(f);
         }
         cameraYaw=Mathf.Atan2(player.facing.x,player.facing.z)*Mathf.Rad2Deg; cameraPitch=spectatorMode?42:DefaultThirdPersonPitch; targetLock=false;
-        player.lastPosition=player.root.position; enemy.lastPosition=enemy.root.position;
+        foreach(Fighter f in fighterRoster)f.lastPosition=f.root.position;
         roundTime=0; paused=false; spaceClock=0; cameraShakeTime=cameraShakeStrength=0; UpdateObstacles(0);
-        Animate(player); Animate(enemy); UpdateCamera(10);
+        AnimateRoster();UpdateCamera(10);
     }
     void Update()
     {
@@ -348,12 +396,37 @@ public sealed partial class VoxArena : MonoBehaviour
         float dt=Mathf.Min(Time.deltaTime,.05f);
         roundTime+=dt; hitConfirmTime=Mathf.Max(0,hitConfirmTime-dt); UpdateObstacles(dt); ProcessTimedFrag(dt);
         if(!spectatorMode&&!player.deadVisual&&!playerRespawnPrompt) PlayerInput(dt);
-        if(!enemy.deadVisual&&(!testLabEnabled || aiMoveEnabled || aiAttackEnabled || aiJumpEnabled)) EnemyAI(enemy,player,dt);
-        if(spectatorMode&&!player.deadVisual&&!enemy.deadVisual) EnemyAI(player,enemy,dt);
-        if(targetLock&&!enemy.deadVisual) FaceOpponent(player,enemy,dt);
-        if(!enemy.deadVisual&&!player.deadVisual) FaceOpponent(enemy,player,dt);
-        UpdateCombat(dt); UpdateSalvage(dt); UpdateSparks(dt); if(!player.deadVisual)Animate(player); if(!enemy.deadVisual)Animate(enemy);
+        UpdateRosterAI(dt); FaceRosterTargets(dt);
+        UpdateCombat(dt); UpdateSalvage(dt); UpdateSparks(dt); AnimateRoster();
         if(Finished) FinishPresentation();
+    }
+    void UpdateRosterAI(float dt)
+    {
+        if(testLabEnabled&&!smoke&&!aiMoveEnabled&&!aiAttackEnabled&&!aiJumpEnabled)return;
+        foreach(Fighter actor in fighterRoster)
+        {
+            if(actor==player||actor==null||actor.deadVisual)continue;
+            Fighter target=Opponent(actor);
+            if(target!=null&&!target.deadVisual)EnemyAI(actor,target,dt);
+        }
+        if(spectatorMode&&!player.deadVisual)
+        {
+            Fighter target=Opponent(player);
+            if(target!=null&&!target.deadVisual)EnemyAI(player,target,dt);
+        }
+    }
+    void FaceRosterTargets(float dt)
+    {
+        foreach(Fighter actor in fighterRoster)
+        {
+            if(actor==null||actor.deadVisual||actor==player&&!targetLock)continue;
+            Fighter target=actor==player&&IsHostile(player,enemy)&&!enemy.deadVisual?enemy:Opponent(actor);
+            if(target!=null&&!target.deadVisual)FaceOpponent(actor,target,dt);
+        }
+    }
+    void AnimateRoster()
+    {
+        foreach(Fighter actor in fighterRoster)if(actor!=null&&!actor.deadVisual&&actor.body!=null)Animate(actor);
     }
     void LateUpdate() { if(player!=null && enemy!=null) UpdateCamera(Time.deltaTime); }
     void UpdateCamera(float dt)
@@ -658,13 +731,14 @@ public sealed partial class VoxArena : MonoBehaviour
         // Vertical thrust shares fuel with horizontal boost; larger/heavier frames cost more.
         if(f.jumpHeight<=.02f) f.jumpOriginY=f.root.position.y;
         bool airborne=f.jumpHeight>0 || f.jumpVelocity>0;
-        bool verticalBoost=f.spec.allowVerticalBoost && airborne && f.jumpHeight<maxJumpHeight && f.jumpHeld && !f.boostLocked && f.boostEnergy>0;
+        bool verticalBoost=f.spec.allowVerticalBoost && f.spec.verticalBoostScale>0 && boostClimbSpeed>0 && airborne && f.jumpHeld && !f.boostLocked && f.boostEnergy>0;
         if(verticalBoost)
         {
             float weightFactor=Mathf.Max(.5f,f.spec.jumpWeightFactor); // Explicit per-frame tuning, independent of armor and visual scale.
             float drain=jumpBoostDrain*weightFactor*dt;
             float fraction=drain>0?Mathf.Min(1,f.boostEnergy/drain):1;
-            f.jumpVelocity+=jumpThrust*f.spec.verticalBoostScale/weightFactor*fraction*dt;
+            float climbSpeed=Mathf.Max(0,boostClimbSpeed)*f.spec.verticalBoostScale/weightFactor*fraction;
+            f.jumpVelocity=Mathf.MoveTowards(f.jumpVelocity,climbSpeed,boostClimbAcceleration*dt);
             f.boostEnergy=Mathf.Max(0,f.boostEnergy-drain);
             f.recoveryTime=recoveryDelay;
             if(f.boostEnergy<=0) f.boostLocked=true;
@@ -678,10 +752,13 @@ public sealed partial class VoxArena : MonoBehaviour
             if(!airborne) f.boostEnergy=Mathf.Min(f.spec.boostCapacity,f.boostEnergy+boostRecovery*t);
         }
         f.pulseTime=Mathf.Max(0,f.pulseTime-dt);
-        // Holding Space adds fuel-powered lift, capped at a readable obstacle-clearing height.
-        if(f.jumpHeight>=maxJumpHeight && f.jumpVelocity>0) f.jumpVelocity=0;
-        float gravityScale=f.jumpVelocity<0?fallGravityMultiplier:1f;
-        f.jumpVelocity-=jumpGravity*gravityScale*f.spec.fallGravityFactor*dt;
+        // An unpowered jump keeps its frame-specific arc. Powered boost instead
+        // regulates a slow climb and spends the shared gauge, with no altitude ceiling.
+        if(!verticalBoost)
+        {
+            float gravityScale=f.jumpVelocity<0?fallGravityMultiplier:1f;
+            f.jumpVelocity-=jumpGravity*gravityScale*f.spec.fallGravityFactor*dt;
+        }
         Vector3 desired=motion*speed;
         if(dashing)
         {
@@ -753,9 +830,7 @@ public sealed partial class VoxArena : MonoBehaviour
         }
         float preLandingHeight=f.jumpHeight;
         float preLandingFallSpeed=-f.jumpVelocity;
-        Vector3 before=f.root.position; MoveWithObstacles(f,desired*dt+Vector3.up*f.jumpVelocity*dt);
-        float jumpCeiling=Mathf.Max(f.jumpOriginY+maxJumpHeight,SurfaceHeight(f.root.position)+FighterSupportOffset);
-        if(f.root.position.y>jumpCeiling) { f.root.position=new Vector3(f.root.position.x,jumpCeiling,f.root.position.z); f.jumpVelocity=0; }
+        Vector3 before=f.root.position; MoveWithObstacles(f,desired*dt+Vector3.up*f.jumpVelocity*dt,verticalBoost);
         f.jumpHeight=Mathf.Max(0,f.root.position.y-LandingHeight(f.root.position,f.Radius,f.root.position.y));
         // High-speed landing briefly staggers the legs; unlike weapon knockdown it grants no invulnerability.
         if(landingStaggerEnabled && preLandingHeight>.05f && f.jumpHeight<=.001f && preLandingFallSpeed>15f)
@@ -801,7 +876,7 @@ public sealed partial class VoxArena : MonoBehaviour
         Burst(target.root.position,absorbed>0?Cyan:Orange,6);
         Flash(target.root.position,absorbed>0?Cyan:new Color(1,.65f,.22f),.85f,.12f);
         PlaySound(absorbed>0?SoundKind.Shield:SoundKind.Hit,target.root.position,.65f);
-        if(Finished&&!timedFragMode) { if(enemy.hp<=0) wins++; else losses++; } if(timedFragMode&&target.hp<=0) RegisterTimedFragDeath(attacker,target);
+        if(Finished&&!timedFragMode) { if(MatchWinnerTeam()==player.teamId) wins++; else losses++; } if(timedFragMode&&target.hp<=0) RegisterTimedFragDeath(attacker,target);
     }
     bool InArc(Fighter f,Vector3 direction)=>direction.sqrMagnitude>.01f&&Vector3.Angle(f.facing,direction)<=gunHalfAngle;
     void Burst(Vector3 p,Color color,int count)
