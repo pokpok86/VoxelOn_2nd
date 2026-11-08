@@ -6,6 +6,7 @@ public sealed partial class VoxArena
     const string PreferencePrefix="VoxSky.Pilot.";
     static float ValidTuning(float value)=>float.IsNaN(value)||float.IsInfinity(value)?1:Mathf.Clamp(value,.5f,2);
     static float ValidVolume(float value)=>float.IsNaN(value)||float.IsInfinity(value)?.7f:Mathf.Clamp01(value);
+    static ArenaMapKind ResolveStoredMap(int map)=>map==1?ArenaMapKind.OutdoorCanyon:map==3?ArenaMapKind.CoastalBay:ArenaMapKind.IndoorFactory;
     int ResolveRival()=>rivalSelection<0?UnityEngine.Random.Range(0,CraftCatalog.UnlockedCount):Mathf.Clamp(rivalSelection,0,CraftCatalog.UnlockedCount-1);
     void LoadPreferences(string scope=PreferencePrefix)
     {
@@ -29,17 +30,17 @@ public sealed partial class VoxArena
         PlayerPrefs.SetInt(scope+"Muted",muted?1:0);
         PlayerPrefs.SetFloat(scope+"Volume",ValidVolume(effectsVolume));
         PlayerPrefs.SetInt(scope+"Frame",selectedCraft);
-        PlayerPrefs.SetInt(scope+"Map",(int)arenaMap);
+        PlayerPrefs.SetInt(scope+"Map",arenaMap==ArenaMapKind.CoastalBay?3:(int)arenaMap);
         PlayerPrefs.SetInt(scope+"Rival",rivalSelection);
         PlayerPrefs.SetFloat(scope+"BulletSpeed",ValidTuning(bulletSpeedScale));
         PlayerPrefs.SetFloat(scope+"BulletSize",ValidTuning(bulletSizeScale));
         PlayerPrefs.SetFloat(scope+"Cooldown",ValidTuning(weaponCooldownScale));
         PlayerPrefs.Save();
     }
-    void OnApplicationQuit()=>SavePreferences();
+    void OnApplicationQuit(){FlushAutomaticBalance();SavePreferences();}
     void SwitchArenaMap()
     {
-        arenaMap=(ArenaMapKind)(((int)arenaMap+1)%2);
+        arenaMap=arenaMap==ArenaMapKind.IndoorFactory?ArenaMapKind.OutdoorCanyon:arenaMap==ArenaMapKind.OutdoorCanyon?ArenaMapKind.CoastalBay:ArenaMapKind.IndoorFactory;
         SavePreferences();
         UnityEngine.SceneManagement.SceneManager.LoadScene("Arena");
     }

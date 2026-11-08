@@ -104,7 +104,7 @@ public sealed partial class VoxArena
         aiAttackEnabled=GUI.Toggle(new Rect(350,181,150,28),aiAttackEnabled,"ATTACK");
         aiJumpEnabled=GUI.Toggle(new Rect(500,181,150,28),aiJumpEnabled,"JUMP");
         aiBoostEnabled=GUI.Toggle(new Rect(650,181,150,28),aiBoostEnabled,"BOOST");
-        Text(200,213,750,"Changes are runtime-only. No mass or weight parameters are used by this lab.",small);
+        Text(200,213,750,"FALL MASS / frame class + equipped weapon and loaded-ammo weight.",small);
         if(testCategory==5&&testPickupTools)
         {
             GUI.Label(new Rect(910,154,170,24),"SALVAGE TEST");

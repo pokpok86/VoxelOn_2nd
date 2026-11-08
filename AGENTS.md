@@ -27,3 +27,7 @@
 - Smoke runs produce screenshots in Builds; inspect relevant screenshots after visual changes. Historical baseline: 187 checks passed on 2026-10-27; this is not proof for future changes.
 - Run appropriate checks once; repeat only after changes, failures or unresolved concerns. Keep a known-good runnable build before risky changes.
 - Summarize changes, actual validation and limitations; do not merge or release unvalidated changes automatically.
+
+## PD balance data ownership
+- Data/Balance/PD-Balance.json is PD-authored runtime data. Never replace it with defaults, generated balance results, test fixtures, or another PC copy without an explicit PD request. Tests must use an isolated balanceDirectoryOverride.
+- PD controls weapon numbers and hand/shoulder classification. Preserve their edits across builds and restarts; do not rebalance or reclassify on later loads. The authorized one-time hand-only migration keeps a .before-hand-only.bak and records handMountDefaultsApplied.

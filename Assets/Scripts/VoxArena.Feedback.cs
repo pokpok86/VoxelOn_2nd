@@ -41,6 +41,7 @@ public sealed partial class VoxArena
         DrawOccludedPilot();
         if(targetLock&&player.spec.supportsLockOn&&TryGetTargetScreenRect(out Rect targetRect))
         {
+            if(TryGetTargetScreenPoint(out Vector2 lockPoint))targetRect.center=lockPoint;
             float x=targetRect.center.x,y=targetRect.center.y;
             Color color=hitConfirmTime>0?Color.white:assistEngaged?Cyan:new Color(1,.55f,.28f);
             float corner=Mathf.Clamp(Mathf.Min(targetRect.width,targetRect.height)*.20f,8,18),thick=2;

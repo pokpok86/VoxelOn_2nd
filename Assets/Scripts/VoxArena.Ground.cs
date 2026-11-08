@@ -7,16 +7,23 @@ public sealed partial class VoxArena
         if(arenaMap==ArenaMapKind.OpenPlains){starRoot=SpawnPDPart("PlainsTerrain",null,new Vector3(0,GroundSurfaceY,0),Vector3.one);CachePlainsSurface();return;}
         // Repeating grid follows the camera in whole-cell increments. No hard arena walls.
         starRoot=new GameObject("Ground tile field").transform;
-        Box("Endless ground",starRoot,new Vector3(0,GroundSurfaceY-(arenaMap==ArenaMapKind.OutdoorCanyon?.15f:.125f),0),new Vector3(900,.25f,900),new Color(.16f,.205f,.22f));
         if(arenaMap==ArenaMapKind.OutdoorCanyon)
         {
-            // Outdoor floor is warm rock, not the factory grid/runway.
-            Box("Canyon sandy stone floor",starRoot,
-                new Vector3(0,GroundSurfaceY-.02f,0),
-                new Vector3(280,.01f,280),new Color(.33f,.29f,.24f));
+            // Keep a deep foundation beneath the sampled ground mesh. The mesh
+            // carries the walkable water-basin ramps all the way to their floors.
+            Box("Canyon ground foundation",starRoot,
+                new Vector3(0,GroundSurfaceY-15.1f,0),new Vector3(900,.25f,900),new Color(.16f,.205f,.22f));
+            BuildCanyonGroundMesh(starRoot);
             BuildOutdoorFloorDetails(starRoot);
             return;
         }
+        if(arenaMap==ArenaMapKind.CoastalBay)
+        {
+            Box("Coastal seabed foundation",starRoot,new Vector3(0,GroundSurfaceY-19f,0),new Vector3(900,.25f,900),new Color(.045f,.13f,.16f));
+            BuildCoastalGroundMesh(starRoot);
+            return;
+        }
+        Box("Endless ground",starRoot,new Vector3(0,GroundSurfaceY-.125f,0),new Vector3(900,.25f,900),new Color(.16f,.205f,.22f));
         Color seam=new Color(.20f,.25f,.26f),paint=new Color(.31f,.39f,.39f);
         for(int i=-16;i<=16;i++)
         {

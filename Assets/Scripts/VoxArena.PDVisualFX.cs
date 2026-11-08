@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 public sealed partial class VoxArena
@@ -61,22 +61,22 @@ public sealed partial class VoxArena
     }
     void SetupBoostVisual(Fighter f)
     {
-        f.boostVisual=SpawnPDPart("BoostCone_v002",f.body,Vector3.zero,Vector3.one);
-        SetPartMaterial(f.boostVisual,fxSolid);f.boostLight=f.boostVisual.gameObject.AddComponent<Light>();f.boostLight.type=LightType.Point;f.boostLight.range=2.5f;f.boostLight.color=Cyan;f.boostLight.shadows=LightShadows.None;f.boostVisual.gameObject.SetActive(false);
+        f.boostVisual=new GameObject("Reusable booster exhaust").transform;f.boostVisual.SetParent(f.body,false);
+        f.boostEmitter=f.boostVisual.gameObject.AddComponent<BoosterEmitter>();
         foreach(Renderer r in f.thruster.GetComponentsInChildren<Renderer>())r.enabled=false;
         foreach(Renderer r in f.jumpFlame.GetComponentsInChildren<Renderer>())r.enabled=false;
     }
     void AnimateBoostVisual(Fighter f,float dt)
     {
-        if(f.boostVisual==null)return;
-        bool visible=!inMenu&&!Finished&&(f.jumpHeight>.08f&&f.jumpHeld&&f.boostEnergy>0||f.spec.name!="WISP"&&f.boosting);
-        f.exhaustBlend=Mathf.MoveTowards(f.exhaustBlend,visible?1:0,Mathf.Max(0,dt)*9);
-        f.boostVisual.gameObject.SetActive(f.exhaustBlend>.01f);if(f.boostLight!=null)f.boostLight.intensity=f.exhaustBlend*.7f;
-        Vector3 back=-f.facing;f.boostVisual.position=f.root.position+Vector3.down*.55f+back*.28f;
-        Vector3 direction=f.jumpHeight>.08f&&f.jumpHeld?Vector3.down:f.velocity.sqrMagnitude>.5f?-f.velocity.normalized:back;
-        f.boostVisual.rotation=Quaternion.LookRotation(direction,Mathf.Abs(Vector3.Dot(direction,Vector3.up))>.95f?Vector3.forward:Vector3.up);
-        float output=f.boosting?1.4f:f.jumpVelocity>0?1.1f:.7f;
-        f.boostVisual.localScale=new Vector3(.95f,.95f,output*1.35f)*f.exhaustBlend;ColorPDPart(f.boostVisual,new Color(.13f,.78f,1),true);
+        if(f.boostEmitter==null)return;
+        f.boostVisual.gameObject.SetActive(true);
+        bool vertical=f.spec.allowVerticalBoost&&f.jumpHeld&&f.boostEnergy>0&&!f.boostLocked;
+        bool ground=(f.boosting||f.dashRemaining>0)&&f.jumpHeight<=.08f;
+        bool visible=!inMenu&&!Finished&&!f.deadVisual&&(vertical||ground);
+        Vector3 origin=f.backPart!=null?f.backPart.TransformPoint(new Vector3(0,-.35f,-.18f)):f.root.position+Vector3.down*.55f;
+        Vector3 direction=vertical?Vector3.down:f.velocity.sqrMagnitude>.5f?-f.velocity.normalized:-f.facing;
+        if(!visible&&f.boostEmitter.Visible)direction=f.boostVisual.forward;
+        f.boostEmitter.SetWorldPose(origin,direction);f.boostEmitter.SetThrust(visible?1:0);f.exhaustBlend=f.boostEmitter.Envelope;
     }
     void BreakRobotModules(Fighter f)
     {
@@ -94,7 +94,7 @@ public sealed partial class VoxArena
     {
         foreach(FlyingModule m in flyingModules)if(m.part!=null&&m.parent!=null){m.part.SetParent(m.parent,false);m.part.localPosition=m.position;m.part.localRotation=m.rotation;m.part.localScale=m.scale;}
         flyingModules.Clear();foreach(VisualParticle p in visualParticles)ReleasePDPart(p.visual);visualParticles.Clear();
-        foreach(Fighter f in new[]{player,enemy})if(f!=null){f.deadVisual=false;f.partDamage=new float[6];f.exhaustBlend=0;f.damageSmokeClock=0;if(f.boostVisual!=null)f.boostVisual.gameObject.SetActive(false);}
+        foreach(Fighter f in new[]{player,enemy})if(f!=null){f.deadVisual=false;f.partDamage=new float[6];f.exhaustBlend=0;if(f.boostEmitter!=null)f.boostEmitter.ResetEmission();f.damageSmokeClock=0;if(f.boostVisual!=null)f.boostVisual.gameObject.SetActive(false);}
     }
     void UpdatePDVisualEffects(float dt)
     {

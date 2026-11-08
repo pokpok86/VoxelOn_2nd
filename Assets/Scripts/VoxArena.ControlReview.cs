@@ -23,6 +23,14 @@ public sealed partial class VoxArena
             player.root.position=new Vector3(80,FighterGroundY,70);enemy.root.position=player.root.position+new Vector3(20,0,20);cameraYaw=45;cameraPitch=DefaultThirdPersonPitch;targetLock=true;UpdateThirdPersonCamera(.02f);
             bool framed=TryGetTargetScreenRect(out Rect lockRect)&&lockRect.width>20&&lockRect.height>20&&lockRect.center.x>0&&lockRect.center.y>0;
             Check(framed,"lock cursor and character brackets share imported rendered bounds "+id);
+            Vector3 rootPosition=enemy.root.position,aimPoint=LockAimPoint(enemy);
+            enemy.root.position=rootPosition+Vector3.up*2f;Vector3 raisedAimPoint=LockAimPoint(enemy);enemy.root.position=rootPosition;
+            Check(aimPoint.y>rootPosition.y+.35f&&Mathf.Abs(raisedAimPoint.y-aimPoint.y-2f)<.05f,
+                "lock aim uses chest height and follows target movement "+id);
+            Vector3 rootScreen=view.WorldToScreenPoint(rootPosition);
+            bool gotLockPoint=TryGetTargetScreenPoint(out Vector2 lockPoint);
+            Check(gotLockPoint&&lockPoint.y<(Screen.height-rootScreen.y)*720f/Screen.height,
+                "lock marker sits on the torso above the ground root "+id);
             if(framed){yield return null;yield return new WaitForEndOfFrame();Texture2D lockImage=ScreenCapture.CaptureScreenshotAsTexture();File.WriteAllBytes(Path.Combine(dir,"lock-frame-"+player.spec.name+".png"),lockImage.EncodeToPNG());Destroy(lockImage);}
             targetLock=false;
             view.transform.position=player.root.position-Vector3.forward*10+Vector3.up*2;view.transform.LookAt(enemy.root.position+Vector3.up*1.2f);

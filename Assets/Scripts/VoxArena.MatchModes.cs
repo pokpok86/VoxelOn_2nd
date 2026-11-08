@@ -116,7 +116,7 @@ public sealed partial class VoxArena
         fighter.hp=fighter.spec.health;fighter.boostEnergy=fighter.spec.boostCapacity;fighter.shieldEnergy=fighter.spec.ShieldMax;
         fighter.weapons=NewWeaponStates(fighter.weaponProfiles);fighter.weaponSlot=1;fighter.magazine=fighter.weaponProfiles[0].capacity;fighter.reloadTime=0;
         fighter.velocity=Vector3.zero;fighter.jumpHeight=fighter.jumpVelocity=0;fighter.knockdownTime=0;fighter.invulnerableTime=1.25f;
-        Vector3 spawn=fighter.teamId==0?new Vector3(-15,1.1f,-15):new Vector3(15,1.1f,15);
+        Vector3 spawn=ArenaSpawnPosition(fighter.teamId);
         Vector2 offset=UnityEngine.Random.insideUnitCircle*2.2f;fighter.root.position=spawn+new Vector3(offset.x,0,offset.y);
         fighter.lastPosition=fighter.root.position;fighter.respawnTimer=0;fighter.aiCoverRouting=false;fighter.aiCoverRetry=0;
         Fighter target=Opponent(fighter);if(target!=null&&!target.deadVisual)FaceOpponent(fighter,target);

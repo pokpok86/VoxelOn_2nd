@@ -25,13 +25,16 @@ public sealed partial class VoxArena
     void BuildVoxelCover(Transform root,Vector3 size,int kind)
     {
         float bottom=SurfaceHeight(root.position)-root.position.y,top=size.y*.5f;
-        if(arenaMap!=ArenaMapKind.IndoorFactory){SpawnNaturalRock(root,new Vector3(0,bottom,0),new Vector3(size.x,top-bottom,size.z));return;}
-        string asset=arenaMap==ArenaMapKind.OutdoorCanyon?"CanyonRock":kind%3==0?"FoundryCargo":kind%3==1?"FoundryGenerator":"FoundryBarricade";
+        if(arenaMap==ArenaMapKind.OutdoorCanyon||arenaMap==ArenaMapKind.OpenPlains){SpawnNaturalRock(root,new Vector3(0,bottom,0),new Vector3(size.x,top-bottom,size.z));return;}
+        string asset=kind%3==0?"FoundryCargo":kind%3==1?"FoundryGenerator":"FoundryBarricade";
         PlaceEnvironment(asset,root,new Vector3(0,bottom,0),new Vector3(size.x,top-bottom,size.z));
     }
     void BuildOutdoorFloorDetails(Transform root)
     {
-        PlaceEnvironment("OutdoorGround",root,new Vector3(0,GroundSurfaceY,0),Vector3.one);
+        // Canyon now has a sampled, deeply cut top surface; keep the authored
+        // ground mesh beneath its foundation so it cannot flatten the basins.
+        float y=arenaMap==ArenaMapKind.OutdoorCanyon?GroundSurfaceY-18f:GroundSurfaceY;
+        PlaceEnvironment("OutdoorGround",root,new Vector3(0,y,0),Vector3.one);
     }
     void BuildOutdoorVista()
     {

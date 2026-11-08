@@ -6,6 +6,9 @@ public sealed partial class VoxArena
 {
     Bounds wispHeadBounds;
     bool wispHeadBoundsReady;
+    Fighter portraitModel;
+    Camera portraitCamera;
+    Transform portraitHangar;
     void CacheWispHeadBounds(Fighter fighter)
     {
         if(wispHeadBoundsReady)return;
@@ -574,6 +577,73 @@ public sealed partial class VoxArena
             Plate("Precision servo rail",model,new Vector3(side*.205f,.015f,.09f),new Vector3(.055f,.28f,.37f),edge,side*-8f);
             Shape(PrimitiveType.Sphere,"Precision servo indicator",model,new Vector3(side*.20f,.04f,.29f),new Vector3(.08f,.06f,.08f),highlight,true);
         }
+        else if(visual=="ARM_ASSAULT")
+        {
+            BeveledPlate("Assault knuckle gauntlet",model,new Vector3(0,-.03f,.07f),new Vector3(.55f,.36f,.48f),armor,side*4,.12f,.90f);
+            for(int finger=-1;finger<=1;finger++)
+            {
+                float x=finger*.15f;
+                BeveledPlate("Assault knuckle ridge "+(finger+2),model,new Vector3(x,-.20f,.26f),new Vector3(.12f,.12f,.22f),edge,side*finger*4,.05f,.80f);
+            }
+            Plate("Assault wrist hazard band",model,new Vector3(0,-.02f,-.20f),new Vector3(.42f,.055f,.07f),highlight);
+        }
+        else if(visual=="ARM_BULWARK")
+        {
+            BeveledPlate("Bulwark forearm slab",model,new Vector3(0,0,.02f),new Vector3(.58f,.43f,.57f),armor,side*3,.14f,.92f);
+            Plate("Bulwark center inset",model,new Vector3(0,.015f,.315f),new Vector3(.29f,.24f,.055f),dark);
+            Plate("Bulwark center stripe",model,new Vector3(0,.02f,.35f),new Vector3(.12f,.19f,.035f),edge);
+            for(int row=0;row<2;row++)Plate("Bulwark vent "+row,model,new Vector3(side*.19f,.08f-row*.11f,.35f),new Vector3(.09f,.035f,.025f),highlight);
+            Plate("Bulwark elbow cuff",model,new Vector3(0,.015f,-.29f),new Vector3(.45f,.29f,.11f),dark);
+        }
+        else if(visual=="ARM_SCOUT")
+        {
+            BeveledPlate("Scout slim forearm shell",model,new Vector3(0,0,.02f),new Vector3(.34f,.24f,.58f),dark,side*-5,.08f,.86f);
+            Plate("Scout luminous servo rail",model,new Vector3(side*.18f,.015f,.06f),new Vector3(.045f,.18f,.42f),highlight,side*-5);
+            Plate("Scout dorsal sensor fin",model,new Vector3(0,.17f,-.02f),new Vector3(.11f,.22f,.27f),armor,side*8f);
+            Shape(PrimitiveType.Sphere,"Scout wrist optic",model,new Vector3(0,.015f,.34f),new Vector3(.13f,.10f,.08f),edge,true);
+        }
+        else if(visual=="ARM_CLAW")
+        {
+            BeveledPlate("Claw forearm housing",model,new Vector3(0,0,-.02f),new Vector3(.43f,.31f,.43f),armor,side*4,.10f,.86f);
+            Plate("Claw wrist socket",model,new Vector3(0,0,.23f),new Vector3(.32f,.26f,.14f),dark);
+            for(int finger=-1;finger<=1;finger++)
+            {
+                float x=finger*.12f;
+                BeveledPlate("Claw talon "+(finger+2),model,new Vector3(x,-.015f,.43f),new Vector3(.065f,.085f,.32f),edge,side*finger*7,.03f,.78f);
+                Plate("Claw talon tip "+(finger+2),model,new Vector3(x,-.035f,.61f),new Vector3(.04f,.045f,.11f),highlight,side*finger*8f);
+            }
+        }
+        else if(visual=="ARM_BRUISER")
+        {
+            BeveledPlate("Bruiser impact gauntlet",model,new Vector3(0,-.035f,.10f),new Vector3(.68f,.48f,.54f),armor,side*3,.16f,.94f);
+            for(int knuckle=-1;knuckle<=1;knuckle++)
+            {
+                float x=knuckle*.19f;
+                BeveledPlate("Bruiser knuckle block "+(knuckle+2),model,new Vector3(x,-.205f,.36f),new Vector3(.15f,.13f,.17f),edge,side*knuckle*3,.045f,.86f);
+            }
+            BeveledPlate("Bruiser thumb guard",model,new Vector3(side*.33f,-.11f,.20f),new Vector3(.19f,.27f,.32f),dark,side*20,.07f,.84f);
+            Plate("Bruiser shock band",model,new Vector3(0,.08f,-.19f),new Vector3(.48f,.065f,.12f),highlight);
+        }
+        else if(visual=="ARM_VANGUARD")
+        {
+            BeveledPlate("Vanguard forearm outer shell",model,new Vector3(0,.015f,.015f),new Vector3(.52f,.39f,.61f),armor,side*-6,.14f,.78f);
+            BeveledPlate("Vanguard swept side guard",model,new Vector3(side*.24f,.025f,.075f),new Vector3(.16f,.31f,.48f),edge,side*10,.08f,.72f);
+            Plate("Vanguard center chevron",model,new Vector3(0,.035f,.34f),new Vector3(.17f,.16f,.04f),dark,side*-8);
+            Plate("Vanguard signal slit",model,new Vector3(0,.035f,.37f),new Vector3(.09f,.045f,.025f),highlight,side*-8);
+            Plate("Vanguard wrist collar",model,new Vector3(0,0,-.30f),new Vector3(.42f,.30f,.12f),dark);
+        }
+        else if(visual=="ARM_TACTICAL")
+        {
+            BeveledPlate("Tactical compact forearm shell",model,new Vector3(0,0,.015f),new Vector3(.38f,.29f,.50f),dark,side*-4,.09f,.84f);
+            Plate("Tactical top utility rail",model,new Vector3(0,.18f,.045f),new Vector3(.19f,.10f,.49f),armor,side*-3);
+            for(int rail=-1;rail<=1;rail+=2)
+            {
+                Plate("Tactical side stabilizer",model,new Vector3(side*rail*.20f,.01f,.02f),new Vector3(.065f,.20f,.53f),edge,side*rail*4);
+                Plate("Tactical stabilizer fastener",model,new Vector3(side*rail*.20f,.015f,.27f),new Vector3(.085f,.06f,.045f),highlight);
+            }
+            Shape(PrimitiveType.Sphere,"Tactical wrist optic",model,new Vector3(0,.025f,.32f),new Vector3(.13f,.11f,.08f),highlight,true);
+            Plate("Tactical elbow data port",model,new Vector3(0,.045f,-.28f),new Vector3(.23f,.17f,.09f),armor);
+        }
     }
     void BuildSelectableLegVisualVariant(Fighter f,Color armor,Color dark,Color edge,Color highlight)
     {
@@ -625,11 +695,44 @@ public sealed partial class VoxArena
                 BeveledPlate("Assault shin guard",knee,new Vector3(0,-.27f,.18f),new Vector3(.48f,.48f,.18f),armor,side*-3,.09f,.82f);
                 Plate("Assault shin ridge",knee,new Vector3(side*.22f,-.27f,.29f),new Vector3(.045f,.37f,.035f),edge);
             }
-            else
+            else if(visual=="LEGS_SCOUT")
             {
                 Plate("Scout shin servo rail",knee,new Vector3(side*.22f,-.28f,-.01f),new Vector3(.06f,.43f,.12f),edge);
                 Transform ankle=FindOptionalJoint(leg,i==0?"Left_ankle":"Right_ankle")??FindOptionalJoint(leg,i==0?"Left ankle pivot":"Right ankle pivot")??leg;
                 Shape(PrimitiveType.Sphere,"Scout ankle locator",ankle,new Vector3(0,.08f,.20f),new Vector3(.12f,.07f,.07f),highlight,true);
+            }
+            if(f.spec.mobility!=MobilityKind.StandardBiped&&f.spec.mobility!=MobilityKind.Runner)continue;
+            Transform ankleJoint=FindOptionalJoint(leg,i==0?"Left_ankle":"Right_ankle")??FindOptionalJoint(leg,i==0?"Left ankle pivot":"Right ankle pivot")??leg;
+            if(visual=="LEGS_RANGER")
+            {
+                BeveledPlate("Ranger thigh flank armor",leg,new Vector3(side*.19f,.03f,.015f),new Vector3(.25f,.48f,.27f),dark,side*5,.12f,.82f);
+                BeveledPlate("Ranger layered shin guard",knee,new Vector3(0,-.27f,.19f),new Vector3(.37f,.46f,.15f),armor,side*-2,.10f,.86f);
+                Plate("Ranger cyan servo inlay",knee,new Vector3(side*.18f,-.27f,.28f),new Vector3(.035f,.30f,.025f),highlight);
+            }
+            else if(visual=="LEGS_HEAVY")
+            {
+                BeveledPlate("Heavy thigh armor shell",leg,new Vector3(0,.02f,.08f),new Vector3(.54f,.53f,.39f),armor,side*-3,.15f,.88f);
+                Plate("Heavy thigh inset",leg,new Vector3(0,.04f,.285f),new Vector3(.25f,.29f,.035f),dark);
+                BeveledPlate("Heavy shin slab",knee,new Vector3(0,-.27f,.18f),new Vector3(.56f,.53f,.24f),edge,side*2,.13f,.90f);
+                Shape(PrimitiveType.Cylinder,"Heavy ankle shock",ankleJoint,new Vector3(0,.04f,-.06f),new Vector3(.25f,.12f,.25f),dark);
+            }
+            else if(visual=="LEGS_JUMPER")
+            {
+                Plate("Jumper thigh power cell",leg,new Vector3(0,.02f,.18f),new Vector3(.22f,.36f,.09f),dark);
+                Plate("Jumper thigh charge window",leg,new Vector3(0,.03f,.235f),new Vector3(.12f,.22f,.025f),highlight);
+                for(int piston=-1;piston<=1;piston+=2)
+                {
+                    Shape(PrimitiveType.Cylinder,"Jumper external piston",knee,new Vector3(side*piston*.20f,-.28f,.015f),new Vector3(.075f,.39f,.075f),edge);
+                    for(int collar=0;collar<3;collar++)Plate("Jumper piston collar",knee,new Vector3(side*piston*.20f,-.16f-collar*.12f,.06f),new Vector3(.105f,.035f,.11f),highlight);
+                }
+                BeveledPlate("Jumper heel thruster",ankleJoint,new Vector3(0,-.04f,-.16f),new Vector3(.28f,.20f,.22f),dark,0,.07f,.9f);
+            }
+            else if(visual=="LEGS_REVERSE")
+            {
+                BeveledPlate("Reverse joint high calf",leg,new Vector3(0,-.05f,-.12f),new Vector3(.34f,.42f,.29f),dark,side*5,.10f,.84f);
+                BeveledPlate("Reverse angled shin",knee,new Vector3(0,-.25f,.06f),new Vector3(.34f,.53f,.18f),armor,side*-12,.11f,.82f);
+                Plate("Reverse rear tendon",knee,new Vector3(side*.18f,-.23f,-.12f),new Vector3(.08f,.42f,.12f),edge,side*-12);
+                BeveledPlate("Reverse raised heel",ankleJoint,new Vector3(0,.02f,-.16f),new Vector3(.34f,.16f,.34f),edge,0,.06f,.86f);
             }
         }
     }
@@ -1178,26 +1281,99 @@ public sealed partial class VoxArena
         AddFrameIdentity(f,armor,hull,dark,edge);
         ApplyImportedWisp(f);BuildSelectableHeadVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableCoreVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableArmVisualVariant(f,true,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableArmVisualVariant(f,false,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableLegVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));BuildBoosterVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));SetupWeaponVisuals(f);SetupBoostVisual(f);if(f==player)RegisterCameraFadeRenderers(f);
     }
-    RenderTexture[] framePortraits;float portraitYaw;
+    RenderTexture[] framePortraits,customizationPortraits;float portraitYaw;
     void BuildPortraits()
     {
-        if(framePortraits!=null)foreach(RenderTexture old in framePortraits)if(old!=null){old.Release();Destroy(old);}
-        framePortraits=new RenderTexture[CraftCatalog.Selectable.Length];
-        Fighter model=MakeFighter("Portrait studio robot",Cyan); model.root.position=new Vector3(0,60,0);
-        Camera camera=new GameObject("Portrait studio camera").AddComponent<Camera>();
-        camera.enabled=false; camera.orthographic=true; camera.orthographicSize=3.65f; camera.clearFlags=CameraClearFlags.SolidColor;
-        camera.backgroundColor=new Color(.065f,.095f,.14f,1); camera.cullingMask=1<<8;
-        camera.transform.position=model.root.position+new Vector3(2.5f,4.1f,9f); camera.transform.LookAt(model.root.position+Vector3.up*.60f);
+        if(framePortraits==null||framePortraits.Length!=CraftCatalog.Selectable.Length||customizationPortraits==null||customizationPortraits.Length!=CraftCatalog.Selectable.Length)
+        {
+            if(framePortraits!=null)foreach(RenderTexture old in framePortraits)if(old!=null){old.Release();Destroy(old);}
+            if(customizationPortraits!=null)foreach(RenderTexture old in customizationPortraits)if(old!=null){old.Release();Destroy(old);}
+            framePortraits=new RenderTexture[CraftCatalog.Selectable.Length];
+            customizationPortraits=new RenderTexture[CraftCatalog.Selectable.Length];
+            for(int i=0;i<framePortraits.Length;i++){framePortraits[i]=new RenderTexture(384,512,16);customizationPortraits[i]=new RenderTexture(384,512,16);}
+        }
+        if(portraitModel==null)
+        {
+            portraitModel=MakeFighter("Portrait studio robot",Cyan);portraitModel.root.position=new Vector3(0,60,0);
+            portraitCamera=new GameObject("Portrait studio camera").AddComponent<Camera>();
+            portraitCamera.enabled=false;portraitCamera.orthographic=true;portraitCamera.clearFlags=CameraClearFlags.SolidColor;
+            portraitCamera.backgroundColor=new Color(.025f,.04f,.06f,1);portraitCamera.cullingMask=1<<8;
+            CreatePortraitHangar();
+        }
         for(int i=0;i<CraftCatalog.Selectable.Length;i++)
         {
-            ApplySelectableCharacter(model,i); model.body.localPosition=Vector3.up*.4f;camera.orthographicSize=i==1?4.35f:3.65f;
-            for(int side=0;side<2;side++)if(model.weaponVisuals!=null&&model.weaponVisuals[side]!=null)model.weaponVisuals[side].gameObject.SetActive(true);
-            camera.transform.position=model.root.position+Quaternion.Euler(0,portraitYaw,0)*new Vector3(2.5f,4.1f,9f);camera.transform.LookAt(model.root.position+Vector3.up*.60f);
-            model.fist.gameObject.SetActive(false);
-            foreach(Transform t in model.root.GetComponentsInChildren<Transform>(true)) t.gameObject.layer=8;
-            framePortraits[i]=new RenderTexture(384,512,16); camera.targetTexture=framePortraits[i]; camera.Render();
+            ApplySelectableCharacter(portraitModel,i);PreparePortraitModel();RenderPortraitFrame(i);RenderPortraitFrame(i,true);
         }
-        camera.targetTexture=null; Destroy(camera.gameObject); Destroy(model.root.gameObject); Destroy(model.thruster.gameObject); Destroy(model.shadow.gameObject);
+        int selected=Mathf.Clamp(balanceFrameIndex,0,CraftCatalog.Selectable.Length-1);
+        ApplySelectableCharacter(portraitModel,selected);PreparePortraitModel();RenderPortraitFrame(selected);RenderPortraitFrame(selected,true);
+    }
+    void PreparePortraitModel()
+    {
+        portraitModel.root.position=new Vector3(0,60,0);portraitModel.body.localPosition=Vector3.up*.4f;
+        for(int side=0;side<2;side++)if(portraitModel.weaponVisuals!=null&&portraitModel.weaponVisuals[side]!=null)portraitModel.weaponVisuals[side].gameObject.SetActive(true);
+        portraitModel.fist.gameObject.SetActive(false);portraitModel.guardBlend=0;PlaceGuardVisuals(portraitModel);
+        // Preview chassis were placed at the hangar origin, which left their
+        // feet below the raised floor. Lift the complete model until its
+        // lowest visible chassis renderer clears the floor surface.
+        float floorTop=portraitHangar!=null?portraitHangar.position.y-.035f:59.965f;
+        bool found=false;float lowest=float.PositiveInfinity;
+        foreach(Renderer renderer in portraitModel.body.GetComponentsInChildren<Renderer>(true))
+        {
+            if(renderer==null||!renderer.enabled||!renderer.gameObject.activeInHierarchy)continue;
+            bool weapon=false;
+            if(portraitModel.weaponVisuals!=null)foreach(Transform visual in portraitModel.weaponVisuals)if(visual!=null&&(renderer.transform==visual||renderer.transform.IsChildOf(visual))){weapon=true;break;}
+            if(weapon)continue;
+            found=true;lowest=Mathf.Min(lowest,renderer.bounds.min.y);
+        }
+        if(found&&lowest<floorTop+.06f)portraitModel.root.position+=Vector3.up*(floorTop+.06f-lowest);
+        foreach(Transform t in portraitModel.root.GetComponentsInChildren<Transform>(true))t.gameObject.layer=8;
+    }
+    void RenderPortraitFrame(int index,bool customization=false)
+    {
+        RenderTexture[] destination=customization?customizationPortraits:framePortraits;
+        if(portraitModel==null||portraitCamera==null||destination==null||index<0||index>=destination.Length)return;
+        // Keep the hangar wall behind the robot as the preview orbits. The
+        // backdrop shares the preview yaw so it cannot slide between camera
+        // and chassis during a full turn.
+        if(portraitHangar!=null)portraitHangar.rotation=Quaternion.Euler(0,portraitYaw,0);
+        Bounds bounds=new Bounds(portraitModel.root.position+Vector3.up*.6f,Vector3.zero);bool found=false;
+        foreach(Renderer renderer in portraitModel.body.GetComponentsInChildren<Renderer>(true))
+        {
+            if(renderer==null||!renderer.enabled||!renderer.gameObject.activeInHierarchy)continue;
+            bool weapon=false;
+            if(portraitModel.weaponVisuals!=null)foreach(Transform visual in portraitModel.weaponVisuals)if(visual!=null&&(renderer.transform==visual||renderer.transform.IsChildOf(visual))){weapon=true;break;}
+            if(weapon)continue;
+            if(!found){bounds=renderer.bounds;found=true;}else bounds.Encapsulate(renderer.bounds);
+        }
+        Vector3 target=found?bounds.center:portraitModel.root.position+Vector3.up*.6f;
+        Vector3 cameraPosition=portraitModel.root.position+Quaternion.Euler(0,portraitYaw,0)*new Vector3(2.5f,4.1f,9f);
+        portraitCamera.transform.position=cameraPosition;portraitCamera.transform.rotation=Quaternion.LookRotation(target-cameraPosition,Vector3.up);
+        if(found)
+        {
+            Vector3 extents=bounds.extents,screenUp=portraitCamera.transform.up;
+            float verticalExtent=Mathf.Abs(Vector3.Dot(Vector3.right,screenUp))*extents.x+Mathf.Abs(Vector3.Dot(Vector3.up,screenUp))*extents.y+Mathf.Abs(Vector3.Dot(Vector3.forward,screenUp))*extents.z;
+            portraitCamera.orthographicSize=Mathf.Max(2.6f,verticalExtent*(customization?1.12f:1.30f)+.08f);
+        }
+        portraitCamera.targetTexture=destination[index];portraitCamera.Render();portraitCamera.targetTexture=null;
+    }
+    void CreatePortraitHangar()
+    {
+        portraitHangar=new GameObject("Hangar portrait backdrop").transform;portraitHangar.position=new Vector3(0,60,0);
+        void Box(string name,Vector3 local,Vector3 size,Color color)
+        {
+            GameObject item=GameObject.CreatePrimitive(PrimitiveType.Cube);item.name=name;item.layer=8;item.transform.SetParent(portraitHangar,false);item.transform.localPosition=local;item.transform.localScale=size;
+            Collider collider=item.GetComponent<Collider>();if(collider!=null)Destroy(collider);
+            Renderer renderer=item.GetComponent<Renderer>();if(renderer!=null)renderer.sharedMaterial=Mat(color);
+        }
+        Box("Hangar floor",new Vector3(0,-.16f,0),new Vector3(28,.25f,28),new Color(.10f,.14f,.18f));
+        Box("Hangar rear wall",new Vector3(0,4,-8),new Vector3(28,10,.25f),new Color(.055f,.085f,.12f));
+        for(int side=-1;side<=1;side+=2)
+        {
+            Box("Hangar support",new Vector3(side*7,3,-3),new Vector3(.34f,7,.38f),new Color(.19f,.26f,.30f));
+            Box("Hangar light",new Vector3(side*5,7,-2),new Vector3(1.8f,.08f,.45f),new Color(.3f,.73f,.78f));
+        }
+        Box("Hangar upper truss",new Vector3(0,7.4f,-3),new Vector3(15,.22f,.30f),new Color(.16f,.22f,.26f));
+        for(int i=-2;i<=2;i++)Box("Floor guide",new Vector3(i*2.1f,.002f,2),new Vector3(.035f,.012f,12),new Color(.22f,.33f,.38f));
     }
     System.Collections.IEnumerator CaptureCustomizationLineup()
     {

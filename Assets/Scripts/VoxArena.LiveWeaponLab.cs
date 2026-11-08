@@ -29,7 +29,7 @@ public sealed partial class VoxArena
             check(actual!=null&&AuthoredProjectileFits(actual),"authored projectile keeps imported forward axis and transverse physical envelope slot "+i);
             check(enemy.weaponProfiles[i].damage==rivalDamage&&Loadout[i].damage==rivalDamage,"runtime weapon edit leaves rival and saved trial profile unchanged slot "+i);
         }
-        player.weaponProfiles=NewWeaponProfiles();check(Mathf.Abs(player.weaponProfiles[0].damage-8.05f)<.001f&&player.weaponProfiles[1].damage!=12,"runtime reset restores four default profiles");
+        player.weaponProfiles=NewWeaponProfiles();check(Mathf.Abs(player.weaponProfiles[0].damage-16.1f)<.001f&&player.weaponProfiles[1].damage!=12,"runtime reset restores four default profiles");
         player.root.position=new Vector3(120,FighterGroundY,-120);player.facing=Vector3.forward;player.velocity=Vector3.zero;player.boostHeld=false;player.jumpHeight=player.jumpVelocity=0;player.jumpHeld=false;player.spec.leftSpeedFactor=1;Vector3 start=player.root.position;Move(player,Vector3.left,.05f);float original=Vector3.Distance(start,player.root.position);
         player.root.position=start;player.velocity=Vector3.zero;player.spec.leftSpeedFactor=.5f;Move(player,Vector3.left,.05f);float adjusted=Vector3.Distance(start,player.root.position);
         check(original>.1f&&Mathf.Abs(adjusted-original*.5f)<.01f,"live left movement factor changes actual travel without altering right factor");

@@ -1,0 +1,6 @@
+weapon,matches,wins,draws,losses,winPoints,meanRemainingHP,meanFightSeconds
+Military_AR,40,39,0,1,39.00,133.30,44.83
+Military_LMG,40,30,0,10,30.00,148.79,44.87
+Military_GL,40,21,0,19,21.00,104.93,44.94
+Military_RL,40,10,0,30,10.00,117.83,44.98
+Military_SR,40,0,0,40,0.00,111.33,45.05

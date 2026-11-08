@@ -18,14 +18,14 @@ public sealed partial class VoxArena : MonoBehaviour
     [Header("Jump and vertical boost")]
     public float jumpSpeed = 10.6f, jumpGravity = 24f, jumpThrust = 34f, jumpBoostDrain = 24f;
     [Tooltip("Steady upward speed while powered vertical boost is held, before frame tuning.")]
-    public float boostClimbSpeed=2.2f, boostClimbAcceleration=30f;
+    public float boostClimbSpeed=8f, boostClimbAcceleration=14f;
     [Tooltip("Landing hit-stun is disabled for current playtests; hard landings still use normal movement physics.")]
     public bool landingStaggerEnabled=false;
     [Tooltip("Maximum vertical rise of an unpowered jump from takeoff.")]
     public float jumpMaxHeight = 6.4f;
     [Tooltip("Extra gravity while descending so landings feel quicker.")]
-    public float fallGravityMultiplier = 1.8f;
-    public float gunHalfAngle = 65, shieldRecoveryDelay = 3, shieldFullRecoveryTime = 6;
+    public float fallGravityMultiplier = 2.7f;
+    public float gunHalfAngle = 65, shieldRecoveryDelay = 3, shieldFullRecoveryTime = 30;
     [Header("Weapon tuning (all frames)")]
     [Range(.5f,2)] public float bulletSpeedScale=1;
     [Range(.5f,2)] public float bulletSizeScale=1;
@@ -43,10 +43,10 @@ public sealed partial class VoxArena : MonoBehaviour
         // Independent arm sockets; pelvis belongs to the leg module.
         public Transform pelvisPart;
         public Transform guardShield,guardElbow;
-        public Light boostLight;public Transform boostVisual;public float exhaustBlend,damageSmokeClock;public float[] partDamage;public int lastDamagedPart;public bool deadVisual;
+        public BoosterEmitter boostEmitter;public float shieldVisualScale=.8f;public Light boostLight;public Transform boostVisual;public float exhaustBlend,damageSmokeClock;public float[] partDamage;public int lastDamagedPart;public bool deadVisual;
         public ReferenceHandPose[] handPoses;public bool handPoseInitialized;
-        public Quaternion[] shoulderWeaponRest;public Vector3[] shoulderWeaponOffsets;
-        public string[] weaponArtIds;public Transform[] weaponGripPoints,weaponMuzzlePoints;public bool modernWeaponArt;
+        public Transform[] shoulderConnectors;public Quaternion[] shoulderWeaponRest;public Vector3[] shoulderWeaponOffsets;
+        public string[] weaponArtIds;public Transform[] weaponGripPoints,weaponMuzzlePoints,shieldBeamVisuals;public bool modernWeaponArt;
         public string headVisualId="HEAD_STANDARD",coreVisualId="CORE_STANDARD",leftArmVisualId="ARM_STANDARD",rightArmVisualId="ARM_STANDARD",legsVisualId="LEGS_STANDARD",boosterVisualId="BOOSTER_TWIN";
         public Transform[] weaponVisuals;public float aimSettled;
         public Fighter assistTrackedTarget;public ArmGrip[] gripRig;public QuadPose quadPose;
@@ -57,7 +57,7 @@ public sealed partial class VoxArena : MonoBehaviour
         public bool guarding;
         public float guardBlend;
         // Stable team identity; multiple fighters can share a team in future modes.
-        public int teamId,matchKills,matchDeaths; public float respawnTimer;
+        public int teamId,matchKills,matchDeaths; public float respawnTimer,duelDamageDealt;
         public int frameIndex,selectableIndex=-1; public float hitFlash;
         public Transform[] quadrupedLegs,quadrupedKnees,quadrupedAnkles;
         public Transform[][] treadLinks;
@@ -128,7 +128,7 @@ public sealed partial class VoxArena : MonoBehaviour
         Fighter fighter=MakeFighter(string.IsNullOrWhiteSpace(name)?"Match participant":name,teamId==0?Cyan:Orange);
         ApplySelectableCharacter(fighter,index);
         fighter.teamId=teamId==0?0:1;
-        fighter.root.position=fighter.teamId==0?new Vector3(-15,FighterGroundY,-15):new Vector3(15,FighterGroundY,15);
+        fighter.root.position=ArenaSpawnPosition(fighter.teamId);
         fighter.hp=fighter.spec.health;fighter.boostEnergy=fighter.spec.boostCapacity;fighter.shieldEnergy=fighter.spec.ShieldMax;
         fighter.weapons=NewWeaponStates(fighter.weaponProfiles);fighter.weaponSlot=1;
         fighter.magazine=fighter.weaponProfiles[0].capacity;fighter.lastPosition=fighter.root.position;
@@ -173,6 +173,7 @@ public sealed partial class VoxArena : MonoBehaviour
         bool cornerSoak=Array.IndexOf(Environment.GetCommandLineArgs(),"--corner-soak")>=0;
         bool shellCapture=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-shell")>=0;
         bool effectCapture=Array.IndexOf(Environment.GetCommandLineArgs(),"--fx-capture")>=0;
+        bool automaticBalanceStudy=Array.IndexOf(Environment.GetCommandLineArgs(),"--automatic-balance-study")>=0;
         bool balanceStudy=Array.IndexOf(Environment.GetCommandLineArgs(),"--balance-study")>=0;
         bool weaponDuelStudy=Array.IndexOf(Environment.GetCommandLineArgs(),"--weapon-duel-study")>=0;
         bool climateSmoke=Array.IndexOf(Environment.GetCommandLineArgs(),"--climate-smoke")>=0;
@@ -186,11 +187,12 @@ public sealed partial class VoxArena : MonoBehaviour
         bool environmentSmoke=Array.IndexOf(Environment.GetCommandLineArgs(),"--environment-smoke")>=0;
         bool captureLineup=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-customization-lineup")>=0;
         captureCustomizationEditor=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-bastion-customization")>=0;
-        captureGameplayPreview=captureCustomizationEditor||captureLineup||motionStudy||projectileGallery||labCapture||radarCapture||cornerSoak||shellCapture||effectCapture||balanceStudy||weaponDuelStudy||climateSmoke||prototypeSoak||Array.IndexOf(Environment.GetCommandLineArgs(),"--camera-review")>=0||wispSoak||Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-gameplay-ui")>=0;
-        smoke=captureLineup||motionStudy||projectileGallery||labCapture||radarCapture||cornerSoak||shellCapture||effectCapture||balanceStudy||weaponDuelStudy||climateSmoke||prototypeSoak||wispSoak||performance||multiAIPerformance||captureGallery||captureVisualTargets||environmentSmoke||Array.IndexOf(Environment.GetCommandLineArgs(),"--smoke-test")>=0;
+        captureGameplayPreview=automaticBalanceStudy||captureCustomizationEditor||captureLineup||motionStudy||projectileGallery||labCapture||radarCapture||cornerSoak||shellCapture||effectCapture||balanceStudy||weaponDuelStudy||climateSmoke||prototypeSoak||Array.IndexOf(Environment.GetCommandLineArgs(),"--camera-review")>=0||wispSoak||Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-gameplay-ui")>=0;
+        smoke=automaticBalanceStudy||captureLineup||motionStudy||projectileGallery||labCapture||radarCapture||cornerSoak||shellCapture||effectCapture||balanceStudy||weaponDuelStudy||climateSmoke||prototypeSoak||wispSoak||performance||multiAIPerformance||captureGallery||captureVisualTargets||environmentSmoke||Array.IndexOf(Environment.GetCommandLineArgs(),"--smoke-test")>=0;
         // Plains prototype is archived at PD request; ordinary play exposes bounded maps only.
-        arenaMap=Array.IndexOf(Environment.GetCommandLineArgs(),"--outdoor")>=0?ArenaMapKind.OutdoorCanyon:
-            smoke?ArenaMapKind.IndoorFactory:(ArenaMapKind)Mathf.Clamp(PlayerPrefs.GetInt(PreferencePrefix+"Map",0),0,1);
+        arenaMap=Array.IndexOf(Environment.GetCommandLineArgs(),"--coastal")>=0?ArenaMapKind.CoastalBay:
+            Array.IndexOf(Environment.GetCommandLineArgs(),"--outdoor")>=0?ArenaMapKind.OutdoorCanyon:
+            smoke?ArenaMapKind.IndoorFactory:ResolveStoredMap(PlayerPrefs.GetInt(PreferencePrefix+"Map",0));
         if(RunPreferenceProbe()) return;
         if(!smoke&&!captureGameplayPreview)
         {
@@ -200,10 +202,12 @@ public sealed partial class VoxArena : MonoBehaviour
         }
         BuildWorld();BuildPDVisualEffects(); BuildAudio(); LoadPreferences();
         selectedCraft=captureCustomizationEditor?Mathf.Min(1,CraftCatalog.UnlockedCount-1):Mathf.Clamp(selectedCraft,0,CraftCatalog.UnlockedCount-1);
+        if(!smoke&&!captureGameplayPreview)InitializeAutomaticBalance();
         ApplySelectableCharacter(player,selectedCraft); ApplySelectableCharacter(enemy,ResolveRival());
         ResetRound(); BuildPortraits(); inMenu=true;
         if(captureCustomizationEditor){balanceFrameIndex=1;balanceTab=0;balanceMountIndex=0;OpenBalanceEditor();}
-        if(captureCustomizationEditor)StartCoroutine(CaptureBastionCustomization());
+        if(automaticBalanceStudy)StartCoroutine(AutomaticBalanceStudy());
+        else if(captureCustomizationEditor)StartCoroutine(CaptureBastionCustomization());
         else if(captureLineup)StartCoroutine(CaptureCustomizationLineup());
         else if(motionStudy)StartCoroutine(ChassisMotionStudy());
         else if(projectileGallery)StartCoroutine(CaptureProjectileGallery());
@@ -281,7 +285,7 @@ public sealed partial class VoxArena : MonoBehaviour
         // Keep chassis yaw independent of the upper-body aiming direction after spawn.
         Vector3 initialChassis=Vector3.ProjectOnPlane(f.facing,Vector3.up);
         f.chassisForward=initialChassis.sqrMagnitude>.001f?initialChassis.normalized:Vector3.forward;
-        BuildRobot(f); f.body.localScale=Vector3.one*f.spec.size;if(f.guardShield!=null)f.guardShield.gameObject.SetActive(HasEquippedGuard(f));
+        BuildRobot(f); f.body.localScale=Vector3.one*f.spec.size;if(f.guardShield!=null)f.guardShield.gameObject.SetActive(UsesNativeGuardShield(f));
         bool artistWisp=(f.spec.name=="WISP"&&wispModelSource!=null||f.importedChassis)&&f.headPart!=null;
         foreach(Renderer r in f.body.GetComponentsInChildren<Renderer>())
             if(r.name.StartsWith("Armor") || r.name=="Visor")
@@ -339,7 +343,7 @@ public sealed partial class VoxArena : MonoBehaviour
             f.dashCostFactor=1f; // No mass-derived mobility modifiers in test baseline.
             f.orbitSign=1;
         }
-        Vector3 playerSpawn=new Vector3(-15,1.1f,-15),enemySpawn=new Vector3(15,1.1f,15);
+        Vector3 playerSpawn=ArenaSpawnPosition(0),enemySpawn=ArenaSpawnPosition(1);
         player.root.position=playerSpawn;enemy.root.position=enemySpawn;
         Dictionary<int,int> teamSpawnCounts=new Dictionary<int,int>{{0,1},{1,1}};
         foreach(Fighter fighter in fighterRoster)
@@ -394,7 +398,7 @@ public sealed partial class VoxArena : MonoBehaviour
         if(Finished) { FinishPresentation(); return; }
         if(paused || smoke) return;
         float dt=Mathf.Min(Time.deltaTime,.05f);
-        roundTime+=dt; hitConfirmTime=Mathf.Max(0,hitConfirmTime-dt); UpdateObstacles(dt); ProcessTimedFrag(dt);
+        roundTime+=dt; hitConfirmTime=Mathf.Max(0,hitConfirmTime-dt); UpdateGravityEvent(dt);UpdateObstacles(dt); ProcessTimedFrag(dt);
         if(!spectatorMode&&!player.deadVisual&&!playerRespawnPrompt) PlayerInput(dt);
         UpdateRosterAI(dt); FaceRosterTargets(dt);
         UpdateCombat(dt); UpdateSalvage(dt); UpdateSparks(dt); AnimateRoster();
@@ -428,7 +432,7 @@ public sealed partial class VoxArena : MonoBehaviour
     {
         foreach(Fighter actor in fighterRoster)if(actor!=null&&!actor.deadVisual&&actor.body!=null)Animate(actor);
     }
-    void LateUpdate() { if(player!=null && enemy!=null) UpdateCamera(Time.deltaTime); }
+    void LateUpdate() { FlushAutomaticBalance();if(player!=null && enemy!=null) UpdateCamera(Time.deltaTime); }
     void UpdateCamera(float dt)
     {
         if(paused&&!inMenu&&!smoke&&!spectatorMode)return;
@@ -491,25 +495,33 @@ public sealed partial class VoxArena : MonoBehaviour
     }
     bool CanStartLockOn(Fighter fighter)
     {
-        return fighter!=null && fighter.spec!=null && fighter.spec.supportsLockOn;
+        return fighter!=null && fighter.spec!=null && fighter.weaponProfiles!=null && !HasEquippedGuard(fighter) && !EquippedProfile(fighter).isShield && !EquippedProfile(fighter).isUnarmed && HasWeaponTrait(EquippedProfile(fighter),"LOCK");
     }
     bool TryAcquireTargetLock(Fighter fighter,Fighter target)
     {
+        float lockRange=WeatherLockRange(fighter);
         if(!CanStartLockOn(fighter) || target==null ||
-            Vector3.Distance(fighter.root.position,target.root.position)>fighter.spec.lockRange)
+            Vector3.Distance(fighter.root.position,target.root.position)>lockRange)
         {
             targetLock=false;
             return false;
         }
         if(!smoke&&fighter==player)
         {
-            Vector3 eye=target.root.position+Vector3.up*1.2f;Vector3 p=view.WorldToViewportPoint(eye);
+            Vector3 eye=LockAimPoint(target);Vector3 p=view.WorldToViewportPoint(eye);
             if(p.z<=0||p.x<=0||p.x>=1||p.y<=0||p.y>=1||ObstacleOnSegment(fighter.root.position+Vector3.up*1.5f,eye,.15f,out _)){targetLock=false;return false;}
         }
         if(!targetLock)lockViewInitialized=false;
         targetLock=true;
         occludedLockTimer=fighter.spec.occludedLockSeconds;
         return true;
+    }
+    bool UpdateHeldManualLock(Fighter fighter,Fighter target,bool buttonHeld,bool lockAvailable)
+    {
+        if(!lockAvailable||!buttonHeld){targetLock=false;return false;}
+        if(!targetLock)TryAcquireTargetLock(fighter,target);
+        if(targetLock&&Vector3.Distance(fighter.root.position,target.root.position)>WeatherLockRange(fighter))targetLock=false;
+        return targetLock;
     }
     bool CanFireSpecialWithCurrentLock(Fighter fighter)
     {
@@ -519,8 +531,8 @@ public sealed partial class VoxArena : MonoBehaviour
     void PlayerInput(float dt)
     {
         bool wispHands=player.spec.name=="WISP";
-        player.guarding=wispHands&&HasEquippedGuard(player)&&Input.GetMouseButton(1);
-        for(int slot=0;slot<4;slot++)if(Input.GetKeyDown((KeyCode)((int)KeyCode.Alpha1+slot)))player.weaponSlot=slot+1;
+        player.guarding=HasEquippedGuard(player)&&Input.GetMouseButton(1);
+        for(int slot=0;slot<4;slot++)if(Input.GetKeyDown((KeyCode)((int)KeyCode.Alpha1+slot)))SelectWeaponOrdinal(player,slot);
         player.crouching=Input.GetKey(KeyCode.F);
         if(Input.GetKeyDown(KeyCode.F)) TryPickupSalvage();
         if(Input.GetKeyDown(KeyCode.G)) UseSalvage(aimDirection);
@@ -533,14 +545,14 @@ public sealed partial class VoxArena : MonoBehaviour
         // Runner prototype: forward Shift stays a ground sprint; sideways/backward
         // Shift starts a short, low-hop distance dash. Legacy frames retain double-tap.
         bool boostPressed=Input.GetKeyDown(KeyCode.LeftShift)||Input.GetKeyDown(KeyCode.RightShift);
-        if(player.spec.name!="WISP"&&player.spec.usePrototypeMovement && player.spec.mobility==MobilityKind.Runner &&
+        if((player.spec.name=="WISP"||player.spec.usePrototypeMovement && player.spec.mobility==MobilityKind.Runner) &&
            boostPressed && move.sqrMagnitude>.01f && player.jumpHeight<=.02f)
         {
             float forwardIntent=Vector3.Dot(move.normalized,forward);
             if(forwardIntent<.5f && TryDash(player,move))
             {
                 player.jumpOriginY=player.root.position.y;
-                player.jumpVelocity=Mathf.Max(player.jumpVelocity,jumpSpeed*.23f);
+                if(player.spec.name!="WISP")player.jumpVelocity=Mathf.Max(player.jumpVelocity,jumpSpeed*.23f);
             }
         }
         // A second press of the same movement key within the window starts a fixed-distance dash.
@@ -573,7 +585,7 @@ public sealed partial class VoxArena : MonoBehaviour
                     float charge=Mathf.Clamp01(player.jumpHoldElapsed/Mathf.Max(.01f,player.spec.jumpChargeSeconds));
                     float power=Mathf.Lerp(player.spec.jumpMinImpulseFactor,player.spec.jumpImpulseScale,charge);
                     player.jumpOriginY=player.root.position.y;
-                    player.jumpVelocity=jumpSpeed*power/Mathf.Sqrt(Mathf.Max(.5f,player.spec.jumpWeightFactor));
+                    player.jumpVelocity=JumpLaunchSpeed(player,power);
                 }
                 player.jumpHoldElapsed=0f;
                 player.jumpChargeCanceled=false;
@@ -584,13 +596,10 @@ public sealed partial class VoxArena : MonoBehaviour
         {
             player.jumpOriginY=player.root.position.y;
             player.jumpHoldElapsed=0f;
-            player.jumpVelocity=jumpSpeed*player.spec.jumpImpulseScale/Mathf.Sqrt(Mathf.Max(.5f,player.spec.jumpWeightFactor));
+            player.jumpVelocity=JumpLaunchSpeed(player,player.spec.jumpImpulseScale);
         }
         bool lockOnAvailable=CanStartLockOn(player);
-        if(!lockOnAvailable) targetLock=false;
-        if(lockOnAvailable && Input.GetMouseButtonDown(1)) TryAcquireTargetLock(player,enemy);
-        if(!lockOnAvailable || Input.GetMouseButtonUp(1) ||
-            Vector3.Distance(player.root.position,enemy.root.position)>player.spec.lockRange) targetLock=false;
+        UpdateHeldManualLock(player,enemy,Input.GetMouseButton(1),lockOnAvailable);
         if(wasInputTargetLock!=targetLock){ResetMouseLookCapture();wasInputTargetLock=targetLock;}
         if(!targetLock)
         {
@@ -598,12 +607,13 @@ public sealed partial class VoxArena : MonoBehaviour
                 Application.isFocused&&Cursor.lockState==CursorLockMode.Locked);
         }
         UpdatePlayerHeading(player,move,forward,targetLock,lockOnAvailable,dt);
+        if(targetLock&&CanStartLockOn(player))move*=1-Mathf.Clamp01(EquippedProfile(player).lockPenalty);
         Move(player,move,dt);
         if(targetLock)
         {
-            Vector3 viewport=view.WorldToViewportPoint(enemy.root.position+Vector3.up*1.2f);
+            Vector3 viewport=view.WorldToViewportPoint(LockAimPoint(enemy));
             bool visible=viewport.z>0&&viewport.x>0&&viewport.x<1&&viewport.y>0&&viewport.y<1&&
-                !ObstacleOnSegment(player.root.position+Vector3.up*1.5f,enemy.root.position+Vector3.up*1.2f,.15f,out _);
+                !ObstacleOnSegment(player.root.position+Vector3.up*1.5f,LockAimPoint(enemy),.15f,out _);
             if(visible) occludedLockTimer=player.spec.occludedLockSeconds;
             else
             {
@@ -612,7 +622,7 @@ public sealed partial class VoxArena : MonoBehaviour
                     targetLock=false;
             }
         }
-        aimDirection=targetLock?(enemy.root.position-player.root.position).normalized:player.facing;
+        aimDirection=targetLock?(LockAimPoint(enemy)-WeaponMuzzle(player)).normalized:player.facing;
         Ray ray=view.ScreenPointToRay(new Vector3(Screen.width*.5f,Screen.height*.5f,0));
         Vector3 reticleTarget=ReticleAimPoint(ray);aimMarker.position=reticleTarget;
         if(!targetLock)aimDirection=(reticleTarget-WeaponMuzzle(player)).normalized;
@@ -647,7 +657,7 @@ public sealed partial class VoxArena : MonoBehaviour
     void UpdatePlayerHeading(Fighter f,Vector3 move,Vector3 cameraForward,bool locked,bool lockAvailable,float dt)
     {
         if(locked) FaceOpponent(f,enemy,dt);
-        else FaceMovement(f,!lockAvailable?cameraForward:move,dt);
+        else FaceMovement(f,!f.spec.supportsLockOn?cameraForward:move,dt);
     }
     Vector3 CameraRelativeMove(Vector3 cameraForward,Vector3 cameraRight,float horizontal,float vertical,bool runner=false)
     {
@@ -658,21 +668,23 @@ public sealed partial class VoxArena : MonoBehaviour
     bool TryDash(Fighter f,Vector3 direction)
     {
         // TARANTULA has no booster: reject double-tap/Shift dash at the shared entry point.
-        if(!f.spec.allowHorizontalBoost) return false;
+        if(!f.spec.allowHorizontalBoost||f.jumpHeight>.02f||f.jumpVelocity>0) return false;
         if(direction.sqrMagnitude<.01f || f.dashRemaining>0 || f.dashCooldownLeft>0 || f.boostLocked || f.lockTime>0) return false;
         // Runner ground dodges use cooldown/distance, not boost fuel.
         // Airborne dodges still consume the shared gauge.
-        bool freeGroundDash=f.spec.mobility==MobilityKind.Runner && f.jumpHeight<=.02f && f.jumpVelocity<=0f;
+        bool freeGroundDash=f.spec.name!="WISP"&&f.spec.mobility==MobilityKind.Runner && f.jumpHeight<=.02f && f.jumpVelocity<=0f;
         float cost=freeGroundDash?0f:dashFuelCost*f.dashCostFactor;
         if(f.boostEnergy<cost) return false;
         f.boostEnergy-=cost;
         if(cost>0f) f.recoveryTime=recoveryDelay;
         f.dashDirection=direction.normalized;
         f.dashRemaining=Mathf.Max(.01f,dashDistance*f.dashDistanceFactor);
-        f.dashCooldownLeft=dashCooldown;
+        f.dashCooldownLeft=f.spec.name=="WISP"?.18f:dashCooldown;
         PlaySound(SoundKind.Boost,f.root.position,.6f);
         return true;
     }
+    bool ShouldApplyLandingStagger(Fighter f,float takeoffHeight,float landingHeight,float fallSpeed)
+        =>landingStaggerEnabled&&f.spec.name!="WISP"&&takeoffHeight>.05f&&landingHeight<=.001f&&fallSpeed>15f;
     float BoostDirectionFactor(Fighter f,Vector3 direction)
     {
         if(f.spec.name=="WISP") return 1f;
@@ -696,9 +708,10 @@ public sealed partial class VoxArena : MonoBehaviour
         f.invulnerableTime=Mathf.Max(0,f.invulnerableTime-dt);
         float recovery=Mathf.Max(0,dt-f.shieldRecoveryTime);
         f.shieldRecoveryTime=Mathf.Max(0,f.shieldRecoveryTime-dt);
-        f.shieldEnergy=Mathf.Min(f.spec.ShieldMax,f.shieldEnergy+f.spec.ShieldMax/shieldFullRecoveryTime*recovery);
+        f.shieldEnergy=Mathf.Min(f.spec.ShieldMax,f.shieldEnergy+f.spec.ShieldMax/Mathf.Max(1f,f.spec.shieldRecoverySeconds)*recovery);
         // Release both boost controls before rearming an exhausted shared gauge.
         if(!f.boostHeld && !f.jumpHeld) f.boostLocked=false;
+        if(f.jumpHeight>.02f||f.jumpVelocity>0){f.boostHeld=false;f.pulseTime=0;f.dashRemaining=0;}
         bool wasBoosting=f.boosting;
         if(f.spec.allowHorizontalBoost && f.spec.boost==BoostKind.Pulse && !f.spec.usePrototypeMovement && f.boostHeld && !f.wasBoostHeld && f.lockTime<=0 &&
             f.boostEnergy>=f.spec.boostDrain*f.spec.pulseDuration && direction.sqrMagnitude>.01f)
@@ -708,7 +721,7 @@ public sealed partial class VoxArena : MonoBehaviour
         bool wants=f.spec.allowHorizontalBoost&&!dashing&&f.boostHeld&&direction.sqrMagnitude>.01f;
         // WISP prototype: Shift is a sprint only while moving forward relative
         // to the camera-aligned input. Side/reverse Shift uses the low-hop dash.
-        if(f.spec.name!="WISP"&&f.spec.usePrototypeMovement && f.spec.mobility==MobilityKind.Runner && wants)
+        if((f.spec.name=="WISP"||f.spec.usePrototypeMovement && f.spec.mobility==MobilityKind.Runner) && wants)
         {
             Vector3 horizontalFacing=Vector3.ProjectOnPlane(f.facing,Vector3.up).normalized;
             if(horizontalFacing.sqrMagnitude>.001f &&
@@ -723,7 +736,7 @@ public sealed partial class VoxArena : MonoBehaviour
             bool forwardRun=f.spec.name=="WISP"&&Vector3.Dot(motion.normalized,f.facing)>.8f;
             float required=f.spec.boostDrain*active*(forwardRun?.5f:1f);
             float fraction=required>0?Mathf.Min(1,f.boostEnergy/required):1;
-            speed=Mathf.Lerp(speed,(forwardRun?f.spec.prototypeBaseSpeed*1.65f:f.spec.boostSpeed)*BoostDirectionFactor(f,motion),fraction*active/dt);
+            speed=Mathf.Lerp(speed,(forwardRun?f.spec.prototypeBaseSpeed*1.9f:f.spec.boostSpeed)*BoostDirectionFactor(f,motion),fraction*active/dt);
             f.boostEnergy=Mathf.Max(0,f.boostEnergy-required); f.recoveryTime=recoveryDelay;
             if(f.boostEnergy<=0) { f.boostLocked=true; f.boosting=false; }
             if(!wasBoosting) PlaySound(SoundKind.Boost,f.root.position,.45f);
@@ -737,7 +750,7 @@ public sealed partial class VoxArena : MonoBehaviour
             float weightFactor=Mathf.Max(.5f,f.spec.jumpWeightFactor); // Explicit per-frame tuning, independent of armor and visual scale.
             float drain=jumpBoostDrain*weightFactor*dt;
             float fraction=drain>0?Mathf.Min(1,f.boostEnergy/drain):1;
-            float climbSpeed=Mathf.Max(0,boostClimbSpeed)*f.spec.verticalBoostScale/weightFactor*fraction;
+            float climbSpeed=Mathf.Max(0,boostClimbSpeed)*f.spec.verticalBoostScale/weightFactor*fraction*EnvironmentMobilityScale;
             f.jumpVelocity=Mathf.MoveTowards(f.jumpVelocity,climbSpeed,boostClimbAcceleration*dt);
             f.boostEnergy=Mathf.Max(0,f.boostEnergy-drain);
             f.recoveryTime=recoveryDelay;
@@ -757,12 +770,14 @@ public sealed partial class VoxArena : MonoBehaviour
         if(!verticalBoost)
         {
             float gravityScale=f.jumpVelocity<0?fallGravityMultiplier:1f;
-            f.jumpVelocity-=jumpGravity*gravityScale*f.spec.fallGravityFactor*dt;
+            float weightGravity=Mathf.Sqrt(FallWeightFactor(f));
+            f.jumpVelocity-=jumpGravity*gravityScale*f.spec.fallGravityFactor*weightGravity*EnvironmentGravityScale(f)*dt;
         }
+        speed*=EnvironmentMobilityScale;
         Vector3 desired=motion*speed;
         if(dashing)
         {
-            float dashStep=Mathf.Min(f.dashRemaining,Mathf.Max(.01f,dashSpeed*f.dashSpeedFactor)*dt);
+            float dashStep=Mathf.Min(f.dashRemaining,Mathf.Max(.01f,dashSpeed*f.dashSpeedFactor)*EnvironmentMobilityScale*dt);
             desired=f.dashDirection*(dashStep/Mathf.Max(dt,.0001f));
         }
         if(motion.sqrMagnitude>.001f && !dashing)
@@ -793,7 +808,9 @@ public sealed partial class VoxArena : MonoBehaviour
             float forward=Vector3.Dot(desired.normalized,heading);
             desired*=forward>.5f?1.3f:forward<-.5f?.55f:.7f;
         }
-        if(!smoke){if(!f.boosting&&f.dashRemaining<=0)desired*=normalTravelScale;if(HasEquippedGuard(f))desired*=1-(f.guarding?f.spec.shieldGuardMovePenalty:f.spec.shieldEquipMovePenalty);}
+        if(!smoke&&!f.boosting&&f.dashRemaining<=0)desired*=normalTravelScale;
+        desired*=ShieldMovementMultiplier(f);
+        desired+=Vector3.left*CoastalWaveShoreSpeed(f);
         if(f.crouching) desired*=.4f;
         // Opt-in tank chassis: choose the shorter forward/reverse turn. Opposite input
         // reverses immediately, while oblique input rotates at a finite angular rate.
@@ -833,7 +850,7 @@ public sealed partial class VoxArena : MonoBehaviour
         Vector3 before=f.root.position; MoveWithObstacles(f,desired*dt+Vector3.up*f.jumpVelocity*dt,verticalBoost);
         f.jumpHeight=Mathf.Max(0,f.root.position.y-LandingHeight(f.root.position,f.Radius,f.root.position.y));
         // High-speed landing briefly staggers the legs; unlike weapon knockdown it grants no invulnerability.
-        if(landingStaggerEnabled && preLandingHeight>.05f && f.jumpHeight<=.001f && preLandingFallSpeed>15f)
+        if(ShouldApplyLandingStagger(f,preLandingHeight,f.jumpHeight,preLandingFallSpeed))
         {
             float severity=Mathf.Clamp01((preLandingFallSpeed-15f)/20f);
             float landingRecovery=Mathf.Max(.2f,f.spec.recoverySpeed);
@@ -855,22 +872,19 @@ public sealed partial class VoxArena : MonoBehaviour
     void Hit(Fighter target,Vector3 source,float damage,Vector3? impactPoint=null,Fighter attacker=null)
     {
         if(Finished || target.deadVisual || target.hp<=0 || target.invulnerableTime>0) return;
+        damage*=1-GuardReduction(target,source);
         if(AbsorbSalvageShield(target,damage)) return;
         float before=target.hp+target.shieldEnergy;
         float incoming=damage*(1-target.spec.armor), absorbed=Mathf.Min(target.shieldEnergy,incoming);
         target.shieldEnergy-=absorbed; target.hp=Mathf.Max(0,target.hp-incoming+absorbed);
         float actualDamage=before-target.hp-target.shieldEnergy;
+        if(attacker!=null) attacker.duelDamageDealt+=actualDamage;
         RecordDamage(target,actualDamage,absorbed>0);
         if(actualDamage>absorbed)NotifyPartDamage(target,impactPoint??target.root.position,actualDamage-absorbed);
         if(target==player && actualDamage>0)
         {
             cameraShakeTime=.3f;
             cameraShakeStrength=Mathf.Clamp(actualDamage/110f,.04f,.32f);
-        }
-        if(actualDamage>32f*target.spec.knockdownResistance && target.hp>0)
-        {
-            target.knockdownTime=.75f/Mathf.Max(.2f,target.spec.recoverySpeed);
-            target.invulnerableTime=target.knockdownTime+.3f;
         }
         target.hitFlash=.14f; target.shieldRecoveryTime=shieldRecoveryDelay; target.shieldFlash=absorbed>0?.12f:0;
         Burst(target.root.position,absorbed>0?Cyan:Orange,6);
@@ -921,7 +935,8 @@ public sealed partial class VoxArena : MonoBehaviour
             if(f.capsuleTreads)f.legsPart.position=f.root.TransformPoint(f.importedChassisAnchor);
         }
         else if(f.legsPart!=null) f.legsPart.localRotation=Quaternion.identity;
-        float stride=Mathf.Clamp01(Vector3.ProjectOnPlane(f.velocity,Vector3.up).magnitude/Mathf.Max(1f,f.spec.speed));
+        bool airborneLegPose=f.jumpHeight>.08f||f.jumpVelocity>1f;
+        float stride=airborneLegPose?0f:Mathf.Clamp01(Vector3.ProjectOnPlane(f.velocity,Vector3.up).magnitude/Mathf.Max(1f,f.spec.speed));
         float gait=Mathf.Sin(roundTime*(7f+stride*9f))*stride;
         bool riggedWisp=importedWisp&&IsArticulatedWisp;
         f.leftLeg.localRotation=Quaternion.Euler(gait*25f,0,riggedWisp?0:-5);
@@ -937,8 +952,9 @@ public sealed partial class VoxArena : MonoBehaviour
         else AnimateTreads(f,Time.deltaTime);
         f.leftArm.localRotation=Quaternion.Euler(-gait*13f,0,0);
         f.rightArm.localRotation=Quaternion.Euler(gait*13f,0,0);
-        if(f.guardShield!=null)f.guardShield.gameObject.SetActive(HasEquippedGuard(f));
-        if(importedWisp&&f.guardShield!=null&&f.guardElbow!=null)
+        if(f.guardShield!=null)f.guardShield.gameObject.SetActive(UsesNativeGuardShield(f));
+        f.guardBlend=Mathf.MoveTowards(f.guardBlend,HasEquippedGuard(f)&&f.guarding&&!inMenu&&!Finished?1f:0f,Mathf.Min(Time.deltaTime,.05f)*8f);
+        if(importedWisp&&UsesNativeGuardShield(f)&&f.guardShield!=null&&f.guardElbow!=null)
         {
             float guardTarget=HasEquippedGuard(f)&&f.guarding&&!inMenu&&!Finished?1f:0f;
             f.guardBlend=Mathf.MoveTowards(f.guardBlend,guardTarget,Mathf.Min(Time.deltaTime,.05f)*8f);
@@ -947,7 +963,7 @@ public sealed partial class VoxArena : MonoBehaviour
             f.guardShield.localRotation=Quaternion.identity;
             f.guardShield.rotation=Quaternion.Slerp(f.guardShield.rotation,f.root.rotation,f.guardBlend);
         }
-        AnimateArmGrips(f);
+        AnimateArmGrips(f);PlaceGuardVisuals(f);
         f.gun.gameObject.SetActive(f.rushTime<=0f);
         f.shield.gameObject.SetActive(f.shieldFlash>0&&!Finished&&!inMenu);
         bool jumpExhaust=(f.spec.name=="WISP"?f.jumpHeight>.08f&&f.jumpHeld&&f.boostEnergy>0&&!f.boostLocked:f.jumpVelocity>1f)&&!inMenu&&!Finished;

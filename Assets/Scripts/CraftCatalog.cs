@@ -30,6 +30,7 @@ public sealed class CraftSpec
     // Leg assembly parameters; step-up height is deliberately below tall jump-only platforms.
     public float stepHeight=.45f, slopeLimitDegrees=32f;
     public float leftArmHandling=1f,leftArmStability=1f,rightArmHandling=1f,rightArmStability=1f;
+    public float shieldRecoverySeconds=30f;
     public float footprintRadius=0,shieldEquipMovePenalty=.02f,shieldGuardMovePenalty=.06f,radarRange=85f;
     public float damage, weaponCooldown, range, projectileSpeed, projectileRadius, size, specialCooldown;
     public PrimaryKind primary;
@@ -120,6 +121,7 @@ public static class CraftCatalog
         tank.color=new Color(.38f,.47f,.27f);
         tank.role="TRACKED SIEGE FRAME";tank.size=.95f;tank.footprintRadius=1.90f;
         tank.supportsLockOn=true;
+        tank.prototypeBaseSpeed=18f;tank.boostSpeed=36f;
         tank.forwardSpeedFactor=1f; tank.reverseSpeedFactor=.4f;
         tank.leftSpeedFactor=tank.rightSpeedFactor=.6f;
         tank.jumpHeightScale=.72f;
@@ -131,7 +133,7 @@ public static class CraftCatalog
         spider.prototypeBaseSpeed=13.8f;
         spider.forwardSpeedFactor=spider.reverseSpeedFactor=1f;
         spider.leftSpeedFactor=spider.rightSpeedFactor=1f;
-        spider.jumpImpulseScale=1.45f; spider.jumpHeightScale=1.55f; spider.allowVerticalBoost=false;
+        spider.jumpImpulseScale=4.35f; spider.jumpHeightScale=4.65f; spider.allowVerticalBoost=false;
         spider.chargedReleaseJump=true; spider.jumpChargeSeconds=1.1f;
         spider.jumpMinImpulseFactor=.70f;
         spider.allowHorizontalBoost=false;
@@ -143,7 +145,7 @@ public static class CraftCatalog
         hound.prototypeBaseSpeed=13f;
         hound.forwardSpeedFactor=1f; hound.reverseSpeedFactor=1f/3f;
         hound.leftSpeedFactor=hound.rightSpeedFactor=1f/3f;
-        hound.jumpImpulseScale=1.35f; hound.jumpHeightScale=1.35f; hound.allowVerticalBoost=false;
+        hound.jumpImpulseScale=4.05f; hound.jumpHeightScale=4.05f; hound.allowVerticalBoost=false;
         hound.dashRangeScale=1.45f; // Longer ground dash, not higher dash speed.
         return new[]{runner,tank,spider,hound};
     }

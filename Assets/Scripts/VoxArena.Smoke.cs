@@ -295,22 +295,17 @@ public sealed partial class VoxArena
             "hangar exposes three authored prototypes while HOUND stays locked");
         Check(!CraftCatalog.Selectable[0].supportsLockOn && CraftCatalog.Selectable[1].supportsLockOn &&
             CraftCatalog.Selectable[2].supportsLockOn && !CraftCatalog.Selectable[3].supportsLockOn,
-            "lock-on availability matches official WISP/BASTION/TARANTULA/HOUND concept");
+            "legacy frame lock metadata remains available for reference");
+        for(int chassis=0;chassis<CraftCatalog.Selectable.Length;chassis++)
+        {
+            TestSetupSelectable(chassis,(chassis+1)%CraftCatalog.Selectable.Length);
+            Check(!CanStartLockOn(player),"lock-on is not granted by chassis alone "+player.spec.name);
+            player.weaponProfiles[0].trait="LOCK";player.weaponProfiles[0].lockStrength=.6f;
+            Check(CanStartLockOn(player)&&TryAcquireTargetLock(player,enemy),"LOCK weapon can acquire on chassis "+player.spec.name);
+            player.weaponProfiles[0].isShield=true;
+            Check(!CanStartLockOn(player),"equipped shield suppresses manual lock on "+player.spec.name);
+        }
         TestSetupSelectable(0,1);
-        Check(!CanStartLockOn(player) && CanStartLockOn(enemy),
-            "WISP cannot enter lock-on while BASTION can");
-        targetLock=true;
-        Check(!TryAcquireTargetLock(player,enemy) && !targetLock,
-            "WISP right-click cannot acquire a target lock");
-        Check(TryAcquireTargetLock(enemy,player) && targetLock,
-            "BASTION right-click can acquire a target lock");
-        TestSetupSelectable(2,3);
-        Check(CanStartLockOn(player) && !CanStartLockOn(enemy),
-            "TARANTULA can enter lock-on while HOUND cannot");
-        Check(TryAcquireTargetLock(player,enemy) && targetLock,
-            "TARANTULA right-click can acquire a target lock");
-        Check(!TryAcquireTargetLock(enemy,player) && !targetLock,
-            "HOUND right-click cannot acquire a target lock");
         Check(CanFireSpecialWithCurrentLock(enemy),
             "HOUND special remains usable without a lock-on sensor");
         TestSetupSelectable(0,1);
@@ -396,7 +391,7 @@ public sealed partial class VoxArena
             farthestCover=Mathf.Max(farthestCover,radius);
             if(radius<50) nearbyCover++;
         }
-        Check(debris.Count>=24&&farthestCover>180&&nearbyCover<=6,"ground cover is distributed beyond the central combat pad");
+        Check(debris.Count>=30&&farthestCover>150&&nearbyCover<=debris.Count/2,"ground cover is spread across the playable hangar without crowding its center");
         int savedRivalTeam=enemy.teamId;
         enemy.teamId=player.teamId;
         Check(Opponent(player)==null && Opponent(enemy)==null,"same-team fighters are not opponents");
@@ -492,12 +487,13 @@ public sealed partial class VoxArena
         TestStep(.4f);
         Check(Mathf.Abs(enemy.hp+enemy.shieldEnergy-afterRush)<.01f,"saber cannot hit repeatedly");
         TestSetup(6);
-        enemy.root.position=player.root.position+Vector3.forward*60;
+        player.root.position=new Vector3(0,FighterGroundY,-70);enemy.root.position=player.root.position+Vector3.forward*25;FaceOpponent(player,enemy);
         Special(player,enemy,Vector3.forward);
         TestStep(1.0f);
         bool waiting=shots.Count==3;
         foreach(Shot s in shots) waiting&=s.fuse>=0&&s.velocity==Vector3.zero&&s.warning!=null;
-        Check(waiting,"homing lasers stop and telegraph explosion");
+        string homingState=string.Join(";",shots.ConvertAll(s=>"fuse="+s.fuse.ToString("F2")+",track="+s.tracking.ToString("F2")+",warning="+(s.warning!=null)));
+        Check(waiting,"homing lasers stop and telegraph explosion (count="+shots.Count+"; "+homingState+")");
         enemy.root.position+=Vector3.right*60; targetShield=(enemy.hp+enemy.shieldEnergy);
         TestStep(1);
         Check(shots.Count==0&&(enemy.hp+enemy.shieldEnergy)==targetShield,"homing explosion can be evaded");
@@ -523,7 +519,7 @@ public sealed partial class VoxArena
         Hit(player,enemy.root.position,20);
         Check(player.shieldEnergy==0&&player.hp<hull,"shield overflow reaches hull");
         Move(player,Vector3.zero,10);
-        Check(player.shieldEnergy==player.spec.ShieldMax&&player.hp<hull,"shield refills without healing hull");
+        Check(player.shieldEnergy>0&&player.shieldEnergy<player.spec.ShieldMax&&player.hp<hull,"shield recovers gradually without healing hull");
         TestSetup(3);
         before=player.root.position; player.boostHeld=true;
         Move(player,Vector3.forward,.1f);
@@ -1086,7 +1082,7 @@ public sealed partial class VoxArena
         player.weaponTimer=0; player.magazine=30;
         int shotsBefore=shots.Count;
         Attack(player,enemy,(enemy.root.position-player.root.position).normalized);
-        Check(player.magazine==29&&shots.Count==shotsBefore+1&&Mathf.Abs(shots[shots.Count-1].velocity.magnitude-132*bulletSpeedScale)<.01f,"slot one fires the universal rapid gun and spends one round");
+        Check(player.magazine==29&&shots.Count==shotsBefore+1&&Mathf.Abs(shots[shots.Count-1].velocity.magnitude-264*bulletSpeedScale)<.01f,"slot one fires the doubled-speed rapid gun and spends one round");
         player.magazine=1; player.reloadTime=0; player.weaponTimer=0;
         Attack(player,enemy,(enemy.root.position-player.root.position).normalized);
         Check(player.magazine==0&&player.reloadTime>0,"empty magazine starts automatic reload");

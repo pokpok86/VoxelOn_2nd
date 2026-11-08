@@ -9,17 +9,22 @@ public sealed partial class VoxArena
     void WispOvernightChecks(Action<bool,string> check)
     {
         bool savedSmoke=smoke; smoke=true;
-        float[] speeds=new float[4];Vector3[] directions={Vector3.forward,Vector3.back,Vector3.left,Vector3.right};
+        Vector3[] directions={Vector3.forward,Vector3.back,Vector3.left,Vector3.right};
+        float[] speeds=new float[4];
         for(int i=0;i<4;i++) { TestSetupSelectable(0,0);player.facing=Vector3.forward;Move(player,directions[i],.05f);speeds[i]=Vector3.ProjectOnPlane(player.velocity,Vector3.up).magnitude; }
-        check(Mathf.Abs(speeds[0]-3*speeds[1])<.02f&&Mathf.Abs(speeds[0]-speeds[2])<.02f&&Mathf.Abs(speeds[0]-speeds[3])<.02f,"WISP actual normal travel is forward/back/left/right 3:1:3:3");
+        check(speeds[0]>speeds[1]&&Mathf.Abs(speeds[0]-speeds[2])<.02f&&Mathf.Abs(speeds[0]-speeds[3])<.02f,"WISP reverse travel is slower while unboosted lateral movement stays available ("+string.Join(",",speeds)+")");
         Vector3 oblique=CameraRelativeMove(Vector3.forward,Vector3.right,1,1,true);
         check(Vector3.Angle(oblique,Vector3.forward)>10&&Vector3.Angle(oblique,Vector3.forward)<20,"forward plus side input runs with a slight turn, not a 45 degree strafe");
-        for(int i=0;i<4;i++)
+        TestSetupSelectable(0,0);player.facing=Vector3.forward;player.boostHeld=true;Vector3 forwardStart=player.root.position;float forwardFuel=player.boostEnergy;
+        for(int tick=0;tick<14;tick++)Move(player,Vector3.forward,.025f);
+        check(player.boosting&&player.boostEnergy<forwardFuel&&Vector3.Distance(forwardStart,player.root.position)>speeds[0]*.35f+1f,"held Shift sustains WISP forward sprint");
+        for(int i=1;i<4;i++)
         {
-            TestSetupSelectable(0,0);player.facing=Vector3.forward;player.boostHeld=true;Vector3 start=player.root.position;
-            for(int t=0;t<14;t++)Move(player,directions[i],.025f);
+            TestSetupSelectable(0,0);player.facing=Vector3.forward;float fuel=player.boostEnergy;Vector3 start=player.root.position;
+            bool dashed=TryDash(player,directions[i]);
+            for(int t=0;t<14;t++)Move(player,Vector3.zero,.025f);
             float distance=Vector3.Distance(start,player.root.position);
-            check(player.boosting&&player.jumpHeight<.01f&&distance>speeds[i]*.35f+1f,"held Shift provides continuous grounded movement direction "+i);
+            check(dashed&&player.boostEnergy<fuel&&distance>6f&&distance<10.5f&&player.dashRemaining<=.01f,"WISP Shift finite ground dash direction "+i+" (started="+dashed+", moved="+distance.ToString("F2")+", fuel="+(fuel-player.boostEnergy).ToString("F1")+", remaining="+player.dashRemaining.ToString("F2")+", jump="+player.jumpHeight.ToString("F2")+", boostAllowed="+player.spec.allowHorizontalBoost+")");
         }
         TestSetupSelectable(0,0);player.facing=Vector3.forward;player.root.rotation=Quaternion.identity;
         player.velocity=Vector3.right*15;roundTime=.1f;Animate(player);

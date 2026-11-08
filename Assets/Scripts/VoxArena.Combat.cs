@@ -240,12 +240,20 @@ public sealed partial class VoxArena
                     Vector3 toward=(target.root.position-from).normalized;
                     s.velocity=Vector3.RotateTowards(s.velocity.normalized,toward,3.2f*dt,0)*s.velocity.magnitude;
                     s.tracking=Mathf.Max(0,s.tracking-dt);
-                    if(s.tracking<=0 && s.stopAndExplode) { s.velocity=Vector3.zero; s.fuse=.32f; continue; }
+                    if(s.tracking<=0 && s.stopAndExplode)
+                    {
+                        s.velocity=Vector3.zero;s.fuse=.32f;
+                        // Start the warning on the same frame the seeker changes
+                        // from guidance to its timed explosion state.
+                        if(s.warning==null)s.warning=Line("Blast warning",TeamColor(s.owner),.1f);
+                        Circle(s.warning,from,s.blast);
+                        continue;
+                    }
                 }
             }
             Vector3 velocity=s.velocity;
             if(s.wave>0) velocity+=Vector3.Cross(s.heading,Vector3.up)*Mathf.Sin(s.age*10)*s.wave;
-            Vector3 to=from+velocity*Mathf.Min(dt,s.life);
+            Vector3 to=from+ProjectileStep(from,velocity,dt,s.life);
             bool hit=!s.stopAndExplode && SegmentSphere(from,to,target.root.position,target.Radius+s.radius,out float unused);
             float targetDistance=float.PositiveInfinity;
             if(hit) SegmentSphere(from,to,target.root.position,target.Radius+s.radius,out targetDistance);

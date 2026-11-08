@@ -41,6 +41,10 @@ public sealed partial class VoxArena
         float limit=Mathf.Max(.1f,ArenaLimit-radius-.02f);
         return Mathf.Abs(point.x)<=limit&&Mathf.Abs(point.z)<=limit;
     }
+    bool AIRepositioningDuringReload(Fighter f,float distance)=>f.reloadTime>0&&distance<50;
+    bool AIReloadBoostWindow(Fighter f,float offset)=>Mathf.Repeat(f.aiClock+offset,1.5f)<.9f;
+    bool AIReloadDashWindow(Fighter f,float offset)=>Mathf.Repeat(f.aiClock+offset,1.5f)<.26f;
+    bool AIReloadJumpWindow(Fighter f,float offset,float cycle)=>Mathf.Repeat(f.aiClock+offset,cycle)<Mathf.Max(.5f,cycle*.42f);
     Vector3 EscapeHeading(Fighter f,Vector3 goal)
     {
         Vector3 best=Vector3.zero; float bestScore=float.NegativeInfinity;
@@ -126,9 +130,11 @@ public sealed partial class VoxArena
         bool obstacleAhead=ObstacleOnSegment(f.root.position+Vector3.up*.2f,
             f.root.position+f.aiMove.normalized*4f+Vector3.up*.2f,f.Radius*.65f,out _);
         bool threatened=ThreatAt(f,Vector3.zero,.55f)>14f;
+        bool reloadEvasion=!smoke&&!f.aiCoverRouting&&AIRepositioningDuringReload(f,distance);
         float jumpCycle=1.7f+personality*1.6f;
         bool jumpWindow=(f.aiClock+personality*2f)%jumpCycle<(.38f+personality*.25f);
-        bool jumpRequest=(!testRival || aiJumpEnabled) && (obstacleAhead || (threatened && jumpWindow)) && f.boostEnergy>f.spec.boostCapacity*.18f;
+        bool reloadJump=reloadEvasion&&AIReloadJumpWindow(f,personality*2f,jumpCycle);
+        bool jumpRequest=(!testRival || aiJumpEnabled) && (obstacleAhead || (threatened && jumpWindow)||reloadJump) && f.boostEnergy>f.spec.boostCapacity*.18f;
         if(f.spec.chargedReleaseJump)
         {
             bool grounded=f.jumpHeight<=.02f && f.jumpVelocity<=0f;
@@ -141,7 +147,7 @@ public sealed partial class VoxArena
                 {
                     float power=Mathf.Lerp(f.spec.jumpMinImpulseFactor,f.spec.jumpImpulseScale,1f);
                     f.jumpOriginY=f.root.position.y;
-                    f.jumpVelocity=jumpSpeed*power/Mathf.Sqrt(Mathf.Max(.5f,f.spec.jumpWeightFactor));
+                    f.jumpVelocity=JumpLaunchSpeed(f,power);
                     f.jumpHeld=false; f.jumpHoldElapsed=0f;
                 }
             }
@@ -151,10 +157,17 @@ public sealed partial class VoxArena
         {
             f.jumpHeld=jumpRequest;
             if(f.jumpHeld && f.jumpHeight<=.02f && f.jumpVelocity<=0)
-            { f.jumpOriginY=f.root.position.y; f.jumpVelocity=jumpSpeed*f.spec.jumpImpulseScale/Mathf.Sqrt(Mathf.Max(.5f,f.spec.jumpWeightFactor)); }
+            { f.jumpOriginY=f.root.position.y; f.jumpVelocity=JumpLaunchSpeed(f,f.spec.jumpImpulseScale); }
         }
         if(!smoke)UpdateCoverRoute(f,target);
-        if(!smoke&&!f.aiCoverRouting&&f.reloadTime>0&&distance<35){f.aiMove=EscapeHeading(f,f.root.position-target.root.position);f.aiState="RELOAD / REPOSITION";}
+        if(reloadEvasion)
+        {
+            f.aiMove=EscapeHeading(f,f.root.position-target.root.position);f.aiState="RELOAD / DODGE";
+            float timingOffset=personality*1.7f;
+            if(AIReloadBoostWindow(f,timingOffset)&&f.boostEnergy>f.spec.boostCapacity*.15f)f.boostHeld=true;
+            if(AIReloadDashWindow(f,timingOffset)&&f.spec.allowHorizontalBoost&&f.jumpHeight<=.02f&&f.jumpVelocity<=0&&f.dashRemaining<=0&&f.dashCooldownLeft<=0)
+                TryDash(f,f.aiMove);
+        }
         Vector3 movement=f.aiMove;
         // Practice rivals pause between maneuvers, while still escaping blocked routes.
         // Practice keeps drifting between decisions instead of appearing to stall.

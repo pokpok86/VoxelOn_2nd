@@ -5,14 +5,14 @@ public sealed partial class VoxArena
 {
     // The fighter root is centered near the chest while grounded. Keep the
     // visible floor and obstacle collision bottoms aligned to the same plane.
-    public enum ArenaMapKind { IndoorFactory, OutdoorCanyon, OpenPlains }
+    public enum ArenaMapKind { IndoorFactory, OutdoorCanyon, OpenPlains, CoastalBay=3 }
     [Header("Arena map (select before Play)")]
     public ArenaMapKind arenaMap=ArenaMapKind.IndoorFactory;
     const float ArenaHalfWidth=140f;
     const float GroundSurfaceY=-.91f;
     const float FighterSupportOffset=2.01f;
     const float FighterGroundY=GroundSurfaceY+FighterSupportOffset;
-    sealed class Debris { public Transform visual; public Vector3 origin,size; public float phase,hp; public bool destroyed; public List<Transform> cracks=new List<Transform>(); }
+    sealed class Debris { public Transform visual; public Vector3 origin,size; public float phase,hp; public bool destroyed,gravityRegulator; public List<Transform> cracks=new List<Transform>(); }
     readonly List<Bounds> obstacles=new List<Bounds>();
     readonly List<Bounds> cameraSolids=new List<Bounds>();
     readonly List<Debris> debris=new List<Debris>();
@@ -29,7 +29,54 @@ public sealed partial class VoxArena
     // Terrain blocks share the obstacle model so navigation, shots and landing agree.
     readonly List<Bounds> terrainSteps=new List<Bounds>();
     readonly HashSet<Bounds> terrainStepLookup=new HashSet<Bounds>();
+    static readonly int[] CanyonTerrainStepCounts={11,13,10,12,14,11,13,10,12};
     float spaceClock;
+    [Header("Foundry gravity regulator")]
+    [Range(.2f,1f)] public float foundryMinimumGravity=.55f;
+    [Range(0,.5f)] public float foundryMobilityBonus=.2f;
+    [Range(1,10)] public float foundryGravityRecoverySeconds=4f;
+    float foundryGravityElapsed,foundryGravityDuration,foundryGravityRecovery;bool foundryGravityRegulatorSpent;
+    float FoundryGravityEventStrength
+    {
+        get
+        {
+            if(foundryGravityDuration<=0)return 0;
+            if(foundryGravityElapsed<foundryGravityDuration)return Mathf.SmoothStep(0,1,foundryGravityElapsed/foundryGravityDuration);
+            return 1-Mathf.SmoothStep(0,1,foundryGravityRecovery/Mathf.Max(.1f,foundryGravityRecoverySeconds));
+        }
+    }
+    float EnvironmentGravityScale(Fighter fighter)=>Mathf.Lerp(1,foundryMinimumGravity,FoundryGravityEventStrength)*WaterGravityScale(fighter);
+    float EnvironmentMobilityScale=>1+foundryMobilityBonus*FoundryGravityEventStrength;
+    float JumpLaunchSpeed(Fighter fighter,float impulse)=>jumpSpeed*impulse/Mathf.Sqrt(Mathf.Max(.5f,fighter.spec.jumpWeightFactor))*EnvironmentMobilityScale;
+    float FallWeightFactor(Fighter fighter)
+    {
+        float factor=Mathf.Max(.5f,fighter.spec.jumpWeightFactor);float equipmentKg=0;
+        if(fighter.weaponProfiles!=null)for(int i=0;i<fighter.weaponProfiles.Length;i++)
+        {
+            WeaponProfile profile=fighter.weaponProfiles[i];if(profile==null||profile.isUnarmed)continue;
+            int rounds=fighter.weapons!=null&&i<fighter.weapons.Length&&fighter.weapons[i]!=null?Mathf.Max(0,fighter.weapons[i].ammo):Mathf.Max(0,profile.capacity);
+            equipmentKg+=Mathf.Max(0,profile.weight)+Mathf.Max(0,profile.ammoWeight)*rounds;
+        }
+        // The frame factor represents the base 100 kg chassis class; equipped
+        // weapon and loaded-ammunition kilograms add directly to that ratio.
+        return Mathf.Clamp(factor+equipmentKg/100f,.5f,10f);
+    }
+    void UpdateGravityEvent(float dt)
+    {
+        if(foundryGravityDuration<=0)return;
+        if(foundryGravityElapsed<foundryGravityDuration)foundryGravityElapsed=Mathf.Min(foundryGravityDuration,foundryGravityElapsed+dt);
+        else
+        {
+            foundryGravityRecovery+=dt;
+            if(foundryGravityRecovery>=foundryGravityRecoverySeconds){foundryGravityDuration=0;foundryGravityElapsed=foundryGravityRecovery=0;}
+        }
+    }
+    void StartFoundryGravityEvent()
+    {
+        if(arenaMap!=ArenaMapKind.IndoorFactory||foundryGravityRegulatorSpent)return;
+        foundryGravityRegulatorSpent=true;foundryGravityDuration=UnityEngine.Random.Range(10f,20f);foundryGravityElapsed=foundryGravityRecovery=0;
+        Debug.Log("FOUNDRY_GRAVITY_EVENT duration="+foundryGravityDuration.ToString("F1")+"s minGravity="+foundryMinimumGravity.ToString("F2"));
+    }
 
     void BuildWorld()
     {
@@ -66,6 +113,16 @@ public sealed partial class VoxArena
             RenderSettings.fog=true; RenderSettings.fogColor=new Color(.55f,.65f,.69f);
             RenderSettings.fogMode=FogMode.ExponentialSquared; RenderSettings.fogDensity=.0022f;
         }
+        else if(arenaMap==ArenaMapKind.CoastalBay)
+        {
+            view.backgroundColor=new Color(.38f,.65f,.76f);
+            light.intensity=1.08f;light.color=new Color(.84f,.94f,1f);
+            RenderSettings.ambientSkyColor=new Color(.36f,.58f,.67f);
+            RenderSettings.ambientEquatorColor=new Color(.25f,.43f,.49f);
+            RenderSettings.ambientGroundColor=new Color(.09f,.19f,.23f);
+            RenderSettings.fog=true;RenderSettings.fogColor=new Color(.38f,.63f,.70f);
+            RenderSettings.fogMode=FogMode.ExponentialSquared;RenderSettings.fogDensity=.0018f;
+        }
         else RenderSettings.fog=false;
         BuildGround();
         BuildVisualEnvironment();
@@ -74,31 +131,56 @@ public sealed partial class VoxArena
         if(arenaMap==ArenaMapKind.IndoorFactory)
         {
         AddDebris(new Vector3(-16,1.1f,3),new Vector3(5,4.2f,5),0);
-        AddDebris(new Vector3(20,1.1f,38),new Vector3(6,3.4f,5),1.4f);
+        AddDebris(new Vector3(20,1.1f,38),new Vector3(6,3.4f,5),1.4f,true);
         AddDebris(new Vector3(-5,1.1f,-19),new Vector3(4,1.8f,6),2.8f);
         AddDebris(new Vector3(6,1.1f,23),new Vector3(6,4.2f,4),4.1f);
-        AddDebris(new Vector3(-48,1.1f,-35),new Vector3(5,3.4f,5),5.4f);
-        AddDebris(new Vector3(55,1.1f,-42),new Vector3(4,1.8f,6),6.7f);
-        AddDebris(new Vector3(-58,1.1f,30),new Vector3(7,2.6f,4),1.1f);
-        AddDebris(new Vector3(64,1.1f,40),new Vector3(5,3.6f,7),2.2f);
-        AddDebris(new Vector3(-38,1.1f,60),new Vector3(8,2.2f,5),3.3f);
-        AddDebris(new Vector3(42,1.1f,-62),new Vector3(7,3.0f,5),4.4f);
-        AddDebris(new Vector3(-70,1.1f,-10),new Vector3(5,4.0f,7),5.5f);
-        AddDebris(new Vector3(78,1.1f,8),new Vector3(8,2.4f,5),6.6f);
-        // Spread cover across the open ground so roaming beyond the starting pad
-        // leads to new routes instead of an empty, unbounded-looking plain.
-        AddDebris(new Vector3(-136,1.1f,110),new Vector3(8,3.4f,6),.5f);
-        AddDebris(new Vector3(142,1.1f,92),new Vector3(6,2.2f,9),1.6f);
-        AddDebris(new Vector3(158,1.1f,-54),new Vector3(7,4.0f,5),2.7f);
-        AddDebris(new Vector3(-162,1.1f,-104),new Vector3(9,2.6f,7),3.8f);
-        AddDebris(new Vector3(12,1.1f,154),new Vector3(7,3.6f,6),4.9f);
-        AddDebris(new Vector3(-34,1.1f,-158),new Vector3(6,2.4f,8),6.0f);
-        AddDebris(new Vector3(104,1.1f,166),new Vector3(8,3.0f,5),.9f);
-        AddDebris(new Vector3(-108,1.1f,-166),new Vector3(7,4.2f,6),2.0f);
-        AddDebris(new Vector3(184,1.1f,18),new Vector3(6,2.8f,8),3.1f);
-        AddDebris(new Vector3(-184,1.1f,42),new Vector3(8,2.2f,6),4.2f);
-        AddDebris(new Vector3(160,1.1f,160),new Vector3(9,3.4f,7),5.3f);
-        AddDebris(new Vector3(-166,1.1f,-164),new Vector3(7,2.6f,9),6.4f);
+        // Add a close-range cover ring around the central combat lanes while
+        // keeping both diagonal spawn approaches open. These are destructible
+        // Foundry props and use the same bounds for movement and projectiles.
+        AddDebris(new Vector3(-30,1.1f,-7),new Vector3(6,3.0f,5),.7f);
+        AddDebris(new Vector3(30,1.1f,7),new Vector3(5,2.4f,7),1.8f);
+        AddDebris(new Vector3(-8,1.1f,31),new Vector3(7,3.6f,5),2.9f);
+        AddDebris(new Vector3(8,1.1f,-31),new Vector3(5,2.8f,8),4.0f);
+        AddDebris(new Vector3(-39,1.1f,17),new Vector3(8,2.2f,5),5.1f);
+        AddDebris(new Vector3(39,1.1f,-17),new Vector3(5,4.0f,7),6.2f);
+        AddDebris(new Vector3(-23,1.1f,39),new Vector3(6,2.6f,8),1.3f);
+        AddDebris(new Vector3(23,1.1f,-39),new Vector3(8,3.2f,5),3.4f);
+        AddDebris(new Vector3(-65,1.1f,-52),new Vector3(7,3.4f,6),5.5f);
+        AddDebris(new Vector3(66,1.1f,50),new Vector3(6,2.0f,9),.2f);
+        AddDebris(new Vector3(-88,1.1f,0),new Vector3(5,3.4f,5),5.4f);
+        AddDebris(new Vector3(88,1.1f,-22),new Vector3(4,1.8f,6),6.7f);
+        AddDebris(new Vector3(-20,1.1f,78),new Vector3(7,2.6f,4),1.1f);
+        AddDebris(new Vector3(24,1.1f,-76),new Vector3(5,3.6f,7),2.2f);
+        AddDebris(new Vector3(-80,1.1f,46),new Vector3(8,2.2f,5),3.3f);
+        AddDebris(new Vector3(76,1.1f,-70),new Vector3(7,3.0f,5),4.4f);
+        AddDebris(new Vector3(-98,1.1f,-42),new Vector3(5,4.0f,7),5.5f);
+        AddDebris(new Vector3(98,1.1f,64),new Vector3(8,2.4f,5),6.6f);
+        // Carry the cover out toward all four edges without placing it beyond
+        // the hangar walls, spreading routes beyond the central combat lanes.
+        AddDebris(new Vector3(-112,1.1f,102),new Vector3(8,3.4f,6),.5f);
+        AddDebris(new Vector3(112,1.1f,92),new Vector3(6,2.2f,9),1.6f);
+        AddDebris(new Vector3(118,1.1f,-54),new Vector3(7,4.0f,5),2.7f);
+        AddDebris(new Vector3(-114,1.1f,-82),new Vector3(9,2.6f,7),3.8f);
+        AddDebris(new Vector3(12,1.1f,115),new Vector3(7,3.6f,6),4.9f);
+        AddDebris(new Vector3(-34,1.1f,-116),new Vector3(6,2.4f,8),6.0f);
+        AddDebris(new Vector3(72,1.1f,115),new Vector3(8,3.0f,5),.9f);
+        AddDebris(new Vector3(-75,1.1f,-114),new Vector3(7,4.2f,6),2.0f);
+        AddDebris(new Vector3(120,1.1f,18),new Vector3(6,2.8f,8),3.1f);
+        AddDebris(new Vector3(-120,1.1f,42),new Vector3(8,2.2f,6),4.2f);
+        AddDebris(new Vector3(112,1.1f,112),new Vector3(9,3.4f,7),5.3f);
+        AddDebris(new Vector3(-112,1.1f,-110),new Vector3(7,2.6f,9),6.4f);
+        // Additional cover uses the mid and outer quadrants, keeping the
+        // center lanes readable while preventing large empty map corners.
+        AddDebris(new Vector3(40,1.1f,100),new Vector3(7,2.8f,6),.8f);
+        AddDebris(new Vector3(-45,1.1f,100),new Vector3(8,3.2f,5),1.9f);
+        AddDebris(new Vector3(40,1.1f,-110),new Vector3(6,2.4f,8),3.0f);
+        AddDebris(new Vector3(-45,1.1f,-78),new Vector3(7,3.6f,6),4.1f);
+        AddDebris(new Vector3(90,1.1f,0),new Vector3(8,2.6f,5),5.2f);
+        AddDebris(new Vector3(-92,1.1f,-80),new Vector3(9,3.2f,7),6.3f);
+        AddDebris(new Vector3(0,1.1f,90),new Vector3(6,2.2f,7),.4f);
+        AddDebris(new Vector3(-110,1.1f,0),new Vector3(7,2.8f,6),1.5f);
+        AddDebris(new Vector3(116,1.1f,-100),new Vector3(8,3.4f,6),2.6f);
+        AddDebris(new Vector3(0,1.1f,-90),new Vector3(7,2.4f,5),3.7f);
         BuildElevationCourse();
         for(int side=-1;side<=1;side+=2) for(int i=0;i<5;i++)
         {
@@ -112,16 +194,24 @@ public sealed partial class VoxArena
             // destructible cover across the canyon so movement and shots have
             // meaningful obstruction throughout the arena.
             AddDebris(new Vector3(-82,1.1f,48),new Vector3(8,3.2f,6),.4f);
-            AddDebris(new Vector3(88,1.1f,-52),new Vector3(7,2.6f,9),1.3f);
+            AddDebris(new Vector3(110,1.1f,0),new Vector3(7,2.6f,9),1.3f);
             AddDebris(new Vector3(-112,1.1f,-76),new Vector3(9,4.0f,7),2.2f);
             AddDebris(new Vector3(116,1.1f,78),new Vector3(8,3.0f,8),3.1f);
-            AddDebris(new Vector3(-36,1.1f,106),new Vector3(7,2.4f,10),4.0f);
+            AddDebris(new Vector3(-52,1.1f,120),new Vector3(7,2.4f,10),4.0f);
             AddDebris(new Vector3(42,1.1f,-108),new Vector3(10,3.6f,7),4.9f);
-            AddDebris(new Vector3(4,1.1f,72),new Vector3(6,2.2f,6),5.8f);
+            AddDebris(new Vector3(-25,1.1f,20),new Vector3(6,2.2f,6),5.8f);
             AddDebris(new Vector3(-8,1.1f,-74),new Vector3(7,3.4f,6),6.7f);
             // Stepped ridges and shelves are also registered as terrain
             // obstacles, so they block projectiles and resolve fighter motion.
             BuildCanyonTerrain();
+        }
+        else if(arenaMap==ArenaMapKind.CoastalBay)
+        {
+            // Cargo yards and port machinery stay on the land half; keep a broad
+            // clear approach along the shore for land-to-water engagements.
+            Vector3[] sites={new Vector3(-124,0,-112),new Vector3(-98,0,-112),new Vector3(-76,0,-112),new Vector3(-124,0,-62),new Vector3(-98,0,-62),new Vector3(-76,0,-62),new Vector3(-124,0,-8),new Vector3(-98,0,-8),new Vector3(-76,0,-8),new Vector3(-124,0,48),new Vector3(-98,0,48),new Vector3(-76,0,48),new Vector3(-124,0,108),new Vector3(-98,0,108),new Vector3(-76,0,108)};
+            Vector3[] sizes={new Vector3(13,5,9),new Vector3(9,4,14),new Vector3(12,6,8),new Vector3(8,4,12),new Vector3(14,5,9),new Vector3(9,4,13),new Vector3(12,5,8),new Vector3(8,6,12),new Vector3(13,4,9),new Vector3(9,5,13),new Vector3(14,4,8),new Vector3(9,6,12),new Vector3(12,4,9),new Vector3(8,5,12),new Vector3(9,4,13)};
+            for(int i=0;i<sites.Length;i++){sites[i].y=SurfaceHeight(sites[i])+sizes[i].y*.5f;AddDebris(sites[i],sizes[i],i*.73f);}
         }
         else BuildPlainsCover();
         player=MakeFighter("Pilot frame",Cyan); enemy=MakeFighter("Rival frame",Orange);
@@ -136,7 +226,7 @@ public sealed partial class VoxArena
         // Geometry is readable from inside, but movement is also clamped so
         // high-jump and dash fighters cannot escape over a decorative boundary.
         Color wall=arenaMap==ArenaMapKind.IndoorFactory?
-            new Color(.16f,.20f,.24f):new Color(.29f,.26f,.22f);
+            new Color(.16f,.20f,.24f):arenaMap==ArenaMapKind.CoastalBay?new Color(.16f,.36f,.43f):new Color(.29f,.26f,.22f);
         float height=arenaMap==ArenaMapKind.IndoorFactory?65f:36f;
         bool authoredCanyon=arenaMap==ArenaMapKind.OutdoorCanyon &&
             PlaceEnvironment("CanyonBoundary",null,new Vector3(0,GroundSurfaceY,0),Vector3.one)!=null;
@@ -155,7 +245,7 @@ public sealed partial class VoxArena
             Vector3 size=axis==0?new Vector3(5,height,290):new Vector3(290,height,5);
             Vector3 pos=axis==0?new Vector3(side*(ArenaHalfWidth+2.5f),GroundSurfaceY+height*.5f,0):
                 new Vector3(0,GroundSurfaceY+height*.5f,side*(ArenaHalfWidth+2.5f));
-            if(!authoredCanyon) Box(arenaMap==ArenaMapKind.IndoorFactory?"Hangar boundary wall":"Canyon cliff boundary",
+            if(!authoredCanyon) Box(arenaMap==ArenaMapKind.IndoorFactory?"Hangar boundary wall":arenaMap==ArenaMapKind.CoastalBay?"Coastal bay boundary":"Canyon cliff boundary",
                 null,pos,size,wall);
             cameraSolids.Add(new Bounds(pos,size));
             if(arenaMap==ArenaMapKind.OutdoorCanyon && !authoredCanyon)
@@ -175,25 +265,44 @@ public sealed partial class VoxArena
             }
         }
     }
+    Vector3 ArenaSpawnPosition(int teamId)
+    {
+        if(arenaMap==ArenaMapKind.CoastalBay)
+        {
+            Vector3 position=teamId==0?new Vector3(-50,0,0):new Vector3(45,0,12);
+            position.y=SurfaceHeight(position)+FighterSupportOffset;
+            return position;
+        }
+        return teamId==0?new Vector3(-15,FighterGroundY,-15):new Vector3(15,FighterGroundY,15);
+    }
     void BuildCanyonTerrain()
     {
-        // Nine broad, traversable ridgelines add frequent changes in elevation
-        // while keeping each individual riser below every frame's step height.
+        // Low-poly slope meshes hide the terraced collision samples and break
+        // the repeating stair silhouette into broad, irregular terrain forms.
         Color low=new Color(.34f,.30f,.25f),high=new Color(.43f,.37f,.29f);
-        int[] stepCounts={8,11,14,9,13,10,15,9,12};
-        for(int ridge=0;ridge<stepCounts.Length;ridge++)
+        for(int ridge=0;ridge<CanyonTerrainStepCounts.Length;ridge++)
         {
-            int count=stepCounts[ridge];
-            float cx=-84f+ridge*21f;
-            float cz=(ridge%2==0?24f:-27f);
-            for(int step=0;step<count;step++)
+            // The two basin cuts replace these overlapping stepped ridges with
+            // broad continuous slopes that remain walkable underwater.
+            if(ridge==7)continue;
+            int count=CanyonTerrainStepCounts[ridge];
+            float cx=ridge==4?38f:ridge==6?75f:ridge==8?120f:-84f+ridge*21f;
+            float cz=ridge%2==0?25f:-54f;
+            float totalRise=ridge==4?5.1f:1.65f+(ridge%3)*.26f;
+            int colliderCount=ridge==4?56:count;
+            float spacing=ridge==4?.475f:1.9f;
+            BuildCanyonSlopeVisual(ridge,cx,cz,colliderCount*spacing,19f+ridge%3*3f,totalRise,low,high);
+            float previousHeight=0;
+            for(int step=0;step<colliderCount;step++)
             {
-                float h=.32f*(step+1);
-                float x=cx+(step-(count-1)*.5f)*2.1f;
-                AddTerrainBlock("Canyon climbable ridge "+ridge+" "+step,
-                    new Vector3(x,GroundSurfaceY+h*.5f,cz+Mathf.Sin(step*.8f+ridge)*.65f),
-                    new Vector3(2f,h,14f+ridge%3*3f),
-                    Color.Lerp(low,high,Mathf.Round(step/(float)(count-1)*2f)*.5f));
+                float t=(step+1f)/colliderCount;
+                float roughness=(Mathf.PerlinNoise(step*.29f+ridge*.31f,ridge*.83f)-.5f)*(ridge==4?.035f:.14f);
+                float riseLimit=ridge==4?.09f:.34f;
+                float h=Mathf.Max(previousHeight+.025f,totalRise*t+roughness);h=Mathf.Min(h,previousHeight+riseLimit);previousHeight=h;
+                float x=cx+(step-(colliderCount-1)*.5f)*spacing;
+                float z=CanyonRidgeZ(ridge,cz,t);
+                AddTerrainCollider(new Vector3(x,GroundSurfaceY+h*.5f,z),
+                    new Vector3(ridge==4?.1f:1.2f,h,19f+ridge%3*3f));
             }
         }
         // Scattered broad shelves provide sightline variation without dense cover.
@@ -205,12 +314,68 @@ public sealed partial class VoxArena
                 new Vector3(10,h,12),low);
         }
     }
+    float CanyonRidgeZ(int ridge,float center,float t)
+        =>center+Mathf.Sin(t*CanyonRidgeSegmentCount(ridge)*.57f+ridge*.91f)*1.1f+
+          (Mathf.PerlinNoise(ridge*.71f,t*CanyonRidgeSegmentCount(ridge)*.38f)-.5f)*1.4f;
+    int CanyonRidgeSegmentCount(int ridge)=>ridge==4?56:CanyonTerrainStepCounts[Mathf.Clamp(ridge,0,CanyonTerrainStepCounts.Length-1)];
+    void BuildCanyonSlopeVisual(int ridge,float centerX,float centerZ,float length,float width,float rise,Color low,Color high)
+    {
+        const int across=8;
+        int along=CanyonRidgeSegmentCount(ridge);
+        var vertices=new List<Vector3>((along+1)*(across+1));
+        for(int x=0;x<=along;x++)
+        {
+            float t=x/(float)along,centerZAtX=CanyonRidgeZ(ridge,centerZ,t);
+            float xPos=centerX-length*.5f+t*length;
+            for(int z=0;z<=across;z++)
+            {
+                float v=z/(float)across*2-1;
+                float noise=(Mathf.PerlinNoise(x*.19f+ridge*2.1f,z*.47f+ridge*.7f)-.5f)*.14f*Mathf.Sin(t*Mathf.PI);
+                float height=Mathf.Max(0,rise*t*(1-.16f*v*v)+noise);
+                vertices.Add(new Vector3(xPos,GroundSurfaceY+height,centerZAtX+v*width*.5f));
+            }
+        }
+        var materialTriangles=new[]{new List<int>(),new List<int>(),new List<int>()};
+        for(int x=0;x<along;x++)for(int z=0;z<across;z++)
+        {
+            int a=x*(across+1)+z,b=(x+1)*(across+1)+z,c=a+1,d=b+1;
+            int material=Mathf.Clamp(Mathf.FloorToInt(Mathf.PerlinNoise(x*.27f+ridge*.9f,z*.31f+ridge*1.3f)*3),0,2);
+            List<int> tris=materialTriangles[material];tris.Add(a);tris.Add(c);tris.Add(b);tris.Add(b);tris.Add(c);tris.Add(d);
+        }
+        void AddSide(int topA,int topB,bool reverse)
+        {
+            int bottomA=vertices.Count;vertices.Add(new Vector3(vertices[topA].x,GroundSurfaceY,vertices[topA].z));
+            int bottomB=vertices.Count;vertices.Add(new Vector3(vertices[topB].x,GroundSurfaceY,vertices[topB].z));
+            List<int> tris=materialTriangles[1];
+            if(reverse){tris.Add(topA);tris.Add(bottomA);tris.Add(topB);tris.Add(topB);tris.Add(bottomA);tris.Add(bottomB);}
+            else{tris.Add(topA);tris.Add(topB);tris.Add(bottomA);tris.Add(topB);tris.Add(bottomB);tris.Add(bottomA);}
+        }
+        for(int x=0;x<along;x++)
+        {
+            AddSide(x*(across+1),(x+1)*(across+1),true);
+            AddSide(x*(across+1)+across,(x+1)*(across+1)+across,false);
+        }
+        for(int z=0;z<across;z++)
+        {
+            AddSide(z,z+1,true);
+            int end=along*(across+1);AddSide(end+z,end+z+1,false);
+        }
+        var mesh=new Mesh{name="Irregular canyon slope / ridge "+ridge};mesh.indexFormat=UnityEngine.Rendering.IndexFormat.UInt32;
+        mesh.SetVertices(vertices);mesh.subMeshCount=materialTriangles.Length;
+        for(int i=0;i<materialTriangles.Length;i++)mesh.SetTriangles(materialTriangles[i],i);
+        mesh.RecalculateNormals();mesh.RecalculateBounds();
+        Transform root=Module("Canyon natural slope "+ridge,null,Vector3.zero);
+        root.gameObject.AddComponent<MeshFilter>().sharedMesh=mesh;
+        MeshRenderer renderer=root.gameObject.AddComponent<MeshRenderer>();renderer.sharedMaterials=new[]{Mat(low),Mat(Color.Lerp(low,high,.52f)),Mat(high)};
+    }
     void AddTerrainBlock(string name,Vector3 center,Vector3 size,Color color)
     {
         Transform terrain=Module(name,null,center);
-        if(arenaMap==ArenaMapKind.OutdoorCanyon)
-            Box(name,terrain,Vector3.zero,size,color);
-        else BuildVoxelCover(terrain,size,2);
+        BuildVoxelCover(terrain,size,2);
+        AddTerrainCollider(center,size);
+    }
+    void AddTerrainCollider(Vector3 center,Vector3 size)
+    {
         Bounds bounds=new Bounds(center,size);
         obstacles.Add(bounds);
         terrainSteps.Add(bounds);
@@ -257,13 +422,23 @@ public sealed partial class VoxArena
         }
         return f;
     }
-    void AddDebris(Vector3 origin,Vector3 size,float phase)
+    void AddDebris(Vector3 origin,Vector3 size,float phase,bool gravityRegulator=false)
     {
-        Transform root=new GameObject("Ground cover "+debris.Count).transform;
+        if(arenaMap==ArenaMapKind.OutdoorCanyon||arenaMap==ArenaMapKind.CoastalBay)origin.y=SurfaceHeight(origin)+size.y*.5f;
+        Transform root=new GameObject(gravityRegulator?"Foundry gravity regulator / destructible":"Ground cover "+debris.Count).transform;
         root.position=origin;
         BuildGroundCover(root,size,debris.Count);
-        debris.Add(new Debris{visual=root,origin=origin,size=size,phase=phase,hp=120f+size.x*size.z*1.5f});
+        Debris piece=new Debris{visual=root,origin=origin,size=size,phase=phase,hp=120f+size.x*size.z*1.5f,gravityRegulator=gravityRegulator};
+        if(gravityRegulator)BuildGravityRegulatorVisual(root,size);
+        debris.Add(piece);
         obstacles.Add(DebrisBounds(origin,size));
+    }
+    void BuildGravityRegulatorVisual(Transform root,Vector3 size)
+    {
+        Color signal=new Color(.18f,.86f,1f);
+        Shape(PrimitiveType.Cylinder,"Gravity regulator emitter ring",root,new Vector3(0,size.y*.36f,0),new Vector3(size.x*.54f,.10f,size.z*.54f),signal,true);
+        Shape(PrimitiveType.Sphere,"Gravity regulator core",root,new Vector3(0,size.y*.24f,0),Vector3.one*.62f,signal,true);
+        for(int side=-1;side<=1;side+=2)Shape(PrimitiveType.Cube,"Gravity regulator mast",root,new Vector3(side*size.x*.36f,size.y*.25f,0),new Vector3(.14f,size.y*.65f,.14f),new Color(.95f,.49f,.16f),true);
     }
     Bounds DebrisBounds(Vector3 center,Vector3 size)
     {
@@ -361,6 +536,7 @@ public sealed partial class VoxArena
                 return;
             }
             d.destroyed=true;foreach(Transform crack in d.cracks)ReleasePDPart(crack);d.cracks.Clear();
+            if(d.gravityRegulator)StartFoundryGravityEvent();
             PlaySound(SoundKind.CoverBreak,impact,.95f);
             ScatterCoverFragments(d,impact);
             for(int cloud=0;cloud<8;cloud++)EmitPDParticle("SmokePuff",impact,Vector3.up+UnityEngine.Random.onUnitSphere,.3f,new Color(.36f,.32f,.26f,.45f),1.6f,true);
@@ -374,10 +550,11 @@ public sealed partial class VoxArena
     void ResetCoverForRound()
     {
         foreach(CoverFragment fragment in coverFragments)ReleasePDPart(fragment.visual);coverFragments.Clear();
+        foundryGravityElapsed=foundryGravityDuration=foundryGravityRecovery=0;foundryGravityRegulatorSpent=false;
         for(int i=0;i<debris.Count;i++)
         {
             Debris d=debris[i];foreach(Transform crack in d.cracks)ReleasePDPart(crack);d.cracks.Clear();
-            if(d.destroyed){d.visual=new GameObject("Ground cover "+i).transform;d.visual.position=d.origin;BuildGroundCover(d.visual,d.size,i);d.destroyed=false;}
+            if(d.destroyed){d.visual=new GameObject(d.gravityRegulator?"Foundry gravity regulator / destructible":"Ground cover "+i).transform;d.visual.position=d.origin;BuildGroundCover(d.visual,d.size,i);if(d.gravityRegulator)BuildGravityRegulatorVisual(d.visual,d.size);d.destroyed=false;}
             d.hp=120+d.size.x*d.size.z*1.5f;obstacles[i]=DebrisBounds(d.origin,d.size);
         }
     }
@@ -472,18 +649,19 @@ public sealed partial class VoxArena
         stepped=p;
         if(horizontal.sqrMagnitude<.00001f || f.jumpVelocity>1f) return false;
         float maxStep=Mathf.Max(0,f.spec.stepHeight);
+        float highestLanding=p.y;bool found=false;
         foreach(Bounds b in terrainSteps)
         {
             Vector3 ahead=p+horizontal;
             if(!OverlapsFootprint(b,ahead,f.Radius)) continue;
             float landingY=b.max.y+FighterSupportOffset;
-            float rise=landingY-p.y;
-            if(rise<=.01f || rise>maxStep) continue;
-            Vector3 candidate=new Vector3(ahead.x,landingY+.01f,ahead.z);
-            bool blocked=Occupied(candidate,f.Radius);
-            if(!blocked) { stepped=candidate; return true; }
+            if(landingY>highestLanding){highestLanding=landingY;found=true;}
         }
-        return false;
+        float rise=highestLanding-p.y;
+        if(!found||rise<=.01f||rise>maxStep)return false;
+        Vector3 candidate=new Vector3(p.x+horizontal.x,highestLanding+.01f,p.z+horizontal.z);
+        if(Occupied(candidate,f.Radius))return false;
+        stepped=candidate;return true;
     }
     void MoveWithObstacles(Fighter f,Vector3 displacement,bool poweredClimb=false)
     {
@@ -510,7 +688,7 @@ public sealed partial class VoxArena
             Vector3 next=p+Vector3.up*step.y;
             if(step.y>0)
             {
-                float jumpTop=f.jumpOriginY+jumpMaxHeight*Mathf.Max(.1f,f.spec.jumpHeightScale);
+                float jumpTop=f.jumpOriginY+jumpMaxHeight*Mathf.Max(.1f,f.spec.jumpHeightScale)*EnvironmentMobilityScale;
                 if(!poweredClimb && p.y<=jumpTop && next.y>jumpTop) { next.y=jumpTop; p=next; f.jumpVelocity=0; }
                 else if(!Occupied(next,f.Radius)) p=next;
                 else f.jumpVelocity=Mathf.Min(0,f.jumpVelocity);

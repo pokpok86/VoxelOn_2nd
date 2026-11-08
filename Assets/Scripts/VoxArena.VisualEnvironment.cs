@@ -27,10 +27,18 @@ public sealed partial class VoxArena
                 UnityEngine.Rendering.ShadowCastingMode.Off;
         }
     }
+    void VisualReef(string name,Transform parent,Vector3 pos,Vector3 size,Color color,float yaw)
+    {
+        Transform rock=Shape(PrimitiveType.Sphere,name,parent,pos,size,color);
+        rock.rotation=Quaternion.Euler(0,yaw,0);
+        Collider collider=rock.GetComponent<Collider>();if(collider!=null)Destroy(collider);
+        Renderer renderer=rock.GetComponent<Renderer>();if(renderer!=null)renderer.shadowCastingMode=UnityEngine.Rendering.ShadowCastingMode.Off;
+    }
     void BuildVisualEnvironment()
     {
         if(arenaMap==ArenaMapKind.OpenPlains)return;
         if(arenaMap==ArenaMapKind.OutdoorCanyon) { BuildOutdoorVista(); return; }
+        if(arenaMap==ArenaMapKind.CoastalBay) { BuildCoastalVista(); return; }
         if(PlaceEnvironment("FoundryBackdrop",null,new Vector3(0,GroundSurfaceY,0),Vector3.one)!=null) return;
         Transform root=new GameObject("Visual environment - no collision").transform;
         Color concrete=new Color(.27f,.32f,.38f);
@@ -132,5 +140,31 @@ public sealed partial class VoxArena
                 VisualBox("Pylon collar",pylon,new Vector3(0,8.8f,0),
                     new Vector3(2.3f,.45f,2.3f),panel);
             }
+    }
+    void BuildCoastalVista()
+    {
+        Transform root=new GameObject("Earth coastal harbor / visual only").transform;
+        Color concrete=new Color(.20f,.31f,.34f),steel=new Color(.16f,.26f,.31f),rust=new Color(.61f,.34f,.19f),lamp=new Color(.34f,.79f,.85f);
+        for(int i=0;i<4;i++)
+        {
+            float x=-92+i*26,z=(i%2==0?-126:126),height=25+i%2*6;
+            VisualBox("Harbor crane tower",root,new Vector3(x,height*.5f,z),new Vector3(2.4f,height,2.4f),steel);
+            VisualBox("Harbor crane crossarm",root,new Vector3(x+8,height,z),new Vector3(19,1.6f,2.2f),rust);
+            VisualBox("Crane hanging cable",root,new Vector3(x+14,height*.72f,z),new Vector3(.22f,height*.55f,.22f),steel);
+            VisualBox("Crane hook",root,new Vector3(x+14,height*.43f,z),new Vector3(1.1f,.7f,.65f),lamp,true);
+        }
+        for(int i=0;i<7;i++)
+        {
+            float x=-133+i*17;
+            VisualBox("Coastal warehouse silhouette",root,new Vector3(x,7.5f,-137),new Vector3(13,15,8),concrete);
+            VisualBox("Warehouse roof",root,new Vector3(x,15.2f,-137),new Vector3(14,1,9),steel);
+        }
+        for(int i=0;i<16;i++)
+        {
+            float x=20+(i%4)*27,z=-108+(i/4)*70,y=CoastalBaySurfaceHeight(new Vector3(x,0,z));
+            Color reef=i%2==0?new Color(.10f,.31f,.33f):new Color(.20f,.35f,.31f);
+            VisualReef("Undersea reef boulder",root,new Vector3(x,y+1.05f,z),new Vector3(4+(i%3),2.1f+(i%4),3+(i*3%4)),reef,i*17);
+            VisualReef("Reef outcrop",root,new Vector3(x+2.2f,y+.45f,z+1.4f),new Vector3(2.5f,1.3f,2.1f),Color.Lerp(reef,new Color(.38f,.49f,.33f),.45f),i*29);
+        }
     }
 }
