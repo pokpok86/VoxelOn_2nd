@@ -1,0 +1,243 @@
+{
+  "version": "2.0-draft",
+  "status": "design data only; no developer job",
+  "source": "PD-approved WISP image & 4-view design chat 2026-11-10",
+  "units": "meters",
+  "axes": {
+    "x": "right",
+    "y": "back",
+    "z": "up",
+    "forward": "-Y"
+  },
+  "height_estimate_m": 1.57,
+  "design": {
+    "head": "very small fixed",
+    "torso": "compact common chassis",
+    "shoulder_armor": "NONE for base",
+    "hands": "NONE",
+    "forearms": "large integrated laser cannon",
+    "legs": "short slim humanoid; not reverse-jointed",
+    "waist": "yaw only"
+  },
+  "dimensions": [
+    [
+      "head",
+      [
+        0.16,
+        0.145,
+        0.125
+      ],
+      [
+        0,
+        -0.02,
+        1.405
+      ]
+    ],
+    [
+      "torso",
+      [
+        0.42,
+        0.25,
+        0.43
+      ],
+      [
+        0,
+        0,
+        1.08
+      ]
+    ],
+    [
+      "chest",
+      [
+        0.48,
+        0.18,
+        0.25
+      ],
+      [
+        0,
+        -0.11,
+        1.13
+      ]
+    ],
+    [
+      "pelvis",
+      [
+        0.34,
+        0.23,
+        0.17
+      ],
+      [
+        0,
+        0,
+        0.73
+      ]
+    ],
+    [
+      "upper_arm_L",
+      [
+        0.125,
+        0.13,
+        0.235
+      ],
+      [
+        -0.355,
+        0.01,
+        1.105
+      ]
+    ],
+    [
+      "upper_arm_R",
+      [
+        0.125,
+        0.13,
+        0.235
+      ],
+      [
+        0.355,
+        0.01,
+        1.105
+      ]
+    ],
+    [
+      "forearm_gun_L",
+      [
+        0.245,
+        0.24,
+        0.39
+      ],
+      [
+        -0.402,
+        -0.015,
+        0.755
+      ]
+    ],
+    [
+      "forearm_gun_R",
+      [
+        0.245,
+        0.24,
+        0.39
+      ],
+      [
+        0.402,
+        -0.015,
+        0.755
+      ]
+    ],
+    [
+      "thigh_L",
+      [
+        0.13,
+        0.145,
+        0.28
+      ],
+      [
+        -0.155,
+        0,
+        0.54
+      ]
+    ],
+    [
+      "thigh_R",
+      [
+        0.13,
+        0.145,
+        0.28
+      ],
+      [
+        0.155,
+        0,
+        0.54
+      ]
+    ],
+    [
+      "shin_L",
+      [
+        0.12,
+        0.14,
+        0.265
+      ],
+      [
+        -0.17,
+        0,
+        0.25
+      ]
+    ],
+    [
+      "shin_R",
+      [
+        0.12,
+        0.14,
+        0.265
+      ],
+      [
+        0.17,
+        0,
+        0.25
+      ]
+    ],
+    [
+      "foot_L",
+      [
+        0.175,
+        0.245,
+        0.13
+      ],
+      [
+        -0.17,
+        -0.055,
+        0.065
+      ]
+    ],
+    [
+      "foot_R",
+      [
+        0.175,
+        0.245,
+        0.13
+      ],
+      [
+        0.17,
+        -0.055,
+        0.065
+      ]
+    ]
+  ],
+  "joints": {
+    "pelvis": [
+      0,
+      0,
+      0.69
+    ],
+    "waist_yaw": [
+      0,
+      0,
+      0.81
+    ],
+    "head": [
+      0,
+      -0.012,
+      1.365
+    ],
+    "shoulder_x_abs": 0.335,
+    "shoulder_z": 1.245,
+    "elbow_x_abs": 0.365,
+    "elbow_z": 0.975,
+    "hip_x_abs": 0.145,
+    "hip_z": 0.685,
+    "knee_z": 0.405,
+    "ankle_z": 0.115
+  },
+  "idle": {
+    "period_frames": 49,
+    "fps": 24,
+    "chest_bob_m": 0.006,
+    "chest_scale_z_max": 1.006,
+    "shoulder_pitch_change_deg": 0.9
+  },
+  "notes": [
+    "All values are authored initial guesses, not measurements from artwork.",
+    "Blender and Unity runtime not verified.",
+    "No hands, fingers, weapon grips, shoulder armor."
+  ]
+}

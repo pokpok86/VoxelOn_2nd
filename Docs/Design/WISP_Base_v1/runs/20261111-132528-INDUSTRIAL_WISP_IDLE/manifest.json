@@ -1,0 +1,294 @@
+{
+  "run_id": "20261111-132528-INDUSTRIAL_WISP_IDLE",
+  "pose": "IDLE",
+  "palette": {
+    "armor_rgb": [
+      0.36,
+      0.37,
+      0.39
+    ],
+    "frame_rgb": [
+      0.025,
+      0.032,
+      0.043
+    ],
+    "accent_rgb": [
+      0.82,
+      0.3,
+      0.07
+    ],
+    "visor": "CYAN_RETAINED"
+  },
+  "joint_cylinder_sides": 24,
+  "joint_cap_sides": 12,
+  "shoulder_armor_status": "MIRRORED_OUTER_CAPS_ADDED",
+  "accent_panels": [
+    "Chest_Accent_Panel",
+    "Forearm_Accent_Panel_L",
+    "Forearm_Accent_Panel_R"
+  ],
+  "pose_joints": {
+    "Shoulder_L_PitchX": -7.0,
+    "Elbow_L_PitchX": -30.0,
+    "Hip_L_PitchX": 0.0,
+    "Knee_L_PitchX": 0.0,
+    "Ankle_L_PitchX": 0.0
+  },
+  "variant": {
+    "id": "INDUSTRIAL_WISP_IDLE",
+    "armor_color": [
+      0.36,
+      0.37,
+      0.39
+    ],
+    "frame_color": [
+      0.025,
+      0.032,
+      0.043
+    ],
+    "accent_color": [
+      0.82,
+      0.3,
+      0.07
+    ],
+    "pose": "IDLE",
+    "hip_z": 0.615,
+    "joint_back_shift_m": 0.02,
+    "leg_scale": 0.89,
+    "pelvis_center_z": 0.655,
+    "torso_form": "WAIST_SCULPT",
+    "torso_height": 0.16,
+    "torso_center_z": 0.815,
+    "pelvis_form": "HIP_BRIDGE",
+    "pelvis_armor_level": -0.1,
+    "torso_armor_level": 0.1,
+    "chest_armor_height_ratio": 0.75,
+    "shoulder_gap_m": 0.015,
+    "shoulder_z_offset": -0.02,
+    "foot_offset_y": -0.025,
+    "head_form": "ANGULAR_SENSOR",
+    "face_form": "BEAKED_VISOR",
+    "face_width": 0.86,
+    "face_height": 0.44,
+    "antenna_side": 0,
+    "forearm_form": "EGG_GUN",
+    "shoulder_profile": "NARROW_WEDGE",
+    "shoulder_size": [
+      0.13,
+      0.12,
+      0.12
+    ],
+    "shoulder_bevel": 0.006,
+    "shoulder_tilt_deg": 22,
+    "head_size": [
+      0.132,
+      0.113,
+      0.108
+    ],
+    "head_center_z": 0.9745,
+    "head_antenna_height": 0.038,
+    "neck_radius": 0.015,
+    "forearm_size": [
+      0.2,
+      0.19,
+      0.32
+    ],
+    "muzzle_radius": 0.065,
+    "muzzle_enabled": true,
+    "upper_arm_size": [
+      0.066,
+      0.066,
+      0.14
+    ],
+    "foot_size": [
+      0.16,
+      0.22,
+      0.12
+    ],
+    "upper_arm_center_drop": 0.1,
+    "elbow_drop": 0.18,
+    "forearm_drop": 0.155,
+    "core_size": [
+      0.34,
+      0.23,
+      0.34
+    ],
+    "chest_size": [
+      0.25,
+      0.15,
+      0.2
+    ],
+    "pelvis_size": [
+      0.14,
+      0.075,
+      0.16
+    ],
+    "chest_profile": "TAPERED",
+    "limb_profile": "CANNON_TAPER",
+    "arm_splay_deg": 23,
+    "elbow_bend_deg": -30,
+    "leg_splay_deg": 7
+  },
+  "derived": {
+    "shoulder_axis_x": 0.192,
+    "shoulder_socket_x": 0.125,
+    "shoulder_gap_m": 0.015,
+    "joint_back_shift_m": 0.02,
+    "arm_chain_x": 0.2310731128489274,
+    "elbow_axis_x": 0.26233160312806925
+  },
+  "joint_centers_world": {
+    "Shoulder_L_AbductY": [
+      -0.192,
+      0.0,
+      0.87
+    ],
+    "Shoulder_R_AbductY": [
+      0.192,
+      0.0,
+      0.87
+    ],
+    "Hip_L_AbductY": [
+      -0.11,
+      0.02,
+      0.615
+    ],
+    "Hip_R_AbductY": [
+      0.11,
+      0.02,
+      0.615
+    ]
+  },
+  "blender_version": "5.2.3 LTS",
+  "model_objects": 67,
+  "required_hierarchy_objects": [
+    "Chest_Accent_Panel",
+    "Chest_Armor",
+    "Face_Aperture",
+    "Face_Visor",
+    "ForearmGun_L",
+    "ForearmGun_R",
+    "Forearm_Accent_Panel_L",
+    "Forearm_Accent_Panel_R",
+    "Head_FIXED",
+    "Head_Small",
+    "Hip_L_Axle",
+    "Hip_L_Can",
+    "Hip_R_Axle",
+    "Hip_R_Can",
+    "Knee_Armor_L",
+    "Knee_Armor_R",
+    "Knee_L_PitchX",
+    "Knee_R_PitchX",
+    "Neck_Link",
+    "Pelvis_Frame",
+    "Pelvis_Hip_Form_Link_L",
+    "Pelvis_Hip_Form_Link_R",
+    "ROOT",
+    "Shin_L",
+    "Shin_R",
+    "Shoulder_Armor_L",
+    "Shoulder_Armor_R",
+    "Shoulder_Connector_Short_L",
+    "Shoulder_Connector_Short_R",
+    "Shoulder_L_Axle",
+    "Shoulder_L_Can",
+    "Shoulder_L_PitchX",
+    "Shoulder_R_Axle",
+    "Shoulder_R_Can",
+    "Shoulder_R_PitchX",
+    "Socket_Backpack",
+    "UpperBody_BreathIdle",
+    "Waist_Yaw_Z"
+  ],
+  "bolt_on_line_geometry": "REMOVED",
+  "shoulder_armor": "MIRRORED_REFERENCE_CAPS",
+  "shoulder_can_local_dimensions": [
+    0.066,
+    0.066,
+    0.066
+  ],
+  "shoulder_can_front_to_back_depth": 0.066,
+  "upper_arm_dimensions": [
+    0.06336,
+    0.066,
+    0.14
+  ],
+  "hip_can_local_dimensions": [
+    0.082,
+    0.082,
+    0.075
+  ],
+  "thigh_dimensions": [
+    0.082,
+    0.075,
+    0.2492
+  ],
+  "shoulder_pivot_inset_from_chest_edge": -0.067,
+  "limb_and_joint_rearward_shift_m": 0.02,
+  "requested_forearm_dimensions": [
+    0.2,
+    0.19,
+    0.32
+  ],
+  "requested_foot_dimensions": [
+    0.16,
+    0.22,
+    0.12
+  ],
+  "requested_pelvis_dimensions": [
+    0.14,
+    0.075,
+    0.16
+  ],
+  "pelvis_top_z": 0.735,
+  "pelvis_bottom_z": 0.575,
+  "pelvis_height_m": 0.16,
+  "pelvis_width_m": 0.14,
+  "pelvis_depth_m": 0.075,
+  "pelvis_half_width_at_hip_m": 0.0672,
+  "hip_center_z_m": 0.615,
+  "hip_inset_from_pelvis_bottom_m": 0.04,
+  "leg_scale": 0.89,
+  "head_center_z_m": 0.9745,
+  "neck_visible_emergence_m": 0.0155,
+  "neck_radius_m": 0.015,
+  "requested_head_dimensions": [
+    0.132,
+    0.113,
+    0.108
+  ],
+  "upper_arm_length_m": 0.14,
+  "pelvis_link_centers_world": {
+    "L": [
+      -0.0886,
+      0.02,
+      0.615
+    ],
+    "R": [
+      0.0886,
+      0.02,
+      0.615
+    ]
+  },
+  "foot_rearward_offset_y": 0.03,
+  "shoulder_joint_gap_from_torso": 0.015,
+  "abdomen_armor_status": "SHORTENED_PANEL_RETAINED",
+  "chest_armor_dimensions": [
+    0.212296,
+    0.12,
+    0.1104
+  ],
+  "chest_armor_height_ratio": 0.75,
+  "articulation_centerlines": "PASS: shoulder can, upper-arm root and elbow pivot share the articulated X/Y centerline; elbow can/forearm, hip can/thigh, knee can/shin are centered",
+  "blend": "C:\\git\\VoxelOn_2nd\\Docs\\Design\\WISP_Base_v1\\runs\\20261111-132528-INDUSTRIAL_WISP_IDLE\\WISP_Base_v2.blend",
+  "images": [
+    "C:\\git\\VoxelOn_2nd\\Docs\\Design\\WISP_Base_v1\\runs\\20261111-132528-INDUSTRIAL_WISP_IDLE\\01-front.png",
+    "C:\\git\\VoxelOn_2nd\\Docs\\Design\\WISP_Base_v1\\runs\\20261111-132528-INDUSTRIAL_WISP_IDLE\\02-right.png",
+    "C:\\git\\VoxelOn_2nd\\Docs\\Design\\WISP_Base_v1\\runs\\20261111-132528-INDUSTRIAL_WISP_IDLE\\03-back.png",
+    "C:\\git\\VoxelOn_2nd\\Docs\\Design\\WISP_Base_v1\\runs\\20261111-132528-INDUSTRIAL_WISP_IDLE\\04-three-quarter-45.png"
+  ],
+  "automation": "PASS",
+  "design_review": "PENDING_PD_VISUAL_REVIEW",
+  "note": "Successful generation and rendering do not constitute design approval."
+}
