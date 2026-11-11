@@ -1,0 +1,45 @@
+{
+  "asset": "WISP HD-01 sensor head only",
+  "blender": "5.2.3 LTS",
+  "normalized_wisp_height_m": 1.0,
+  "measured_bounds_m": {
+    "width_x": 0.127,
+    "depth_y": 0.111,
+    "height_z": 0.137
+  },
+  "face_direction": "negative Y",
+  "visor": "single continuous horizontal cyan optical slit; no separate eyes",
+  "neck_interface": "small fixed connector; no head/neck articulation",
+  "bd01_mating": {
+    "body_interface_top_z_m": 0.158,
+    "head_interface_bottom_local_z_m": -0.059,
+    "head_root_z_for_mating_m": 0.217,
+    "interface_width_depth_m": [
+      0.058,
+      0.052
+    ]
+  },
+  "contains_torso": false,
+  "contains_arms_or_forearm_cannon": false,
+  "contains_legs": false,
+  "mesh_count": 10,
+  "renders": [
+    "HD01-01-Front.png",
+    "HD01-02-Right.png",
+    "HD01-03-Back.png",
+    "HD01-04-Left.png",
+    "HD01-05-45deg.png",
+    "HD01-06-Top.png"
+  ],
+  "review_files": [
+    "HD01-Concept-Comparison.png",
+    "HD01-Review-Phone.png"
+  ],
+  "references": [
+    "HD01-Design-Guide.jpg",
+    "WISP-Reference-Concept.png"
+  ],
+  "automation": "PASS",
+  "design_review": "PENDING_PD_VISUAL_REVIEW",
+  "note": "Standalone head module only; unrelated WISP parts were not edited."
+}

@@ -8,9 +8,11 @@ LG-01 is a standalone, mirrored pair of short humanoid legs. It contains no pelv
 - `LG01-01-Front.png` through `LG01-05-45deg.png`: front, right, back, left, and 45-degree views
 - `LG01-06-Joint-Centers-Axes.png`: pivot centers and rotation-axis guide
 - `LG01-Review-Phone.png`: phone-sized view sheet
+- `LG01-Concept-Comparison.png`: supplied guide beside the generated 45-degree pair
 - `LG01-Design-Guide.jpg` and `WISP-Reference-Concept.png`: supplied references
 - `build_lg01.py`: repeatable model and render generator
 - `make_lg01_review.ps1`: adds the pivot legend and builds the review sheet
+- `make_lg01_comparison.ps1`: rebuilds the reference comparison image
 - `manifest.json`: measured pair dimensions, pivot centers, and rig motion checks
 
 ## Scale and rig

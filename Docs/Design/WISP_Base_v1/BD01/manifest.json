@@ -1,0 +1,92 @@
+{
+  "asset": "WISP BD-01 compact body, shoulders, and upper-arm connector stubs",
+  "blender": "5.2.3 LTS",
+  "normalized_wisp_height_m": 1.0,
+  "measured_bounds_m": {
+    "width_x": 0.736,
+    "depth_y": 0.271,
+    "height_z": 0.413
+  },
+  "main_torso_core_m": {
+    "width_x": 0.392,
+    "depth_y": 0.23,
+    "height_z": 0.241
+  },
+  "contains_head": false,
+  "contains_forearm_weapon": false,
+  "contains_legs": false,
+  "neck": "fixed compact mount, no neck pivot",
+  "joint_centers_m": {
+    "shoulder_L": [
+      -0.238,
+      0,
+      0.032
+    ],
+    "shoulder_R": [
+      0.238,
+      0,
+      0.032
+    ],
+    "waist_yaw": [
+      0,
+      0,
+      -0.151
+    ]
+  },
+  "axes": {
+    "shoulder_pitch": "X front/back arm swing",
+    "shoulder_abduction": "Y slight lateral spread",
+    "waist": "Z left/right yaw only"
+  },
+  "connection_pixels_closeup": [
+    {
+      "joint": "shoulder_L",
+      "x": 202,
+      "y": 404
+    },
+    {
+      "joint": "shoulder_R",
+      "x": 898,
+      "y": 561
+    },
+    {
+      "joint": "waist",
+      "x": 550,
+      "y": 816
+    }
+  ],
+  "rig_motion_checks": {
+    "L": {
+      "pitch_moves_connector": true,
+      "abduction_moves_connector_outward": true
+    },
+    "R": {
+      "pitch_moves_connector": true,
+      "abduction_moves_connector_outward": true
+    },
+    "waist": {
+      "yaw_rotates_pelvis_interface": true
+    }
+  },
+  "mirrored_shoulders": true,
+  "renders": [
+    "BD01-01-Front.png",
+    "BD01-02-Right.png",
+    "BD01-03-Back.png",
+    "BD01-04-Left.png",
+    "BD01-05-45deg.png",
+    "BD01-06-Connections-Closeup.png",
+    "BD01-07-Connection-Axes.png"
+  ],
+  "review_files": [
+    "BD01-Concept-Comparison.png",
+    "BD01-Review-Phone.png"
+  ],
+  "references": [
+    "BD01-Design-Guide.jpg",
+    "WISP-Reference-Concept.png"
+  ],
+  "automation": "PASS",
+  "design_review": "PENDING_PD_VISUAL_REVIEW",
+  "note": "Standalone body unit only; shoulder armor is shifted outward to expose the cylindrical pivot face. No other WISP parts were generated or modified."
+}
