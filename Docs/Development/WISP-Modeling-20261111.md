@@ -414,6 +414,6 @@ The runner compares progressively fuller shoulder caps while keeping the approve
 - Opened the phone pose sheet and verified that the shoulder and hip cans read as cylinders again.
 
 ## Match the industrial WISP reference finish — 2026-11-11
-- Used the newly supplied WISP render as the appearance target: light neutral armor, dark graphite frame, orange armor accents and cyan optics. Restored the paired shoulder armor caps and added chest/forearm accent panels while keeping shoulder and hip cans cylindrical.
-- Generated IDLE, AIM, GUARD and CROUCH models with Blender 5.2.3. Each has an editable `.blend`, four camera renders, an automation manifest and log under `Docs/Design/WISP_Base_v1/runs/20261111-132528-INDUSTRIAL_WISP_IDLE` through `.../20261111-132613-INDUSTRIAL_WISP_CROUCH`.
-- Opened the front and 45-degree renders. The palette and broad armor placement now follow the reference direction, but the geometry remains a simple blockout and is visibly less detailed than the target render. Automation passed; design review is still pending PD. No Unity import.
+- Used the newly supplied WISP render as the appearance target: light neutral armor, dark graphite frame, orange armor accents and cyan optics. Restored paired shoulder armor caps and added chest/forearm accent panels while keeping shoulder and hip cans cylindrical.
+- Blender 5.2.3 generated IDLE, AIM, GUARD and CROUCH locally. The Git package keeps only the IDLE `.blend`, its four camera renders, manifest and one portrait 4-view sheet; the other poses, logs and comparison sheets are intermediate material and are not included.
+- Opened the front and 45-degree renders. The palette and broad armor placement follow the reference direction, but the geometry remains a simple blockout and is visibly less detailed than the target render. Automation passed; design review is still pending PD. No Unity import.
