@@ -1,0 +1,92 @@
+{
+  "asset": "WISP LG-01 mirrored biped leg pair",
+  "blender": "5.2.3 LTS",
+  "normalized_wisp_height_m": 1.0,
+  "measured_pair_bounds_m": {
+    "width_x": 0.294,
+    "depth_y": 0.161,
+    "height_z": 0.494
+  },
+  "hip_center_x_abs_m": 0.092,
+  "joint_centers_m": {
+    "hip_z": 0.455,
+    "knee_z": 0.254,
+    "ankle_z": 0.066
+  },
+  "joint_center_pixels_in_axis_render": [
+    {
+      "side": "L",
+      "joint": "hip",
+      "x": 452,
+      "y": 226
+    },
+    {
+      "side": "L",
+      "joint": "knee",
+      "x": 448,
+      "y": 517
+    },
+    {
+      "side": "L",
+      "joint": "ankle",
+      "x": 448,
+      "y": 787
+    },
+    {
+      "side": "R",
+      "joint": "hip",
+      "x": 648,
+      "y": 284
+    },
+    {
+      "side": "R",
+      "joint": "knee",
+      "x": 644,
+      "y": 574
+    },
+    {
+      "side": "R",
+      "joint": "ankle",
+      "x": 644,
+      "y": 845
+    }
+  ],
+  "axes": {
+    "hip_pitch": "X, front/back swing",
+    "hip_abduction": "Y, lateral splay",
+    "knee_pitch": "X, forward human knee bend",
+    "ankle_pitch": "X, front/back foot rotation"
+  },
+  "rig_motion_checks": {
+    "L": {
+      "hip_pitch_moves_leg": true,
+      "hip_abduction_moves_leg_outward": true,
+      "knee_bends_forward": true,
+      "ankle_pitch_moves_foot": true
+    },
+    "R": {
+      "hip_pitch_moves_leg": true,
+      "hip_abduction_moves_leg_outward": true,
+      "knee_bends_forward": true,
+      "ankle_pitch_moves_foot": true
+    }
+  },
+  "mirrored_left_right": true,
+  "contains_pelvis_or_torso": false,
+  "renders": [
+    "LG01-01-Front.png",
+    "LG01-02-Right.png",
+    "LG01-03-Back.png",
+    "LG01-04-Left.png",
+    "LG01-05-45deg.png",
+    "LG01-06-Joint-Centers-Axes.png",
+    "LG01-Review-Phone.png"
+  ],
+  "references": [
+    "LG01-Design-Guide.jpg",
+    "WISP-Reference-Concept.png"
+  ],
+  "automation": "PASS",
+  "design_review": "PENDING_PD_VISUAL_REVIEW",
+  "note": "Standalone paired legs only; PD retains design acceptance. Joint names mark Blender pivot origins."
+}
