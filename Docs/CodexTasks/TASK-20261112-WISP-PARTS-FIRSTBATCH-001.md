@@ -11,6 +11,8 @@ owner: developer
 
 # PD design brief — WISP modular parts / first batch
 
+Common production standard: [WISP modular part design standards](../Design/WISP_Parts/DESIGN_STANDARDS.md). Follow the PD-defined replacement boundaries, fixed base proportions, shared interfaces, and silhouette-first review process for this batch and later part IDs.
+
 **CURRENT STATE: READY — W-01 LUMEN ONLY.**
 
 PD activated this task in chat on 2026-11-12. All six reference PNGs are present on work in commit 868ee7b; their SHA-256 hashes and byte lengths match the supplied ZIP manifest. W-01 appearance and mounting must receive PD approval before any other item starts.
