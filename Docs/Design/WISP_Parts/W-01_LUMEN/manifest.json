@@ -1,0 +1,59 @@
+{
+  "asset": "W-01 LUMEN",
+  "reference": "../References/W-01_LUMEN.png",
+  "blender": "5.2.3 LTS",
+  "bounds_working_units": {
+    "width_x": 0.214,
+    "length_y": 0.7085,
+    "height_z": 0.2768
+  },
+  "elbow_pivot_working_units": [
+    0.0,
+    0.28200000524520874,
+    0.10899999737739563
+  ],
+  "same_orthographic_scale_all_four_views": 0.96,
+  "structural_armor_mesh_count": 38,
+  "front_emitter_visibility_rays": [
+    true,
+    true,
+    true
+  ],
+  "mounted_scale_for_normalized_base": 0.42,
+  "mounted_elbows_normalized_base": [
+    [
+      0.282,
+      0,
+      0.604
+    ],
+    [
+      -0.282,
+      0,
+      0.604
+    ]
+  ],
+  "base_sha256_unchanged": {
+    "BD01": "ccaa9c0428841e1bca6a1779ae1bcc7d3d0731da969a1d694ba47a338777a070",
+    "HD01": "d2beba89291e5fbaeffba87639f94f79dce4afaa541937d9bdb1db3f872a35d9",
+    "LG01": "581d189b09217e04285577ea7adf8686ab9e1f64d2fd1a0905fe6ac4b6c11160"
+  },
+  "clearance_checks": {
+    "idle": {
+      "major_shell_vs_torso_thigh_aabb_clear": true,
+      "overlaps": []
+    },
+    "aimed": {
+      "major_shell_vs_torso_thigh_aabb_clear": true,
+      "overlaps": []
+    }
+  },
+  "automation": "PASS",
+  "design_approval": "PENDING_PD",
+  "unity_integration": "NOT_PERFORMED",
+  "assumptions": [
+    "Sheet views disagree: front and 45-degree silhouette prioritized.",
+    "Internal elbow retention and hidden barrel internals are inferred, not supplied CAD.",
+    "Working dimensions approximate the sheet envelope; mounted scale .42 adapts it to the pre-existing normalized WISP base.",
+    "Clearance checks are static AABB checks for major shells against torso and thighs in two poses; no exhaustive animation/physics validation."
+  ]
+}
