@@ -1,7 +1,7 @@
-"""Build only the mirrored WISP LG-01 biped leg pair and review renders.
+"""Build the mirrored WISP LG-01 biped lower body and review renders.
 
-Coordinates use meters, Z up, forward along -Y. The pelvis is deliberately not
-included. A gimbal at each hip provides X-axis pitch and Y-axis abduction; knee
+Coordinates use meters, Z up, forward along -Y. A compact pelvis connects both
+hip gimbals, providing X-axis pitch and Y-axis abduction; knee
 and ankle pivots provide X-axis sagittal rotation.
 """
 import bpy
@@ -95,7 +95,8 @@ def cylinder_axis(name, loc, radius, depth, axis, material, verts=24):
     rot = {"X": (0,math.pi/2,0), "Y": (math.pi/2,0,0), "Z": (0,0,0)}[axis]
     bpy.ops.mesh.primitive_cylinder_add(vertices=verts, radius=radius, depth=depth,
                                         location=loc, rotation=rot)
-    return bevel(put(bpy.context.object, MODEL, material), .002)
+    o=put(bpy.context.object, MODEL, material);o.name=name
+    return bevel(o, .002)
 
 def clipped_rect(hx, hy, cut=.25):
     cx, cy = hx*cut, hy*cut
@@ -170,6 +171,27 @@ HIP_X = .092
 ROOT=make_empty("LG01_PAIR_ROOT",(0,0,0))
 PIVOTS={}
 PARTS=[]
+
+# Compact pelvis: both hip axes pass through the same structural cross-shaft.
+# The hip centers stay within the pelvis height, not below a dangling plate.
+pelvis=loft_z('LG01_Pelvis_Core',[
+    (.417,.031,.030,.003,.24),(.433,.043,.037,.003,.22),
+    (.482,.045,.036,.003,.23),(.498,.034,.029,.003,.24)],GRAPHITE)
+bridge=cylinder_axis('LG01_Pelvis_Hip_Cross_Shaft',(0,0,HIP_Z),.021,2*HIP_X,'X',GUNMETAL,32)
+pelvis_front=front_plate('LG01_Pelvis_Front_Armor',0,[
+    (-.033,.492),(.033,.492),(.041,.477),(.032,.431),
+    (.020,.420),(-.020,.420),(-.032,.431),(-.041,.477)],-.039,.014,ARMOR)
+pelvis_back=box('LG01_Pelvis_Rear_Cover',(0,.039,.458),(.068,.012,.058),ARMOR_SHADE,.003)
+waist_floor=box('LG01_Waist_Socket_Floor',(0,0,.499),(.083,.073,.012),GRAPHITE,.002)
+PARTS.extend([(pelvis,ROOT),(bridge,ROOT),(pelvis_front,ROOT),(pelvis_back,ROOT),(waist_floor,ROOT)])
+for x in (-.039,.039):
+    lip=box('LG01_Waist_Socket_Side',(x,0,.510),(.006,.073,.012),GUNMETAL,.001)
+    PARTS.append((lip,ROOT))
+for y in (-.034,.034):
+    lip=box('LG01_Waist_Socket_End',(0,y,.510),(.072,.006,.012),GUNMETAL,.001)
+    PARTS.append((lip,ROOT))
+waist_interface=make_empty('LG01_WAIST_MATING_INTERFACE',(0,0,.505),ROOT)
+waist_interface['motion']='fixed pelvis socket; yaw articulation belongs to BD01'
 
 for side, s in (("L",-1),("R",1)):
     hx=s*HIP_X
@@ -269,6 +291,16 @@ for obj,parent in PARTS:
 
 # Verify the actual beveled armor geometry, not just object centers.
 bpy.context.view_layer.update()
+def world_bounds(obj):
+    pts=[obj.matrix_world @ Vector(v) for v in obj.bound_box]
+    return [(min(p[i] for p in pts),max(p[i] for p in pts)) for i in range(3)]
+def boxes_overlap(a,b):
+    aa,bb=world_bounds(a),world_bounds(b)
+    return all(min(aa[i][1],bb[i][1])-max(aa[i][0],bb[i][0])>0.0001 for i in range(3))
+pelvis_connection_checks={}
+for name in ('LG01_Pelvis_Core','L_Hip_Can_X','R_Hip_Can_X'):
+    assert boxes_overlap(bridge,bpy.data.objects[name]),f'Pelvis shaft is disconnected from {name}'
+    pelvis_connection_checks[name]=True
 symmetry_checks={}
 deps=bpy.context.evaluated_depsgraph_get()
 for suffix in ('Thigh_Armor','Thigh_Front_Plate','Shin_Armor','Shin_Front_Plate','Knee_Guard','Angular_Foot'):
@@ -410,7 +442,7 @@ bounds={"width_x":round(max(v.x for v in coords)-min(v.x for v in coords),3),
         "depth_y":round(max(v.y for v in coords)-min(v.y for v in coords),3),
         "height_z":round(max(v.z for v in coords)-min(v.z for v in coords),3)}
 manifest={
-    "asset":"WISP LG-01 mirrored biped leg pair",
+    "asset":"WISP LG-01 mirrored biped lower-body module with pelvis",
     "blender":bpy.app.version_string,
     "normalized_wisp_height_m":1.0,
     "measured_pair_bounds_m":bounds,
@@ -422,12 +454,15 @@ manifest={
     "rig_motion_checks":rig_checks,
     "evaluated_armor_mirror_checks":symmetry_checks,
     "mirrored_left_right":True,
-    "contains_pelvis_or_torso":False,
+    "contains_pelvis":True,
+    "pelvis_shaft_overlap_checks":pelvis_connection_checks,
+    "contains_torso":False,
+    "pelvis_hip_connection":{"cross_shaft_axis":"X","cross_shaft_center_z_m":HIP_Z,"hip_centers":[[-HIP_X,0,HIP_Z],[HIP_X,0,HIP_Z]],"pelvis_core_z_range_m":[.417,.498],"waist_mating_center_m":[0,0,.505]},
     "renders":[f for f,_ in views]+["LG01-06-Joint-Centers-Axes.png","LG01-Review-Phone.png"],
     "references":["LG01-Design-Guide.jpg","WISP-Reference-Concept.png"],
     "automation":"PASS",
     "design_review":"PENDING_PD_VISUAL_REVIEW",
-    "note":"Standalone paired legs only; PD retains design acceptance. Joint names mark Blender pivot origins."
+    "note":"Lower-body module includes a short central pelvis, waist socket and co-centered hip cross-shaft. PD retains design acceptance."
 }
 with open(os.path.join(OUT,"manifest.json"),"w",encoding="utf-8") as f:
     json.dump(manifest,f,ensure_ascii=False,indent=2)

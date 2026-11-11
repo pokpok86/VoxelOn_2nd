@@ -1,11 +1,11 @@
 {
-  "asset": "WISP LG-01 mirrored biped leg pair",
+  "asset": "WISP LG-01 mirrored biped lower-body module with pelvis",
   "blender": "5.2.3 LTS",
   "normalized_wisp_height_m": 1.0,
   "measured_pair_bounds_m": {
     "width_x": 0.266,
     "depth_y": 0.164,
-    "height_z": 0.482
+    "height_z": 0.508
   },
   "hip_center_x_abs_m": 0.092,
   "joint_centers_m": {
@@ -80,7 +80,38 @@
     "Angular_Foot": true
   },
   "mirrored_left_right": true,
-  "contains_pelvis_or_torso": false,
+  "contains_pelvis": true,
+  "pelvis_shaft_overlap_checks": {
+    "LG01_Pelvis_Core": true,
+    "L_Hip_Can_X": true,
+    "R_Hip_Can_X": true
+  },
+  "contains_torso": false,
+  "pelvis_hip_connection": {
+    "cross_shaft_axis": "X",
+    "cross_shaft_center_z_m": 0.455,
+    "hip_centers": [
+      [
+        -0.092,
+        0,
+        0.455
+      ],
+      [
+        0.092,
+        0,
+        0.455
+      ]
+    ],
+    "pelvis_core_z_range_m": [
+      0.417,
+      0.498
+    ],
+    "waist_mating_center_m": [
+      0,
+      0,
+      0.505
+    ]
+  },
   "renders": [
     "LG01-01-Front.png",
     "LG01-02-Right.png",
@@ -96,5 +127,5 @@
   ],
   "automation": "PASS",
   "design_review": "PENDING_PD_VISUAL_REVIEW",
-  "note": "Standalone paired legs only; PD retains design acceptance. Joint names mark Blender pivot origins."
+  "note": "Lower-body module includes a short central pelvis, waist socket and co-centered hip cross-shaft. PD retains design acceptance."
 }

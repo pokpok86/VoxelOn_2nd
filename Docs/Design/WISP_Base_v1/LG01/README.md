@@ -1,10 +1,10 @@
-# WISP LG-01 Biped Leg Pair
+# WISP LG-01 Biped Lower Body
 
-LG-01 is a standalone, mirrored pair of short humanoid legs. It contains no pelvis, torso, arms, or head. The geometry follows the supplied leg guide and the WISP base concept's compact lower-body proportions.
+LG-01 is a standalone, mirrored pair of short humanoid legs with a compact central pelvis. It contains no torso, arms, or head. The geometry follows the supplied leg guide and the WISP base concept's compact lower-body proportions.
 
 ## Deliverables
 
-- `LG01.blend`: editable paired leg modules with named Blender pivot empties
+- `LG01.blend`: editable pelvis and paired leg modules with named Blender pivot empties
 - `LG01-01-Front.png` through `LG01-05-45deg.png`: front, right, back, left, and 45-degree views
 - `LG01-06-Joint-Centers-Axes.png`: pivot centers and rotation-axis guide
 - `LG01-Review-Phone.png`: phone-sized view sheet
@@ -16,6 +16,8 @@ LG-01 is a standalone, mirrored pair of short humanoid legs. It contains no pelv
 - `manifest.json`: measured pair dimensions, pivot centers, and rig motion checks
 
 ## Scale and rig
+
+The pelvis core occupies Z=0.417–0.498 m; both hip centers lie at Z=0.455 m within that range. A continuous X-axis shaft connects the central core to both cylindrical hip housings. The top has a short rectangular waist socket, with a named mating interface at (0,0,0.505). The generator verifies that the shaft geometry overlaps the central core and both hip housings, and continues to check mirrored leg armor and leg articulation.
 
 WISP height is normalized to 1 m. Current pair bounds are recorded in `manifest.json`. Hip centers are at ±0.092 m X, Z=0.455 m; knees at Z=0.254 m; ankles at Z=0.066 m. The concept-refinement pass reduces the exposed hip/knee drums, tapers the thigh and shin shells, adds separate shaped front plates, and separates the heel and toe features. Side accent positions include each leg's center offset so they no longer float between the legs.
 
