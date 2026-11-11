@@ -137,10 +137,12 @@ def parent_at(obj,parent):
 
 def front_plate(name,hx,points,y,depth,material):
     n=len(points)
-    vs=[(hx+x,yy,z) for yy in (y-depth/2,y+depth/2) for x,z in points]
+    s=1 if hx>0 else -1
+    vs=[(hx+s*x,yy,z) for yy in (y-depth/2,y+depth/2) for x,z in points]
     fs=[tuple(range(n-1,-1,-1)),tuple(range(n,2*n))]
     for i in range(n):
         j=(i+1)%n;fs.append((i,j,n+j,n+i))
+    if s<0: fs=[tuple(reversed(f)) for f in fs]
     mesh=bpy.data.meshes.new(name+'_plate');mesh.from_pydata(vs,[],fs);mesh.update()
     o=bpy.data.objects.new(name,mesh);MODEL.objects.link(o);o.data.materials.append(material)
     return bevel(o,.0015)
@@ -150,11 +152,13 @@ def thigh_ridged_plate(name,hx,material):
     # remains narrow in front view; extra volume is toward the front (-Y).
     outline=[(-.027,.419),(0,.422),(.027,.419),(.033,.391),(.021,.303),(0,.289),(-.017,.289),(-.028,.320)]
     n=len(outline)
-    vs=[(hx+x,-.061-(.010 if abs(x)<.001 else 0),z) for x,z in outline]
-    vs += [(hx+x,-.049,z) for x,z in outline]
+    s=1 if hx>0 else -1
+    vs=[(hx+s*x,-.061-(.010 if abs(x)<.001 else 0),z) for x,z in outline]
+    vs += [(hx+s*x,-.049,z) for x,z in outline]
     fs=[(7,6,5,1,0),(5,4,3,2,1),tuple(range(n,2*n))]
     for i in range(n):
         j=(i+1)%n;fs.append((i,j,n+j,n+i))
+    if s<0: fs=[tuple(reversed(f)) for f in fs]
     me=bpy.data.meshes.new(name+'_ridge');me.from_pydata(vs,[],fs);me.update()
     o=bpy.data.objects.new(name,me);MODEL.objects.link(o);o.data.materials.append(material)
     return bevel(o,.0015)
@@ -262,6 +266,21 @@ for side, s in (("L",-1),("R",1)):
 # Parent each designed part to its articulation while retaining world placement.
 for obj,parent in PARTS:
     parent_at(obj,parent)
+
+# Verify the actual beveled armor geometry, not just object centers.
+bpy.context.view_layer.update()
+symmetry_checks={}
+deps=bpy.context.evaluated_depsgraph_get()
+for suffix in ('Thigh_Armor','Thigh_Front_Plate','Shin_Armor','Shin_Front_Plate','Knee_Guard','Angular_Foot'):
+    clouds=[]
+    for side in ('L','R'):
+        obj=bpy.data.objects[f'{side}_{suffix}'].evaluated_get(deps)
+        mesh=obj.to_mesh()
+        pts=[obj.matrix_world @ v.co for v in mesh.vertices]
+        clouds.append({(round(-v.x if side=='L' else v.x,5),round(v.y,5),round(v.z,5)) for v in pts})
+        obj.to_mesh_clear()
+    assert clouds[0]==clouds[1],f'Armor mirror mismatch: {suffix}'
+    symmetry_checks[suffix]=True
 
 # Nested pivot hierarchy uses object origins as actual mechanical centers.
 # Hip Y abduction -> Hip X flexion -> Knee X flexion -> Ankle X rotation.
@@ -401,6 +420,7 @@ manifest={
     "axes":{"hip_pitch":"X, front/back swing","hip_abduction":"Y, lateral splay",
             "knee_pitch":"X, forward human knee bend","ankle_pitch":"X, front/back foot rotation"},
     "rig_motion_checks":rig_checks,
+    "evaluated_armor_mirror_checks":symmetry_checks,
     "mirrored_left_right":True,
     "contains_pelvis_or_torso":False,
     "renders":[f for f,_ in views]+["LG01-06-Joint-Centers-Axes.png","LG01-Review-Phone.png"],

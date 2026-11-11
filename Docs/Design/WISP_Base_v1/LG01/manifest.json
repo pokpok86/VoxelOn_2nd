@@ -71,6 +71,14 @@
       "ankle_pitch_moves_foot": true
     }
   },
+  "evaluated_armor_mirror_checks": {
+    "Thigh_Armor": true,
+    "Thigh_Front_Plate": true,
+    "Shin_Armor": true,
+    "Shin_Front_Plate": true,
+    "Knee_Guard": true,
+    "Angular_Foot": true
+  },
   "mirrored_left_right": true,
   "contains_pelvis_or_torso": false,
   "renders": [

@@ -18,7 +18,7 @@ Standalone torso/shoulder module. It does not include a head, upper arms, forear
 
 The chest has an open lower outline: its lower cheek plates flank a recessed, tapered dark abdomen. A small center chest plate and restrained orange inset follow the supplied concept. Angled shoulder caps wrap around the cylindrical joint, and the short upper-arm connectors now point downward. The bottom waist interface was shortened. A subtle procedural material normal adds surface grain without extra geometric decoration.
 
-The central chest plate now has a shallow 10 mm forward ridge, forming two broad angled faces. Its outside width remains unchanged.
+The central chest plate now has an 18 mm forward ridge, forming two broad angled faces. The lower chest cheek plates also project more strongly to make the surrounding chest volume readable. Its outside width remains unchanged.
 
 Current bounds and pivot centers are stored in `manifest.json` and named Blender empties. The main torso core is about 0.350 m wide. The generator temporarily rotates each shoulder and the waist interface, checks that the connector moves while the waist rotates in place, and restores the neutral pose before rendering. Visual resemblance remains a review task; generation success does not approve the design.
 

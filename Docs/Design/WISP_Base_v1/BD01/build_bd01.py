@@ -131,10 +131,10 @@ PARTS.append((chest,ROOT))
 accent=prism_xz("Chest_Center_Point_Armor",[
     (-.071,.082),(0,.085),(.071,.082),(.071,.035),(0,.029),(-.071,.035)],-.131,.007,ARMOR,.0015)
 # A shallow central ridge makes two broad chest planes rather than another
-# flat plate. Only the front center vertices project by 10 mm.
+# flat plate. Only the front center vertices project by 18 mm.
 for v in accent.data.vertices:
     if abs(v.co.x)<.001 and v.co.y<-.131:
-        v.co.y-=.010
+        v.co.y-=.018
 # Explicit left/right facets avoid ambiguous triangulation of a raised ngon.
 am=accent.data
 verts=[tuple(v.co) for v in am.vertices]
@@ -147,7 +147,7 @@ orange_point=prism_xz("Chest_Point_Orange_Inset",[
     (-.152,.065),(-.101,.054),(-.102,.020),(-.145,.030)],-.130,.004,ORANGE,.001)
 PARTS.append((orange_point,ROOT))
 for s in (-1,1):
-    cheek=prism_xz(f"Chest_Lower_Chamfer_{s}",mirror([(.074,-.006),(.112,-.012),(.147,-.042),(.109,-.075),(.074,-.058)],s),-.116,.025,ARMOR_SHADE,.002)
+    cheek=prism_xz(f"Chest_Lower_Chamfer_{s}",mirror([(.074,-.006),(.112,-.012),(.147,-.042),(.109,-.075),(.074,-.058)],s),-.120,.038,ARMOR_SHADE,.002)
     PARTS.append((cheek,ROOT))
 belly=prism_xz("Recessed_Abdominal_Frame",[(-.062,-.003),(.062,-.003),(.052,-.092),(-.052,-.092)],-.067,.034,GUNMETAL,.003)
 belly_inset=cube("Abdominal_Recess",(0,-.087,-.028),(.072,.009,.023),GRAPHITE,.001)

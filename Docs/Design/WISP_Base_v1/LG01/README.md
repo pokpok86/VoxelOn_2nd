@@ -23,6 +23,8 @@ Each hip uses nested Y-axis abduction and X-axis pitch pivots. Knee and ankle pi
 
 The thigh front plates have a shallow longitudinal ridge and thicker forward projection. This adds depth in three-quarter and side views without widening the legs.
 
+The shaped front plates are now mirrored across X rather than copied in the same orientation. Generator assertions compare the evaluated beveled vertex positions of paired thigh/shin shells, front plates, knee guards and feet to verify actual left/right symmetry, including face-winding correction on the mirrored plates.
+
 ## Rebuild
 
 Run Blender 5.2.3 with `build_lg01.py`, then run `make_lg01_review.ps1` in PowerShell. Generation and the pivot-motion checks completed; design approval remains pending PD review. No Unity import or full WISP edits were made.

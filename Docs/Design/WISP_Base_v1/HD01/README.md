@@ -20,7 +20,7 @@ The latest full-body concept is the reference for this revision. A single rectan
 
 Coordinates use meters, Z-up, facing -Y. Current measured dimensions are recorded in `manifest.json`; the bounds include the antenna and fixed connector. The render lighting was lowered to preserve material color, and a subtle procedural surface normal was added.
 
-The latest face adjustment narrows the foremost shell section by about 9% and lightly tapers the lower cheeks. The rectangular sensor, head height, fore/aft depth, and fixed neck interface retain their previous dimensions. Side pods move inward by 2 mm per side to stay seated against the shell.
+The face adjustments narrow the foremost shell section by about 13% relative to the initial concept-refinement pass and taper the lower cheeks by up to 14%. The rectangular sensor, head height, fore/aft depth, and fixed neck interface retain their previous dimensions. Side pods remain seated against the shell.
 
 ## Rebuild
 

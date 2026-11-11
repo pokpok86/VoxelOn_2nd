@@ -101,7 +101,7 @@ def loft_y(name, sections, material):
         for x,z in clipped(hx,hz,cut):
             # Taper the lower cheeks slightly while preserving the brow and
             # the fixed sensor opening. The rear shell retains its volume.
-            jaw_taper=1.0-.10*max(0.0,-z/hz) if y<.035 else 1.0
+            jaw_taper=1.0-.14*max(0.0,-z/hz) if y<.035 else 1.0
             verts.append((x*jaw_taper,y,z+cz))
     faces = [tuple(range(n-1,-1,-1))]
     for k in range(len(sections)-1):
@@ -121,8 +121,8 @@ def loft_y(name, sections, material):
 # Small low-poly shell: cut brow, tapered cheeks and a short chin create a
 # sensor/avian profile without making a round ball or a plain cube.
 loft_y("HD01_Main_Faceted_Helmet_Shell", [
-    (-.050,.042,.028,.000,.30),
-    (-.035,.055,.040,.000,.28),
+    (-.050,.040,.028,.000,.30),
+    (-.035,.053,.040,.000,.28),
     (.028,.059,.041,.001,.25),
     (.055,.050,.033,.002,.27),
 ], ARMOR)
