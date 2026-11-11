@@ -13,9 +13,9 @@ owner: developer
 
 Common production standard: [WISP modular part design standards](../Design/WISP_Parts/DESIGN_STANDARDS.md). Follow the PD-defined replacement boundaries, fixed base proportions, shared interfaces, and silhouette-first review process for this batch and later part IDs.
 
-**CURRENT STATE: READY — W-01 LUMEN ONLY.**
+**CURRENT STATE: READY — W-01 APPROVED; REMAINING FIVE AUTHORIZED.**
 
-PD activated this task in chat on 2026-11-12. All six reference PNGs are present on work in commit 868ee7b; their SHA-256 hashes and byte lengths match the supplied ZIP manifest. W-01 appearance and mounting must receive PD approval before any other item starts.
+PD activated this task in chat on 2026-11-12. All six reference PNGs are present on work in commit 868ee7b; their SHA-256 hashes and byte lengths match the supplied ZIP manifest. W-01 subsequently received explicit PD approval and the other five were authorized together.
 
 ## Reference images (REQUIRED)
 
@@ -54,11 +54,17 @@ Upload these SIX PNGs from the supplied `WISP_Parts_FirstBatch_20261112.zip` int
 
 The original concept images are generated presentation art rather than precise CAD. Orthographic views may disagree across angles; treat the PD-approved front and 45° silhouette as visual priority, explicitly annotate hidden-geometry assumptions. Do **not** claim a render is an exact match before side-by-side PD inspection.
 
-PD activated W-01 in chat after reference upload. W-02 through W-05 and B-01 remain gated on W-01 PD approval.
+PD activated W-01 after reference upload. Its PD gate was satisfied by explicit chat approval; W-02 through W-05 and B-01 are now authorized for batch production, with their results awaiting separate review.
 
 ## First-gate delivery
 
 - W-01 candidate: `Docs/Design/WISP_Parts/W-01_LUMEN/`.
 - Editable standalone module and separate mounted review scene; front/right/rear/45-degree renders, interface close-up, idle and aimed previews, and portrait concept comparison.
 - Blender generation, source-base file preservation and limited static clearance checks are recorded in `manifest.json`. Exact scope and hidden-geometry assumptions are documented in the module README.
-- **Design and mount appearance: PENDING PD APPROVAL.** Do not activate the other five parts based on automation success.
+- **W-01 design approval: APPROVED BY PD IN CHAT, 2026-11-12.** PD said “이정도면 합격다음꺼는 5개 한방에” and explicitly authorized W-02 BREAKER, W-03 RATTLE, W-04 EDGE, W-05 AEGIS and B-01 TWIN DRIVE as one batch. Their new results still require PD review.
+
+## Authorized five-part batch
+
+- New standalone and mounted review files are in `Docs/Design/WISP_Parts/<part ID>/` for the five authorized IDs.
+- Summary and actual validation scope: `Docs/Design/WISP_Parts/FIRST_BATCH_DELIVERY.md`.
+- The five new designs remain **PENDING PD REVIEW**. No Unity integration or balance changes are included.

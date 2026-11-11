@@ -1,0 +1,57 @@
+{
+  "asset": "B-01_TWIN_DRIVE",
+  "reference": "../References/B-01_TWIN_DRIVE.png",
+  "reference_sha256": "9be3763b5622c7698bca3c5eef2c4029c1f87d32b9b5dbadfe22962161164903",
+  "blender": "5.2.3 LTS",
+  "working_bounds": {
+    "width_x": 0.377,
+    "length_y": 0.2327,
+    "height_z": 0.2705
+  },
+  "module_mesh_count": 38,
+  "connection_origin_working_units": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "common_elbow_interface": null,
+  "back_mount_assumption": {
+    "anchor_normalized_base": [
+      0,
+      0.139,
+      0.707
+    ],
+    "pin_rectangle_width_height": [
+      0.068,
+      0.05
+    ],
+    "source": "provisional attachment to existing rear plate; concealed retention not supplied"
+  },
+  "four_views_same_ortho_scale": 0.49764000535011294,
+  "face_view_axis": "-Y/+Y front and rear",
+  "mounted_scale": 1.0,
+  "base_sha256_unchanged": {
+    "BD01": "ccaa9c0428841e1bca6a1779ae1bcc7d3d0731da969a1d694ba47a338777a070",
+    "HD01": "d2beba89291e5fbaeffba87639f94f79dce4afaa541937d9bdb1db3f872a35d9",
+    "LG01": "581d189b09217e04285577ea7adf8686ab9e1f64d2fd1a0905fe6ac4b6c11160"
+  },
+  "static_clearance_checks": {
+    "idle": {
+      "major_shell_vs_torso_thigh_bounds_clear": true,
+      "overlaps": []
+    }
+  },
+  "thruster_lens_visibility_rays": [
+    true,
+    true
+  ],
+  "automation": "PASS",
+  "design_approval": "PENDING_PD",
+  "unity_integration": "NOT_PERFORMED",
+  "assumptions": [
+    "Front and 45-degree concept silhouettes take priority where views disagree.",
+    "Concealed internals and connector retention are modeling assumptions, not verified CAD.",
+    "Weapons use the LUMEN approved mount scale .42 on the normalized base; backpack uses the normalized torso scale directly.",
+    "Clearance covers selected major shells versus torso/thigh AABBs in static poses, not exhaustive collision or animation validation."
+  ]
+}

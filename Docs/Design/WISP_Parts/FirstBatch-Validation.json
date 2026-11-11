@@ -1,0 +1,47 @@
+{
+  "W-02_BREAKER": {
+    "saved_blend_reopened": true,
+    "standalone_mesh_count": 38,
+    "reference_sha256_match": true,
+    "base_sha256_match": true,
+    "same_scale_orthographic_views": true,
+    "recorded_static_checks_pass": true,
+    "design_approval": "PENDING_PD"
+  },
+  "W-03_RATTLE": {
+    "saved_blend_reopened": true,
+    "standalone_mesh_count": 67,
+    "reference_sha256_match": true,
+    "base_sha256_match": true,
+    "same_scale_orthographic_views": true,
+    "recorded_static_checks_pass": true,
+    "design_approval": "PENDING_PD"
+  },
+  "W-04_EDGE": {
+    "saved_blend_reopened": true,
+    "standalone_mesh_count": 26,
+    "reference_sha256_match": true,
+    "base_sha256_match": true,
+    "same_scale_orthographic_views": true,
+    "recorded_static_checks_pass": true,
+    "design_approval": "PENDING_PD"
+  },
+  "W-05_AEGIS": {
+    "saved_blend_reopened": true,
+    "standalone_mesh_count": 26,
+    "reference_sha256_match": true,
+    "base_sha256_match": true,
+    "same_scale_orthographic_views": true,
+    "recorded_static_checks_pass": true,
+    "design_approval": "PENDING_PD"
+  },
+  "B-01_TWIN_DRIVE": {
+    "saved_blend_reopened": true,
+    "standalone_mesh_count": 38,
+    "reference_sha256_match": true,
+    "base_sha256_match": true,
+    "same_scale_orthographic_views": true,
+    "recorded_static_checks_pass": true,
+    "design_approval": "PENDING_PD"
+  }
+}

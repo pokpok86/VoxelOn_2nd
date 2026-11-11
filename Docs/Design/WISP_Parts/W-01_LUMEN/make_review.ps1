@@ -8,7 +8,7 @@ $title=[Drawing.Font]::new('Segoe UI',24,[Drawing.FontStyle]::Bold)
 $small=[Drawing.Font]::new('Segoe UI',14)
 $white=[Drawing.SolidBrush]::new([Drawing.Color]::White)
 $g.DrawString('W-01 LUMEN | FIRST DESIGN GATE',$title,$white,30,20)
-$g.DrawString('Concept (left) / Blender (right) | PD review pending',$small,$white,30,65)
+$g.DrawString('Concept (left) / Blender (right) | PD approved 2026-11-12',$small,$white,30,65)
 $g.DrawString('Raw four-view renders share 0.96 orthographic scale. Review crops enlarged independently.',$small,$white,30,95)
 function Fit($img,$r){
  $s=[Math]::Min($r.Width/$img.Width,$r.Height/$img.Height)
@@ -36,7 +36,7 @@ foreach($pose in @('idle','aimed')){
  $x=if($pose -eq 'idle'){20}else{550}
  Fit $im ([Drawing.Rectangle]::new($x,2700,510,700));$im.Dispose()
 }
-$g.DrawString('Automation PASS | Design approval PENDING | Unity NOT performed',$small,$white,30,3450)
+$g.DrawString('Automation PASS | Design PD APPROVED | Unity NOT performed',$small,$white,30,3450)
 $board.Save((Join-Path $dir 'W-01_LUMEN-Comparison-Phone.png'),[Drawing.Imaging.ImageFormat]::Png)
 $g.Dispose();$board.Dispose();$ref.Dispose()
 'W01_REVIEW_BOARD_PASS'

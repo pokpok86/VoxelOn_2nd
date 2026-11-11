@@ -48,12 +48,17 @@
     }
   },
   "automation": "PASS",
-  "design_approval": "PENDING_PD",
+  "design_approval": "PD_APPROVED",
   "unity_integration": "NOT_PERFORMED",
   "assumptions": [
     "Sheet views disagree: front and 45-degree silhouette prioritized.",
     "Internal elbow retention and hidden barrel internals are inferred, not supplied CAD.",
     "Working dimensions approximate the sheet envelope; mounted scale .42 adapts it to the pre-existing normalized WISP base.",
     "Clearance checks are static AABB checks for major shells against torso and thighs in two poses; no exhaustive animation/physics validation."
-  ]
+  ],
+  "pd_approval": {
+    "date": "2026-11-12",
+    "source": "user chat",
+    "text": "이정도면 합격다음꺼는 5개 한방에"
+  }
 }

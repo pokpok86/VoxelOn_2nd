@@ -1,0 +1,46 @@
+{
+  "asset": "W-03_RATTLE",
+  "reference": "../References/W-03_RATTLE.png",
+  "reference_sha256": "8905739d0b699a46dbf620a3196e6875cbbbf123f31e945d9dc3a34b9298d6e7",
+  "blender": "5.2.3 LTS",
+  "working_bounds": {
+    "width_x": 0.227,
+    "length_y": 0.7105,
+    "height_z": 0.2913
+  },
+  "module_mesh_count": 67,
+  "connection_origin_working_units": [
+    0.0,
+    0.28200000524520874,
+    0.10899999737739563
+  ],
+  "common_elbow_interface": "W-01_LUMEN X-axis origin, drum and seat",
+  "back_mount_assumption": null,
+  "four_views_same_ortho_scale": 0.9378796720504761,
+  "face_view_axis": "-Y/+Y front and rear",
+  "mounted_scale": 0.42,
+  "base_sha256_unchanged": {
+    "BD01": "ccaa9c0428841e1bca6a1779ae1bcc7d3d0731da969a1d694ba47a338777a070",
+    "HD01": "d2beba89291e5fbaeffba87639f94f79dce4afaa541937d9bdb1db3f872a35d9",
+    "LG01": "581d189b09217e04285577ea7adf8686ab9e1f64d2fd1a0905fe6ac4b6c11160"
+  },
+  "static_clearance_checks": {
+    "idle": {
+      "major_shell_vs_torso_thigh_bounds_clear": true,
+      "overlaps": []
+    },
+    "aimed": {
+      "major_shell_vs_torso_thigh_bounds_clear": true,
+      "overlaps": []
+    }
+  },
+  "automation": "PASS",
+  "design_approval": "PENDING_PD",
+  "unity_integration": "NOT_PERFORMED",
+  "assumptions": [
+    "Front and 45-degree concept silhouettes take priority where views disagree.",
+    "Concealed internals and connector retention are modeling assumptions, not verified CAD.",
+    "Weapons use the LUMEN approved mount scale .42 on the normalized base; backpack uses the normalized torso scale directly.",
+    "Clearance covers selected major shells versus torso/thigh AABBs in static poses, not exhaustive collision or animation validation."
+  ]
+}
