@@ -98,7 +98,11 @@ def loft_y(name, sections, material):
     n = 8
     verts = []
     for y, hx, hz, cz, cut in sections:
-        verts.extend((x, y, z+cz) for x, z in clipped(hx, hz, cut))
+        for x,z in clipped(hx,hz,cut):
+            # Taper the lower cheeks slightly while preserving the brow and
+            # the fixed sensor opening. The rear shell retains its volume.
+            jaw_taper=1.0-.10*max(0.0,-z/hz) if y<.035 else 1.0
+            verts.append((x*jaw_taper,y,z+cz))
     faces = [tuple(range(n-1,-1,-1))]
     for k in range(len(sections)-1):
         a, b = k*n, (k+1)*n
@@ -117,14 +121,13 @@ def loft_y(name, sections, material):
 # Small low-poly shell: cut brow, tapered cheeks and a short chin create a
 # sensor/avian profile without making a round ball or a plain cube.
 loft_y("HD01_Main_Faceted_Helmet_Shell", [
-    (-.050,.046,.028,.000,.30),
-    (-.035,.058,.040,.000,.28),
+    (-.050,.042,.028,.000,.30),
+    (-.035,.055,.040,.000,.28),
     (.028,.059,.041,.001,.25),
     (.055,.050,.033,.002,.27),
 ], ARMOR)
 
-# One broad horizontal glass band, not two eye lenses. The wedge-like outline
-# follows the sloping cheek line and slightly rises toward the outer corners.
+# One rectangular sensor window stays the same size as the previous pass.
 visor=box("HD01_Continuous_Visor_Glass",(0,-.054,-.003),(.036,.006,.044),GRAPHITE,.004)
 box("HD01_Single_Cyan_Optical_Slit",(0,-.058,-.003),(.020,.002,.029),CYAN,.002)
 for x in (-.021,.021):
@@ -135,7 +138,7 @@ for z in (-.028,.022):
 # Side cheek housings are narrow low-profile pods seated into the helmet shell.
 # They are structural side sensors, not extra eyes or decorative ear blocks.
 for side, s in (("L",-1),("R",1)):
-    pod = box(f"HD01_{side}_Side_Sensor_Pod", (s*.055,.029,.002), (.023,.045,.037), GUNMETAL, .0025)
+    pod = box(f"HD01_{side}_Side_Sensor_Pod", (s*.053,.029,.002), (.023,.045,.037), GUNMETAL, .0025)
     pod.rotation_euler[2] = s*math.radians(-8)
     # Single pale outer cheek plane keeps the visor mask visually framed.
     # The shell itself provides the cheek facet; no separately stuck-on tabs.

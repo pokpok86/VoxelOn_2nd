@@ -21,6 +21,8 @@ WISP height is normalized to 1 m. Current pair bounds are recorded in `manifest.
 
 Each hip uses nested Y-axis abduction and X-axis pitch pivots. Knee and ankle pivots rotate around X. Their Blender empty origins are placed at the actual joint centers. The generator temporarily rotates each pivot and checks that the foot moves, the hips spread outward, and the knees bend forward, then restores the neutral pose before saving.
 
+The thigh front plates have a shallow longitudinal ridge and thicker forward projection. This adds depth in three-quarter and side views without widening the legs.
+
 ## Rebuild
 
 Run Blender 5.2.3 with `build_lg01.py`, then run `make_lg01_review.ps1` in PowerShell. Generation and the pivot-motion checks completed; design approval remains pending PD review. No Unity import or full WISP edits were made.

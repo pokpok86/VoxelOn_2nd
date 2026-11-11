@@ -129,7 +129,19 @@ chest=prism_xz("Chest_Armor_Main",[
 PARTS.append((chest,ROOT))
 # A single small central accent plate; no extra vents, pipes, or panel grid.
 accent=prism_xz("Chest_Center_Point_Armor",[
-    (-.071,.082),(.071,.082),(.071,.035),(-.071,.035)],-.131,.007,ARMOR,.0015)
+    (-.071,.082),(0,.085),(.071,.082),(.071,.035),(0,.029),(-.071,.035)],-.131,.007,ARMOR,.0015)
+# A shallow central ridge makes two broad chest planes rather than another
+# flat plate. Only the front center vertices project by 10 mm.
+for v in accent.data.vertices:
+    if abs(v.co.x)<.001 and v.co.y<-.131:
+        v.co.y-=.010
+# Explicit left/right facets avoid ambiguous triangulation of a raised ngon.
+am=accent.data
+verts=[tuple(v.co) for v in am.vertices]
+faces=[(5,4,1,0),(4,3,2,1),tuple(range(6,12))]
+for i in range(6):
+    j=(i+1)%6;faces.append((i,j,6+j,6+i))
+am.clear_geometry();am.from_pydata(verts,[],faces);am.update()
 PARTS.append((accent,ROOT))
 orange_point=prism_xz("Chest_Point_Orange_Inset",[
     (-.152,.065),(-.101,.054),(-.102,.020),(-.145,.030)],-.130,.004,ORANGE,.001)

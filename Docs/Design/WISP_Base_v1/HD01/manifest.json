@@ -3,7 +3,7 @@
   "blender": "5.2.3 LTS",
   "normalized_wisp_height_m": 1.0,
   "measured_bounds_m": {
-    "width_x": 0.139,
+    "width_x": 0.135,
     "depth_y": 0.116,
     "height_z": 0.146
   },

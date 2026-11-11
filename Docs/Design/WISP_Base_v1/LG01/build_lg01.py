@@ -145,6 +145,20 @@ def front_plate(name,hx,points,y,depth,material):
     o=bpy.data.objects.new(name,mesh);MODEL.objects.link(o);o.data.materials.append(material)
     return bevel(o,.0015)
 
+def thigh_ridged_plate(name,hx,material):
+    # Two sloping front planes share a shallow longitudinal ridge. The plate
+    # remains narrow in front view; extra volume is toward the front (-Y).
+    outline=[(-.027,.419),(0,.422),(.027,.419),(.033,.391),(.021,.303),(0,.289),(-.017,.289),(-.028,.320)]
+    n=len(outline)
+    vs=[(hx+x,-.061-(.010 if abs(x)<.001 else 0),z) for x,z in outline]
+    vs += [(hx+x,-.049,z) for x,z in outline]
+    fs=[(7,6,5,1,0),(5,4,3,2,1),tuple(range(n,2*n))]
+    for i in range(n):
+        j=(i+1)%n;fs.append((i,j,n+j,n+i))
+    me=bpy.data.meshes.new(name+'_ridge');me.from_pydata(vs,[],fs);me.update()
+    o=bpy.data.objects.new(name,me);MODEL.objects.link(o);o.data.materials.append(material)
+    return bevel(o,.0015)
+
 # WISP height is normalized to 1 m. The leg pair occupies about the lower 46%,
 # keeping the legs visually subordinate to the compact head and torso.
 HIP_Z, KNEE_Z, ANKLE_Z = .455, .254, .066
@@ -184,7 +198,7 @@ for side, s in (("L",-1),("R",1)):
         (.310,.022,.033,-.012,.28),(.325,.034,.044,-.012,.25),
         (.393,.041,.047,-.008,.22),(.420,.029,.033,-.004,.28)],ARMOR,x_center=hx)
     PARTS.append((thigh,hip_x))
-    thigh_front=front_plate(f'{side}_Thigh_Front_Plate',hx,[(-.027,.419),(.027,.419),(.033,.391),(.021,.303),(-.017,.289),(-.028,.320)],-.055,.012,ARMOR)
+    thigh_front=thigh_ridged_plate(f'{side}_Thigh_Front_Plate',hx,ARMOR)
     PARTS.append((thigh_front,hip_x))
     # Small side inset, mirrored exactly; no bulky thigh fins.
     thigh_side=prism_yz(f"{side}_Thigh_Safety_Inset",hx+s*.032,.003,
