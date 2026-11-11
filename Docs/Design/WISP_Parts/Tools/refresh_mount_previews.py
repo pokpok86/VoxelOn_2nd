@@ -1,4 +1,4 @@
-"""Refresh assemblies after an explicitly authorized base-size correction.
+"""Refresh assemblies after PD-authorized body or weapon mounting changes.
 
 Standalone weapon/backpack .blend and raw part renders are read-only inputs.
 Only mounted review scenes/images and their mounting metadata are rewritten.
@@ -13,6 +13,7 @@ from mathutils import Vector
 
 sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
 from assembly_layout import load_layout
+from weapon_mount_style import style_weapon
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE=os.path.abspath(os.path.join(ROOT,'../WISP_Base_v1'))
 PARTS=['W-01_LUMEN','W-02_BREAKER','W-03_RATTLE','W-04_EDGE','W-05_AEGIS','B-01_TWIN_DRIVE']
@@ -42,6 +43,9 @@ def attach_pair(root,col,scale):
     other=root.copy();other.name=root.name.replace('_ROOT','_LEFT_ROOT');col.objects.link(other);other.location=layout['left_elbow']
     for obj in meshes:
         cp=obj.copy();cp.data=obj.data.copy();col.objects.link(cp);cp.parent=other
+    part=root.name.removesuffix('_ROOT')
+    style_weapon(root,col,part)
+    style_weapon(other,col,part,left=True)
     return other
 def camera(name,location):
     d=bpy.data.cameras.new(name);d.type='ORTHO';d.ortho_scale=1.27
@@ -87,7 +91,8 @@ for part,path in sources.items():
     manifest['assembly_layout']=layout
     manifest['base_sha256_unchanged']=base_hashes
     manifest['standalone_part_sha256_preserved']=part_hashes[part]
-    manifest['body_size_revision']={'source':'PD chat 2026-11-12: body too large; adjust body first','factor':layout['body_size_factor'],'weapon_geometry_and_mount_scale_unchanged':True}
+    manifest['weapon_mount_revision']={'body_scale_relative_to_previous':1.30,'root_and_connector_unchanged':True,'right_local_body_roll_degrees':-90 if part in ('W-04_EDGE','W-05_AEGIS') else 0,'left_roll_mirrored':True}
+    if 'body_size_revision' in manifest:manifest['body_size_revision']['weapon_geometry_and_mount_scale_unchanged']=False
     manifest['body_contact_checks']={'waist_contact_error_m':waist_error,'neck_contact_error_m':neck_error}
     if part=='W-01_LUMEN':
         manifest['mounted_elbows_normalized_base']=[layout['right_elbow'],layout['left_elbow']]
@@ -100,5 +105,5 @@ for part,path in sources.items():
 
 assert all(sha(path)==part_hashes[p] for p,path in sources.items()),'Standalone part source changed'
 assert all(sha(os.path.join(BASE,p,p+'.blend'))==h for p,h in base_hashes.items()),'Base changed during review refresh'
-with open(os.path.join(ROOT,'Body-Size-Validation.json'),'w',encoding='utf-8') as f:json.dump({'layout':layout,'parts':report,'all_six_standalone_blends_preserved':True},f,indent=2)
-print('BODY_SIZE_REVIEW_PASS',len(report))
+with open(os.path.join(ROOT,'Weapon-Mount-Validation.json'),'w',encoding='utf-8') as f:json.dump({'layout':layout,'parts':report,'all_six_standalone_blends_preserved':True},f,indent=2)
+print('WEAPON_MOUNT_REVIEW_PASS',len(report))

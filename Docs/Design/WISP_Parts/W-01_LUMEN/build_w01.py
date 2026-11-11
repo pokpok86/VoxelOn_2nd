@@ -207,6 +207,7 @@ from mathutils import Matrix
 BASE = os.path.abspath(os.path.join(HERE, '../../WISP_Base_v1'))
 sys.path.insert(0,os.path.join(HERE,'../Tools'))
 from assembly_layout import load_layout
+from weapon_mount_style import style_weapon
 layout=load_layout(BASE)
 BASE_FILES = {p:os.path.join(BASE,p,p+'.blend') for p in ('BD01','HD01','LG01')}
 def digest(path):
@@ -362,6 +363,8 @@ root.location=target;root.scale=(module_scale,)*3;root.rotation_euler.x=math.rad
 left_root=root.copy();left_root.name='W-01_LUMEN_LEFT_ROOT';COL.objects.link(left_root);left_root.location=layout['left_elbow']
 for obj in module_meshes:
     duplicate=obj.copy();duplicate.data=obj.data.copy();COL.objects.link(duplicate);duplicate.parent=left_root
+style_weapon(root,COL,'W-01_LUMEN')
+style_weapon(left_root,COL,'W-01_LUMEN',left=True)
 bpy.context.view_layer.update()
 def aabb(obj):
     points=[obj.matrix_world @ Vector(v) for v in obj.bound_box]

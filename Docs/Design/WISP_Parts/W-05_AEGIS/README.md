@@ -38,3 +38,6 @@ Blender 5.2.3 LTS에서 생성·렌더를 실행했습니다. 장착 자세에�
 & 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe' --background --python-exit-code 1 --python Docs/Design/WISP_Parts/Tools/build_batch_part.py -- --part W-05_AEGIS
 & Docs/Design/WISP_Parts/Tools/make_batch_review.ps1
 ```
+
+
+장착 미리보기 추가 수정(2026-11-12): 무기 본체만 30% 확대하고 팔꿈치 연결부는 유지했습니다. EDGE·AEGIS는 본체만 좌우 바깥 방향으로 90도 돌렸습니다. 단독 원본과 백팩 본체는 유지합니다. 자세한 내용은 `../Weapon-Mount-Revision.md`를 참고하세요.

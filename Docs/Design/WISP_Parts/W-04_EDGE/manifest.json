@@ -79,10 +79,16 @@
   "body_size_revision": {
     "source": "PD chat 2026-11-12: body too large; adjust body first",
     "factor": 0.82,
-    "weapon_geometry_and_mount_scale_unchanged": true
+    "weapon_geometry_and_mount_scale_unchanged": false
   },
   "body_contact_checks": {
     "waist_contact_error_m": 0.0,
     "neck_contact_error_m": 5.960464477539063e-08
+  },
+  "weapon_mount_revision": {
+    "body_scale_relative_to_previous": 1.3,
+    "root_and_connector_unchanged": true,
+    "left_roll_mirrored": true,
+    "right_local_body_roll_degrees": -90
   }
 }

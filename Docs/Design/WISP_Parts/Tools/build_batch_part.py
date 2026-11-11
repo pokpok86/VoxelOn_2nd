@@ -25,6 +25,7 @@ PARTS_ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT=os.path.join(PARTS_ROOT,PART);os.makedirs(OUT,exist_ok=True)
 BASE=os.path.abspath(os.path.join(PARTS_ROOT,'../WISP_Base_v1'))
 from assembly_layout import load_layout
+from weapon_mount_style import style_weapon
 layout=load_layout(BASE)
 BASE_FILES={p:os.path.join(BASE,p,p+'.blend') for p in ('BD01','HD01','LG01')}
 def sha(path):
@@ -254,6 +255,8 @@ if IS_BACKPACK:
         if obj.type=='MESH':
             cp=obj.copy();cp.data=obj.data.copy();arm_col.objects.link(cp);cp.parent=other
     assert approved_hash==sha(approved_path),'Approved LUMEN file changed'
+    style_weapon(arm,arm_col,'W-01_LUMEN')
+    style_weapon(other,arm_col,'W-01_LUMEN',left=True)
     pose_angles=[('idle',0)]
     preview_cam=(1.5,2,.95)
 else:
@@ -261,6 +264,8 @@ else:
     left=root.copy();left.name=PART+'_LEFT_ROOT';COL.objects.link(left);left.location=layout['left_elbow']
     for obj in meshes:
         cp=obj.copy();cp.data=obj.data.copy();COL.objects.link(cp);cp.parent=left
+    style_weapon(root,COL,PART)
+    style_weapon(left,COL,PART,left=True)
     pose_angles=[('idle',65),('guard' if PART=='W-05_AEGIS' else 'aimed',90 if PART=='W-05_AEGIS' else 0)]
     preview_cam=(1.6,-2,.95)
 
