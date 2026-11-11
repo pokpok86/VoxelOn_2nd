@@ -206,6 +206,14 @@ for side,s in (("L",-1),("R",1)):
 for obj,parent in PARTS:
     parent_keep(obj,parent)
 
+# PD requested a smaller body after reviewing the assembled part batch.
+# Reduce the torso/shoulders together, while retaining mating pin dimensions.
+BODY_SIZE=.82
+ROOT.scale=(BODY_SIZE,)*3
+for interface in (neck_top,waist_key,bpy.data.objects['L_UpperArm_Connector_Pin'],bpy.data.objects['R_UpperArm_Connector_Pin']):
+    interface.scale=tuple(v/BODY_SIZE for v in interface.scale)
+bpy.context.view_layer.update()
+
 # Verify motion transforms, then restore the zero pose before renders and save.
 def world_center(obj):
     return obj.matrix_world.translation.copy()
@@ -257,10 +265,10 @@ def axis_pair(name,c,d,half,mat):
     segment(name+"_line",a,b,.0023,mat); cone(name+"_a",a,-d,.007,.016,mat); cone(name+"_b",b,d,.007,.016,mat)
 
 for side,s in (("L",-1),("R",1)):
-    c=(s*.238,0,.032)
-    axis_pair(side+"_SHOULDER_PITCH_X",c,(1,0,0),.096,GUIDE_X)
-    axis_pair(side+"_SHOULDER_SPREAD_Y",c,(0,1,0),.091,GUIDE_Y)
-axis_pair("WAIST_YAW_Z",(0,0,waist_z),(0,0,1),.090,GUIDE_Z)
+    c=Vector((s*.238,0,.032))*BODY_SIZE
+    axis_pair(side+"_SHOULDER_PITCH_X",c,(1,0,0),.096*BODY_SIZE,GUIDE_X)
+    axis_pair(side+"_SHOULDER_SPREAD_Y",c,(0,1,0),.091*BODY_SIZE,GUIDE_Y)
+axis_pair("WAIST_YAW_Z",Vector((0,0,waist_z))*BODY_SIZE,(0,0,1),.090*BODY_SIZE,GUIDE_Z)
 
 world=bpy.data.worlds.new("BD01 studio world"); world.use_nodes=True
 world.node_tree.nodes.get("Background").inputs["Color"].default_value=(.012,.018,.028,1)
@@ -308,7 +316,7 @@ bpy.ops.render.render(write_still=True)
 axis_pixels=[]
 for key,c in [("shoulder_L",(-.238,0,.032)),("shoulder_R",(.238,0,.032)),("waist",(0,0,waist_z))]:
     from bpy_extras.object_utils import world_to_camera_view
-    p=world_to_camera_view(scene,scene.camera,Vector(c))
+    p=world_to_camera_view(scene,scene.camera,Vector(c)*BODY_SIZE)
     axis_pixels.append({"joint":key,"x":round(p.x*scene.render.resolution_x),
                         "y":round((1-p.y)*scene.render.resolution_y)})
 GUIDE.hide_render=True; GUIDE.hide_viewport=True
@@ -322,14 +330,26 @@ coords=[o.matrix_world @ Vector(c) for o in mesh_objects for c in o.bound_box]
 bounds={"width_x":round(max(v.x for v in coords)-min(v.x for v in coords),3),
         "depth_y":round(max(v.y for v in coords)-min(v.y for v in coords),3),
         "height_z":round(max(v.z for v in coords)-min(v.z for v in coords),3)}
+def bbox_world(obj):
+    points=[obj.matrix_world @ Vector(v) for v in obj.bound_box]
+    return [(min(p[i] for p in points),max(p[i] for p in points)) for i in range(3)]
+neck_bounds=bbox_world(neck_top);waist_bounds=bbox_world(waist_key)
+interfaces={
+    'waist_bottom_local_z':waist_bounds[2][0],
+    'neck_contact_top_local':[0,0,neck_bounds[2][1]],
+    'right_elbow_local':list(bpy.data.objects['R_UpperArm_Connector_Pin'].matrix_world.translation),
+    'left_elbow_local':list(bpy.data.objects['L_UpperArm_Connector_Pin'].matrix_world.translation),
+    'back_mount_local':[0,.139*BODY_SIZE,-.005*BODY_SIZE],
+    'mating_pin_dimensions_preserved':True}
 manifest={
     "asset":"WISP BD-01 compact body, shoulders, and upper-arm connector stubs",
     "blender":bpy.app.version_string,"normalized_wisp_height_m":1.0,
     "measured_bounds_m":bounds,
-    "main_torso_core_m":{"width_x":0.350,"depth_y":0.180,"height_z":0.231},
+    "main_torso_core_m":{"width_x":.350*BODY_SIZE,"depth_y":.180*BODY_SIZE,"height_z":.231*BODY_SIZE},
+    "body_size_factor":BODY_SIZE,"assembly_interfaces":interfaces,
     "contains_head":False,"contains_forearm_weapon":False,"contains_legs":False,
     "neck":"fixed compact mount, no neck pivot",
-    "joint_centers_m":{"shoulder_L":[-.238,0,.032],"shoulder_R":[.238,0,.032],"waist_yaw":[0,0,waist_z]},
+    "joint_centers_m":{"shoulder_L":list(Vector((-.238,0,.032))*BODY_SIZE),"shoulder_R":list(Vector((.238,0,.032))*BODY_SIZE),"waist_yaw":list(Vector((0,0,waist_z))*BODY_SIZE)},
     "axes":{"shoulder_pitch":"X front/back arm swing","shoulder_abduction":"Y slight lateral spread","waist":"Z left/right yaw only"},
     "connection_pixels_closeup":axis_pixels,
     "rig_motion_checks":checks,

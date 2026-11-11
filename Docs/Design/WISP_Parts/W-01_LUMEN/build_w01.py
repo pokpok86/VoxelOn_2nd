@@ -7,6 +7,7 @@ Run with Blender 5.2.3: blender --background --python build_la01l.py
 import bpy
 import math
 import os
+import sys
 from mathutils import Vector
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -204,6 +205,9 @@ import hashlib
 import json
 from mathutils import Matrix
 BASE = os.path.abspath(os.path.join(HERE, '../../WISP_Base_v1'))
+sys.path.insert(0,os.path.join(HERE,'../Tools'))
+from assembly_layout import load_layout
+layout=load_layout(BASE)
 BASE_FILES = {p:os.path.join(BASE,p,p+'.blend') for p in ('BD01','HD01','LG01')}
 def digest(path):
     with open(path,'rb') as f: return hashlib.sha256(f.read()).hexdigest()
@@ -349,13 +353,13 @@ base_collections={'BD01':'BD01_BODY_AND_SHOULDERS','HD01':'HD01_SENSOR_HEAD','LG
 for part,path in BASE_FILES.items():
     with bpy.data.libraries.load(path,link=False) as (src,dst):dst.collections=[base_collections[part]]
     for collection in dst.collections:scene.collection.children.link(collection)
-bpy.data.objects['BD01_ROOT'].location.z+=.712
-bpy.data.objects['HD01_ROOT'].location.z+=.929
+bpy.data.objects['BD01_ROOT'].location=layout['body_translation']
+bpy.data.objects['HD01_ROOT'].location=layout['head_translation']
 module_scale=.42
-target=Vector((.282,0,.604))
+target=Vector(layout['right_elbow'])
 root.location=target;root.scale=(module_scale,)*3;root.rotation_euler.x=math.radians(65)
 # Copy the module for the opposite arm, preserving the existing base meshes.
-left_root=root.copy();left_root.name='W-01_LUMEN_LEFT_ROOT';COL.objects.link(left_root);left_root.location.x=-.282
+left_root=root.copy();left_root.name='W-01_LUMEN_LEFT_ROOT';COL.objects.link(left_root);left_root.location=layout['left_elbow']
 for obj in module_meshes:
     duplicate=obj.copy();duplicate.data=obj.data.copy();COL.objects.link(duplicate);duplicate.parent=left_root
 bpy.context.view_layer.update()
@@ -380,7 +384,7 @@ assert base_hashes=={p:digest(path) for p,path in BASE_FILES.items()},'Baseline 
 manifest={'asset':'W-01 LUMEN','reference':'../References/W-01_LUMEN.png','blender':bpy.app.version_string,
  'bounds_working_units':bounds,'elbow_pivot_working_units':list(PIVOT),'same_orthographic_scale_all_four_views':.96,
  'structural_armor_mesh_count':len(module_meshes),'front_emitter_visibility_rays':emitter_visibility,'mounted_scale_for_normalized_base':module_scale,
- 'mounted_elbows_normalized_base':[[.282,0,.604],[-.282,0,.604]],'base_sha256_unchanged':base_hashes,
+ 'mounted_elbows_normalized_base':[layout['right_elbow'],layout['left_elbow']],'base_sha256_unchanged':base_hashes,
  'clearance_checks':clearance,'automation':'PASS','design_approval':'PENDING_PD','unity_integration':'NOT_PERFORMED',
  'assumptions':['Sheet views disagree: front and 45-degree silhouette prioritized.',
  'Internal elbow retention and hidden barrel internals are inferred, not supplied CAD.',

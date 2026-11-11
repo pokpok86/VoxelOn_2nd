@@ -20,7 +20,7 @@
   "face_view_axis": "-Y/+Y front and rear",
   "mounted_scale": 0.42,
   "base_sha256_unchanged": {
-    "BD01": "ccaa9c0428841e1bca6a1779ae1bcc7d3d0731da969a1d694ba47a338777a070",
+    "BD01": "36fd5031f21d24bc2742afa2653e1a17979e9af2a13aa8cd13c6ebd647f91b4e",
     "HD01": "d2beba89291e5fbaeffba87639f94f79dce4afaa541937d9bdb1db3f872a35d9",
     "LG01": "581d189b09217e04285577ea7adf8686ab9e1f64d2fd1a0905fe6ac4b6c11160"
   },
@@ -42,5 +42,46 @@
     "Concealed internals and connector retention are modeling assumptions, not verified CAD.",
     "Weapons use the LUMEN approved mount scale .42 on the normalized base; backpack uses the normalized torso scale directly.",
     "Clearance covers selected major shells versus torso/thigh AABBs in static poses, not exhaustive collision or animation validation."
-  ]
+  ],
+  "assembly_layout": {
+    "body_translation": [
+      0,
+      0,
+      0.6765400069952011
+    ],
+    "head_translation": [
+      0,
+      -0.003,
+      0.8663599982261658
+    ],
+    "right_elbow": [
+      0.23124000430107117,
+      0.0,
+      0.5879800069332123
+    ],
+    "left_elbow": [
+      -0.23124000430107117,
+      0.0,
+      0.5879800069332123
+    ],
+    "back_mount": [
+      0,
+      0.11398,
+      0.6724400069952011
+    ],
+    "waist_world_z": 0.505,
+    "neck_contact_world_z": 0.8073599982261658,
+    "body_size_factor": 0.82,
+    "mating_pin_dimensions_preserved": true
+  },
+  "standalone_part_sha256_preserved": "eef04d78487c3e11295f4621d5669c95c2d0d962ddf82337b45e935aefdf7708",
+  "body_size_revision": {
+    "source": "PD chat 2026-11-12: body too large; adjust body first",
+    "factor": 0.82,
+    "weapon_geometry_and_mount_scale_unchanged": true
+  },
+  "body_contact_checks": {
+    "waist_contact_error_m": 0.0,
+    "neck_contact_error_m": 5.960464477539063e-08
+  }
 }

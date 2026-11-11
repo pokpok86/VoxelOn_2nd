@@ -18,7 +18,7 @@ Standalone torso/shoulder module. It does not include a head, upper arms, forear
 
 The chest has an open lower outline: its lower cheek plates flank a recessed, tapered dark abdomen. A small center chest plate and restrained orange inset follow the supplied concept. Angled shoulder caps wrap around the cylindrical joint, and the short upper-arm connectors now point downward. The bottom waist interface was shortened. A subtle procedural material normal adds surface grain without extra geometric decoration.
 
-The central chest plate now has an 18 mm forward ridge, forming two broad angled faces. The lower chest cheek plates also project more strongly to make the surrounding chest volume readable. Its outside width remains unchanged.
+The central chest plate now has an 18 mm forward ridge, forming two broad angled faces. The lower chest cheek plates also project more strongly to make the surrounding chest volume readable. The subsequent PD-requested size correction below scales this chest shaping together with the body.
 
 Current bounds and pivot centers are stored in `manifest.json` and named Blender empties. The main torso core is about 0.350 m wide. The generator temporarily rotates each shoulder and the waist interface, checks that the connector moves while the waist rotates in place, and restores the neutral pose before rendering. Visual resemblance remains a review task; generation success does not approve the design.
 
@@ -32,3 +32,12 @@ From the project root:
 ```
 
 Blender generation and the pivot motion checks passed with Blender 5.2.3 LTS. The renders were opened and visually inspected. **Design approval remains pending PD review.** No Unity import or full-robot edits were made.
+
+
+## PD body size correction — 2026-11-12
+
+PD reported that the body looked too large in assembled previews. The BD01 root is now uniformly 0.82 of its prior size, including shoulder caps and upper-arm stubs. Measured overall bounds are 0.602 × 0.232 × 0.302 m. Neck, waist and elbow mating pin dimensions are preserved; their positions follow the smaller body.
+
+Head, leg, standalone weapon and backpack geometry are unchanged. Assembly positions are derived from the saved interface metadata rather than the former fixed offsets. See `../../WISP_Parts/Body-Size-Revision.md` for validation.
+
+`BD01-Size-Comparison-Phone.png` compares before and after with the same camera, framing and weapon scale. This is a size candidate for PD review, not a declaration of design approval.

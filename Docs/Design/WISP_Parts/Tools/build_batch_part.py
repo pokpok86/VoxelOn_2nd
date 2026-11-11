@@ -24,6 +24,8 @@ PART=parser.parse_args(args).part
 PARTS_ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT=os.path.join(PARTS_ROOT,PART);os.makedirs(OUT,exist_ok=True)
 BASE=os.path.abspath(os.path.join(PARTS_ROOT,'../WISP_Base_v1'))
+from assembly_layout import load_layout
+layout=load_layout(BASE)
 BASE_FILES={p:os.path.join(BASE,p,p+'.blend') for p in ('BD01','HD01','LG01')}
 def sha(path):
     with open(path,'rb') as f:return hashlib.sha256(f.read()).hexdigest()
@@ -237,17 +239,17 @@ collections={'BD01':'BD01_BODY_AND_SHOULDERS','HD01':'HD01_SENSOR_HEAD','LG01':'
 for part,path in BASE_FILES.items():
     with bpy.data.libraries.load(path,link=False) as (src,dst):dst.collections=[collections[part]]
     for col in dst.collections:scene.collection.children.link(col)
-bpy.data.objects['BD01_ROOT'].location.z+=.712;bpy.data.objects['HD01_ROOT'].location.z+=.929
+bpy.data.objects['BD01_ROOT'].location=layout['body_translation'];bpy.data.objects['HD01_ROOT'].location=layout['head_translation']
 if IS_BACKPACK:
-    mount_scale=1.0;root.location=(0,.139,.707);root.scale=(1,1,1)
+    mount_scale=1.0;root.location=layout['back_mount'];root.scale=(1,1,1)
     # Keep the approved forearms visible in the backpack mounting review.
     approved_path=os.path.join(PARTS_ROOT,'W-01_LUMEN','W-01_LUMEN.blend')
     approved_hash=sha(approved_path)
     with bpy.data.libraries.load(approved_path,link=False) as (src,dst):dst.collections=['W01_LUMEN_MODULE']
     for col in dst.collections:scene.collection.children.link(col)
-    arm=bpy.data.objects['W-01_LUMEN_ROOT'];arm.location=(.282,0,.604);arm.scale=(.42,)*3;arm.rotation_euler.x=math.radians(65)
+    arm=bpy.data.objects['W-01_LUMEN_ROOT'];arm.location=layout['right_elbow'];arm.scale=(.42,)*3;arm.rotation_euler.x=math.radians(65)
     arm_col=dst.collections[0]
-    other=arm.copy();other.name='W-01_LUMEN_LEFT_ROOT';arm_col.objects.link(other);other.location.x=-.282
+    other=arm.copy();other.name='W-01_LUMEN_LEFT_ROOT';arm_col.objects.link(other);other.location=layout['left_elbow']
     for obj in list(arm_col.objects):
         if obj.type=='MESH':
             cp=obj.copy();cp.data=obj.data.copy();arm_col.objects.link(cp);cp.parent=other
@@ -255,8 +257,8 @@ if IS_BACKPACK:
     pose_angles=[('idle',0)]
     preview_cam=(1.5,2,.95)
 else:
-    mount_scale=.42;root.location=(.282,0,.604);root.scale=(mount_scale,)*3
-    left=root.copy();left.name=PART+'_LEFT_ROOT';COL.objects.link(left);left.location.x=-.282
+    mount_scale=.42;root.location=layout['right_elbow'];root.scale=(mount_scale,)*3
+    left=root.copy();left.name=PART+'_LEFT_ROOT';COL.objects.link(left);left.location=layout['left_elbow']
     for obj in meshes:
         cp=obj.copy();cp.data=obj.data.copy();COL.objects.link(cp);cp.parent=left
     pose_angles=[('idle',65),('guard' if PART=='W-05_AEGIS' else 'aimed',90 if PART=='W-05_AEGIS' else 0)]
@@ -284,7 +286,7 @@ assert before=={p:sha(path) for p,path in BASE_FILES.items()},'Base file was mod
 manifest={'asset':PART,'reference':'../References/'+PART+'.png','reference_sha256':sha(REFERENCE),'blender':bpy.app.version_string,
  'working_bounds':bounds,'module_mesh_count':len(meshes),'connection_origin_working_units':list(PIVOT),
  'common_elbow_interface':'W-01_LUMEN X-axis origin, drum and seat' if not IS_BACKPACK else None,
- 'back_mount_assumption':{'anchor_normalized_base':[0,.139,.707],'pin_rectangle_width_height':[.068,.050],'source':'provisional attachment to existing rear plate; concealed retention not supplied'} if IS_BACKPACK else None,
+ 'back_mount_assumption':{'anchor_normalized_base':layout['back_mount'],'pin_rectangle_width_height':[.068,.050],'source':'provisional attachment to existing rear plate; concealed retention not supplied'} if IS_BACKPACK else None,
  'four_views_same_ortho_scale':scale,'face_view_axis':'+Z/-Z face and reverse' if FACE_PLANE else '-Y/+Y front and rear',
  'mounted_scale':mount_scale,'base_sha256_unchanged':before,'static_clearance_checks':checks,
  'thruster_lens_visibility_rays':nozzle_visibility,'automation':'PASS','design_approval':'PENDING_PD','unity_integration':'NOT_PERFORMED',
