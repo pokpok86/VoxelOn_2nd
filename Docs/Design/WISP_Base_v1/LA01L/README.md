@@ -15,4 +15,4 @@ Standalone forearm weapon module only. It does not contain or modify the WISP he
 
 Generated with Blender 5.2.3 LTS using `build_la01l.py`. The module root is `LA01L_ROOT`, located at the elbow pivot. Coordinates are meters, with the muzzle toward negative Y and the width along X.
 
-Measured model bounds: 0.31 m wide × 0.735 m long × 0.267 m high. This is close to the reference's approximate 0.32 × 0.72 × 0.28 m envelope. Blender generation and the five renders completed; visual/design acceptance remains pending PD review. Unity import was not performed.
+Measured model bounds: 0.294 m wide × 0.714 m long × 0.267 m high. This is close to the reference's approximate 0.32 × 0.72 × 0.28 m envelope. The elbow coupler is narrower than the previous pass, and the muzzle now has separate armor, gunmetal, and dark inner bevel steps around its recessed three-bar emitter. Blender generation and the five renders completed; visual/design acceptance remains pending PD review. Unity import was not performed.

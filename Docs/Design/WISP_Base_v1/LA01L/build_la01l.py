@@ -200,9 +200,10 @@ def cylinder_y(name, center, radius, depth, mat, vertices=32):
 
 def muzzle_bezel():
     """Nested octagonal stepped rim facing the muzzle (-Y)."""
-    # Outer and inner X/Z half-radii for each ring along the bore depth.
-    rings = [(-.342, .142, .119), (-.359, .142, .119),
-             (-.361, .113, .091), (-.344, .101, .080)]
+    # Three visible material steps echo the layered polygonal reference muzzle.
+    rings = [(-.335, .145, .120), (-.355, .145, .120),
+             (-.362, .128, .104), (-.358, .116, .093),
+             (-.344, .104, .081)]
     sides = 8
     verts = []
     for y, rx, rz in rings:
@@ -221,20 +222,25 @@ def muzzle_bezel():
     mesh.update()
     obj = bpy.data.objects.new("MuzzleOuterRim", mesh)
     COL.objects.link(obj)
-    obj.data.materials.append(GUNMETAL)
+    for mat in (GUNMETAL, ARMOR_SHADE, GUNMETAL, GRAPHITE):
+        obj.data.materials.append(mat)
+    band_materials = (0, 1, 2, 3, 3)
+    for band, material_index in enumerate(band_materials):
+        for poly in obj.data.polygons[band*sides:(band+1)*sides]:
+            poly.material_index = material_index
     return obj
 
 
 def emitter_panel():
     bpy.ops.mesh.primitive_cube_add(size=1, location=(0, -.339, -.004))
     obj = link_object(bpy.context.object, "Socket_Muzzle", GRAPHITE)
-    obj.dimensions = (.171, .008, .138)
+    obj.dimensions = (.166, .008, .132)
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
     bevel(obj, .013, 1)
-    for i, z in enumerate((.038, -.004, -.046), start=1):
+    for i, z in enumerate((.036, -.004, -.044), start=1):
         bpy.ops.mesh.primitive_cube_add(size=1, location=(0, -.345, z))
         bar = link_object(bpy.context.object, f"Emitter_CyanBar_{i}", CYAN)
-        bar.dimensions = (.092, .006, .010)
+        bar.dimensions = (.088, .006, .010)
         bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
         bevel(bar, .003, 1)
 
@@ -310,26 +316,22 @@ emitter_panel()
 
 # Rear elbow hinge/coupler is a real separate socket centered on the pivot axis.
 # The transverse X axis can attach to WISP's existing elbow joint later.
-cylinder_x("RearElbowHinge", (0, .245, .004), .115, .270, GRAPHITE, 32)
+cylinder_x("RearElbowHinge", (0, .245, .004), .094, .235, GRAPHITE, 32)
 for side, sx in (("L", -1), ("R", 1)):
-    annular_ring_x(f"Socket_Elbow_{side}", (sx*.135, .245, .004), .112, .078, .024, GUNMETAL, 32)
-    cylinder_x(f"Elbow_Recess_{side}", (sx*.150, .245, .004), .073, .008, GRAPHITE, 32)
-    annular_ring_x(f"Elbow_Inner_Rim_{side}", (sx*.152, .245, .004), .058, .044, .006, ARMOR_SHADE, 24)
+    annular_ring_x(f"Socket_Elbow_{side}", (sx*.1175, .245, .004), .092, .064, .020, GUNMETAL, 32)
+    cylinder_x(f"Elbow_Recess_{side}", (sx*.129, .245, .004), .060, .008, GRAPHITE, 32)
+    annular_ring_x(f"Elbow_Inner_Rim_{side}", (sx*.131, .245, .004), .048, .037, .006, ARMOR_SHADE, 24)
 # The rear orthographic end is a recessed circular socket, while side trunnions
 # define the transverse elbow pivot axis. This matches the concept's rear view.
-annular_ring_y("Rear_Elbow_Socket_Rim", (0,.360,.004), .102, .065, .028, GUNMETAL, 32)
-cylinder_y("Rear_Elbow_Socket_Recess", (0,.354,.004), .064, .012, GRAPHITE, 32)
-annular_ring_y("Rear_Elbow_Socket_Inner_Ring", (0,.358,.004), .055, .044, .004, ARMOR_SHADE, 24)
+annular_ring_y("Rear_Elbow_Socket_Rim", (0,.340,.004), .082, .052, .024, GUNMETAL, 32)
+cylinder_y("Rear_Elbow_Socket_Recess", (0,.335,.004), .051, .010, GRAPHITE, 32)
+annular_ring_y("Rear_Elbow_Socket_Inner_Ring", (0,.341,.004), .044, .035, .004, ARMOR_SHADE, 24)
 # Short, protected dorsal connector bridges the cannon shell to the hinge.
 prism_xy("Socket_Elbow_Bridge", [(-.080,.214),(.080,.214),(.060,.288),(-.060,.288)], .005, .090, ARMOR_SHADE, .006)
 
 # Muted edge guards protect the lower rails without enlarging the silhouette.
 for side, sx in (("L", -1), ("R", 1)):
     prism_yz(f"ArmorLowerRail_{side}", [(-.232,-.070),(-.181,-.104),(.064,-.102),(.170,-.053),(.137,-.076),(-.170,-.080)], sx*.125, .014, ARMOR_SHADE, .002)
-
-# Small rear orange index marks, kept flush to the outer coupler shell.
-for side, sx in (("L", -1), ("R", 1)):
-    prism_yz(f"Rear_Orange_Index_{side}", [(.252,-.020),(.270,-.016),(.270,.024),(.252,.028)], sx*.143, .003, ORANGE, .001)
 
 # A single attach root at the elbow pivot keeps this a standalone replaceable module.
 root = bpy.data.objects.new("LA01L_ROOT", None)

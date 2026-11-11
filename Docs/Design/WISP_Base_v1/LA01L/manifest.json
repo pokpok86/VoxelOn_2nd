@@ -3,8 +3,8 @@
   "blender": "5.2.3 LTS",
   "unit_scale_wisp_height_m": 1.0,
   "bounds_m": {
-    "width_x": 0.31,
-    "length_y": 0.735,
+    "width_x": 0.294,
+    "length_y": 0.714,
     "height_z": 0.267
   },
   "expected_approx_bounds_m": {
@@ -13,7 +13,7 @@
     "height_z": 0.28
   },
   "named_module_root": "LA01L_ROOT",
-  "mesh_count": 38,
+  "mesh_count": 36,
   "components": [
     "ArmorBottom",
     "ArmorFrontCheek_L",
@@ -45,8 +45,6 @@
     "Rear_Elbow_Socket_Inner_Ring",
     "Rear_Elbow_Socket_Recess",
     "Rear_Elbow_Socket_Rim",
-    "Rear_Orange_Index_L",
-    "Rear_Orange_Index_R",
     "Safety_Insignia_L",
     "Safety_Insignia_R",
     "Socket_Elbow_Bridge",
