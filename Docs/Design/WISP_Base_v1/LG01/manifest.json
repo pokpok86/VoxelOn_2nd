@@ -3,9 +3,9 @@
   "blender": "5.2.3 LTS",
   "normalized_wisp_height_m": 1.0,
   "measured_pair_bounds_m": {
-    "width_x": 0.294,
-    "depth_y": 0.161,
-    "height_z": 0.494
+    "width_x": 0.266,
+    "depth_y": 0.164,
+    "height_z": 0.482
   },
   "hip_center_x_abs_m": 0.092,
   "joint_centers_m": {
@@ -18,37 +18,37 @@
       "side": "L",
       "joint": "hip",
       "x": 452,
-      "y": 226
+      "y": 229
     },
     {
       "side": "L",
       "joint": "knee",
       "x": 448,
-      "y": 517
+      "y": 528
     },
     {
       "side": "L",
       "joint": "ankle",
       "x": 448,
-      "y": 787
+      "y": 807
     },
     {
       "side": "R",
       "joint": "hip",
       "x": 648,
-      "y": 284
+      "y": 263
     },
     {
       "side": "R",
       "joint": "knee",
       "x": 644,
-      "y": 574
+      "y": 562
     },
     {
       "side": "R",
       "joint": "ankle",
       "x": 644,
-      "y": 845
+      "y": 841
     }
   ],
   "axes": {
@@ -81,9 +81,6 @@
     "LG01-05-45deg.png",
     "LG01-06-Joint-Centers-Axes.png",
     "LG01-Review-Phone.png"
-  ],
-  "review_files": [
-    "LG01-Concept-Comparison.png"
   ],
   "references": [
     "LG01-Design-Guide.jpg",

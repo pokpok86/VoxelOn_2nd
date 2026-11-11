@@ -16,9 +16,9 @@ Standalone small sensor-head module only. It contains no torso, shoulder parts, 
 
 ## Design
 
-The low-poly shell uses clipped armor planes with a short front-to-back profile and tapered lower cheeks. One horizontal cyan glass slit spans the front; it is one continuous optic, not two eyes. Low-profile side sensor pods and a short rear-set antenna are kept within the small head silhouette. A small fixed mount is included at the bottom. The head has no independent articulation.
+The latest full-body concept is the reference for this revision. A single rectangular cyan sensor sits within a shallow dark bezel. The shell has clipped brow and cheek planes, dark rear-side sensor pods and a short flattened antenna. The rectangular sensor replaces the previous horizontal strip to match the newly supplied reference. A small fixed mount is included at the bottom.
 
-Coordinates use meters, Z-up, facing -Y. Blender measured bounds include the antenna and fixed connector: **0.157 m wide × 0.111 m deep × 0.150 m high**.
+Coordinates use meters, Z-up, facing -Y. Current measured dimensions are recorded in `manifest.json`; the bounds include the antenna and fixed connector. The render lighting was lowered to preserve material color, and a subtle procedural surface normal was added.
 
 ## Rebuild
 

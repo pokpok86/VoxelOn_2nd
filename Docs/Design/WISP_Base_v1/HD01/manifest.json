@@ -3,12 +3,12 @@
   "blender": "5.2.3 LTS",
   "normalized_wisp_height_m": 1.0,
   "measured_bounds_m": {
-    "width_x": 0.127,
-    "depth_y": 0.111,
-    "height_z": 0.137
+    "width_x": 0.139,
+    "depth_y": 0.116,
+    "height_z": 0.146
   },
   "face_direction": "negative Y",
-  "visor": "single continuous horizontal cyan optical slit; no separate eyes",
+  "visor": "single recessed rectangular cyan sensor window with a dark bezel, following the latest full-body concept reference",
   "neck_interface": "small fixed connector; no head/neck articulation",
   "bd01_mating": {
     "body_interface_top_z_m": 0.158,
@@ -22,7 +22,7 @@
   "contains_torso": false,
   "contains_arms_or_forearm_cannon": false,
   "contains_legs": false,
-  "mesh_count": 10,
+  "mesh_count": 12,
   "renders": [
     "HD01-01-Front.png",
     "HD01-02-Right.png",

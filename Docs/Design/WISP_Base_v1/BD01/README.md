@@ -16,9 +16,9 @@ Standalone torso/shoulder module. It does not include a head, upper arms, forear
 
 ## Shape and attachment points
 
-The chest is a short, broad core with a single large front plate and a small center point plate. A plain rear plate has one central recess. The neck interface is fixed and compact. Each side has a cylindrical X-axis shoulder pitch joint, a nested Y-axis slight-spread pivot, a small shoulder armor cap, and only a short upper-arm connector stub. The bottom is a short Z-axis waist-yaw housing and interface.
+The chest has an open lower outline: its lower cheek plates flank a recessed, tapered dark abdomen. A small center chest plate and restrained orange inset follow the supplied concept. Angled shoulder caps wrap around the cylindrical joint, and the short upper-arm connectors now point downward. The bottom waist interface was shortened. A subtle procedural material normal adds surface grain without extra geometric decoration.
 
-Approximate outer bounds: **0.736 m wide × 0.271 m deep × 0.413 m high**. The actual main torso core is about 0.392 m wide. Pivot centers are stored in `manifest.json` and named Blender empties. The generator temporarily rotates each shoulder and the waist interface, checks that the connector moves while the waist rotates in place, and restores the neutral pose before rendering.
+Current bounds and pivot centers are stored in `manifest.json` and named Blender empties. The main torso core is about 0.350 m wide. The generator temporarily rotates each shoulder and the waist interface, checks that the connector moves while the waist rotates in place, and restores the neutral pose before rendering. Visual resemblance remains a review task; generation success does not approve the design.
 
 ## Rebuild and validation
 

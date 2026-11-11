@@ -32,6 +32,10 @@ def mat(name, color, roughness=.55, metallic=0.0, emission=None):
     p.inputs["Base Color"].default_value = (*color, 1)
     p.inputs["Roughness"].default_value = roughness
     p.inputs["Metallic"].default_value = metallic
+    if not emission:
+        noise=m.node_tree.nodes.new('ShaderNodeTexNoise'); noise.inputs['Scale'].default_value=230
+        bump=m.node_tree.nodes.new('ShaderNodeBump'); bump.inputs['Strength'].default_value=.14; bump.inputs['Distance'].default_value=.0005
+        m.node_tree.links.new(noise.outputs['Fac'],bump.inputs['Height']); m.node_tree.links.new(bump.outputs['Normal'],p.inputs['Normal'])
     if emission:
         p.inputs["Emission Color"].default_value = (*color, 1)
         p.inputs["Emission Strength"].default_value = emission
@@ -82,6 +86,7 @@ def keep_parent(child, parent):
 def box(name, loc, dims, material, bevel_amt=.003):
     bpy.ops.mesh.primitive_cube_add(size=1, location=loc)
     o = put(bpy.context.object, MODEL, material)
+    o.name = name
     o.dimensions = dims
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
     return bevel(o, bevel_amt)
@@ -130,6 +135,16 @@ def parent_at(obj,parent):
     keep_parent(obj,parent)
     return obj
 
+def front_plate(name,hx,points,y,depth,material):
+    n=len(points)
+    vs=[(hx+x,yy,z) for yy in (y-depth/2,y+depth/2) for x,z in points]
+    fs=[tuple(range(n-1,-1,-1)),tuple(range(n,2*n))]
+    for i in range(n):
+        j=(i+1)%n;fs.append((i,j,n+j,n+i))
+    mesh=bpy.data.meshes.new(name+'_plate');mesh.from_pydata(vs,[],fs);mesh.update()
+    o=bpy.data.objects.new(name,mesh);MODEL.objects.link(o);o.data.materials.append(material)
+    return bevel(o,.0015)
+
 # WISP height is normalized to 1 m. The leg pair occupies about the lower 46%,
 # keeping the legs visually subordinate to the compact head and torso.
 HIP_Z, KNEE_Z, ANKLE_Z = .455, .254, .066
@@ -151,9 +166,9 @@ for side, s in (("L",-1),("R",1)):
     hip_x["motion"]="front/back hip pitch"
     PIVOTS[(side,"hip")]=(hx,0,HIP_Z)
     # compact transverse gimbal drums (main axis housings)
-    hip_outer=cylinder_axis(f"{side}_Hip_Can_X",(hx,0,HIP_Z),.047,.082,"X",GRAPHITE,32)
-    hip_cap=cylinder_axis(f"{side}_Hip_Can_Face",(hx,-.002,HIP_Z),.038,.084,"Y",GUNMETAL,32)
-    hip_face=cylinder_axis(f"{side}_Hip_Cap_Inset",(hx,-.047,HIP_Z),.025,.006,"Y",JOINT_FACE,24)
+    hip_outer=cylinder_axis(f"{side}_Hip_Can_X",(hx,0,HIP_Z),.035,.064,"X",GRAPHITE,32)
+    hip_cap=cylinder_axis(f"{side}_Hip_Can_Face",(hx,-.002,HIP_Z),.027,.050,"Y",GUNMETAL,32)
+    hip_face=cylinder_axis(f"{side}_Hip_Cap_Inset",(hx,-.029,HIP_Z),.019,.006,"Y",JOINT_FACE,24)
     PARTS.extend([(hip_outer,ROOT),(hip_cap,ROOT),(hip_face,ROOT)])
     # Hip cross-axis stub remains at the gimbal pivot; its end stops are small.
     hip_pin=cylinder_axis(f"{side}_Hip_Abduction_Pin",(hx,0,HIP_Z),.027,.092,"Y",GUNMETAL,24)
@@ -166,11 +181,13 @@ for side, s in (("L",-1),("R",1)):
     PARTS.append((upper_link,hip_x))
     # Slim angular thigh plate, subtly tapered at both ends.
     thigh=loft_z(f"{side}_Thigh_Armor",[
-        (.286,.034,.044,-.012,.28),(.300,.044,.054,-.012,.27),
-        (.397,.041,.052,-.008,.25),(.420,.031,.043,-.004,.28)],ARMOR,x_center=hx)
+        (.310,.022,.033,-.012,.28),(.325,.034,.044,-.012,.25),
+        (.393,.041,.047,-.008,.22),(.420,.029,.033,-.004,.28)],ARMOR,x_center=hx)
     PARTS.append((thigh,hip_x))
+    thigh_front=front_plate(f'{side}_Thigh_Front_Plate',hx,[(-.027,.419),(.027,.419),(.033,.391),(.021,.303),(-.017,.289),(-.028,.320)],-.055,.012,ARMOR)
+    PARTS.append((thigh_front,hip_x))
     # Small side inset, mirrored exactly; no bulky thigh fins.
-    thigh_side=prism_yz(f"{side}_Thigh_Safety_Inset",s*.044,.003,
+    thigh_side=prism_yz(f"{side}_Thigh_Safety_Inset",hx+s*.032,.003,
         [(-.052,.331),(-.048,.321),(-.018,.329),(-.020,.344)],ORANGE)
     PARTS.append((thigh_side,hip_x))
 
@@ -179,14 +196,14 @@ for side, s in (("L",-1),("R",1)):
     knee["rotation_axis"]="X"
     knee["motion"]="forward human-knee bend"
     PIVOTS[(side,"knee")]=(hx,-.004,KNEE_Z)
-    knee_shell=cylinder_axis(f"{side}_Knee_Can_X",(hx,-.004,KNEE_Z),.040,.076,"X",GRAPHITE,32)
-    knee_cap=cylinder_axis(f"{side}_Knee_Can_Face",(hx,-.005,KNEE_Z),.031,.078,"Y",GUNMETAL,24)
-    knee_inset=cylinder_axis(f"{side}_Knee_Inset",(hx,-.047,KNEE_Z),.021,.006,"Y",JOINT_FACE,24)
+    knee_shell=cylinder_axis(f"{side}_Knee_Can_X",(hx,-.004,KNEE_Z),.028,.064,"X",GRAPHITE,32)
+    knee_cap=cylinder_axis(f"{side}_Knee_Can_Face",(hx,-.005,KNEE_Z),.023,.050,"Y",GUNMETAL,24)
+    knee_inset=cylinder_axis(f"{side}_Knee_Inset",(hx,-.033,KNEE_Z),.017,.006,"Y",JOINT_FACE,24)
     PARTS.extend([(knee_shell,hip_x),(knee_cap,hip_x),(knee_inset,hip_x)])
     # A small faceted knee guard sits over the top of the cylindrical hinge.
     knee_guard=loft_z(f"{side}_Knee_Guard",[
-        (.256,.030,.040,-.035,.28),(.264,.037,.044,-.035,.26),
-        (.286,.031,.040,-.032,.28)],ARMOR_SHADE,x_center=hx)
+        (.256,.020,.023,-.029,.28),(.264,.029,.027,-.029,.26),
+        (.286,.025,.025,-.027,.28)],ARMOR_SHADE,x_center=hx)
     PARTS.append((knee_guard,hip_x))
 
     # Shin armor overlaps the knee slightly and tapers to the ankle.
@@ -195,10 +212,12 @@ for side, s in (("L",-1),("R",1)):
         (.216,.029,.033,.000,.22),(.238,.026,.030,.000,.22)],GRAPHITE,x_center=hx)
     PARTS.append((lower_link,knee))
     shin=loft_z(f"{side}_Shin_Armor",[
-        (.093,.031,.040,-.012,.28),(.108,.039,.047,-.011,.26),
-        (.208,.036,.046,-.008,.26),(.228,.029,.039,-.004,.28)],ARMOR,x_center=hx)
+        (.112,.021,.029,-.012,.30),(.132,.031,.039,-.011,.25),
+        (.204,.038,.047,-.008,.22),(.228,.029,.035,-.004,.28)],ARMOR,x_center=hx)
     PARTS.append((shin,knee))
-    shin_side=prism_yz(f"{side}_Shin_Safety_Inset",s*.037,.003,
+    shin_front=front_plate(f'{side}_Shin_Front_Plate',hx,[(-.025,.229),(.024,.229),(.033,.201),(.018,.108),(-.013,.098),(-.027,.131)],-.053,.012,ARMOR)
+    PARTS.append((shin_front,knee))
+    shin_side=prism_yz(f"{side}_Shin_Safety_Inset",hx+s*.027,.003,
         [(-.045,.129),(-.041,.120),(-.010,.128),(-.013,.143)],ORANGE)
     PARTS.append((shin_side,knee))
 
@@ -211,13 +230,18 @@ for side, s in (("L",-1),("R",1)):
     ankle_cap=cylinder_axis(f"{side}_Ankle_Can_Face",(hx,-.005,ANKLE_Z),.022,.068,"Y",GUNMETAL,24)
     ankle_inset=cylinder_axis(f"{side}_Ankle_Inset",(hx,-.042,ANKLE_Z),.014,.006,"Y",JOINT_FACE,20)
     PARTS.extend([(ankle_shell,knee),(ankle_cap,knee),(ankle_inset,knee)])
-    foot=prism_yz(f"{side}_Angular_Foot",hx,.108,
+    foot=prism_yz(f"{side}_Angular_Foot",hx,.076,
         [(.055,.017),(.047,.062),(.025,.078),(-.060,.074),(-.100,.052),(-.106,.020),(-.080,.010),(.043,.010)],ARMOR)
     PARTS.append((foot,ankle))
-    toe=prism_yz(f"{side}_Toe_Graphite_Sole",hx,.110,
+    heel=box(f"{side}_Heel_Block",(hx,.039,.037),(.080,.038,.050),GRAPHITE,.002)
+    instep=loft_z(f"{side}_Instep_Armor",[(.038,.034,.037,-.038,.23),(.074,.026,.029,-.029,.22)],ARMOR_SHADE,x_center=hx)
+    PARTS.extend([(heel,ankle),(instep,ankle)])
+    toe=prism_yz(f"{side}_Toe_Graphite_Sole",hx,.079,
         [(-.107,.020),(-.099,.010),(-.071,.008),(-.068,.023)],GRAPHITE)
     PARTS.append((toe,ankle))
-    foot_accent=prism_yz(f"{side}_Foot_Heel_Accent",s*.036,.003,
+    toe_front=box(f'{side}_Toe_Front_Bumper',(hx,-.099,.033),(.044,.015,.030),GRAPHITE,.002)
+    PARTS.append((toe_front,ankle))
+    foot_accent=prism_yz(f"{side}_Foot_Heel_Accent",hx+s*.039,.003,
         [(.018,.022),(.023,.017),(.043,.019),(.039,.026)],ORANGE)
     PARTS.append((foot_accent,ankle))
 
@@ -320,7 +344,7 @@ views=[
     ("LG01-02-Right.png",(2,0,.25)),
     ("LG01-03-Back.png",(0,2,.25)),
     ("LG01-04-Left.png",(-2,0,.25)),
-    ("LG01-05-45deg.png",(1.6,-1.6,.95)),
+    ("LG01-05-45deg.png",(1.6,-1.6,.65)),
 ]
 for filename,loc in views:
     scene.camera=camera("Camera_"+filename[:-4],loc)

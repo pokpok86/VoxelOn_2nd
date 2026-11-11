@@ -17,7 +17,7 @@ LG-01 is a standalone, mirrored pair of short humanoid legs. It contains no pelv
 
 ## Scale and rig
 
-WISP height is normalized to 1 m. The pair measures 0.294 m across, 0.161 m front-to-back, and 0.494 m high. Hip centers are at ±0.092 m X, Z=0.455 m; knees at Z=0.254 m; ankles at Z=0.066 m.
+WISP height is normalized to 1 m. Current pair bounds are recorded in `manifest.json`. Hip centers are at ±0.092 m X, Z=0.455 m; knees at Z=0.254 m; ankles at Z=0.066 m. The concept-refinement pass reduces the exposed hip/knee drums, tapers the thigh and shin shells, adds separate shaped front plates, and separates the heel and toe features. Side accent positions include each leg's center offset so they no longer float between the legs.
 
 Each hip uses nested Y-axis abduction and X-axis pitch pivots. Knee and ankle pivots rotate around X. Their Blender empty origins are placed at the actual joint centers. The generator temporarily rotates each pivot and checks that the foot moves, the hips spread outward, and the knees bend forward, then restores the neutral pose before saving.
 

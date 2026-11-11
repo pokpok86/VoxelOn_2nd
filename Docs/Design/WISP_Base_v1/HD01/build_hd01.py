@@ -27,6 +27,10 @@ def mat(name, color, rough=.42, metallic=.28, emission=0):
     p.inputs["Base Color"].default_value = (*color, 1)
     p.inputs["Roughness"].default_value = rough
     p.inputs["Metallic"].default_value = metallic
+    if not emission:
+        noise=m.node_tree.nodes.new('ShaderNodeTexNoise'); noise.inputs['Scale'].default_value=280
+        bump=m.node_tree.nodes.new('ShaderNodeBump'); bump.inputs['Strength'].default_value=.12; bump.inputs['Distance'].default_value=.0002
+        m.node_tree.links.new(noise.outputs['Fac'],bump.inputs['Height']); m.node_tree.links.new(bump.outputs['Normal'],p.inputs['Normal'])
     if emission:
         p.inputs["Emission Color"].default_value = (*color, 1)
         p.inputs["Emission Strength"].default_value = emission
@@ -121,29 +125,25 @@ loft_y("HD01_Main_Faceted_Helmet_Shell", [
 
 # One broad horizontal glass band, not two eye lenses. The wedge-like outline
 # follows the sloping cheek line and slightly rises toward the outer corners.
-visor = prism_xz("HD01_Continuous_Visor_Glass", [
-    (-.048,-.009),(-.043,-.018),(0,-.022),(.043,-.018),(.048,-.009),
-    (.042,.002),(0,.005),(-.042,.002)
-], -.0522, .004, GLASS, .001)
-prism_xz("HD01_Single_Cyan_Optical_Slit", [
-    (-.038,-.006),(-.034,-.010),(0,-.012),(.034,-.010),(.038,-.006),
-    (.033,-.002),(0,-.001),(-.033,-.002)
-], -.0555, .002, CYAN, .0007)
+visor=box("HD01_Continuous_Visor_Glass",(0,-.054,-.003),(.036,.006,.044),GRAPHITE,.004)
+box("HD01_Single_Cyan_Optical_Slit",(0,-.058,-.003),(.020,.002,.029),CYAN,.002)
+for x in (-.021,.021):
+    box("Sensor_Bezel_Side",(x,-.058,-.003),(.006,.007,.052),GUNMETAL,.001)
+for z in (-.028,.022):
+    box("Sensor_Bezel_End",(0,-.058,z),(.040,.007,.005),GUNMETAL,.001)
 
 # Side cheek housings are narrow low-profile pods seated into the helmet shell.
 # They are structural side sensors, not extra eyes or decorative ear blocks.
 for side, s in (("L",-1),("R",1)):
-    pod = box(f"HD01_{side}_Side_Sensor_Pod", (s*.052,.002,.002), (.018,.040,.032), GUNMETAL, .0025)
+    pod = box(f"HD01_{side}_Side_Sensor_Pod", (s*.055,.029,.002), (.023,.045,.037), GUNMETAL, .0025)
     pod.rotation_euler[2] = s*math.radians(-8)
     # Single pale outer cheek plane keeps the visor mask visually framed.
-    prism_xz(f"HD01_{side}_Cheek_Armor", [
-        (s*.041,-.025),(s*.052,-.018),(s*.059,.010),(s*.044,.028)
-    ], -.040, .018, SHADE, .001)
+    # The shell itself provides the cheek facet; no separately stuck-on tabs.
 
 # Small rear-set antenna, kept thin and short relative to the helmet.
 antenna = cyl("HD01_Short_Antenna_Base", (.032,.031,.045), .006, .012, "Z", GRAPHITE, 12)
-antenna_rod = cyl("HD01_Antenna_Rod", (.034,.033,.061), .0028, .034, "Z", ANTENNA, 10)
-antenna_rod.rotation_euler[1] = math.radians(-10)
+antenna_rod = box("HD01_Antenna_Rod", (.034,.033,.065), (.009,.008,.043), ANTENNA, .0015)
+antenna_rod.rotation_euler[1] = math.radians(-20)
 
 # Fixed lower interface only; no articulated neck or complete neck geometry.
 box("HD01_Fixed_Neck_Interface", (0,.003,-.050), (.058,.052,.018), GRAPHITE, .002)
@@ -185,9 +185,9 @@ def area(name, loc, power, size, color):
     o.location = loc
     o.rotation_euler = (Vector((0,0,0))-o.location).to_track_quat("-Z","Y").to_euler()
 
-area("key",(-.55,-.75,.55),95,.65,(.78,.86,1))
-area("fill",(.65,-.55,.18),48,.55,(1,.83,.68))
-area("rim",(.4,.55,.48),80,.55,(.58,.77,1))
+area("key",(-.55,-.75,.55),24,.65,(.88,.91,1))
+area("fill",(.65,-.55,.18),10,.55,(1,.83,.68))
+area("rim",(.4,.55,.48),27,.55,(.70,.83,1))
 
 def camera(name, loc, target=(0,0,0), scale=.31):
     d = bpy.data.cameras.new(name)
@@ -204,7 +204,7 @@ views = [
     ("HD01-02-Right.png", (1.1,0,0)),
     ("HD01-03-Back.png", (0,1.1,0)),
     ("HD01-04-Left.png", (-1.1,0,0)),
-    ("HD01-05-45deg.png", (.85,-.85,.52)),
+    ("HD01-05-45deg.png", (.85,-.85,.20)),
     ("HD01-06-Top.png", (0,0,1.1)),
 ]
 for filename, loc in views:
@@ -226,7 +226,7 @@ manifest = {
     "normalized_wisp_height_m": 1.0,
     "measured_bounds_m": bounds,
     "face_direction": "negative Y",
-    "visor": "single continuous horizontal cyan optical slit; no separate eyes",
+    "visor": "single recessed rectangular cyan sensor window with a dark bezel, following the latest full-body concept reference",
     "neck_interface": "small fixed connector; no head/neck articulation",
     "bd01_mating": {
         "body_interface_top_z_m": 0.158,

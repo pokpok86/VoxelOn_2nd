@@ -27,6 +27,10 @@ def material(name,color,rough=.48,metal=.28,emission=0):
     bs=m.node_tree.nodes.get("Principled BSDF")
     bs.inputs["Base Color"].default_value=(*color,1)
     bs.inputs["Roughness"].default_value=rough; bs.inputs["Metallic"].default_value=metal
+    if not emission:
+        noise=m.node_tree.nodes.new('ShaderNodeTexNoise'); noise.inputs['Scale'].default_value=230
+        bump=m.node_tree.nodes.new('ShaderNodeBump'); bump.inputs['Strength'].default_value=.16; bump.inputs['Distance'].default_value=.0007
+        m.node_tree.links.new(noise.outputs['Fac'],bump.inputs['Height']); m.node_tree.links.new(bump.outputs['Normal'],bs.inputs['Normal'])
     if emission:
         bs.inputs["Emission Color"].default_value=(*color,1)
         bs.inputs["Emission Strength"].default_value=emission
@@ -115,20 +119,27 @@ PIVOTS={}
 
 # Compact, wide chest chassis with one broad continuous front armor surface.
 core=loft_z("Torso_Core",[
-    (-.126,.174,.098,0,.24),(-.108,.196,.115,0,.22),
-    (.090,.196,.112,0,.22),(.115,.171,.096,0,.24)],GRAPHITE)
+    (-.126,.075,.065,.015,.24),(-.070,.105,.080,.012,.22),
+    (.030,.174,.090,.014,.22),(.105,.175,.088,.014,.24)],GRAPHITE)
 PARTS.append((core,ROOT))
 chest=prism_xz("Chest_Armor_Main",[
-    (-.188,-.084),(-.157,-.116),(.157,-.116),(.188,-.084),
-    (.195,.050),(.162,.101),(-.162,.101),(-.195,.050)],-.118,.018,ARMOR,.006)
+    (-.180,.070),(-.150,.105),(.150,.105),(.180,.070),
+    (.176,-.037),(.112,-.087),(.072,-.063),(.072,-.004),
+    (-.072,-.004),(-.072,-.063),(-.112,-.087),(-.176,-.037)],-.105,.044,ARMOR,.003)
 PARTS.append((chest,ROOT))
 # A single small central accent plate; no extra vents, pipes, or panel grid.
 accent=prism_xz("Chest_Center_Point_Armor",[
-    (-.047,.008),(-.041,-.035),(.007,-.055),(.049,-.026),(.044,.021),(-.006,.040)],-.132,.009,ARMOR_SHADE,.002)
+    (-.071,.082),(.071,.082),(.071,.035),(-.071,.035)],-.131,.007,ARMOR,.0015)
 PARTS.append((accent,ROOT))
 orange_point=prism_xz("Chest_Point_Orange_Inset",[
-    (.011,-.034),(.035,-.025),(.030,-.006),(.006,-.015)],-.139,.003,ORANGE,.001)
+    (-.152,.065),(-.101,.054),(-.102,.020),(-.145,.030)],-.130,.004,ORANGE,.001)
 PARTS.append((orange_point,ROOT))
+for s in (-1,1):
+    cheek=prism_xz(f"Chest_Lower_Chamfer_{s}",mirror([(.074,-.006),(.112,-.012),(.147,-.042),(.109,-.075),(.074,-.058)],s),-.116,.025,ARMOR_SHADE,.002)
+    PARTS.append((cheek,ROOT))
+belly=prism_xz("Recessed_Abdominal_Frame",[(-.062,-.003),(.062,-.003),(.052,-.092),(-.052,-.092)],-.067,.034,GUNMETAL,.003)
+belly_inset=cube("Abdominal_Recess",(0,-.087,-.028),(.072,.009,.023),GRAPHITE,.001)
+PARTS.extend([(belly,ROOT),(belly_inset,ROOT)])
 # Rear panel is plain and recessed, matching the reference's one center hatch.
 back=cube("Back_Core_Plate",(0,.116,-.005),(.265,.014,.145),ARMOR_SHADE,.008)
 PARTS.append((back,ROOT))
@@ -141,13 +152,13 @@ neck_top=cube("Neck_Head_Interface",(0,0,.151),(.062,.058,.014),GUNMETAL,.003)
 PARTS.extend([(neck,ROOT),(neck_top,ROOT)])
 
 # Lower waist yaw housing and a short pelvis interface, centered on Z.
-waist_z=-.151
-waist_housing=cylinder("Waist_Yaw_Housing",(0,0,waist_z),.066,.060,"Z",GRAPHITE,32)
-waist_ring=cylinder("Waist_Yaw_Ring",(0,0,waist_z-.030),.050,.010,"Z",GUNMETAL,32)
+waist_z=-.132
+waist_housing=cylinder("Waist_Yaw_Housing",(0,0,waist_z),.054,.040,"Z",GRAPHITE,32)
+waist_ring=cylinder("Waist_Yaw_Ring",(0,0,waist_z-.020),.045,.008,"Z",GUNMETAL,32)
 waist_pivot=empty("BD01_WAIST_YAW_Z",(0,0,waist_z),ROOT)
 waist_pivot["rotation_axis"]="Z"; waist_pivot["motion"]="left/right waist yaw only"
-waist_plug=cylinder("Waist_Rotating_Pelvis_Plug",(0,0,-.202),.045,.060,"Z",GUNMETAL,8)
-waist_key=cube("Waist_Pelvis_Interface_Key",(0,0,-.240),(.080,.070,.030),GRAPHITE,.004)
+waist_plug=cylinder("Waist_Rotating_Pelvis_Plug",(0,0,-.172),.039,.040,"Z",GUNMETAL,8)
+waist_key=cube("Waist_Pelvis_Interface_Key",(0,0,-.197),(.070,.060,.020),GRAPHITE,.003)
 PARTS.extend([(waist_housing,ROOT),(waist_ring,ROOT),(waist_plug,waist_pivot),(waist_key,waist_pivot)])
 PIVOTS["waist"]=(0,0,waist_z)
 
@@ -166,13 +177,18 @@ for side,s in (("L",-1),("R",1)):
     inset=cylinder(f"{side}_Shoulder_Cap_Inset",(sx,-.049,sz),.023,.006,"Y",JOINT_FACE,24)
     PARTS.extend([(can,ROOT),(cap,ROOT),(inset,ROOT)])
     # Small polygonal armor over the outside shoulder, not a large shoulder block.
-    outline=mirror([(.276,-.034),(.335,-.043),(.365,-.012),(.356,.091),(.333,.119),(.286,.098)],s)
-    armor=prism_xz(f"{side}_Shoulder_Armor",outline,-.006,.155,ARMOR,.005)
+    outline=mirror([(.250,.119),(.310,.132),(.350,.102),(.362,.012),(.326,-.030),(.266,-.012)],s)
+    armor=prism_xz(f"{side}_Shoulder_Armor",outline,-.010,.166,ARMOR,.003)
     PARTS.append((armor,ROOT))
+    from mathutils import Matrix
+    cap_center=Vector((s*.302,0,.050))
+    slope=Matrix.Rotation(-s*.20,4,'Y')
+    for vertex in armor.data.vertices:
+        vertex.co=cap_center+slope.to_3x3() @ (vertex.co-cap_center)
     # Upper-arm connector is a replaceable short socket, not an arm model.
-    connector=cube(f"{side}_UpperArm_Connector_Stub",(s*.323,-.002,-.035),(.082,.078,.064),GRAPHITE,.006)
+    connector=cube(f"{side}_UpperArm_Connector_Stub",(s*.282,.000,-.064),(.060,.065,.096),GRAPHITE,.003)
     PARTS.append((connector,pitch))
-    connector_cap=cylinder(f"{side}_UpperArm_Connector_Pin",(s*.359,-.003,-.035),.027,.018,"X",GUNMETAL,24)
+    connector_cap=cylinder(f"{side}_UpperArm_Connector_Pin",(s*.282,.000,-.108),.024,.062,"X",GUNMETAL,24)
     PARTS.append((connector_cap,pitch))
 
 for obj,parent in PARTS:
@@ -260,7 +276,7 @@ def camera(name,loc,target=(0,0,0),ortho=.82):
 views=[
     ("BD01-01-Front.png",(0,-2.2,0)),("BD01-02-Right.png",(2.2,0,0)),
     ("BD01-03-Back.png",(0,2.2,0)),("BD01-04-Left.png",(-2.2,0,0)),
-    ("BD01-05-45deg.png",(1.6,-1.6,1.0)),
+    ("BD01-05-45deg.png",(1.6,-1.6,.40)),
 ]
 for filename,loc in views:
     scene.camera=camera("Camera_"+filename[:-4],loc)
@@ -298,7 +314,7 @@ manifest={
     "asset":"WISP BD-01 compact body, shoulders, and upper-arm connector stubs",
     "blender":bpy.app.version_string,"normalized_wisp_height_m":1.0,
     "measured_bounds_m":bounds,
-    "main_torso_core_m":{"width_x":0.392,"depth_y":0.230,"height_z":0.241},
+    "main_torso_core_m":{"width_x":0.350,"depth_y":0.180,"height_z":0.231},
     "contains_head":False,"contains_forearm_weapon":False,"contains_legs":False,
     "neck":"fixed compact mount, no neck pivot",
     "joint_centers_m":{"shoulder_L":[-.238,0,.032],"shoulder_R":[.238,0,.032],"waist_yaw":[0,0,waist_z]},
@@ -310,7 +326,7 @@ manifest={
     "review_files":["BD01-Concept-Comparison.png","BD01-Review-Phone.png"],
     "references":["BD01-Design-Guide.jpg","WISP-Reference-Concept.png"],
     "automation":"PASS","design_review":"PENDING_PD_VISUAL_REVIEW",
-    "note":"Standalone body unit only; shoulder armor is shifted outward to expose the cylindrical pivot face. No other WISP parts were generated or modified."
+    "note":"Concept refinement: open-bottom chest armor, recessed tapered abdomen, angled shoulder wraps and downward upper-arm sockets. Design approval remains pending."
 }
 with open(os.path.join(OUT,"manifest.json"),"w",encoding="utf-8") as f:
     json.dump(manifest,f,ensure_ascii=False,indent=2)

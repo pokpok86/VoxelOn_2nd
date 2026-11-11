@@ -3,14 +3,14 @@
   "blender": "5.2.3 LTS",
   "normalized_wisp_height_m": 1.0,
   "measured_bounds_m": {
-    "width_x": 0.736,
-    "depth_y": 0.271,
-    "height_z": 0.413
+    "width_x": 0.735,
+    "depth_y": 0.265,
+    "height_z": 0.365
   },
   "main_torso_core_m": {
-    "width_x": 0.392,
-    "depth_y": 0.23,
-    "height_z": 0.241
+    "width_x": 0.35,
+    "depth_y": 0.18,
+    "height_z": 0.231
   },
   "contains_head": false,
   "contains_forearm_weapon": false,
@@ -30,7 +30,7 @@
     "waist_yaw": [
       0,
       0,
-      -0.151
+      -0.132
     ]
   },
   "axes": {
@@ -52,7 +52,7 @@
     {
       "joint": "waist",
       "x": 550,
-      "y": 816
+      "y": 782
     }
   ],
   "rig_motion_checks": {
@@ -88,5 +88,5 @@
   ],
   "automation": "PASS",
   "design_review": "PENDING_PD_VISUAL_REVIEW",
-  "note": "Standalone body unit only; shoulder armor is shifted outward to expose the cylindrical pivot face. No other WISP parts were generated or modified."
+  "note": "Concept refinement: open-bottom chest armor, recessed tapered abdomen, angled shoulder wraps and downward upper-arm sockets. Design approval remains pending."
 }
