@@ -49,3 +49,6 @@ Head, leg, standalone weapon and backpack geometry are unchanged. Assembly posit
 
 
 최신 상박 조정: 상박 길이만 1.5배(0.0672→0.1008 m) 늘리고 팔꿈치 핀을 함께 이동했습니다. 폭·깊이와 어깨 상단, 다른 몸통 형상은 유지했습니다. `../../WISP_Parts/UpperArm-150-Weapon-90-Revision.md` 참고.
+
+
+최신 몸통 수정: 몸통/어깨 외장만 직전의 90%로 줄였습니다. 상박 길이·굵기와 팔꿈치 접속 치수는 보정하여 유지합니다. `../../WISP_Parts/Body-90-Revision.md` 참고.

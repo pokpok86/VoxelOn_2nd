@@ -1,0 +1,38 @@
+{
+  "torso_scale_relative_to_397eb97": 0.9,
+  "scaled_torso_shoulders": [
+    "Abdominal_Recess",
+    "Back_Center_Recess",
+    "Back_Core_Plate",
+    "Chest_Armor_Main",
+    "Chest_Center_Point_Armor",
+    "Chest_Lower_Chamfer_-1",
+    "Chest_Lower_Chamfer_1",
+    "Chest_Point_Orange_Inset",
+    "L_Shoulder_Armor",
+    "L_Shoulder_Can_Face",
+    "L_Shoulder_Can_X",
+    "L_Shoulder_Cap_Inset",
+    "Neck_Fixed_Mount",
+    "R_Shoulder_Armor",
+    "R_Shoulder_Can_Face",
+    "R_Shoulder_Can_X",
+    "R_Shoulder_Cap_Inset",
+    "Recessed_Abdominal_Frame",
+    "Torso_Core",
+    "Waist_Rotating_Pelvis_Plug",
+    "Waist_Yaw_Housing",
+    "Waist_Yaw_Ring"
+  ],
+  "upper_arm_shape_and_offset_from_shoulder_preserved": [
+    "L_UpperArm_Connector_Pin",
+    "L_UpperArm_Connector_Stub",
+    "R_UpperArm_Connector_Pin",
+    "R_UpperArm_Connector_Stub"
+  ],
+  "mating_interface_dimensions_preserved": [
+    "Neck_Head_Interface",
+    "Waist_Pelvis_Interface_Key"
+  ],
+  "PASS": true
+}
