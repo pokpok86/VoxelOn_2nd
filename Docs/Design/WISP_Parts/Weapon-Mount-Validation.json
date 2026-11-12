@@ -3,37 +3,39 @@
     "body_translation": [
       0,
       0,
-      0.6765400069952011
+      0.6529000002145767
     ],
     "head_translation": [
       0,
       -0.003,
-      0.8663599982261658
+      0.7844999963641167
     ],
     "right_elbow": [
-      0.23124000430107117,
+      0.22906050086021423,
       0.0,
-      0.5879800069332123
+      0.5937443375587463
     ],
     "left_elbow": [
-      -0.23124000430107117,
+      -0.22906050086021423,
       0.0,
-      0.5879800069332123
+      0.5937443375587463
     ],
     "back_mount": [
       0,
-      0.11398,
-      0.6724400069952011
+      0.0973,
+      0.6494000002145768
     ],
     "waist_world_z": 0.505,
-    "neck_contact_world_z": 0.8073599982261658,
-    "body_size_factor": 0.82,
-    "mating_pin_dimensions_preserved": true
+    "neck_contact_world_z": 0.7384999963641167,
+    "body_size_factor": 0.7,
+    "mating_pin_dimensions_preserved": true,
+    "review_shoulder_spread_degrees": 20,
+    "review_idle_elbow_degrees": 50
   },
   "parts": {
     "W-01_LUMEN": {
       "waist_contact_error_m": 0.0,
-      "neck_contact_error_m": 5.960464477539063e-08,
+      "neck_contact_error_m": 0.0,
       "clearance": {
         "idle": {
           "major_shell_vs_torso_thigh_bounds_clear": true,
@@ -48,7 +50,7 @@
     },
     "W-02_BREAKER": {
       "waist_contact_error_m": 0.0,
-      "neck_contact_error_m": 5.960464477539063e-08,
+      "neck_contact_error_m": 0.0,
       "clearance": {
         "idle": {
           "major_shell_vs_torso_thigh_bounds_clear": true,
@@ -63,7 +65,7 @@
     },
     "W-03_RATTLE": {
       "waist_contact_error_m": 0.0,
-      "neck_contact_error_m": 5.960464477539063e-08,
+      "neck_contact_error_m": 0.0,
       "clearance": {
         "idle": {
           "major_shell_vs_torso_thigh_bounds_clear": true,
@@ -78,7 +80,7 @@
     },
     "W-04_EDGE": {
       "waist_contact_error_m": 0.0,
-      "neck_contact_error_m": 5.960464477539063e-08,
+      "neck_contact_error_m": 0.0,
       "clearance": {
         "idle": {
           "major_shell_vs_torso_thigh_bounds_clear": true,
@@ -93,7 +95,7 @@
     },
     "W-05_AEGIS": {
       "waist_contact_error_m": 0.0,
-      "neck_contact_error_m": 5.960464477539063e-08,
+      "neck_contact_error_m": 0.0,
       "clearance": {
         "idle": {
           "major_shell_vs_torso_thigh_bounds_clear": true,
@@ -108,7 +110,7 @@
     },
     "B-01_TWIN_DRIVE": {
       "waist_contact_error_m": 0.0,
-      "neck_contact_error_m": 5.960464477539063e-08,
+      "neck_contact_error_m": 0.0,
       "clearance": {
         "idle": {
           "major_shell_vs_torso_thigh_bounds_clear": true,

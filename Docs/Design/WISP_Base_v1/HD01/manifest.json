@@ -5,15 +5,15 @@
   "measured_bounds_m": {
     "width_x": 0.135,
     "depth_y": 0.116,
-    "height_z": 0.146
+    "height_z": 0.133
   },
   "face_direction": "negative Y",
   "visor": "single recessed rectangular cyan sensor window with a dark bezel, following the latest full-body concept reference",
   "neck_interface": "small fixed connector; no head/neck articulation",
   "bd01_mating": {
-    "body_interface_top_z_m": 0.158,
-    "head_interface_bottom_local_z_m": -0.059,
-    "head_root_z_for_mating_m": 0.217,
+    "body_interface_top_z_m": 0.08559999614953995,
+    "head_interface_bottom_local_z_m": -0.046,
+    "head_root_z_for_mating_m": 0.13159999614953993,
     "interface_width_depth_m": [
       0.058,
       0.052

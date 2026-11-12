@@ -13,7 +13,8 @@ from mathutils import Vector
 
 sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
 from assembly_layout import load_layout
-from weapon_mount_style import style_weapon
+from assembly_pose import pose_shoulders, set_forearm_angle, IDLE_DEGREES
+from weapon_mount_style import style_weapon, BODY_SCALE
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE=os.path.abspath(os.path.join(ROOT,'../WISP_Base_v1'))
 PARTS=['W-01_LUMEN','W-02_BREAKER','W-03_RATTLE','W-04_EDGE','W-05_AEGIS','B-01_TWIN_DRIVE']
@@ -37,10 +38,11 @@ def append_base():
         for col in dst.collections:bpy.context.scene.collection.children.link(col)
     bpy.data.objects['BD01_ROOT'].location=layout['body_translation']
     bpy.data.objects['HD01_ROOT'].location=layout['head_translation']
+    pose_shoulders(layout)
 def attach_pair(root,col,scale):
-    root.location=layout['right_elbow'];root.scale=(scale,)*3;root.rotation_euler.x=math.radians(65)
+    root.location=layout['right_elbow'];root.scale=(scale,)*3;set_forearm_angle(root,IDLE_DEGREES)
     meshes=[o for o in col.objects if o.type=='MESH']
-    other=root.copy();other.name=root.name.replace('_ROOT','_LEFT_ROOT');col.objects.link(other);other.location=layout['left_elbow']
+    other=root.copy();other.name=root.name.replace('_ROOT','_LEFT_ROOT');col.objects.link(other);other.location=layout['left_elbow'];set_forearm_angle(other,IDLE_DEGREES,left=True)
     for obj in meshes:
         cp=obj.copy();cp.data=obj.data.copy();col.objects.link(cp);cp.parent=other
     part=root.name.removesuffix('_ROOT')
@@ -48,7 +50,7 @@ def attach_pair(root,col,scale):
     style_weapon(other,col,part,left=True)
     return other
 def camera(name,location):
-    d=bpy.data.cameras.new(name);d.type='ORTHO';d.ortho_scale=1.27
+    d=bpy.data.cameras.new(name);d.type='ORTHO';d.ortho_scale=1.60
     o=bpy.data.objects.new(name,d);bpy.context.scene.collection.objects.link(o);o.location=location
     o.rotation_euler=(Vector((0,0,.53))-o.location).to_track_quat('-Z','Y').to_euler();return o
 
@@ -67,7 +69,7 @@ for part,path in sources.items():
         poses=[('idle',0)];cam_pos=(1.5,2,.95)
     else:
         other=attach_pair(root,col,.42)
-        poses=[('idle',65),('guard' if part=='W-05_AEGIS' else 'aimed',90 if part=='W-05_AEGIS' else 0)]
+        poses=[('idle',IDLE_DEGREES),('guard' if part=='W-05_AEGIS' else 'aimed',90 if part=='W-05_AEGIS' else 0)]
         cam_pos=(1.6,-2,.95)
     bpy.context.view_layer.update()
     waist_error=abs(bounds(bpy.data.objects['Waist_Pelvis_Interface_Key'])[2][0]-bounds(bpy.data.objects['LG01_Waist_Socket_Floor'])[2][1])
@@ -77,21 +79,23 @@ for part,path in sources.items():
     major=[o for o in col.objects if o.type=='MESH' and any(n in o.name for n in ('Structural_Barrel_Core','Main_Armor_','Main_Structural_Housing','Shield_Structural_Core','Longitudinal_Blade_Chassis','Pod_Core_','Blade_Amber_Cutting_Edge'))]
     checks={}
     for pose,angle in poses:
-        if not is_backpack:root.rotation_euler.x=other.rotation_euler.x=math.radians(angle)
+        if not is_backpack:
+            set_forearm_angle(root,angle);set_forearm_angle(other,angle,left=True)
         bpy.context.view_layer.update()
         hits=[(a.name,b.name) for a in major for b in torso if overlap(bounds(a),bounds(b))]
         assert not hits,f'{part}/{pose}: major shell overlaps torso/thigh: {hits}'
         checks[pose]={'major_shell_vs_torso_thigh_bounds_clear':True,'overlaps':hits}
         scene=bpy.context.scene;scene.camera=camera('Camera_Mounted_'+pose,cam_pos)
         scene.render.filepath=os.path.join(folder,part+'-Mounted-'+pose+'.png');bpy.ops.render.render(write_still=True)
-    if not is_backpack:root.rotation_euler.x=other.rotation_euler.x=math.radians(65)
+    if not is_backpack:
+        set_forearm_angle(root,IDLE_DEGREES);set_forearm_angle(other,IDLE_DEGREES,left=True)
     bpy.context.view_layer.update()
     bpy.context.scene.camera=bpy.data.objects['Camera_Mounted_idle']
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(folder,part+'-Mounted-Review.blend'))
     manifest['assembly_layout']=layout
     manifest['base_sha256_unchanged']=base_hashes
     manifest['standalone_part_sha256_preserved']=part_hashes[part]
-    manifest['weapon_mount_revision']={'body_scale_relative_to_previous':1.30,'root_and_connector_unchanged':True,'right_local_body_roll_degrees':-90 if part in ('W-04_EDGE','W-05_AEGIS') else 0,'left_roll_mirrored':True}
+    manifest['weapon_mount_revision']={'body_scale_relative_to_previous':1.50,'body_scale_relative_to_original':BODY_SCALE,'collar_local_geometry_unchanged':True,'root_position_follows_resized_body':True,'right_local_body_roll_degrees':-90 if part in ('W-04_EDGE','W-05_AEGIS') else 0,'left_roll_mirrored':True}
     if 'body_size_revision' in manifest:manifest['body_size_revision']['weapon_geometry_and_mount_scale_unchanged']=False
     manifest['body_contact_checks']={'waist_contact_error_m':waist_error,'neck_contact_error_m':neck_error}
     if part=='W-01_LUMEN':

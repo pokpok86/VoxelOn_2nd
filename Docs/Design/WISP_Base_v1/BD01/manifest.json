@@ -3,37 +3,37 @@
   "blender": "5.2.3 LTS",
   "normalized_wisp_height_m": 1.0,
   "measured_bounds_m": {
-    "width_x": 0.602,
-    "depth_y": 0.232,
-    "height_z": 0.302
+    "width_x": 0.514,
+    "depth_y": 0.198,
+    "height_z": 0.239
   },
   "main_torso_core_m": {
-    "width_x": 0.287,
-    "depth_y": 0.14759999999999998,
-    "height_z": 0.18942
+    "width_x": 0.24499999999999997,
+    "depth_y": 0.126,
+    "height_z": 0.1617
   },
-  "body_size_factor": 0.82,
+  "body_size_factor": 0.7,
   "assembly_interfaces": {
-    "waist_bottom_local_z": -0.1715400069952011,
+    "waist_bottom_local_z": -0.14790000021457672,
     "neck_contact_top_local": [
       0,
       0,
-      0.13081999123096466
+      0.08559999614953995
     ],
     "right_elbow_local": [
-      0.23124000430107117,
+      0.19740000367164612,
       0.0,
-      -0.08856000006198883
+      -0.07559999823570251
     ],
     "left_elbow_local": [
-      -0.23124000430107117,
+      -0.19740000367164612,
       0.0,
-      -0.08856000006198883
+      -0.07559999823570251
     ],
     "back_mount_local": [
       0,
-      0.11398,
-      -0.0040999999999999995
+      0.0973,
+      -0.0034999999999999996
     ],
     "mating_pin_dimensions_preserved": true
   },
@@ -43,19 +43,19 @@
   "neck": "fixed compact mount, no neck pivot",
   "joint_centers_m": {
     "shoulder_L": [
-      -0.19516000151634216,
+      -0.16660000383853912,
       0.0,
-      0.026240000501275063
+      0.02240000106394291
     ],
     "shoulder_R": [
-      0.19516000151634216,
+      0.16660000383853912,
       0.0,
-      0.026240000501275063
+      0.02240000106394291
     ],
     "waist_yaw": [
       0.0,
       0.0,
-      -0.10824000090360641
+      -0.09239999949932098
     ]
   },
   "axes": {
@@ -66,18 +66,18 @@
   "connection_pixels_closeup": [
     {
       "joint": "shoulder_L",
-      "x": 264,
-      "y": 429
+      "x": 306,
+      "y": 445
     },
     {
       "joint": "shoulder_R",
-      "x": 836,
-      "y": 557
+      "x": 794,
+      "y": 555
     },
     {
       "joint": "waist",
       "x": 550,
-      "y": 738
+      "y": 709
     }
   ],
   "rig_motion_checks": {

@@ -25,6 +25,7 @@ PARTS_ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT=os.path.join(PARTS_ROOT,PART);os.makedirs(OUT,exist_ok=True)
 BASE=os.path.abspath(os.path.join(PARTS_ROOT,'../WISP_Base_v1'))
 from assembly_layout import load_layout
+from assembly_pose import pose_shoulders, set_forearm_angle, IDLE_DEGREES
 from weapon_mount_style import style_weapon
 layout=load_layout(BASE)
 BASE_FILES={p:os.path.join(BASE,p,p+'.blend') for p in ('BD01','HD01','LG01')}
@@ -241,6 +242,7 @@ for part,path in BASE_FILES.items():
     with bpy.data.libraries.load(path,link=False) as (src,dst):dst.collections=[collections[part]]
     for col in dst.collections:scene.collection.children.link(col)
 bpy.data.objects['BD01_ROOT'].location=layout['body_translation'];bpy.data.objects['HD01_ROOT'].location=layout['head_translation']
+pose_shoulders(layout)
 if IS_BACKPACK:
     mount_scale=1.0;root.location=layout['back_mount'];root.scale=(1,1,1)
     # Keep the approved forearms visible in the backpack mounting review.
@@ -248,9 +250,9 @@ if IS_BACKPACK:
     approved_hash=sha(approved_path)
     with bpy.data.libraries.load(approved_path,link=False) as (src,dst):dst.collections=['W01_LUMEN_MODULE']
     for col in dst.collections:scene.collection.children.link(col)
-    arm=bpy.data.objects['W-01_LUMEN_ROOT'];arm.location=layout['right_elbow'];arm.scale=(.42,)*3;arm.rotation_euler.x=math.radians(65)
+    arm=bpy.data.objects['W-01_LUMEN_ROOT'];arm.location=layout['right_elbow'];arm.scale=(.42,)*3;set_forearm_angle(arm,IDLE_DEGREES)
     arm_col=dst.collections[0]
-    other=arm.copy();other.name='W-01_LUMEN_LEFT_ROOT';arm_col.objects.link(other);other.location=layout['left_elbow']
+    other=arm.copy();other.name='W-01_LUMEN_LEFT_ROOT';arm_col.objects.link(other);other.location=layout['left_elbow'];set_forearm_angle(other,IDLE_DEGREES,left=True)
     for obj in list(arm_col.objects):
         if obj.type=='MESH':
             cp=obj.copy();cp.data=obj.data.copy();arm_col.objects.link(cp);cp.parent=other
@@ -266,7 +268,7 @@ else:
         cp=obj.copy();cp.data=obj.data.copy();COL.objects.link(cp);cp.parent=left
     style_weapon(root,COL,PART)
     style_weapon(left,COL,PART,left=True)
-    pose_angles=[('idle',65),('guard' if PART=='W-05_AEGIS' else 'aimed',90 if PART=='W-05_AEGIS' else 0)]
+    pose_angles=[('idle',IDLE_DEGREES),('guard' if PART=='W-05_AEGIS' else 'aimed',90 if PART=='W-05_AEGIS' else 0)]
     preview_cam=(1.6,-2,.95)
 
 def aabb(obj):
@@ -276,15 +278,17 @@ def overlaps(a,b):return all(min(a[i][1],b[i][1])-max(a[i][0],b[i][0])>.0001 for
 body=[o for o in bpy.data.objects if o.name in ('Torso_Core','Chest_Armor_Main','L_Thigh_Armor','R_Thigh_Armor')]
 checks={}
 for pose,angle in pose_angles:
-    if not IS_BACKPACK:root.rotation_euler.x=left.rotation_euler.x=math.radians(angle)
+    if not IS_BACKPACK:
+        set_forearm_angle(root,angle);set_forearm_angle(left,angle,left=True)
     bpy.context.view_layer.update()
     major=[o for o in COL.objects if o.type=='MESH' and any(t in o.name for t in ('Main_Structural_Housing','Shield_Structural_Core','Longitudinal_Blade_Chassis','Pod_Core_','Blade_Amber_Cutting_Edge'))]
     hits=[(m.name,b.name) for m in major for b in body if overlaps(aabb(m),aabb(b))]
     checks[pose]={'major_shell_vs_torso_thigh_bounds_clear':not hits,'overlaps':hits}
     assert not hits,f'{PART}: {pose} major-shell clearance failure: {hits}'
-    scene.camera=camera('Camera_Mounted_'+pose,preview_cam,(0,0,.53),1.27)
+    scene.camera=camera('Camera_Mounted_'+pose,preview_cam,(0,0,.53),1.60)
     scene.render.filepath=os.path.join(OUT,PART+'-Mounted-'+pose+'.png');bpy.ops.render.render(write_still=True)
-if not IS_BACKPACK:root.rotation_euler.x=left.rotation_euler.x=math.radians(65)
+if not IS_BACKPACK:
+    set_forearm_angle(root,IDLE_DEGREES);set_forearm_angle(left,IDLE_DEGREES,left=True)
 scene.camera=bpy.data.objects['Camera_Mounted_idle']
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(OUT,PART+'-Mounted-Review.blend'))
 assert before=={p:sha(path) for p,path in BASE_FILES.items()},'Base file was modified'

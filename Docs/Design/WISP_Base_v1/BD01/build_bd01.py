@@ -159,8 +159,8 @@ back_recess=cube("Back_Center_Recess",(0,.126,.008),(.112,.010,.060),GRAPHITE,.0
 PARTS.append((back_recess,ROOT))
 
 # Small fixed neck socket; no head and no neck articulation.
-neck=cube("Neck_Fixed_Mount",(0,0,.132),(.086,.072,.026),GRAPHITE,.004)
-neck_top=cube("Neck_Head_Interface",(0,0,.151),(.062,.058,.014),GUNMETAL,.003)
+neck=cube("Neck_Fixed_Mount",(0,0,.110),(.086,.072,.010),GRAPHITE,.004)
+neck_top=cube("Neck_Head_Interface",(0,0,.118),(.062,.058,.006),GUNMETAL,.003)
 PARTS.extend([(neck,ROOT),(neck_top,ROOT)])
 
 # Lower waist yaw housing and a short pelvis interface, centered on Z.
@@ -208,7 +208,7 @@ for obj,parent in PARTS:
 
 # PD requested a smaller body after reviewing the assembled part batch.
 # Reduce the torso/shoulders together, while retaining mating pin dimensions.
-BODY_SIZE=.82
+BODY_SIZE=.70
 ROOT.scale=(BODY_SIZE,)*3
 for interface in (neck_top,waist_key,bpy.data.objects['L_UpperArm_Connector_Pin'],bpy.data.objects['R_UpperArm_Connector_Pin']):
     interface.scale=tuple(v/BODY_SIZE for v in interface.scale)

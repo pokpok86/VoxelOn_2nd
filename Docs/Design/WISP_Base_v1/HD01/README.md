@@ -30,3 +30,8 @@ The face adjustments narrow the foremost shell section by about 13% relative to 
 ```
 
 Blender generation completed with Blender 5.2.3 LTS and all generated views were visually inspected. **Design approval remains pending PD review.** No Unity import or whole-robot edit was made.
+
+
+## 추가 PD 비율 수정 — 2026-11-12
+
+머리 외형은 유지하고 아래 고정 연결부의 높이를 18 mm에서 6 mm로 줄였습니다. 몸통의 목 받침도 함께 낮춰 떠 보이는 간격을 줄였습니다. 최신 조립 검토 결과는 `../../WISP_Parts/Proportion-Revision-02.md`를 참고하세요.

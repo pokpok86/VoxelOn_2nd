@@ -1,38 +1,38 @@
 {
   "W-01_LUMEN": {
-    "fixed_root_and_collar_count": 22,
+    "validated_root_and_fixed_local_collar_count": 22,
     "scaled_housing_count": 56,
-    "saved_transform_max_error": 0,
+    "saved_transform_max_error": 2.3245812030836532e-07,
     "PASS": true
   },
   "W-02_BREAKER": {
-    "fixed_root_and_collar_count": 18,
+    "validated_root_and_fixed_local_collar_count": 18,
     "scaled_housing_count": 60,
-    "saved_transform_max_error": 0,
+    "saved_transform_max_error": 2.3245812030836532e-07,
     "PASS": true
   },
   "W-03_RATTLE": {
-    "fixed_root_and_collar_count": 18,
+    "validated_root_and_fixed_local_collar_count": 18,
     "scaled_housing_count": 118,
-    "saved_transform_max_error": 0,
+    "saved_transform_max_error": 2.3245812030836532e-07,
     "PASS": true
   },
   "W-04_EDGE": {
-    "fixed_root_and_collar_count": 18,
+    "validated_root_and_fixed_local_collar_count": 18,
     "scaled_housing_count": 36,
-    "saved_transform_max_error": 1.5497207073167374e-07,
+    "saved_transform_max_error": 2.3245812030836532e-07,
     "PASS": true
   },
   "W-05_AEGIS": {
-    "fixed_root_and_collar_count": 18,
+    "validated_root_and_fixed_local_collar_count": 18,
     "scaled_housing_count": 36,
-    "saved_transform_max_error": 1.5497207073167374e-07,
+    "saved_transform_max_error": 2.3245812030836532e-07,
     "PASS": true
   },
   "B-01_TWIN_DRIVE": {
-    "fixed_root_and_collar_count": 22,
+    "validated_root_and_fixed_local_collar_count": 22,
     "scaled_housing_count": 56,
-    "saved_transform_max_error": 0,
+    "saved_transform_max_error": 2.3245812030836532e-07,
     "PASS": true
   }
 }

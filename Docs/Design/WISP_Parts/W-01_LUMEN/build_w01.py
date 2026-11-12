@@ -207,6 +207,7 @@ from mathutils import Matrix
 BASE = os.path.abspath(os.path.join(HERE, '../../WISP_Base_v1'))
 sys.path.insert(0,os.path.join(HERE,'../Tools'))
 from assembly_layout import load_layout
+from assembly_pose import pose_shoulders, set_forearm_angle, IDLE_DEGREES
 from weapon_mount_style import style_weapon
 layout=load_layout(BASE)
 BASE_FILES = {p:os.path.join(BASE,p,p+'.blend') for p in ('BD01','HD01','LG01')}
@@ -356,11 +357,12 @@ for part,path in BASE_FILES.items():
     for collection in dst.collections:scene.collection.children.link(collection)
 bpy.data.objects['BD01_ROOT'].location=layout['body_translation']
 bpy.data.objects['HD01_ROOT'].location=layout['head_translation']
+pose_shoulders(layout)
 module_scale=.42
 target=Vector(layout['right_elbow'])
-root.location=target;root.scale=(module_scale,)*3;root.rotation_euler.x=math.radians(65)
+root.location=target;root.scale=(module_scale,)*3;set_forearm_angle(root,IDLE_DEGREES)
 # Copy the module for the opposite arm, preserving the existing base meshes.
-left_root=root.copy();left_root.name='W-01_LUMEN_LEFT_ROOT';COL.objects.link(left_root);left_root.location=layout['left_elbow']
+left_root=root.copy();left_root.name='W-01_LUMEN_LEFT_ROOT';COL.objects.link(left_root);left_root.location=layout['left_elbow'];set_forearm_angle(left_root,IDLE_DEGREES,left=True)
 for obj in module_meshes:
     duplicate=obj.copy();duplicate.data=obj.data.copy();COL.objects.link(duplicate);duplicate.parent=left_root
 style_weapon(root,COL,'W-01_LUMEN')
@@ -373,14 +375,14 @@ def overlap(a,b):return all(min(a[i][1],b[i][1])-max(a[i][0],b[i][0])>.0001 for 
 clearance={}
 core=[o for o in bpy.data.objects if o.name in ('Torso_Core','Chest_Armor_Main','L_Thigh_Armor','R_Thigh_Armor')]
 major=[o for o in COL.objects if o.type=='MESH' and ('Structural_Barrel_Core' in o.name or 'Main_Armor_' in o.name)]
-for pose,angle in (('idle',65),('aimed',0)):
-    root.rotation_euler.x=left_root.rotation_euler.x=math.radians(angle);bpy.context.view_layer.update()
+for pose,angle in (('idle',IDLE_DEGREES),('aimed',0)):
+    set_forearm_angle(root,angle);set_forearm_angle(left_root,angle,left=True);bpy.context.view_layer.update()
     hits=[(m.name,b.name) for m in major for b in core if overlap(aabb(m),aabb(b))]
     clearance[pose]={'major_shell_vs_torso_thigh_aabb_clear':not hits,'overlaps':hits}
     assert not hits,f'{pose}: major weapon shell overlaps body or thigh bounds: {hits}'
-    scene.camera=camera('Camera_Mounted_'+pose,(1.6,-2,.95),(0,0,.53),1.27)
+    scene.camera=camera('Camera_Mounted_'+pose,(1.6,-2,.95),(0,0,.53),1.60)
     scene.render.filepath=os.path.join(OUT,'W-01_LUMEN-Mounted-'+pose+'.png');bpy.ops.render.render(write_still=True)
-root.rotation_euler.x=left_root.rotation_euler.x=math.radians(65);bpy.context.view_layer.update()
+set_forearm_angle(root,IDLE_DEGREES);set_forearm_angle(left_root,IDLE_DEGREES,left=True);bpy.context.view_layer.update()
 scene.camera=bpy.data.objects['Camera_Mounted_idle']
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(OUT,'W-01_LUMEN-Mounted-Review.blend'))
 assert base_hashes=={p:digest(path) for p,path in BASE_FILES.items()},'Baseline file changed'

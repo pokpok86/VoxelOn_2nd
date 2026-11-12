@@ -41,3 +41,8 @@ PD reported that the body looked too large in assembled previews. The BD01 root 
 Head, leg, standalone weapon and backpack geometry are unchanged. Assembly positions are derived from the saved interface metadata rather than the former fixed offsets. See `../../WISP_Parts/Body-Size-Revision.md` for validation.
 
 `BD01-Size-Comparison-Phone.png` compares before and after with the same camera, framing and weapon scale. This is a size candidate for PD review, not a declaration of design approval.
+
+
+## 추가 PD 비율 수정 — 2026-11-12
+
+몸통/어깨 루트를 초기 크기의 0.70배로 조정했습니다. 직전 0.82배 버전 대비 약 14.6% 축소입니다. 목 받침도 낮췄습니다. 최신 외곽은 0.514 × 0.198 × 0.239 m입니다. 최신 조립 검토 결과는 `../../WISP_Parts/Proportion-Revision-02.md`를 참고하세요.

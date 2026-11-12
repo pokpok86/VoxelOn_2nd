@@ -149,7 +149,7 @@ antenna_rod = box("HD01_Antenna_Rod", (.034,.033,.065), (.009,.008,.043), ANTENN
 antenna_rod.rotation_euler[1] = math.radians(-20)
 
 # Fixed lower interface only; no articulated neck or complete neck geometry.
-box("HD01_Fixed_Neck_Interface", (0,.003,-.050), (.058,.052,.018), GRAPHITE, .002)
+box("HD01_Fixed_Neck_Interface", (0,.003,-.043), (.058,.052,.006), GRAPHITE, .002)
 
 root = bpy.data.objects.new("HD01_ROOT", None)
 MODEL.objects.link(root)
@@ -223,6 +223,8 @@ bounds = {
     "depth_y": round(max(v.y for v in points)-min(v.y for v in points),3),
     "height_z": round(max(v.z for v in points)-min(v.z for v in points),3),
 }
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'../BD01/manifest.json'),encoding='utf-8') as f:
+    body_interface_top=json.load(f)['assembly_interfaces']['neck_contact_top_local'][2]
 manifest = {
     "asset": "WISP HD-01 sensor head only",
     "blender": bpy.app.version_string,
@@ -232,9 +234,9 @@ manifest = {
     "visor": "single recessed rectangular cyan sensor window with a dark bezel, following the latest full-body concept reference",
     "neck_interface": "small fixed connector; no head/neck articulation",
     "bd01_mating": {
-        "body_interface_top_z_m": 0.158,
-        "head_interface_bottom_local_z_m": -0.059,
-        "head_root_z_for_mating_m": 0.217,
+        "body_interface_top_z_m": body_interface_top,
+        "head_interface_bottom_local_z_m": -0.046,
+        "head_root_z_for_mating_m": body_interface_top + .046,
         "interface_width_depth_m": [0.058, 0.052]
     },
     "contains_torso": False,

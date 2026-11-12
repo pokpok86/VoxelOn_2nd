@@ -20,8 +20,8 @@
   "face_view_axis": "+Z/-Z face and reverse",
   "mounted_scale": 0.42,
   "base_sha256_unchanged": {
-    "BD01": "36fd5031f21d24bc2742afa2653e1a17979e9af2a13aa8cd13c6ebd647f91b4e",
-    "HD01": "d2beba89291e5fbaeffba87639f94f79dce4afaa541937d9bdb1db3f872a35d9",
+    "BD01": "2f5e6617e8ceaa53857cea692968cfe8855ff169678656da5bc3e178d869e966",
+    "HD01": "aa3fd93762d77b148ee3aaaa65d820b6b34697ad25e6ba371c905947f43ac778",
     "LG01": "581d189b09217e04285577ea7adf8686ab9e1f64d2fd1a0905fe6ac4b6c11160"
   },
   "static_clearance_checks": {
@@ -48,32 +48,34 @@
     "body_translation": [
       0,
       0,
-      0.6765400069952011
+      0.6529000002145767
     ],
     "head_translation": [
       0,
       -0.003,
-      0.8663599982261658
+      0.7844999963641167
     ],
     "right_elbow": [
-      0.23124000430107117,
+      0.22906050086021423,
       0.0,
-      0.5879800069332123
+      0.5937443375587463
     ],
     "left_elbow": [
-      -0.23124000430107117,
+      -0.22906050086021423,
       0.0,
-      0.5879800069332123
+      0.5937443375587463
     ],
     "back_mount": [
       0,
-      0.11398,
-      0.6724400069952011
+      0.0973,
+      0.6494000002145768
     ],
     "waist_world_z": 0.505,
-    "neck_contact_world_z": 0.8073599982261658,
-    "body_size_factor": 0.82,
-    "mating_pin_dimensions_preserved": true
+    "neck_contact_world_z": 0.7384999963641167,
+    "body_size_factor": 0.7,
+    "mating_pin_dimensions_preserved": true,
+    "review_shoulder_spread_degrees": 20,
+    "review_idle_elbow_degrees": 50
   },
   "standalone_part_sha256_preserved": "a5417ad4c9ecd36f7d2b2c5c4786a748f16148cf476fa99f1de2497bc9c0a47b",
   "body_size_revision": {
@@ -83,12 +85,14 @@
   },
   "body_contact_checks": {
     "waist_contact_error_m": 0.0,
-    "neck_contact_error_m": 5.960464477539063e-08
+    "neck_contact_error_m": 0.0
   },
   "weapon_mount_revision": {
-    "body_scale_relative_to_previous": 1.3,
-    "root_and_connector_unchanged": true,
-    "left_roll_mirrored": true,
-    "right_local_body_roll_degrees": -90
+    "body_scale_relative_to_previous": 1.5,
+    "body_scale_relative_to_original": 1.95,
+    "collar_local_geometry_unchanged": true,
+    "root_position_follows_resized_body": true,
+    "right_local_body_roll_degrees": -90,
+    "left_roll_mirrored": true
   }
 }

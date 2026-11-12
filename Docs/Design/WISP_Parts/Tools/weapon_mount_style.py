@@ -2,7 +2,7 @@
 import math
 from mathutils import Matrix
 
-BODY_SCALE=1.30
+BODY_SCALE=1.95
 ELBOW_SCALE=.42
 
 def style_weapon(root, collection, part, left=False):
@@ -17,9 +17,8 @@ def style_weapon(root, collection, part, left=False):
             continue
         obj.matrix_basis=transform @ obj.matrix_basis
     assert fixed,'Elbow collar classification found no preserved objects'
-    return {'body_scale_relative_to_previous':BODY_SCALE,
+    return {'body_scale_relative_to_original':BODY_SCALE,
             'root_and_collar_scale':ELBOW_SCALE,
             'effective_body_scale':ELBOW_SCALE*BODY_SCALE,
             'local_longitudinal_roll_degrees':angle,
             'preserved_collar_objects':fixed}
-
