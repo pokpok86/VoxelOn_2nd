@@ -1,0 +1,132 @@
+{
+  "assets": [
+    {
+      "id": "BD01",
+      "category": "body",
+      "resource": "WispFamily20261112/BD01",
+      "waistHeight": 0.505,
+      "vertices": 10224,
+      "groups": 10
+    },
+    {
+      "id": "HD01",
+      "category": "head",
+      "resource": "WispFamily20261112/HD01",
+      "waistHeight": 0.505,
+      "vertices": 2184,
+      "groups": 5
+    },
+    {
+      "id": "W-01_LUMEN",
+      "category": "weapon",
+      "resource": "WispFamily20261112/W-01_LUMEN",
+      "waistHeight": 0.505,
+      "vertices": 14952,
+      "groups": 7
+    },
+    {
+      "id": "W-02_BREAKER",
+      "category": "weapon",
+      "resource": "WispFamily20261112/W-02_BREAKER",
+      "waistHeight": 0.505,
+      "vertices": 18288,
+      "groups": 6
+    },
+    {
+      "id": "W-03_RATTLE",
+      "category": "weapon",
+      "resource": "WispFamily20261112/W-03_RATTLE",
+      "waistHeight": 0.505,
+      "vertices": 38196,
+      "groups": 7
+    },
+    {
+      "id": "W-04_EDGE",
+      "category": "weapon",
+      "resource": "WispFamily20261112/W-04_EDGE",
+      "waistHeight": 0.505,
+      "vertices": 11373,
+      "groups": 7
+    },
+    {
+      "id": "W-05_AEGIS",
+      "category": "weapon",
+      "resource": "WispFamily20261112/W-05_AEGIS",
+      "waistHeight": 0.505,
+      "vertices": 11400,
+      "groups": 7
+    },
+    {
+      "id": "B-01_SKYWING",
+      "category": "backpack",
+      "resource": "WispFamily20261112/B-01_SKYWING",
+      "waistHeight": 0.505,
+      "vertices": 7716,
+      "groups": 5
+    },
+    {
+      "id": "B-02_CROSSLANCE",
+      "category": "backpack",
+      "resource": "WispFamily20261112/B-02_CROSSLANCE",
+      "waistHeight": 0.505,
+      "vertices": 10368,
+      "groups": 5
+    },
+    {
+      "id": "B-03_OVERTHRUST",
+      "category": "backpack",
+      "resource": "WispFamily20261112/B-03_OVERTHRUST",
+      "waistHeight": 0.505,
+      "vertices": 10464,
+      "groups": 5
+    },
+    {
+      "id": "B-04_LONGTANK",
+      "category": "backpack",
+      "resource": "WispFamily20261112/B-04_LONGTANK",
+      "waistHeight": 0.505,
+      "vertices": 14028,
+      "groups": 6
+    },
+    {
+      "id": "B-05_RAMJET",
+      "category": "backpack",
+      "resource": "WispFamily20261112/B-05_RAMJET",
+      "waistHeight": 0.505,
+      "vertices": 8052,
+      "groups": 6
+    },
+    {
+      "id": "L-01_STRIDER",
+      "category": "lower_body",
+      "resource": "WispFamily20261112/L-01_STRIDER",
+      "waistHeight": 0.5049999952316284,
+      "vertices": 14088,
+      "groups": 28
+    },
+    {
+      "id": "L-02_BASTION_TRACK",
+      "category": "lower_body",
+      "resource": "WispFamily20261112/L-02_BASTION_TRACK",
+      "waistHeight": 0.4578999876976013,
+      "vertices": 25728,
+      "groups": 89
+    },
+    {
+      "id": "L-03_TARANTULAN",
+      "category": "lower_body",
+      "resource": "WispFamily20261112/L-03_TARANTULAN",
+      "waistHeight": 0.5049999952316284,
+      "vertices": 14976,
+      "groups": 29
+    },
+    {
+      "id": "L-05_SKYLIFT",
+      "category": "lower_body",
+      "resource": "WispFamily20261112/L-05_SKYLIFT",
+      "waistHeight": 0.40625,
+      "vertices": 7440,
+      "groups": 5
+    }
+  ]
+}

@@ -89,7 +89,8 @@ public sealed partial class VoxArena
         Vector3 fired=AssistAim(f,target,direction);
         float spread=(f.spec.aimSpreadDegrees+p.spread)/Mathf.Max(.2f,f.weaponSlot%2==1?f.spec.leftArmStability:f.spec.rightArmStability);
         fired=Quaternion.Euler(0,UnityEngine.Random.Range(-spread,spread),0)*fired;
-        Shot shot=Fire(f,fired,p.damage,p.speed,p.radius,p.range,HasWeaponTrait(p,"LOCK")&&(f!=player||targetLock)?p.lockStrength*p.range/Mathf.Max(1,p.speed):0,p.blast,loadoutVisual:true);
+        bool guided=p.lockStrength>0&&(!HasWeaponTrait(p,"LOCK")||f!=player||targetLock);
+        Shot shot=Fire(f,fired,p.damage,p.speed,p.radius,p.range,guided?p.lockStrength*p.range/Mathf.Max(1,p.speed):0,p.blast,loadoutVisual:true);
         if(shot!=null)shot.visual.localScale*=1.15f; // Cosmetic size is independent of collision radius.
         PlaySound(SoundKind.Fire,f.root.position,.32f,f.weaponSlot==1?1.25f:.85f);
         if(f.magazine<=0)StartWeaponReload(f);
@@ -112,23 +113,27 @@ public sealed partial class VoxArena
     void DrawWeaponLoadout()
     {
         if(inMenu)return;
-        Panel(new Rect(16,526,226,178),new Color(.025f,.045f,.075f,.78f));
+        const float x0=18,y=644,cardW=88,cardH=66,gap=4;
         for(int i=0;i<4;i++)
         {
             WeaponState w=player.weapons[i];WeaponProfile p=player.weaponProfiles[i];
-            float x=22,y=531+i*42;bool active=player.weaponSlot==i+1;bool unavailable=p.shoulderBlocked;
+            float x=x0+i*(cardW+gap);bool active=player.weaponSlot==i+1;bool unavailable=p.shoulderBlocked;
             float fraction=p.isShield?0f:p.isUnarmed?1f:p.capacity>0?Mathf.Clamp01((float)w.ammo/p.capacity):0f;
-            Panel(new Rect(x,y,214,38),active?new Color(.035f,.23f,.29f,.98f):new Color(.035f,.065f,.09f,.86f));
+            bool reloading=w.reload>0&&!p.isShield&&!p.isUnarmed;
+            float reloadDuration=w.ammo<=0?p.emptyReload:p.partialReload;
+            if(reloading)fraction=1-Mathf.Clamp01(w.reload/Mathf.Max(.01f,reloadDuration));
+            Panel(new Rect(x,y,cardW,cardH),active?new Color(.035f,.18f,.23f,.98f):new Color(.035f,.065f,.09f,.88f));
             if(active)
             {
-                Panel(new Rect(x,y,4,38),Cyan);
-                Panel(new Rect(x+4,y,210,1),new Color(.35f,.96f,1f,.8f));
+                Panel(new Rect(x,y,3,cardH),Cyan);Panel(new Rect(x+3,y,cardW-3,2),new Color(.35f,.96f,1f,.9f));
+                Panel(new Rect(x,y+cardH-2,cardW,2),new Color(.35f,.96f,1f,.7f));
             }
-            Color numberColor=active?Color.white:unavailable?new Color(.38f,.46f,.50f):new Color(.68f,.77f,.82f);GUI.color=numberColor;Text(x+8,y+8,25,(i+1).ToString(),label);GUI.color=Color.white;
-            Panel(new Rect(x+39,y+12,103,8),new Color(.17f,.23f,.27f));
-            if(!unavailable&&!p.isShield)Panel(new Rect(x+39,y+12,103*fraction,8),w.reload>0?Orange:active?Cyan:new Color(.44f,.65f,.68f));
-            string state=unavailable?"LOCKED":p.isShield?"GUARD":p.isUnarmed?"MELEE":w.reload>0?"RLD "+w.reload.ToString("F1")+"s":w.ammo+"/"+p.capacity;
-            GUI.color=unavailable?new Color(.48f,.55f,.58f):p.isShield?new Color(.63f,.82f,1f):w.reload>0?Orange:active?Color.white:new Color(.70f,.78f,.81f);Text(x+148,y+8,62,state,small);GUI.color=Color.white;
+            Color numberColor=active?Color.white:unavailable?new Color(.38f,.46f,.50f):new Color(.68f,.77f,.82f);GUI.color=numberColor;Text(x+7,y+3,25,(i+1).ToString(),active?label:small);GUI.color=Color.white;
+            string state=i>=2&&BackpackWeaponMountsPending?"EMPTY":unavailable?"LOCKED":p.isShield?"GUARD":p.isUnarmed?"MELEE":reloading?"RLD "+w.reload.ToString("F1"):w.ammo+"/"+p.capacity;
+            GUI.color=unavailable?new Color(.48f,.55f,.58f):p.isShield?new Color(.63f,.82f,1f):reloading?Orange:active?Color.white:new Color(.70f,.78f,.81f);Text(x+31,y+7,cardW-36,state,small);GUI.color=Color.white;
+            Panel(new Rect(x+7,y+39,cardW-14,7),new Color(.17f,.23f,.27f));
+            if(!unavailable&&!p.isShield)Panel(new Rect(x+7,y+39,(cardW-14)*fraction,7),reloading?Orange:active?Cyan:new Color(.44f,.65f,.68f));
+            if(reloading){GUI.color=Orange;Text(x+7,y+48,cardW-14,"RELOAD",small);GUI.color=Color.white;}
         }
     }
     void CombatRevisionChecks(Action<bool,string> check)

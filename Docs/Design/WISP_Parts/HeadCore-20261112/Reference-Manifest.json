@@ -1,0 +1,42 @@
+[
+  {
+    "id": "H-01_RADOME",
+    "reference": "H-01_RADOME.jpg",
+    "sha256": "afc89e0c08f09d5563ba52fa2a37c8511e5e98f3dc05203333110257a81894c1"
+  },
+  {
+    "id": "H-02_LONGSIGHT",
+    "reference": "H-02_LONGSIGHT.jpg",
+    "sha256": "0e1ccd6be0d0661f9ae0b1580370e179edb2aa37abc982d23848a9a138955d2e"
+  },
+  {
+    "id": "H-03_SWIFTFIN",
+    "reference": "H-03_SWIFTFIN.jpg",
+    "sha256": "3630e13a77e05b86ec024066703be34e22393f45fafa5eb3577b4ef5262be53c"
+  },
+  {
+    "id": "H-04_BULWARK",
+    "reference": "H-04_BULWARK.jpg",
+    "sha256": "bf702a8e8b1c70c19d5865d8db5fb1a1ab04a3fbdde982cd88f7294ebb08efed"
+  },
+  {
+    "id": "C-01_STANDARD",
+    "reference": "C-01_STANDARD.jpg",
+    "sha256": "04c12274c1e75d8e6ee094ac5d3e6f3e8043cd029fbe45f5004beaceb0992774"
+  },
+  {
+    "id": "C-02_LIGHTFRAME",
+    "reference": "C-02_LIGHTFRAME.jpg",
+    "sha256": "7980dc47e8b1b28b258fa28920081cddf3d4abcc0c79e52e7acc00f5ef470238"
+  },
+  {
+    "id": "C-03_BULWARK_CORE",
+    "reference": "C-03_BULWARK_CORE.jpg",
+    "sha256": "e3b19bd41f5dfdb0b60a439d889bf4829692b465c3c165cf7863804edafb9d69"
+  },
+  {
+    "id": "C-04_ARC_CORE",
+    "reference": "C-04_ARC_CORE.jpg",
+    "sha256": "96837e7eedef2d41e5230cb0877680da6e4b912d406a407ad16151a4f742e10d"
+  }
+]

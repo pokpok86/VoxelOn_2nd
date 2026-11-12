@@ -36,7 +36,7 @@ public static class BalanceData
         id=="BOOSTER_TWIN"||id=="BOOSTER_VECTOR"||id=="BOOSTER_CYCLONE":category=="HEAD"?
         id=="HEAD_STANDARD"||id=="HEAD_RANGEFINDER"||id=="HEAD_OMNI":category=="CORE"?
         id=="CORE_STANDARD"||id=="CORE_REACTOR"||id=="CORE_BULWARK":category=="LEFT_ARM"||category=="RIGHT_ARM"?
-        id=="ARM_STANDARD"||id=="ARM_REINFORCED"||id=="ARM_PRECISION"||id=="ARM_ASSAULT"||id=="ARM_BULWARK"||id=="ARM_SCOUT"||id=="ARM_CLAW"||id=="ARM_BRUISER"||id=="ARM_VANGUARD"||id=="ARM_TACTICAL":category=="LEGS"?
+        id=="ARM_STANDARD"||id=="ARM_REINFORCED"||id=="ARM_PRECISION"||id=="ARM_ASSAULT"||id=="ARM_BULWARK"||id=="ARM_SCOUT"||id=="ARM_CLAW"||id=="ARM_BRUISER"||id=="ARM_VANGUARD"||id=="ARM_TACTICAL"||id=="ARM_EXOSKELETON":category=="LEGS"?
         id=="LEGS_STANDARD"||id=="LEGS_ASSAULT"||id=="LEGS_SCOUT"||id=="LEGS_RANGER"||id=="LEGS_HEAVY"||id=="LEGS_JUMPER"||id=="LEGS_REVERSE":id=="STANDARD";
     public static string NormalizePartVisualId(BalancePart part,string id)
     {

@@ -1,0 +1,60 @@
+PASS finite pose, attached elbow centers and aligned hinge axes / L-01_STRIDER / Idle
+PASS finite pose, attached elbow centers and aligned hinge axes / L-01_STRIDER / Forward
+PASS support feet stay near ground / L-01_STRIDER / Forward
+PASS finite pose, attached elbow centers and aligned hinge axes / L-01_STRIDER / Backward
+PASS support feet stay near ground / L-01_STRIDER / Backward
+PASS finite pose, attached elbow centers and aligned hinge axes / L-01_STRIDER / Left
+PASS support feet stay near ground / L-01_STRIDER / Left
+PASS biped hip responds laterally / Left
+PASS finite pose, attached elbow centers and aligned hinge axes / L-01_STRIDER / Right
+PASS support feet stay near ground / L-01_STRIDER / Right
+PASS biped hip responds laterally / Right
+PASS finite pose, attached elbow centers and aligned hinge axes / L-01_STRIDER / Jump
+PASS stride frozen during actual boost ascent / L-01_STRIDER
+PASS finite pose, attached elbow centers and aligned hinge axes / L-01_STRIDER / Landing
+PASS actual landing completes / L-01_STRIDER
+PASS finite pose, attached elbow centers and aligned hinge axes / L-01_STRIDER / AimUp
+PASS finite pose, attached elbow centers and aligned hinge axes / L-01_STRIDER / AimDown
+PASS finite pose, attached elbow centers and aligned hinge axes / L-01_STRIDER / Guard
+PASS finite pose, attached elbow centers and aligned hinge axes / L-02_BASTION_TRACK / Idle
+PASS finite pose, attached elbow centers and aligned hinge axes / L-02_BASTION_TRACK / Forward
+PASS support feet stay near ground / L-02_BASTION_TRACK / Forward
+PASS finite pose, attached elbow centers and aligned hinge axes / L-02_BASTION_TRACK / Backward
+PASS support feet stay near ground / L-02_BASTION_TRACK / Backward
+PASS finite pose, attached elbow centers and aligned hinge axes / L-02_BASTION_TRACK / Left
+PASS support feet stay near ground / L-02_BASTION_TRACK / Left
+PASS finite pose, attached elbow centers and aligned hinge axes / L-02_BASTION_TRACK / Right
+PASS support feet stay near ground / L-02_BASTION_TRACK / Right
+PASS finite pose, attached elbow centers and aligned hinge axes / L-02_BASTION_TRACK / Jump
+PASS finite pose, attached elbow centers and aligned hinge axes / L-02_BASTION_TRACK / Landing
+PASS actual landing completes / L-02_BASTION_TRACK
+PASS finite pose, attached elbow centers and aligned hinge axes / L-02_BASTION_TRACK / AimUp
+PASS finite pose, attached elbow centers and aligned hinge axes / L-02_BASTION_TRACK / AimDown
+PASS finite pose, attached elbow centers and aligned hinge axes / L-02_BASTION_TRACK / Guard
+PASS finite pose, attached elbow centers and aligned hinge axes / L-03_TARANTULAN / Idle
+PASS finite pose, attached elbow centers and aligned hinge axes / L-03_TARANTULAN / Forward
+PASS support feet stay near ground / L-03_TARANTULAN / Forward
+PASS finite pose, attached elbow centers and aligned hinge axes / L-03_TARANTULAN / Backward
+PASS support feet stay near ground / L-03_TARANTULAN / Backward
+PASS finite pose, attached elbow centers and aligned hinge axes / L-03_TARANTULAN / Left
+PASS support feet stay near ground / L-03_TARANTULAN / Left
+PASS finite pose, attached elbow centers and aligned hinge axes / L-03_TARANTULAN / Right
+PASS support feet stay near ground / L-03_TARANTULAN / Right
+PASS finite pose, attached elbow centers and aligned hinge axes / L-03_TARANTULAN / Jump
+PASS stride frozen during actual boost ascent / L-03_TARANTULAN
+PASS finite pose, attached elbow centers and aligned hinge axes / L-03_TARANTULAN / Landing
+PASS actual landing completes / L-03_TARANTULAN
+PASS finite pose, attached elbow centers and aligned hinge axes / L-03_TARANTULAN / AimUp
+PASS finite pose, attached elbow centers and aligned hinge axes / L-03_TARANTULAN / AimDown
+PASS finite pose, attached elbow centers and aligned hinge axes / L-03_TARANTULAN / Guard
+PASS finite pose, attached elbow centers and aligned hinge axes / L-05_SKYLIFT / Idle
+PASS finite pose, attached elbow centers and aligned hinge axes / L-05_SKYLIFT / Forward
+PASS finite pose, attached elbow centers and aligned hinge axes / L-05_SKYLIFT / Backward
+PASS finite pose, attached elbow centers and aligned hinge axes / L-05_SKYLIFT / Left
+PASS finite pose, attached elbow centers and aligned hinge axes / L-05_SKYLIFT / Right
+PASS finite pose, attached elbow centers and aligned hinge axes / L-05_SKYLIFT / Jump
+PASS finite pose, attached elbow centers and aligned hinge axes / L-05_SKYLIFT / Landing
+PASS actual landing completes / L-05_SKYLIFT
+PASS finite pose, attached elbow centers and aligned hinge axes / L-05_SKYLIFT / AimUp
+PASS finite pose, attached elbow centers and aligned hinge axes / L-05_SKYLIFT / AimDown
+PASS finite pose, attached elbow centers and aligned hinge axes / L-05_SKYLIFT / Guard

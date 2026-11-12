@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 // All geometry below is local to a detachable module. Gameplay stats stay in CraftSpec
 // until the assembly system is introduced; visual changes never silently change balance.
@@ -644,6 +644,20 @@ public sealed partial class VoxArena
             Shape(PrimitiveType.Sphere,"Tactical wrist optic",model,new Vector3(0,.025f,.32f),new Vector3(.13f,.11f,.08f),highlight,true);
             Plate("Tactical elbow data port",model,new Vector3(0,.045f,-.28f),new Vector3(.23f,.17f,.09f),armor);
         }
+        else if(visual=="ARM_EXOSKELETON")
+        {
+            BeveledPlate("Exoskeleton upper forearm segment",model,new Vector3(0,.085f,-.055f),new Vector3(.43f,.23f,.27f),armor,side*-3,.07f,.82f);
+            BeveledPlate("Exoskeleton wrist segment",model,new Vector3(0,-.075f,.285f),new Vector3(.39f,.20f,.22f),edge,side*3,.06f,.82f);
+            Plate("Exoskeleton flex gap",model,new Vector3(0,.015f,.115f),new Vector3(.22f,.075f,.12f),dark);
+            for(int rail=-1;rail<=1;rail+=2)
+            {
+                float x=rail*.205f;
+                Shape(PrimitiveType.Cylinder,"Exoskeleton actuator port "+(rail<0?"L":"R"),model,new Vector3(x,.015f,.115f),new Vector3(.07f,.30f,.07f),highlight,true);
+                Shape(PrimitiveType.Sphere,"Exoskeleton hinge cap "+(rail<0?"L":"R"),model,new Vector3(x,.015f,-.155f),new Vector3(.10f,.10f,.08f),dark,true);
+                Plate("Exoskeleton tie bracket "+(rail<0?"L":"R"),model,new Vector3(x,.015f,.30f),new Vector3(.075f,.12f,.09f),dark);
+            }
+            Plate("Exoskeleton dorsal signal",model,new Vector3(0,.205f,-.005f),new Vector3(.12f,.035f,.19f),highlight);
+        }
     }
     void BuildSelectableLegVisualVariant(Fighter f,Color armor,Color dark,Color edge,Color highlight)
     {
@@ -1279,7 +1293,7 @@ public sealed partial class VoxArena
             }
         }
         AddFrameIdentity(f,armor,hull,dark,edge);
-        ApplyImportedWisp(f);BuildSelectableHeadVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableCoreVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableArmVisualVariant(f,true,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableArmVisualVariant(f,false,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableLegVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));BuildBoosterVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));SetupWeaponVisuals(f);SetupBoostVisual(f);if(f==player)RegisterCameraFadeRenderers(f);
+        ApplyImportedWisp(f);BuildSelectableHeadVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableCoreVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableArmVisualVariant(f,true,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableArmVisualVariant(f,false,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableLegVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));BuildBoosterVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));PreparePendingBackpackWeapons(f);SetupWeaponVisuals(f);SetupBoostVisual(f);InstallFamilyArt(f);if(f==player)RegisterCameraFadeRenderers(f);
     }
     RenderTexture[] framePortraits,customizationPortraits;float portraitYaw;
     void BuildPortraits()
@@ -1311,7 +1325,7 @@ public sealed partial class VoxArena
     {
         portraitModel.root.position=new Vector3(0,60,0);portraitModel.body.localPosition=Vector3.up*.4f;
         for(int side=0;side<2;side++)if(portraitModel.weaponVisuals!=null&&portraitModel.weaponVisuals[side]!=null)portraitModel.weaponVisuals[side].gameObject.SetActive(true);
-        portraitModel.fist.gameObject.SetActive(false);portraitModel.guardBlend=0;PlaceGuardVisuals(portraitModel);
+        portraitModel.fist.gameObject.SetActive(false);portraitModel.guardBlend=0;PlaceGuardVisuals(portraitModel);UpdateFamilyArt(portraitModel);
         // Preview chassis were placed at the hangar origin, which left their
         // feet below the raised floor. Lift the complete model until its
         // lowest visible chassis renderer clears the floor surface.
@@ -1336,6 +1350,7 @@ public sealed partial class VoxArena
         // backdrop shares the preview yaw so it cannot slide between camera
         // and chassis during a full turn.
         if(portraitHangar!=null)portraitHangar.rotation=Quaternion.Euler(0,portraitYaw,0);
+        UpdateFamilyArt(portraitModel);
         Bounds bounds=new Bounds(portraitModel.root.position+Vector3.up*.6f,Vector3.zero);bool found=false;
         foreach(Renderer renderer in portraitModel.body.GetComponentsInChildren<Renderer>(true))
         {

@@ -1,0 +1,32 @@
+{
+  "automation": "PASS",
+  "blender": "5.2.3 LTS",
+  "parts": [
+    {
+      "id": "H-05_NEEDLE",
+      "checks": "PASS",
+      "measured_interface_errors_m": {
+        "neck_bottom_m": 3.635883330521672e-09,
+        "neck_to_shell_gap_m": 0
+      },
+      "render_count": 7,
+      "editable_blend": true,
+      "mounted_blend": true,
+      "design_review": "PENDING_PD"
+    },
+    {
+      "id": "H-06_LANCET",
+      "checks": "PASS",
+      "measured_interface_errors_m": {
+        "neck_bottom_m": 3.635883330521672e-09,
+        "neck_to_shell_gap_m": 0
+      },
+      "render_count": 7,
+      "editable_blend": true,
+      "mounted_blend": true,
+      "design_review": "PENDING_PD"
+    }
+  ],
+  "original_base_files_unchanged": true,
+  "unity_integration": "NOT_PERFORMED"
+}

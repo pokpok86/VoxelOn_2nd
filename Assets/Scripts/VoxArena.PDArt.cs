@@ -72,6 +72,7 @@ public sealed partial class VoxArena
     }
     Vector3 WeaponMuzzle(Fighter f)
     {
+        if(TryFamilyMuzzle(f,out Vector3 familyMuzzle))return familyMuzzle;
         if(f.weaponVisuals==null)return f.root.position+f.facing*(f.Radius+.25f);
         int i=WeaponIndex(f);if(f.modernWeaponArt&&f.weaponMuzzlePoints[i]!=null)return f.weaponMuzzlePoints[i].position;float tip=i==0?1.05f:i==1?1.2f:i==2?.53f:1.48f;
         return f.weaponVisuals[i].TransformPoint(Vector3.forward*tip);

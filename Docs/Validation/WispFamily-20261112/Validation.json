@@ -1,0 +1,59 @@
+{
+  "VoxelOn-WispFamily-Build4.log": [
+    "VOXSKY_BUILD_PASS 250377126 bytes"
+  ],
+  "VoxelOn-WispFamily-Review-Final.log": [
+    "WISP_FAMILY_CHECK PASS real game fighter uses exported Blender family",
+    "WISP_FAMILY_CHECK PASS valid actual mesh buffers BD01",
+    "WISP_FAMILY_CHECK PASS valid actual mesh buffers HD01",
+    "WISP_FAMILY_CHECK PASS valid actual mesh buffers W-01_LUMEN",
+    "WISP_FAMILY_CHECK PASS valid actual mesh buffers W-02_BREAKER",
+    "WISP_FAMILY_CHECK PASS valid actual mesh buffers W-03_RATTLE",
+    "WISP_FAMILY_CHECK PASS valid actual mesh buffers W-04_EDGE",
+    "WISP_FAMILY_CHECK PASS valid actual mesh buffers W-05_AEGIS",
+    "WISP_FAMILY_CHECK PASS valid actual mesh buffers B-01_SKYWING",
+    "WISP_FAMILY_CHECK PASS valid actual mesh buffers B-02_CROSSLANCE",
+    "WISP_FAMILY_CHECK PASS valid actual mesh buffers B-03_OVERTHRUST",
+    "WISP_FAMILY_CHECK PASS valid actual mesh buffers B-04_LONGTANK",
+    "WISP_FAMILY_CHECK PASS valid actual mesh buffers B-05_RAMJET",
+    "WISP_FAMILY_CHECK PASS valid actual mesh buffers L-01_STRIDER",
+    "WISP_FAMILY_CHECK PASS valid actual mesh buffers L-02_BASTION_TRACK",
+    "WISP_FAMILY_CHECK PASS valid actual mesh buffers L-03_TARANTULAN",
+    "WISP_FAMILY_CHECK PASS valid actual mesh buffers L-05_SKYLIFT",
+    "WISP_FAMILY_CHECK PASS mounted actual lower/backpack 0",
+    "WISP_FAMILY_CHECK PASS waist connection continuous 0",
+    "WISP_FAMILY_CHECK PASS mounted actual lower/backpack 1",
+    "WISP_FAMILY_CHECK PASS waist connection continuous 1",
+    "WISP_FAMILY_CHECK PASS mounted actual lower/backpack 2",
+    "WISP_FAMILY_CHECK PASS waist connection continuous 2",
+    "WISP_FAMILY_CHECK PASS mounted actual lower/backpack 3",
+    "WISP_FAMILY_CHECK PASS waist connection continuous 3",
+    "WISP_FAMILY_CHECK PASS weapon model selection 1",
+    "WISP_FAMILY_CHECK PASS weapon model selection 2",
+    "WISP_FAMILY_CHECK PASS weapon model selection 3",
+    "WISP_FAMILY_CHECK PASS weapon model selection 4",
+    "WISP_FAMILY_CHECK PASS removing weapon removes new visible mesh",
+    "WISP_FAMILY_CHECK PASS shield maps to shield model",
+    "WISP_FAMILY_CHECK PASS guard rotates actual shield",
+    "WISP_FAMILY_CHECK PASS shots use authored actual muzzle",
+    "WISP_FAMILY_CHECK PASS biped stops stride while airborne",
+    "WISP_FAMILY_CHECK PASS independent appearance settings save and deserialize in isolated folder",
+    "WISP_FAMILY_REVIEW_PASS 35 checks"
+  ],
+  "VoxelOn-WispFamily-LegacySmoke.log": [
+    "VOXSKY_SMOKE_PASS 383 checks: ground, modular robots, camera, slot-one gun, mobility, practice AI, aim assist, audio"
+  ],
+  "preservation": {
+    "Assets/Scenes/Arena.unity": {
+      "sha256": "45394688702dba33ca8555111cb91a97d558098b9b49e413f3cd38e4c122be8b",
+      "matches_before": true
+    },
+    "Data/Balance/PD-Balance.json": {
+      "sha256": "8ddd711c95a9c42a8d35c7c33c3225d62387eb7aed5f723af03e7550af0f5a6c",
+      "matches_before": true
+    }
+  },
+  "unity": "6000.6.7f1",
+  "mode": "New-family dedicated runtime checks + explicitly legacy-art regression suite",
+  "normal_smoke_note": "An earlier run with new surfaces enabled failed 14 old model-name/hierarchy/size checks; legacy suite is not a full new-art-mode pass. Archived non-WISP frames were subsequently excluded from automatic replacement."
+}

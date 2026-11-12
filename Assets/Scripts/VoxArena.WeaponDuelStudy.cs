@@ -18,18 +18,26 @@ public sealed partial class VoxArena
 
     IEnumerator WeaponDuelStudy()
     {
-        // Compare shipped data profiles through the regular AI, movement, firing, reload and hit loops.
+        // Compare authored weapon profiles across the selectable chassis through regular combat loops.
         string[] ids={"Military_AR","Military_LMG","Military_GL","Military_RL","Military_SR"};
-        BalanceDocument defaults=BalanceData.Defaults();
-        BalanceWeapon[] weapons=ids.Select(id=>defaults.weapons.First(w=>w.id==id)).ToArray();
+        int[][] chassisPairs={new[]{0,1},new[]{0,2},new[]{1,2}};
+        // Read the authored tuning for this run, but never write it back. This keeps the
+        // comparison aligned with PD edits while protecting the shared balance file.
+        string balancePath=BalancePath();
+        BalanceDocument studyData=File.Exists(balancePath)?BalanceFiles.Load(balancePath):BalanceData.Defaults();
+        BalanceWeapon[] weapons=ids.Select(id=>studyData.weapons.First(w=>w.id==id)).ToArray();
         var totals=ids.ToDictionary(id=>id,_=>new WeaponDuelTotals());
-        var rows=new StringBuilder("seed,sideSwap,weaponA,weaponB,damageA,intervalA,capacityA,blastA,damageB,intervalB,capacityB,blastB,seconds,winner,weaponAHP,weaponBHP,weaponADamageDealt,weaponBDamageDealt\n");
+        var chassisTotals=new Dictionary<string,WeaponDuelTotals>();
+        foreach(int[] pair in chassisPairs)foreach(string id in ids)foreach(int frameIndex in pair)
+            chassisTotals[CraftCatalog.Selectable[frameIndex].name+"|"+id]=new WeaponDuelTotals();
+        var rows=new StringBuilder("seed,sideSwap,chassisA,chassisB,weaponA,weaponB,damageA,intervalA,capacityA,blastA,damageB,intervalB,capacityB,blastB,seconds,winner,weaponAHP,weaponBHP,weaponADamageDealt,weaponBDamageDealt\n");
         bool valid=true;int matches=0;BalanceDocument previousBalance=activeBalance;bool previousPause=paused,previousSmoke=smoke,previousSpectator=spectatorMode;int previousDifficulty=difficulty;
         activeBalance=null;smoke=false;paused=true;spectatorMode=true;difficulty=0;
-        for(int a=0;a<weapons.Length;a++)for(int b=a+1;b<weapons.Length;b++)for(int seed=0;seed<5;seed++)for(int sideSwap=0;sideSwap<2;sideSwap++)
+        for(int a=0;a<weapons.Length;a++)for(int b=a+1;b<weapons.Length;b++)for(int seed=0;seed<5;seed++)foreach(int[] chassisPair in chassisPairs)for(int sideSwap=0;sideSwap<2;sideSwap++)
         {
-            UnityEngine.Random.InitState(842101+seed*97+a*13+b*31);
-            TestSetupSelectable(0,0);smoke=false;inMenu=false;paused=true;spectatorMode=true;difficulty=0;targetLock=false;roundTime=0;
+            UnityEngine.Random.InitState(842101+seed*97+a*13+b*31+chassisPair[0]*43+chassisPair[1]*71);
+            int playerFrame=sideSwap==0?chassisPair[0]:chassisPair[1],rivalFrame=sideSwap==0?chassisPair[1]:chassisPair[0];
+            TestSetupSelectable(playerFrame,rivalFrame);smoke=false;inMenu=false;paused=true;spectatorMode=true;difficulty=0;targetLock=false;roundTime=0;
             Fighter fighterA=sideSwap==0?player:enemy,fighterB=sideSwap==0?enemy:player;
             fighterA.root.position=new Vector3(sideSwap==0?-12:12,FighterGroundY,sideSwap==0?-12:12);fighterB.root.position=new Vector3(sideSwap==0?12:-12,FighterGroundY,sideSwap==0?12:-12);
             fighterA.hp=fighterA.spec.health;fighterB.hp=fighterB.spec.health;
@@ -49,21 +57,40 @@ public sealed partial class VoxArena
             }
             string winner=Mathf.Abs(fighterA.hp-fighterB.hp)<.1f?"draw":fighterA.hp>fighterB.hp?"A":"B";
             float healthA=fighterA.hp,healthB=fighterB.hp;
-            rows.AppendLine(string.Join(",",new[]{seed.ToString(CultureInfo.InvariantCulture),sideSwap.ToString(CultureInfo.InvariantCulture),weapons[a].id,weapons[b].id,
+            string chassisA=CraftCatalog.Selectable[chassisPair[0]].name,chassisB=CraftCatalog.Selectable[chassisPair[1]].name;
+            rows.AppendLine(string.Join(",",new[]{seed.ToString(CultureInfo.InvariantCulture),sideSwap.ToString(CultureInfo.InvariantCulture),chassisA,chassisB,weapons[a].id,weapons[b].id,
                 F(weapons[a].Get("damage")),F(weapons[a].Get("interval")),I(weapons[a].Get("capacity")),F(weapons[a].Get("blast")),
                 F(weapons[b].Get("damage")),F(weapons[b].Get("interval")),I(weapons[b].Get("capacity")),F(weapons[b].Get("blast")),F(seconds),winner,F(healthA),F(healthB),F(fighterA.duelDamageDealt),F(fighterB.duelDamageDealt)}));
             RecordWeaponDuel(totals[ids[a]],winner=="A"?1:winner=="draw"?0:-1,healthA,seconds,fighterA.duelDamageDealt);
-            RecordWeaponDuel(totals[ids[b]],winner=="B"?1:winner=="draw"?0:-1,healthB,seconds,fighterB.duelDamageDealt);matches++;
+            RecordWeaponDuel(totals[ids[b]],winner=="B"?1:winner=="draw"?0:-1,healthB,seconds,fighterB.duelDamageDealt);
+            RecordWeaponDuel(chassisTotals[chassisA+"|"+ids[a]],winner=="A"?1:winner=="draw"?0:-1,healthA,seconds,fighterA.duelDamageDealt);
+            RecordWeaponDuel(chassisTotals[chassisB+"|"+ids[b]],winner=="B"?1:winner=="draw"?0:-1,healthB,seconds,fighterB.duelDamageDealt);matches++;
         }
+        int expectedMatches=weapons.Length*(weapons.Length-1)/2*5*chassisPairs.Length*2;
+        int expectedPerWeapon=(weapons.Length-1)*5*chassisPairs.Length*2;
+        var expectedByChassisWeapon=chassisTotals.Keys.ToDictionary(key=>key,_=>0);
+        foreach(int[] pair in chassisPairs)
+        {
+            string chassisA=CraftCatalog.Selectable[pair[0]].name,chassisB=CraftCatalog.Selectable[pair[1]].name;
+            for(int weaponIndex=0;weaponIndex<weapons.Length;weaponIndex++)
+            {
+                expectedByChassisWeapon[chassisA+"|"+ids[weaponIndex]]+=(weapons.Length-weaponIndex-1)*5*2;
+                expectedByChassisWeapon[chassisB+"|"+ids[weaponIndex]]+=weaponIndex*5*2;
+            }
+        }
+        bool coverageValid=matches==expectedMatches&&totals.Values.All(t=>t.matches==expectedPerWeapon)&&chassisTotals.All(entry=>entry.Value.matches==expectedByChassisWeapon[entry.Key]);
+        valid&=coverageValid;
         activeBalance=previousBalance;paused=previousPause;smoke=previousSmoke;spectatorMode=previousSpectator;difficulty=previousDifficulty;
         string stamp=DateTime.Now.ToString("yyyyMMdd-HHmmss",CultureInfo.InvariantCulture),directory=Path.Combine(Directory.GetCurrentDirectory(),"Docs","Validation");Directory.CreateDirectory(directory);
         string detailPath=Path.Combine(directory,"Weapon-Duel-Study-"+stamp+".csv"),summaryPath=Path.Combine(directory,"Weapon-Duel-Summary-"+stamp+".csv");
         File.WriteAllText(detailPath,rows.ToString(),new UTF8Encoding(false));
-        var summary=new StringBuilder("weapon,matches,wins,draws,losses,winPoints,meanRemainingHP,meanFightSeconds,meanDamageDealt\n");
-        foreach(string id in ids){WeaponDuelTotals t=totals[id];summary.AppendLine(string.Join(",",id,t.matches,t.wins,t.draws,t.losses,F(t.wins+t.draws*.5f),F(t.remainingHealth/Mathf.Max(1,t.matches)),F(t.duration/Mathf.Max(1,t.matches)),F(t.damageDealt/Mathf.Max(1,t.matches))));}
+        var summary=new StringBuilder("chassis,weapon,matches,wins,draws,losses,winPoints,meanRemainingHP,meanFightSeconds,meanDamageDealt\n");
+        foreach(var entry in chassisTotals.OrderBy(x=>x.Key,StringComparer.Ordinal)){string[] key=entry.Key.Split('|');WeaponDuelTotals t=entry.Value;summary.AppendLine(string.Join(",",key[0],key[1],t.matches,t.wins,t.draws,t.losses,F(t.wins+t.draws*.5f),F(t.remainingHealth/Mathf.Max(1,t.matches)),F(t.duration/Mathf.Max(1,t.matches)),F(t.damageDealt/Mathf.Max(1,t.matches))));}
+        summary.AppendLine("ALL,weapon,matches,wins,draws,losses,winPoints,meanRemainingHP,meanFightSeconds,meanDamageDealt");
+        foreach(string id in ids){WeaponDuelTotals t=totals[id];summary.AppendLine(string.Join(",","ALL",id,t.matches,t.wins,t.draws,t.losses,F(t.wins+t.draws*.5f),F(t.remainingHealth/Mathf.Max(1,t.matches)),F(t.duration/Mathf.Max(1,t.matches)),F(t.damageDealt/Mathf.Max(1,t.matches))));}
         File.WriteAllText(summaryPath,summary.ToString(),new UTF8Encoding(false));
-        Debug.Log(valid&&matches==100?"WEAPON_DUEL_STUDY_PASS matches="+matches+" detail="+detailPath+" summary="+summaryPath:"WEAPON_DUEL_STUDY_FAIL matches="+matches);
-        Application.Quit(valid&&matches==100?0:2);
+        Debug.Log(valid?"WEAPON_DUEL_STUDY_PASS matches="+matches+" chassisPairs="+chassisPairs.Length+" detail="+detailPath+" summary="+summaryPath:"WEAPON_DUEL_STUDY_FAIL matches="+matches+" coverage="+coverageValid);
+        Application.Quit(valid?0:2);
 
         static string F(float value)=>value.ToString("F2",CultureInfo.InvariantCulture);
         static string I(float value)=>Mathf.RoundToInt(value).ToString(CultureInfo.InvariantCulture);

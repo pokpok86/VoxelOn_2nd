@@ -1,0 +1,44 @@
+{
+  "blender_file_interface_verification": "Validation.json",
+  "shared_body_orthographic_scale_m": 0.7,
+  "same_front_camera_center": [
+    0,
+    0,
+    -0.024
+  ],
+  "comparisons": [
+    {
+      "a": "C-01_STANDARD",
+      "b": "C-02_LIGHTFRAME",
+      "front_silhouette_overlap_iou": 0.8161
+    },
+    {
+      "a": "C-01_STANDARD",
+      "b": "C-03_BULWARK_CORE",
+      "front_silhouette_overlap_iou": 0.7665
+    },
+    {
+      "a": "C-01_STANDARD",
+      "b": "C-04_ARC_CORE",
+      "front_silhouette_overlap_iou": 0.8653
+    },
+    {
+      "a": "C-02_LIGHTFRAME",
+      "b": "C-03_BULWARK_CORE",
+      "front_silhouette_overlap_iou": 0.63
+    },
+    {
+      "a": "C-02_LIGHTFRAME",
+      "b": "C-04_ARC_CORE",
+      "front_silhouette_overlap_iou": 0.7368
+    },
+    {
+      "a": "C-03_BULWARK_CORE",
+      "b": "C-04_ARC_CORE",
+      "front_silhouette_overlap_iou": 0.8225
+    }
+  ],
+  "design_approval": "PENDING_PD",
+  "interpretation": "Different silhouettes under identical framing; overlap is not a design-quality score.",
+  "game_integration": "NOT_PERFORMED"
+}

@@ -1,0 +1,48 @@
+{
+  "id": "C-02_LIGHTFRAME",
+  "category": "core",
+  "reference": "../References/C-02_LIGHTFRAME.jpg",
+  "reference_sha256": "7980dc47e8b1b28b258fa28920081cddf3d4abcc0c79e52e7acc00f5ef470238",
+  "blender": "5.2.3 LTS",
+  "mesh_count": 51,
+  "bounds_m": [
+    0.445166677236557,
+    0.17100000381469727,
+    0.21277999877929688
+  ],
+  "neck_bottom_local_z": null,
+  "body_interfaces": {
+    "waist_bottom_local_z": -0.1341100037097931,
+    "neck_contact_top_local": [
+      0,
+      0,
+      0.07733999937772751
+    ],
+    "right_elbow_local": [
+      0.18073999881744385,
+      0.0,
+      -0.11144000291824341
+    ],
+    "left_elbow_local": [
+      -0.18073999881744385,
+      0.0,
+      -0.11144000291824341
+    ],
+    "back_mount_local": [
+      0,
+      0.08757000000000001,
+      -0.00315
+    ],
+    "mating_pin_dimensions_preserved": true
+  },
+  "silhouette_revision": "distinct body and shoulder contours, fixed shared camera scale 0.70m",
+  "short_upper_arms": "copied evaluated geometry from approved BD01; same elbow centers",
+  "automation": "PASS",
+  "design_review": "PENDING_PD",
+  "unity_integration": "NOT_PERFORMED",
+  "assumptions": [
+    "Rear surfaces not shown in concept are conservative closure panels using the common mount.",
+    "References are illustrative; features retain the approved neck/waist/shoulder/elbow positions.",
+    "No new gameplay values or articulation rules are inferred."
+  ]
+}

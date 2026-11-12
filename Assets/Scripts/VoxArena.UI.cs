@@ -179,9 +179,7 @@ public sealed partial class VoxArena
         if(enemy.spec.ShieldMax>0) HudBar(672, 73, 240, enemy.shieldEnergy / enemy.spec.ShieldMax, new Color(.48f,.67f,1));
         Text(1010, 18, 250, timedFragMode?$"FRAG {FragScore(0)}-{FragScore(1)}  {Mathf.CeilToInt(fragTimeRemaining/60):00}:{Mathf.CeilToInt(fragTimeRemaining%60):00}":$"{(int)roundTime / 60:00}:{(int)roundTime % 60:00}     W {wins} / L {losses}", label);
         Panel(new Rect(0, 616, 1280, 104), new Color(.025f, .045f, .075f, .96f));
-        Text(28, 626, 360, player.spec.name + " / " + player.spec.role, label);
-        Text(28,658,360,EquippedProfile(player).mount+" / "+EquippedProfile(player).name,small);
-        Text(28,682,360,player.reloadTime>0?"RELOADING "+player.reloadTime.ToString("F1")+"s":"AMMO "+player.magazine+" / "+EquippedProfile(player).capacity,small);
+        Text(18, 620, 370, player.spec.name + " / " + player.spec.role, small);
         Text(420, 620, 300, "BOOST / "+(player.spec.name=="WISP"?"RUN / SLIDE":player.spec.boost.ToString())+"  "+Mathf.CeilToInt(player.boostEnergy), small);
         Bar(422, 643, 220, player.boostEnergy / player.spec.boostCapacity, Cyan);
         Text(420,652,300,"SHIFT BOOST / SPACE JUMP",small);

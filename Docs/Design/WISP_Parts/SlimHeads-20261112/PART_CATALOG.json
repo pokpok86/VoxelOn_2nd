@@ -1,0 +1,56 @@
+{
+  "parts": [
+    {
+      "id": "H-05_NEEDLE",
+      "category": "head",
+      "reference": "PD chat request: a slimmer elongated head; two directional proposals for comparison",
+      "reference_sha256": null,
+      "blender": "5.2.3 LTS",
+      "mesh_count": 19,
+      "bounds_m": [
+        0.07400000095367432,
+        0.15200001001358032,
+        0.07599999755620956
+      ],
+      "neck_bottom_local_z": -0.046,
+      "body_interfaces": null,
+      "silhouette_revision": null,
+      "short_upper_arms": null,
+      "automation": "PASS",
+      "design_review": "PENDING_PD",
+      "unity_integration": "NOT_PERFORMED",
+      "assumptions": [
+        "No dedicated concept image was supplied for these two proposals.",
+        "H-05 elongates fore/aft; H-06 elongates the face vertically. Direction choice is pending PD.",
+        "The neck connector and approved body/weapon/leg models stay unchanged.",
+        "This is a static Blender design proposal, not a new gameplay sensor specification."
+      ]
+    },
+    {
+      "id": "H-06_LANCET",
+      "category": "head",
+      "reference": "PD chat request: a slimmer elongated head; two directional proposals for comparison",
+      "reference_sha256": null,
+      "blender": "5.2.3 LTS",
+      "mesh_count": 13,
+      "bounds_m": [
+        0.06700000166893005,
+        0.0677500069141388,
+        0.13699999451637268
+      ],
+      "neck_bottom_local_z": -0.046,
+      "body_interfaces": null,
+      "silhouette_revision": null,
+      "short_upper_arms": null,
+      "automation": "PASS",
+      "design_review": "PENDING_PD",
+      "unity_integration": "NOT_PERFORMED",
+      "assumptions": [
+        "No dedicated concept image was supplied for these two proposals.",
+        "H-05 elongates fore/aft; H-06 elongates the face vertically. Direction choice is pending PD.",
+        "The neck connector and approved body/weapon/leg models stay unchanged.",
+        "This is a static Blender design proposal, not a new gameplay sensor specification."
+      ]
+    }
+  ]
+}

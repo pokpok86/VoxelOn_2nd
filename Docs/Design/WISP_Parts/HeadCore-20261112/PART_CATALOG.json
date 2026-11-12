@@ -1,0 +1,292 @@
+{
+  "parts": [
+    {
+      "id": "H-01_RADOME",
+      "category": "head",
+      "reference": "../References/H-01_RADOME.jpg",
+      "reference_sha256": "afc89e0c08f09d5563ba52fa2a37c8511e5e98f3dc05203333110257a81894c1",
+      "blender": "5.2.3 LTS",
+      "mesh_count": 22,
+      "bounds_m": [
+        0.11999999731779099,
+        0.10925953090190887,
+        0.1594286859035492
+      ],
+      "neck_bottom_local_z": -0.046,
+      "body_interfaces": null,
+      "short_upper_arms": null,
+      "automation": "PASS",
+      "design_review": "PENDING_PD",
+      "unity_integration": "NOT_PERFORMED",
+      "assumptions": [
+        "Rear surfaces not shown in concept are conservative closure panels using the common mount.",
+        "References are illustrative; features retain the approved neck/waist/shoulder/elbow positions.",
+        "No new gameplay values or articulation rules are inferred."
+      ]
+    },
+    {
+      "id": "H-02_LONGSIGHT",
+      "category": "head",
+      "reference": "../References/H-02_LONGSIGHT.jpg",
+      "reference_sha256": "0e1ccd6be0d0661f9ae0b1580370e179edb2aa37abc982d23848a9a138955d2e",
+      "blender": "5.2.3 LTS",
+      "mesh_count": 21,
+      "bounds_m": [
+        0.11549101024866104,
+        0.1509999930858612,
+        0.14100000262260437
+      ],
+      "neck_bottom_local_z": -0.046,
+      "body_interfaces": null,
+      "short_upper_arms": null,
+      "automation": "PASS",
+      "design_review": "PENDING_PD",
+      "unity_integration": "NOT_PERFORMED",
+      "assumptions": [
+        "Rear surfaces not shown in concept are conservative closure panels using the common mount.",
+        "References are illustrative; features retain the approved neck/waist/shoulder/elbow positions.",
+        "No new gameplay values or articulation rules are inferred."
+      ]
+    },
+    {
+      "id": "H-03_SWIFTFIN",
+      "category": "head",
+      "reference": "../References/H-03_SWIFTFIN.jpg",
+      "reference_sha256": "3630e13a77e05b86ec024066703be34e22393f45fafa5eb3577b4ef5262be53c",
+      "blender": "5.2.3 LTS",
+      "mesh_count": 21,
+      "bounds_m": [
+        0.10753676295280457,
+        0.17896154522895813,
+        0.15193668007850647
+      ],
+      "neck_bottom_local_z": -0.046,
+      "body_interfaces": null,
+      "short_upper_arms": null,
+      "automation": "PASS",
+      "design_review": "PENDING_PD",
+      "unity_integration": "NOT_PERFORMED",
+      "assumptions": [
+        "Rear surfaces not shown in concept are conservative closure panels using the common mount.",
+        "References are illustrative; features retain the approved neck/waist/shoulder/elbow positions.",
+        "No new gameplay values or articulation rules are inferred."
+      ]
+    },
+    {
+      "id": "H-04_BULWARK",
+      "category": "head",
+      "reference": "../References/H-04_BULWARK.jpg",
+      "reference_sha256": "bf702a8e8b1c70c19d5865d8db5fb1a1ab04a3fbdde982cd88f7294ebb08efed",
+      "blender": "5.2.3 LTS",
+      "mesh_count": 18,
+      "bounds_m": [
+        0.1340000033378601,
+        0.10500000417232513,
+        0.12399999797344208
+      ],
+      "neck_bottom_local_z": -0.046,
+      "body_interfaces": null,
+      "short_upper_arms": null,
+      "automation": "PASS",
+      "design_review": "PENDING_PD",
+      "unity_integration": "NOT_PERFORMED",
+      "assumptions": [
+        "Rear surfaces not shown in concept are conservative closure panels using the common mount.",
+        "References are illustrative; features retain the approved neck/waist/shoulder/elbow positions.",
+        "No new gameplay values or articulation rules are inferred."
+      ]
+    },
+    {
+      "id": "C-01_STANDARD",
+      "category": "core",
+      "reference": "../References/C-01_STANDARD.jpg",
+      "reference_sha256": "04c12274c1e75d8e6ee094ac5d3e6f3e8043cd029fbe45f5004beaceb0992774",
+      "blender": "5.2.3 LTS",
+      "mesh_count": 55,
+      "bounds_m": [
+        0.46389657258987427,
+        0.17949999868869781,
+        0.21277999877929688
+      ],
+      "neck_bottom_local_z": null,
+      "body_interfaces": {
+        "waist_bottom_local_z": -0.1341100037097931,
+        "neck_contact_top_local": [
+          0,
+          0,
+          0.07733999937772751
+        ],
+        "right_elbow_local": [
+          0.18073999881744385,
+          0.0,
+          -0.11144000291824341
+        ],
+        "left_elbow_local": [
+          -0.18073999881744385,
+          0.0,
+          -0.11144000291824341
+        ],
+        "back_mount_local": [
+          0,
+          0.08757000000000001,
+          -0.00315
+        ],
+        "mating_pin_dimensions_preserved": true
+      },
+      "silhouette_revision": "distinct body and shoulder contours, fixed shared camera scale 0.70m",
+      "short_upper_arms": "copied evaluated geometry from approved BD01; same elbow centers",
+      "automation": "PASS",
+      "design_review": "PENDING_PD",
+      "unity_integration": "NOT_PERFORMED",
+      "assumptions": [
+        "Rear surfaces not shown in concept are conservative closure panels using the common mount.",
+        "References are illustrative; features retain the approved neck/waist/shoulder/elbow positions.",
+        "No new gameplay values or articulation rules are inferred."
+      ]
+    },
+    {
+      "id": "C-02_LIGHTFRAME",
+      "category": "core",
+      "reference": "../References/C-02_LIGHTFRAME.jpg",
+      "reference_sha256": "7980dc47e8b1b28b258fa28920081cddf3d4abcc0c79e52e7acc00f5ef470238",
+      "blender": "5.2.3 LTS",
+      "mesh_count": 51,
+      "bounds_m": [
+        0.445166677236557,
+        0.17100000381469727,
+        0.21277999877929688
+      ],
+      "neck_bottom_local_z": null,
+      "body_interfaces": {
+        "waist_bottom_local_z": -0.1341100037097931,
+        "neck_contact_top_local": [
+          0,
+          0,
+          0.07733999937772751
+        ],
+        "right_elbow_local": [
+          0.18073999881744385,
+          0.0,
+          -0.11144000291824341
+        ],
+        "left_elbow_local": [
+          -0.18073999881744385,
+          0.0,
+          -0.11144000291824341
+        ],
+        "back_mount_local": [
+          0,
+          0.08757000000000001,
+          -0.00315
+        ],
+        "mating_pin_dimensions_preserved": true
+      },
+      "silhouette_revision": "distinct body and shoulder contours, fixed shared camera scale 0.70m",
+      "short_upper_arms": "copied evaluated geometry from approved BD01; same elbow centers",
+      "automation": "PASS",
+      "design_review": "PENDING_PD",
+      "unity_integration": "NOT_PERFORMED",
+      "assumptions": [
+        "Rear surfaces not shown in concept are conservative closure panels using the common mount.",
+        "References are illustrative; features retain the approved neck/waist/shoulder/elbow positions.",
+        "No new gameplay values or articulation rules are inferred."
+      ]
+    },
+    {
+      "id": "C-03_BULWARK_CORE",
+      "category": "core",
+      "reference": "../References/C-03_BULWARK_CORE.jpg",
+      "reference_sha256": "e3b19bd41f5dfdb0b60a439d889bf4829692b465c3c165cf7863804edafb9d69",
+      "blender": "5.2.3 LTS",
+      "mesh_count": 60,
+      "bounds_m": [
+        0.5279605984687805,
+        0.20149999856948853,
+        0.22339841723442078
+      ],
+      "neck_bottom_local_z": null,
+      "body_interfaces": {
+        "waist_bottom_local_z": -0.1341100037097931,
+        "neck_contact_top_local": [
+          0,
+          0,
+          0.07733999937772751
+        ],
+        "right_elbow_local": [
+          0.18073999881744385,
+          0.0,
+          -0.11144000291824341
+        ],
+        "left_elbow_local": [
+          -0.18073999881744385,
+          0.0,
+          -0.11144000291824341
+        ],
+        "back_mount_local": [
+          0,
+          0.08757000000000001,
+          -0.00315
+        ],
+        "mating_pin_dimensions_preserved": true
+      },
+      "silhouette_revision": "distinct body and shoulder contours, fixed shared camera scale 0.70m",
+      "short_upper_arms": "copied evaluated geometry from approved BD01; same elbow centers",
+      "automation": "PASS",
+      "design_review": "PENDING_PD",
+      "unity_integration": "NOT_PERFORMED",
+      "assumptions": [
+        "Rear surfaces not shown in concept are conservative closure panels using the common mount.",
+        "References are illustrative; features retain the approved neck/waist/shoulder/elbow positions.",
+        "No new gameplay values or articulation rules are inferred."
+      ]
+    },
+    {
+      "id": "C-04_ARC_CORE",
+      "category": "core",
+      "reference": "../References/C-04_ARC_CORE.jpg",
+      "reference_sha256": "96837e7eedef2d41e5230cb0877680da6e4b912d406a407ad16151a4f742e10d",
+      "blender": "5.2.3 LTS",
+      "mesh_count": 72,
+      "bounds_m": [
+        0.5036963224411011,
+        0.17499999701976776,
+        0.25316426157951355
+      ],
+      "neck_bottom_local_z": null,
+      "body_interfaces": {
+        "waist_bottom_local_z": -0.1341100037097931,
+        "neck_contact_top_local": [
+          0,
+          0,
+          0.07733999937772751
+        ],
+        "right_elbow_local": [
+          0.18073999881744385,
+          0.0,
+          -0.11144000291824341
+        ],
+        "left_elbow_local": [
+          -0.18073999881744385,
+          0.0,
+          -0.11144000291824341
+        ],
+        "back_mount_local": [
+          0,
+          0.08757000000000001,
+          -0.00315
+        ],
+        "mating_pin_dimensions_preserved": true
+      },
+      "silhouette_revision": "distinct body and shoulder contours, fixed shared camera scale 0.70m",
+      "short_upper_arms": "copied evaluated geometry from approved BD01; same elbow centers",
+      "automation": "PASS",
+      "design_review": "PENDING_PD",
+      "unity_integration": "NOT_PERFORMED",
+      "assumptions": [
+        "Rear surfaces not shown in concept are conservative closure panels using the common mount.",
+        "References are illustrative; features retain the approved neck/waist/shoulder/elbow positions.",
+        "No new gameplay values or articulation rules are inferred."
+      ]
+    }
+  ]
+}

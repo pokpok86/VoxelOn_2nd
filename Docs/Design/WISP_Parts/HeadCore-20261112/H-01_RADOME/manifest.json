@@ -1,0 +1,24 @@
+{
+  "id": "H-01_RADOME",
+  "category": "head",
+  "reference": "../References/H-01_RADOME.jpg",
+  "reference_sha256": "afc89e0c08f09d5563ba52fa2a37c8511e5e98f3dc05203333110257a81894c1",
+  "blender": "5.2.3 LTS",
+  "mesh_count": 22,
+  "bounds_m": [
+    0.11999999731779099,
+    0.10925953090190887,
+    0.1594286859035492
+  ],
+  "neck_bottom_local_z": -0.046,
+  "body_interfaces": null,
+  "short_upper_arms": null,
+  "automation": "PASS",
+  "design_review": "PENDING_PD",
+  "unity_integration": "NOT_PERFORMED",
+  "assumptions": [
+    "Rear surfaces not shown in concept are conservative closure panels using the common mount.",
+    "References are illustrative; features retain the approved neck/waist/shoulder/elbow positions.",
+    "No new gameplay values or articulation rules are inferred."
+  ]
+}

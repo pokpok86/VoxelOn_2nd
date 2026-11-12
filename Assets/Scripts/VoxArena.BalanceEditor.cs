@@ -238,8 +238,8 @@ public sealed partial class VoxArena
             Text(28,17,700,"VOXEL-ON  /  HANGAR CUSTOMIZATION",new GUIStyle(GUI.skin.label){fontSize=27,fontStyle=FontStyle.Bold});
             Text(30,55,720,"FRAME  /  WEAPON & PARTS WORKSHOP",small);
             if(GUI.Button(new Rect(1144,20,112,36),"닫기 / ESC")){balanceEditorOpen=false;return;}
-            string[] tabs={"장착","무기 옵션","파츠 수치","스킬 선택"};
-            int[] tabIds={0,1,2,5};
+            string[] tabs={"장착","무기 옵션","파츠 수치","스킬 선택","신형 외형"};
+            int[] tabIds={0,1,2,5,6};
             for(int i=0;i<tabs.Length;i++)
             {
                 GUI.backgroundColor=balanceTab==tabIds[i]?new Color(1f,.42f,.10f):new Color(.10f,.15f,.21f);
@@ -271,9 +271,9 @@ public sealed partial class VoxArena
             GUI.Label(new Rect(760,101,475,28),balanceTab==4?"개발 전용 · 10개 실험 슬롯":"양손 · 양어깨 장착 / 개별 수치 조정",new GUIStyle(GUI.skin.label){fontSize=14});
             bool activeDesignEmpty=EditingDesign()?.isEmpty==true;
             Matrix4x4 oldMatrix=GUI.matrix;
-            GUI.matrix=Matrix4x4.TRS(new Vector3(684,120,0),Quaternion.identity,new Vector3(.70f,.70f,1f))*oldMatrix;
+            if(balanceTab!=6)GUI.matrix=Matrix4x4.TRS(new Vector3(684,120,0),Quaternion.identity,new Vector3(.70f,.70f,1f))*oldMatrix;
             if(activeDesignEmpty&&balanceTab!=0)GUI.Label(new Rect(382,146,820,70),"현재 슬롯은 비어 있습니다. [장착]에서 WISP, BASTION, TARANTULA 중 기체를 골라 설계를 만드세요.",new GUIStyle(GUI.skin.label){fontSize=17,wordWrap=true});
-            else if(balanceTab==0)DrawUnifiedCustomization();else if(balanceTab==1)DrawBalanceWeapons();else if(balanceTab==2)DrawBalanceParts();else if(balanceTab==4)DrawDeveloperPresets();else if(balanceTab==5)DrawBalanceSkills();else DrawBalanceFiles();
+            else if(balanceTab==0)DrawUnifiedCustomization();else if(balanceTab==1)DrawBalanceWeapons();else if(balanceTab==2)DrawBalanceParts();else if(balanceTab==4)DrawDeveloperPresets();else if(balanceTab==5)DrawBalanceSkills();else if(balanceTab==6)DrawFamilyArtOptions();else DrawBalanceFiles();
             GUI.matrix=oldMatrix;
             Text(372,602,875,balanceMessage,new GUIStyle(small){wordWrap=true});
             Text(372,630,875,balanceTab==4?"실험 프리셋 파일: "+DeveloperPresetsPath():"파일: "+BalanceDirectory+Path.DirectorySeparatorChar+balanceFileName+".json",small);
@@ -441,7 +441,7 @@ public sealed partial class VoxArena
         if(part==null)return Array.Empty<string>();
         bool head=part.category=="HEAD",core=part.category=="CORE",arm=part.category=="LEFT_ARM"||part.category=="RIGHT_ARM",legs=part.category=="LEGS";
         CraftSpec frame=legs?CraftCatalog.Selectable.FirstOrDefault(c=>c.name==part.frame):null;bool bipedLegs=frame!=null&&(frame.mobility==MobilityKind.StandardBiped||frame.mobility==MobilityKind.Runner);
-        return head?new[]{"HEAD_STANDARD","HEAD_RANGEFINDER","HEAD_OMNI"}:core?new[]{"CORE_STANDARD","CORE_REACTOR","CORE_BULWARK"}:arm?new[]{"ARM_STANDARD","ARM_REINFORCED","ARM_PRECISION","ARM_ASSAULT","ARM_BULWARK","ARM_SCOUT","ARM_CLAW","ARM_BRUISER","ARM_VANGUARD","ARM_TACTICAL"}:legs?(bipedLegs?new[]{"LEGS_STANDARD","LEGS_ASSAULT","LEGS_SCOUT","LEGS_RANGER","LEGS_HEAVY","LEGS_JUMPER","LEGS_REVERSE"}:new[]{"LEGS_STANDARD","LEGS_ASSAULT","LEGS_SCOUT"}):new[]{"BOOSTER_TWIN","BOOSTER_VECTOR","BOOSTER_CYCLONE"};
+        return head?new[]{"HEAD_STANDARD","HEAD_RANGEFINDER","HEAD_OMNI"}:core?new[]{"CORE_STANDARD","CORE_REACTOR","CORE_BULWARK"}:arm?new[]{"ARM_STANDARD","ARM_REINFORCED","ARM_PRECISION","ARM_ASSAULT","ARM_BULWARK","ARM_SCOUT","ARM_CLAW","ARM_BRUISER","ARM_VANGUARD","ARM_TACTICAL","ARM_EXOSKELETON"}:legs?(bipedLegs?new[]{"LEGS_STANDARD","LEGS_ASSAULT","LEGS_SCOUT","LEGS_RANGER","LEGS_HEAVY","LEGS_JUMPER","LEGS_REVERSE"}:new[]{"LEGS_STANDARD","LEGS_ASSAULT","LEGS_SCOUT"}):new[]{"BOOSTER_TWIN","BOOSTER_VECTOR","BOOSTER_CYCLONE"};
     }
     static int BalanceAssemblyPartIndex(BalanceDesign design,string slot,int armSide=0)
     {
@@ -459,6 +459,7 @@ public sealed partial class VoxArena
         {
             Rect card=new Rect(12,164+mount*99,560,88);Panel(card,new Color(.045f,.075f,.10f));
             GUI.Label(new Rect(card.x+8,card.y+31,72,26),mountLabels[mount],new GUIStyle(GUI.skin.label){fontSize=13,alignment=TextAnchor.MiddleCenter});
+            if(mount>=2&&BackpackWeaponMountsPending){GUI.Label(new Rect(card.x+94,card.y+27,card.width-110,32),"미장착 · 백팩 장착 준비 중",small);continue;}
             BalanceWeapon[] allowed=Array.FindAll(balanceDraft.weapons,w=>BalanceData.CanEquip(w,mount,design.chassisId)&&!(mount>=2&&design.slots[mount==2?3:2]==w.id&&!BalanceData.CanDuplicateShoulderWeapon(w)));
             if(allowed.Length==0){GUI.Label(new Rect(card.x+84,card.y+27,card.width-100,32),"선택 가능한 장비 없음",small);continue;}
             int selected=Array.FindIndex(allowed,w=>w.id==design.slots[mount]);
@@ -615,6 +616,7 @@ public sealed partial class VoxArena
             else if(part.visualId=="ARM_BRUISER"){Panel(new Rect(r.x+24+sign*13,r.y+23,24,18),dark);Panel(new Rect(r.x+27+sign*13,r.y+22,5,6),accent);Panel(new Rect(r.x+34+sign*13,r.y+22,5,6),accent);Panel(new Rect(r.x+41+sign*13,r.y+22,5,6),accent);Panel(new Rect(r.x+39+sign*17,r.y+34,8,10),metal);}
             else if(part.visualId=="ARM_VANGUARD"){Panel(new Rect(r.x+26+sign*12,r.y+17,22,23),metal);Panel(new Rect(r.x+29+sign*13,r.y+20,16,16),accent);Panel(new Rect(r.x+32+sign*14,r.y+24,10,4),dark);Panel(new Rect(r.x+31+sign*14,r.y+29,12,3),accent);}
             else if(part.visualId=="ARM_TACTICAL"){Panel(new Rect(r.x+30+sign*12,r.y+19,15,19),dark);Panel(new Rect(r.x+28+sign*12,r.y+18,3,18),accent);Panel(new Rect(r.x+45+sign*12,r.y+18,3,18),accent);Panel(new Rect(r.x+33+sign*12,r.y+39,11,4),metal);}
+            else if(part.visualId=="ARM_EXOSKELETON"){Panel(new Rect(r.x+28+sign*12,r.y+21,17,8),dark);Panel(new Rect(r.x+28+sign*12,r.y+33,17,8),metal);Panel(new Rect(r.x+27+sign*12,r.y+29,3,5),accent);Panel(new Rect(r.x+43+sign*12,r.y+29,3,5),accent);}
         }
         else if(part.category=="LEGS")
         {
@@ -716,8 +718,8 @@ public sealed partial class VoxArena
     {
         bool head=part.category=="HEAD",core=part.category=="CORE",arm=part.category=="LEFT_ARM"||part.category=="RIGHT_ARM",legs=part.category=="LEGS";GUI.Label(new Rect(330,260,86,25),head?"머리":core?"몸통":arm?"팔":legs?"다리":"백팩");
         CraftSpec frame=legs?CraftCatalog.Selectable.FirstOrDefault(c=>c.name==part.frame):null;bool bipedLegs=frame!=null&&(frame.mobility==MobilityKind.StandardBiped||frame.mobility==MobilityKind.Runner);
-        string[] ids=head?new[]{"HEAD_STANDARD","HEAD_RANGEFINDER","HEAD_OMNI"}:core?new[]{"CORE_STANDARD","CORE_REACTOR","CORE_BULWARK"}:arm?new[]{"ARM_STANDARD","ARM_REINFORCED","ARM_PRECISION","ARM_ASSAULT","ARM_BULWARK","ARM_SCOUT","ARM_CLAW","ARM_BRUISER","ARM_VANGUARD","ARM_TACTICAL"}:legs?(bipedLegs?new[]{"LEGS_STANDARD","LEGS_ASSAULT","LEGS_SCOUT","LEGS_RANGER","LEGS_HEAVY","LEGS_JUMPER","LEGS_REVERSE"}:new[]{"LEGS_STANDARD","LEGS_ASSAULT","LEGS_SCOUT"}):new[]{"BOOSTER_TWIN","BOOSTER_VECTOR","BOOSTER_CYCLONE"};
-        string[] labels=head?new[]{"기본 센서","장거리 안테나","옴니 어레이"}:core?new[]{"기본 코어","반응로 장갑","중장갑 프레임"}:arm?new[]{"기본 팔","보강 건틀릿","정밀 서보","돌격 건틀릿","바스티온 장갑","정찰 센서","클로 암","브루저","뱅가드","택티컬"}:legs?(bipedLegs?new[]{"기본 하체","돌격 그리브","정찰 관절","레인저 장갑","헤비 아머","점프 피스톤","역관절"}:new[]{"기본 하체","돌격 그리브","정찰 관절"}):new[]{"쌍발 표준","벡터 윙","사이클론 터빈"};
+        string[] ids=head?new[]{"HEAD_STANDARD","HEAD_RANGEFINDER","HEAD_OMNI"}:core?new[]{"CORE_STANDARD","CORE_REACTOR","CORE_BULWARK"}:arm?new[]{"ARM_STANDARD","ARM_REINFORCED","ARM_PRECISION","ARM_ASSAULT","ARM_BULWARK","ARM_SCOUT","ARM_CLAW","ARM_BRUISER","ARM_VANGUARD","ARM_TACTICAL","ARM_EXOSKELETON"}:legs?(bipedLegs?new[]{"LEGS_STANDARD","LEGS_ASSAULT","LEGS_SCOUT","LEGS_RANGER","LEGS_HEAVY","LEGS_JUMPER","LEGS_REVERSE"}:new[]{"LEGS_STANDARD","LEGS_ASSAULT","LEGS_SCOUT"}):new[]{"BOOSTER_TWIN","BOOSTER_VECTOR","BOOSTER_CYCLONE"};
+        string[] labels=head?new[]{"기본 센서","장거리 안테나","옴니 어레이"}:core?new[]{"기본 코어","반응로 장갑" ,"중장갑 프레임"}:arm?new[]{"기본 팔","보강 건틀릿","정밀 서보","돌격 건틀릿","바스티온 장갑","정찰 센서","클로 암","브루저","뱅가드","택티컬","외골격 피스톤"}:legs?(bipedLegs?new[]{"기본 하체","돌격 그리브","정찰 관절","레인저 장갑","헤비 아머","점프 피스톤","역관절"}:new[]{"기본 하체","돌격 그리브","정찰 관절"}):new[]{"쌍발 표준","벡터 윙","사이클론 터빈"};
         int selectedIndex=Array.IndexOf(ids,part.visualId);if(selectedIndex<0){selectedIndex=0;BalanceData.SetPartVisualId(part,ids[0]);balanceDirty=true;RefreshBalanceDraftPreview();}
         Rect leftArrow=new Rect(420,258,58,58),previewBox=new Rect(482,258,650,58),rightArrow=new Rect(1138,258,58,58);
         GUI.enabled=ids.Length>1;GUI.backgroundColor=new Color(.07f,.12f,.17f);

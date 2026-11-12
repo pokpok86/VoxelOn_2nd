@@ -1,0 +1,24 @@
+{
+  "id": "H-04_BULWARK",
+  "category": "head",
+  "reference": "../References/H-04_BULWARK.jpg",
+  "reference_sha256": "bf702a8e8b1c70c19d5865d8db5fb1a1ab04a3fbdde982cd88f7294ebb08efed",
+  "blender": "5.2.3 LTS",
+  "mesh_count": 18,
+  "bounds_m": [
+    0.1340000033378601,
+    0.10500000417232513,
+    0.12399999797344208
+  ],
+  "neck_bottom_local_z": -0.046,
+  "body_interfaces": null,
+  "short_upper_arms": null,
+  "automation": "PASS",
+  "design_review": "PENDING_PD",
+  "unity_integration": "NOT_PERFORMED",
+  "assumptions": [
+    "Rear surfaces not shown in concept are conservative closure panels using the common mount.",
+    "References are illustrative; features retain the approved neck/waist/shoulder/elbow positions.",
+    "No new gameplay values or articulation rules are inferred."
+  ]
+}

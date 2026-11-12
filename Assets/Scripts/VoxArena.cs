@@ -187,8 +187,8 @@ public sealed partial class VoxArena : MonoBehaviour
         bool environmentSmoke=Array.IndexOf(Environment.GetCommandLineArgs(),"--environment-smoke")>=0;
         bool captureLineup=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-customization-lineup")>=0;
         captureCustomizationEditor=Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-bastion-customization")>=0;
-        captureGameplayPreview=automaticBalanceStudy||captureCustomizationEditor||captureLineup||motionStudy||projectileGallery||labCapture||radarCapture||cornerSoak||shellCapture||effectCapture||balanceStudy||weaponDuelStudy||climateSmoke||prototypeSoak||Array.IndexOf(Environment.GetCommandLineArgs(),"--camera-review")>=0||wispSoak||Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-gameplay-ui")>=0;
-        smoke=automaticBalanceStudy||captureLineup||motionStudy||projectileGallery||labCapture||radarCapture||cornerSoak||shellCapture||effectCapture||balanceStudy||weaponDuelStudy||climateSmoke||prototypeSoak||wispSoak||performance||multiAIPerformance||captureGallery||captureVisualTargets||environmentSmoke||Array.IndexOf(Environment.GetCommandLineArgs(),"--smoke-test")>=0;
+        captureGameplayPreview=FamilyReviewRequested||automaticBalanceStudy||captureCustomizationEditor||captureLineup||motionStudy||projectileGallery||labCapture||radarCapture||cornerSoak||shellCapture||effectCapture||balanceStudy||weaponDuelStudy||climateSmoke||prototypeSoak||Array.IndexOf(Environment.GetCommandLineArgs(),"--camera-review")>=0||wispSoak||Array.IndexOf(Environment.GetCommandLineArgs(),"--capture-gameplay-ui")>=0;
+        smoke=FamilyReviewRequested||automaticBalanceStudy||captureLineup||motionStudy||projectileGallery||labCapture||radarCapture||cornerSoak||shellCapture||effectCapture||balanceStudy||weaponDuelStudy||climateSmoke||prototypeSoak||wispSoak||performance||multiAIPerformance||captureGallery||captureVisualTargets||environmentSmoke||Array.IndexOf(Environment.GetCommandLineArgs(),"--smoke-test")>=0;
         // Plains prototype is archived at PD request; ordinary play exposes bounded maps only.
         arenaMap=Array.IndexOf(Environment.GetCommandLineArgs(),"--coastal")>=0?ArenaMapKind.CoastalBay:
             Array.IndexOf(Environment.GetCommandLineArgs(),"--outdoor")>=0?ArenaMapKind.OutdoorCanyon:
@@ -222,6 +222,7 @@ public sealed partial class VoxArena : MonoBehaviour
         else if(prototypeSoak)StartCoroutine(PrototypeSoak());
         else if(wispSoak) StartCoroutine(WispSoak());
         else if(environmentSmoke) StartCoroutine(EnvironmentSmoke());
+        else if(FamilyReviewRequested) StartCoroutine(FamilyArtReview());
         else if(captureGameplayPreview) StartCoroutine(CaptureGameplayUI());
         else if(multiAIPerformance) StartCoroutine(MultiAIPerformanceTest());
         else if(performance) StartCoroutine(PerformanceTest());
@@ -963,7 +964,7 @@ public sealed partial class VoxArena : MonoBehaviour
             f.guardShield.localRotation=Quaternion.identity;
             f.guardShield.rotation=Quaternion.Slerp(f.guardShield.rotation,f.root.rotation,f.guardBlend);
         }
-        AnimateArmGrips(f);PlaceGuardVisuals(f);
+        AnimateArmGrips(f);PlaceGuardVisuals(f);UpdateFamilyArt(f);
         f.gun.gameObject.SetActive(f.rushTime<=0f);
         f.shield.gameObject.SetActive(f.shieldFlash>0&&!Finished&&!inMenu);
         bool jumpExhaust=(f.spec.name=="WISP"?f.jumpHeight>.08f&&f.jumpHeld&&f.boostEnergy>0&&!f.boostLocked:f.jumpVelocity>1f)&&!inMenu&&!Finished;
