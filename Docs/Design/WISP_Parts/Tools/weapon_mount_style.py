@@ -3,7 +3,7 @@ import math
 import bpy
 from mathutils import Matrix, Vector
 
-BODY_SCALE=1.95
+BODY_SCALE=1.56
 ELBOW_SCALE=.42
 
 def style_weapon(root, collection, part, left=False):

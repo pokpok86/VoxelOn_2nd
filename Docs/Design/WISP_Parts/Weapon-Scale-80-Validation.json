@@ -1,0 +1,128 @@
+{
+  "W-01_LUMEN": {
+    "offset_bars_removed": [],
+    "collar_local_transforms_preserved": 16,
+    "weapon_body_scale_relative_to_41d69a6": 0.8,
+    "roll_preserved": true,
+    "direct_contacts": [
+      {
+        "side": "L",
+        "rear_plane_distance_m": 0.014700043871998787,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      },
+      {
+        "side": "R",
+        "rear_plane_distance_m": 0.014700043871998787,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      }
+    ],
+    "PASS": true
+  },
+  "W-02_BREAKER": {
+    "offset_bars_removed": [],
+    "collar_local_transforms_preserved": 16,
+    "weapon_body_scale_relative_to_41d69a6": 0.8,
+    "roll_preserved": true,
+    "direct_contacts": [
+      {
+        "side": "L",
+        "rear_plane_distance_m": 0.014700006321072578,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      },
+      {
+        "side": "R",
+        "rear_plane_distance_m": 0.014700006321072578,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      }
+    ],
+    "PASS": true
+  },
+  "W-03_RATTLE": {
+    "offset_bars_removed": [],
+    "collar_local_transforms_preserved": 16,
+    "weapon_body_scale_relative_to_41d69a6": 0.8,
+    "roll_preserved": true,
+    "direct_contacts": [
+      {
+        "side": "L",
+        "rear_plane_distance_m": 0.014700006321072578,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      },
+      {
+        "side": "R",
+        "rear_plane_distance_m": 0.014700006321072578,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      }
+    ],
+    "PASS": true
+  },
+  "W-04_EDGE": {
+    "offset_bars_removed": [],
+    "collar_local_transforms_preserved": 16,
+    "weapon_body_scale_relative_to_41d69a6": 0.8,
+    "roll_preserved": true,
+    "direct_contacts": [
+      {
+        "side": "L",
+        "rear_plane_distance_m": 0.01470001883804798,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      },
+      {
+        "side": "R",
+        "rear_plane_distance_m": 0.01470001883804798,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      }
+    ],
+    "PASS": true
+  },
+  "W-05_AEGIS": {
+    "offset_bars_removed": [],
+    "collar_local_transforms_preserved": 16,
+    "weapon_body_scale_relative_to_41d69a6": 0.8,
+    "roll_preserved": true,
+    "direct_contacts": [
+      {
+        "side": "L",
+        "rear_plane_distance_m": 0.014700028225779533,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      },
+      {
+        "side": "R",
+        "rear_plane_distance_m": 0.014700028225779533,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      }
+    ],
+    "PASS": true
+  },
+  "B-01_TWIN_DRIVE": {
+    "offset_bars_removed": [],
+    "collar_local_transforms_preserved": 16,
+    "weapon_body_scale_relative_to_41d69a6": 0.8,
+    "roll_preserved": true,
+    "direct_contacts": [
+      {
+        "side": "L",
+        "rear_plane_distance_m": 0.014700043871998787,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      },
+      {
+        "side": "R",
+        "rear_plane_distance_m": 0.014700043871998787,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      }
+    ],
+    "PASS": true
+  }
+}

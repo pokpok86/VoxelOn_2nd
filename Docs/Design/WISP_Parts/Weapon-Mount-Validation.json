@@ -45,7 +45,7 @@
         "aimed": {
           "major_shell_vs_torso_thigh_bounds_clear": true,
           "overlaps": [],
-          "elbow_angle_degrees": 30
+          "elbow_angle_degrees": 0
         }
       },
       "standalone_blend_sha256": "a3c872e8474490fa3e911f161459a5f19458398178de8c9efa11b6995822c8e5"
@@ -62,7 +62,7 @@
         "aimed": {
           "major_shell_vs_torso_thigh_bounds_clear": true,
           "overlaps": [],
-          "elbow_angle_degrees": 30
+          "elbow_angle_degrees": 0
         }
       },
       "standalone_blend_sha256": "45a49d53b0ac156790e4a39fa3fb365ed1acf062ef4deb586783a6b74f560ca4"
@@ -79,7 +79,7 @@
         "aimed": {
           "major_shell_vs_torso_thigh_bounds_clear": true,
           "overlaps": [],
-          "elbow_angle_degrees": 30
+          "elbow_angle_degrees": 0
         }
       },
       "standalone_blend_sha256": "eef04d78487c3e11295f4621d5669c95c2d0d962ddf82337b45e935aefdf7708"

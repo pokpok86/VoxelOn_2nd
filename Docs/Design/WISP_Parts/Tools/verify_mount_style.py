@@ -13,17 +13,18 @@ with tempfile.TemporaryDirectory(prefix='wisp-direct-') as temp:
     for part in parts:
         rel=f'Docs/Design/WISP_Parts/{part}/{part}-Mounted-Review.blend'
         old=os.path.join(temp,'before.blend')
-        with open(old,'wb') as f:f.write(subprocess.check_output(['git','show','835ee3b:'+rel],cwd=REPO))
+        with open(old,'wb') as f:f.write(subprocess.check_output(['git','show','41d69a6:'+rel],cwd=REPO))
         before=snapshot(old);after=snapshot(os.path.join(REPO,rel))
         removed=[n for n in before if 'Offset_Link' in n or 'Offset_Bridge' in n]
-        assert removed and set(after)==set(before)-set(removed)
+        assert not removed and set(after)==set(before)
+        assert not any('Offset_Link' in n or 'Offset_Bridge' in n for n in after)
         collars=0
         for name,a in before.items():
             if name not in after:continue
             b=after[name]
             if 'Elbow_' in name:
                 assert err(a,b,4)<.00001,(part,name,'collar changed');collars+=1
-            else:assert err(a,b,3)<.00001,(part,name,'size or roll changed')
+            else:assert err(Matrix.Scale(.8,4) @ a,b,3)<.00001,(part,name,'20 percent reduction or roll mismatch')
         contacts=[]
         for o in bpy.data.objects:
             if not o.name.startswith(('W-01_','W-02_','W-03_','W-04_','W-05_')) or not o.name.endswith('_ROOT'):continue
@@ -36,6 +37,6 @@ with tempfile.TemporaryDirectory(prefix='wisp-direct-') as temp:
             rear=max(v.y for v in pts)
             assert abs(rear+.035)<.00001,(part,side,rear)
             contacts.append({'side':side,'rear_plane_distance_m':abs(rear)*.42,'drum_radius_m':.062*.42,'root_matches_upper_arm_pin':True})
-        report[part]={'offset_bars_removed':removed,'collar_local_transforms_preserved':collars,'weapon_size_and_roll_preserved':True,'direct_contacts':contacts,'PASS':True}
-with open(os.path.join(ROOT,'Direct-Mount-Validation.json'),'w') as f:json.dump(report,f,indent=2)
+        report[part]={'offset_bars_removed':removed,'collar_local_transforms_preserved':collars,'weapon_body_scale_relative_to_41d69a6':.8,'roll_preserved':True,'direct_contacts':contacts,'PASS':True}
+with open(os.path.join(ROOT,'Weapon-Scale-80-Validation.json'),'w') as f:json.dump(report,f,indent=2)
 print('DIRECT_MOUNT_SAVED_PASS',len(report))

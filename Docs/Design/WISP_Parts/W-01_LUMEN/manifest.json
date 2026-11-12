@@ -46,7 +46,7 @@
     "aimed": {
       "major_shell_vs_torso_thigh_bounds_clear": true,
       "overlaps": [],
-      "elbow_angle_degrees": 30
+      "elbow_angle_degrees": 0
     }
   },
   "automation": "PASS",
@@ -107,8 +107,8 @@
     "neck_contact_error_m": 0.0
   },
   "weapon_mount_revision": {
-    "body_scale_relative_to_previous": 1.5,
-    "body_scale_relative_to_original": 1.95,
+    "body_scale_relative_to_previous": 0.8,
+    "body_scale_relative_to_original": 1.56,
     "collar_local_geometry_unchanged": true,
     "root_position_follows_resized_body": true,
     "right_local_body_roll_degrees": 0,
