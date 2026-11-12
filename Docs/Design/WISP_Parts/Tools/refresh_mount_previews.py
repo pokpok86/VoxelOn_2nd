@@ -100,7 +100,7 @@ for part,path in sources.items():
     manifest['assembly_layout']=layout
     manifest['base_sha256_unchanged']=base_hashes
     manifest['standalone_part_sha256_preserved']=part_hashes[part]
-    manifest['weapon_mount_revision']={'body_scale_relative_to_previous':0.80,'body_scale_relative_to_original':BODY_SCALE,'collar_local_geometry_unchanged':True,'root_position_follows_resized_body':True,'right_local_body_roll_degrees':-90 if part in ('W-04_EDGE','W-05_AEGIS') else 0,'left_roll_mirrored':True}
+    manifest['weapon_mount_revision']={'body_scale_relative_to_previous':0.90,'body_scale_relative_to_original':BODY_SCALE,'collar_local_geometry_unchanged':True,'root_position_follows_resized_body':True,'right_local_body_roll_degrees':-90 if part in ('W-04_EDGE','W-05_AEGIS') else 0,'left_roll_mirrored':True}
     if 'body_size_revision' in manifest:manifest['body_size_revision']['weapon_geometry_and_mount_scale_unchanged']=False
     manifest['body_contact_checks']={'waist_contact_error_m':waist_error,'neck_contact_error_m':neck_error}
     if part=='W-01_LUMEN':

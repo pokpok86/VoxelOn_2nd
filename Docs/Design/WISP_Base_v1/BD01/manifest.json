@@ -23,12 +23,12 @@
     "right_elbow_local": [
       0.19740000367164612,
       0.0,
-      -0.07559999823570251
+      -0.10920000821352005
     ],
     "left_elbow_local": [
       -0.19740000367164612,
       0.0,
-      -0.07559999823570251
+      -0.10920000821352005
     ],
     "back_mount_local": [
       0,
@@ -37,6 +37,8 @@
     ],
     "mating_pin_dimensions_preserved": true
   },
+  "upper_arm_length_factor": 1.5,
+  "upper_arm_height_m": 0.1008,
   "contains_head": false,
   "contains_forearm_weapon": false,
   "contains_legs": false,

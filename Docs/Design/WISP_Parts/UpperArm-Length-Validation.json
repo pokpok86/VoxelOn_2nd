@@ -1,0 +1,14 @@
+{
+  "L": {
+    "measured_length_ratio": 1.4999998614103338,
+    "new_upper_arm_height_m": 0.10079999268054962,
+    "width_depth_and_top_anchor_preserved": true,
+    "elbow_pin_follows_lower_end": true
+  },
+  "R": {
+    "measured_length_ratio": 1.4999998614103338,
+    "new_upper_arm_height_m": 0.10079999268054962,
+    "width_depth_and_top_anchor_preserved": true,
+    "elbow_pin_follows_lower_end": true
+  }
+}

@@ -31,7 +31,7 @@
   "face_view_axis": "-Y/+Y front and rear",
   "mounted_scale": 1.0,
   "base_sha256_unchanged": {
-    "BD01": "2f5e6617e8ceaa53857cea692968cfe8855ff169678656da5bc3e178d869e966",
+    "BD01": "9e141991ffb0c8b0090daeedb34f40af9cb06fdd866d3b2cd3cabfbab9668b0c",
     "HD01": "aa3fd93762d77b148ee3aaaa65d820b6b34697ad25e6ba371c905947f43ac778",
     "LG01": "581d189b09217e04285577ea7adf8686ab9e1f64d2fd1a0905fe6ac4b6c11160"
   },
@@ -67,14 +67,14 @@
       0.7844999963641167
     ],
     "right_elbow": [
-      0.24227358400821686,
+      0.2590735852718353,
       0.0,
-      0.6058295369148254
+      0.5767310261726379
     ],
     "left_elbow": [
-      -0.24227358400821686,
+      -0.2590735852718353,
       0.0,
-      0.6058295369148254
+      0.5767310261726379
     ],
     "back_mount": [
       0,
@@ -99,8 +99,8 @@
     "neck_contact_error_m": 0.0
   },
   "weapon_mount_revision": {
-    "body_scale_relative_to_previous": 0.8,
-    "body_scale_relative_to_original": 1.56,
+    "body_scale_relative_to_previous": 0.9,
+    "body_scale_relative_to_original": 1.404,
     "collar_local_geometry_unchanged": true,
     "root_position_follows_resized_body": true,
     "right_local_body_roll_degrees": 0,

@@ -116,6 +116,11 @@ def mirror(poly,s):
 ROOT=empty("BD01_ROOT",(0,0,0))
 PARTS=[]
 PIVOTS={}
+UPPER_ARM_LENGTH_FACTOR=1.5
+upper_arm_height=.096*UPPER_ARM_LENGTH_FACTOR
+upper_arm_top=-.016
+upper_arm_center=upper_arm_top-upper_arm_height/2
+elbow_center=upper_arm_top-upper_arm_height+.004
 
 # Compact, wide chest chassis with one broad continuous front armor surface.
 core=loft_z("Torso_Core",[
@@ -198,9 +203,9 @@ for side,s in (("L",-1),("R",1)):
     for vertex in armor.data.vertices:
         vertex.co=cap_center+slope.to_3x3() @ (vertex.co-cap_center)
     # Upper-arm connector is a replaceable short socket, not an arm model.
-    connector=cube(f"{side}_UpperArm_Connector_Stub",(s*.282,.000,-.064),(.060,.065,.096),GRAPHITE,.003)
+    connector=cube(f"{side}_UpperArm_Connector_Stub",(s*.282,.000,upper_arm_center),(.060,.065,upper_arm_height),GRAPHITE,.003)
     PARTS.append((connector,pitch))
-    connector_cap=cylinder(f"{side}_UpperArm_Connector_Pin",(s*.282,.000,-.108),.024,.062,"X",GUNMETAL,24)
+    connector_cap=cylinder(f"{side}_UpperArm_Connector_Pin",(s*.282,.000,elbow_center),.024,.062,"X",GUNMETAL,24)
     PARTS.append((connector_cap,pitch))
 
 for obj,parent in PARTS:
@@ -347,6 +352,7 @@ manifest={
     "measured_bounds_m":bounds,
     "main_torso_core_m":{"width_x":.350*BODY_SIZE,"depth_y":.180*BODY_SIZE,"height_z":.231*BODY_SIZE},
     "body_size_factor":BODY_SIZE,"assembly_interfaces":interfaces,
+    "upper_arm_length_factor":UPPER_ARM_LENGTH_FACTOR,"upper_arm_height_m":upper_arm_height*BODY_SIZE,
     "contains_head":False,"contains_forearm_weapon":False,"contains_legs":False,
     "neck":"fixed compact mount, no neck pivot",
     "joint_centers_m":{"shoulder_L":list(Vector((-.238,0,.032))*BODY_SIZE),"shoulder_R":list(Vector((.238,0,.032))*BODY_SIZE),"waist_yaw":list(Vector((0,0,waist_z))*BODY_SIZE)},

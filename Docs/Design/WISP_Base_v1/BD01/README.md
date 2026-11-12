@@ -46,3 +46,6 @@ Head, leg, standalone weapon and backpack geometry are unchanged. Assembly posit
 ## 추가 PD 비율 수정 — 2026-11-12
 
 몸통/어깨 루트를 초기 크기의 0.70배로 조정했습니다. 직전 0.82배 버전 대비 약 14.6% 축소입니다. 목 받침도 낮췄습니다. 최신 외곽은 0.514 × 0.198 × 0.239 m입니다. 최신 조립 검토 결과는 `../../WISP_Parts/Proportion-Revision-02.md`를 참고하세요.
+
+
+최신 상박 조정: 상박 길이만 1.5배(0.0672→0.1008 m) 늘리고 팔꿈치 핀을 함께 이동했습니다. 폭·깊이와 어깨 상단, 다른 몸통 형상은 유지했습니다. `../../WISP_Parts/UpperArm-150-Weapon-90-Revision.md` 참고.
