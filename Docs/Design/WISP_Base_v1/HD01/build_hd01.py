@@ -8,7 +8,7 @@ import bpy
 import json
 import math
 import os
-from mathutils import Vector
+from mathutils import Vector, Matrix
 
 OUT = os.path.dirname(os.path.abspath(__file__))
 bpy.context.preferences.filepaths.save_version = 0
@@ -162,6 +162,22 @@ for obj in list(MODEL.objects):
         obj.parent = root
         obj.matrix_world = world
 
+# PD: shrink the helmet 10%, then narrow its sides another 10%.
+# Keep the complete optical camera/bezel at the previous physical size.
+HEAD_SCALE=(.81,.90,.90)
+HEAD_BASE_Z=-.040
+CAMERA_OFFSET=Vector((0,.005,-.0037))
+shape=Matrix.Translation((0,0,HEAD_BASE_Z)) @ Matrix.Diagonal((*HEAD_SCALE,1)) @ Matrix.Translation((0,0,-HEAD_BASE_Z))
+for obj in list(MODEL.objects):
+    if obj.type!='MESH' or obj.name=='HD01_Fixed_Neck_Interface':continue
+    is_camera=obj.name in ('HD01_Continuous_Visor_Glass','HD01_Single_Cyan_Optical_Slit') or obj.name.startswith('Sensor_Bezel_')
+    if is_camera:obj.location+=CAMERA_OFFSET
+    else:
+        local_shape=obj.matrix_world.inverted() @ shape @ obj.matrix_world
+        for vertex in obj.data.vertices:vertex.co=local_shape @ vertex.co
+        obj.data.update()
+bpy.context.view_layer.update()
+
 world = bpy.data.worlds.new("HD01 studio world")
 world.use_nodes = True
 world.node_tree.nodes.get("Background").inputs["Color"].default_value = (.012,.018,.028,1)
@@ -230,6 +246,8 @@ manifest = {
     "blender": bpy.app.version_string,
     "normalized_wisp_height_m": 1.0,
     "measured_bounds_m": bounds,
+    "helmet_scale_relative_to_33d4df0":list(HEAD_SCALE),"camera_dimensions_preserved":True,
+    "camera_group_translation_m":list(CAMERA_OFFSET),"neck_interface_unchanged":True,
     "face_direction": "negative Y",
     "visor": "single recessed rectangular cyan sensor window with a dark bezel, following the latest full-body concept reference",
     "neck_interface": "small fixed connector; no head/neck articulation",

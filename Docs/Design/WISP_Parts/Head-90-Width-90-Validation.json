@@ -1,0 +1,62 @@
+{
+  "HD01_Antenna_Rod": {
+    "rule": "helmet width 81%, depth/height 90% around fixed lower contact",
+    "maximum_vertex_error_m": 4.544854159682643e-09,
+    "PASS": true
+  },
+  "HD01_Continuous_Visor_Glass": {
+    "rule": "camera size and relative geometry unchanged; group translated",
+    "maximum_vertex_error_m": 1.0430812810713341e-09,
+    "PASS": true
+  },
+  "HD01_Fixed_Neck_Interface": {
+    "rule": "neck connector unchanged",
+    "maximum_vertex_error_m": 0.0,
+    "PASS": true
+  },
+  "HD01_L_Side_Sensor_Pod": {
+    "rule": "helmet width 81%, depth/height 90% around fixed lower contact",
+    "maximum_vertex_error_m": 3.0547380458489926e-09,
+    "PASS": true
+  },
+  "HD01_Main_Faceted_Helmet_Shell": {
+    "rule": "helmet width 81%, depth/height 90% around fixed lower contact",
+    "maximum_vertex_error_m": 2.607703213086676e-09,
+    "PASS": true
+  },
+  "HD01_R_Side_Sensor_Pod": {
+    "rule": "helmet width 81%, depth/height 90% around fixed lower contact",
+    "maximum_vertex_error_m": 3.0547380458489926e-09,
+    "PASS": true
+  },
+  "HD01_Short_Antenna_Base": {
+    "rule": "helmet width 81%, depth/height 90% around fixed lower contact",
+    "maximum_vertex_error_m": 4.753470429774698e-09,
+    "PASS": true
+  },
+  "HD01_Single_Cyan_Optical_Slit": {
+    "rule": "camera size and relative geometry unchanged; group translated",
+    "maximum_vertex_error_m": 1.0430812810713341e-09,
+    "PASS": true
+  },
+  "Sensor_Bezel_End": {
+    "rule": "camera size and relative geometry unchanged; group translated",
+    "maximum_vertex_error_m": 1.1652708034604053e-09,
+    "PASS": true
+  },
+  "Sensor_Bezel_End.001": {
+    "rule": "camera size and relative geometry unchanged; group translated",
+    "maximum_vertex_error_m": 1.0430812810713341e-09,
+    "PASS": true
+  },
+  "Sensor_Bezel_Side": {
+    "rule": "camera size and relative geometry unchanged; group translated",
+    "maximum_vertex_error_m": 1.1652708034604053e-09,
+    "PASS": true
+  },
+  "Sensor_Bezel_Side.001": {
+    "rule": "camera size and relative geometry unchanged; group translated",
+    "maximum_vertex_error_m": 1.1652708034604053e-09,
+    "PASS": true
+  }
+}

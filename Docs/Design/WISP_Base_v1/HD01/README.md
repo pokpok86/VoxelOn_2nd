@@ -35,3 +35,6 @@ Blender generation completed with Blender 5.2.3 LTS and all generated views were
 ## 추가 PD 비율 수정 — 2026-11-12
 
 머리 외형은 유지하고 아래 고정 연결부의 높이를 18 mm에서 6 mm로 줄였습니다. 몸통의 목 받침도 함께 낮춰 떠 보이는 간격을 줄였습니다. 최신 조립 검토 결과는 `../../WISP_Parts/Proportion-Revision-02.md`를 참고하세요.
+
+
+최신 머리 수정: 외장 전체 10% 축소 후 양옆 폭을 추가 10% 축소했습니다(폭 81%, 앞뒤/높이 90%). 카메라 창·발광부·테두리 크기와 목 접속부는 유지했습니다. `../../WISP_Parts/Head-90-Width-90-Revision.md` 참고.
