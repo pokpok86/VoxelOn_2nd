@@ -68,7 +68,8 @@
       "standalone": "L-01_STRIDER/L-01_STRIDER.blend",
       "mounted": "L-01_STRIDER/L-01_STRIDER-Mounted-Review.blend",
       "manifest": "L-01_STRIDER/manifest.json",
-      "design_status": "PENDING_PD"
+      "design_status": "PENDING_PD",
+      "waist_mating_height_m": 0.5049999952316284
     },
     {
       "id": "L-02",
@@ -79,7 +80,8 @@
       "standalone": "L-02_BASTION_TRACK/L-02_BASTION_TRACK.blend",
       "mounted": "L-02_BASTION_TRACK/L-02_BASTION_TRACK-Mounted-Review.blend",
       "manifest": "L-02_BASTION_TRACK/manifest.json",
-      "design_status": "PENDING_PD"
+      "design_status": "PENDING_PD",
+      "waist_mating_height_m": 0.4578999876976013
     },
     {
       "id": "L-03",
@@ -90,7 +92,8 @@
       "standalone": "L-03_TARANTULAN/L-03_TARANTULAN.blend",
       "mounted": "L-03_TARANTULAN/L-03_TARANTULAN-Mounted-Review.blend",
       "manifest": "L-03_TARANTULAN/manifest.json",
-      "design_status": "PENDING_PD"
+      "design_status": "PENDING_PD",
+      "waist_mating_height_m": 0.5049999952316284
     },
     {
       "id": "L-05",
@@ -101,7 +104,8 @@
       "standalone": "L-05_SKYLIFT/L-05_SKYLIFT.blend",
       "mounted": "L-05_SKYLIFT/L-05_SKYLIFT-Mounted-Review.blend",
       "manifest": "L-05_SKYLIFT/manifest.json",
-      "design_status": "PENDING_PD"
+      "design_status": "PENDING_PD",
+      "waist_mating_height_m": 0.40625
     }
   ]
 }

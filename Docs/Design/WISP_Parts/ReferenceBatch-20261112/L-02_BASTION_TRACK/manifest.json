@@ -18,13 +18,13 @@
   "bounds_m": {
     "width": 0.33799999952316284,
     "depth": 0.31065818667411804,
-    "height": 0.4906299728900194
+    "height": 0.4435299951583147
   },
   "module_mesh_count": 106,
   "mating_center": [
     0.0,
     0.0,
-    0.5049999952316284
+    0.4578999876976013
   ],
   "mounted_location": [
     0.0,
@@ -32,7 +32,7 @@
     0.0
   ],
   "four_plus_top_same_ortho_scale": 0.686881959438324,
-  "waist_contact_error_m": 5.960464477539063e-08,
+  "waist_contact_error_m": 2.9802322387695312e-08,
   "neck_contact_error_m": 5.960464477539063e-08,
   "joint_stance_notes": [],
   "automation": "PASS",
@@ -40,12 +40,12 @@
   "unity_integration": "NOT_PERFORMED",
   "assumptions": [
     "Backpack interface retention and wing articulation are provisional; wings have a static deployed stance.",
-    "Lower-body waist mating plane is held at 0.505 m to preserve the approved upper-body proportions.",
     "Tracks, four-leg stance and hover fans are visual blockouts with separated parts; no movement or gait animation is claimed.",
     "Low-profile vents are inset; no protruding radiator fins are added.",
     "Contact checks are static interface checks, not exhaustive collision or game validation.",
     "Supplied front and 45-degree silhouette control the design; concealed structure is a modeling assumption.",
-    "Supplied labels may conflict with the legacy catalog; this reference set is separately namespaced."
+    "Supplied labels may conflict with the legacy catalog; this reference set is separately namespaced.",
+    "PD requested a shorter lower body; its socket height is module-specific and the upper assembly translates without scaling."
   ],
   "renders": [
     "L-02_BASTION_TRACK-01-Front.png",
@@ -58,5 +58,10 @@
     "L-02_BASTION_TRACK-Mounted-Rear.png"
   ],
   "reference_sha256": "776a505259966af9dd145048a9e0d631c8ed108a74d24bade976d8b401f401c9",
-  "reference_nozzles": []
+  "reference_nozzles": [],
+  "lower_length_revision": {
+    "thigh_vertical_scale": 0.7,
+    "pelvis_and_hip_drop_m": 0.04709999999999999,
+    "tracks_and_cowlings_unchanged": true
+  }
 }

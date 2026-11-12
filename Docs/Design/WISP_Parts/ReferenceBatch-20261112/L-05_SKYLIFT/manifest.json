@@ -16,15 +16,15 @@
     "WISP_Parts/B-01_TWIN_DRIVE/B-01_TWIN_DRIVE.blend": "a29b8991c3313e87fba6101aa8d76203beb0a6da56cb8905b91c16d8d98c6f6c"
   },
   "bounds_m": {
-    "width": 0.3430038392543793,
-    "depth": 0.16898449510335922,
-    "height": 0.40457089990377426
+    "width": 0.342702716588974,
+    "depth": 0.16897933185100555,
+    "height": 0.30616437643766403
   },
   "module_mesh_count": 32,
   "mating_center": [
     0.0,
     0.0,
-    0.5049999952316284
+    0.40625
   ],
   "mounted_location": [
     0.0,
@@ -32,20 +32,20 @@
     0.0
   ],
   "four_plus_top_same_ortho_scale": 0.5663992702960967,
-  "waist_contact_error_m": 5.960464477539063e-08,
-  "neck_contact_error_m": 5.960464477539063e-08,
+  "waist_contact_error_m": 0.0,
+  "neck_contact_error_m": 0.0,
   "joint_stance_notes": [],
   "automation": "PASS",
   "design_review": "PENDING_PD",
   "unity_integration": "NOT_PERFORMED",
   "assumptions": [
     "Backpack interface retention and wing articulation are provisional; wings have a static deployed stance.",
-    "Lower-body waist mating plane is held at 0.505 m to preserve the approved upper-body proportions.",
     "Tracks, four-leg stance and hover fans are visual blockouts with separated parts; no movement or gait animation is claimed.",
     "Low-profile vents are inset; no protruding radiator fins are added.",
     "Contact checks are static interface checks, not exhaustive collision or game validation.",
     "Supplied front and 45-degree silhouette control the design; concealed structure is a modeling assumption.",
-    "Supplied labels may conflict with the legacy catalog; this reference set is separately namespaced."
+    "Supplied labels may conflict with the legacy catalog; this reference set is separately namespaced.",
+    "PD requested a shorter lower body; its socket height is module-specific and the upper assembly translates without scaling."
   ],
   "renders": [
     "L-05_SKYLIFT-01-Front.png",
@@ -64,14 +64,14 @@
       "mouth": [
         -0.09099999815225601,
         0.0,
-        0.11100000143051147
+        0.1107500010728836
       ],
       "axis": [
         0.0,
         0.0,
         -1.0
       ],
-      "depth": 0.056,
+      "depth": 0.042,
       "width": 0.086,
       "height": 0.094,
       "shape": "round",
@@ -82,18 +82,23 @@
       "mouth": [
         0.09099999815225601,
         0.0,
-        0.11100000143051147
+        0.1107500010728836
       ],
       "axis": [
         0.0,
         0.0,
         -1.0
       ],
-      "depth": 0.056,
+      "depth": 0.042,
       "width": 0.086,
       "height": 0.094,
       "shape": "round",
       "recessed_emitter": true
     }
-  ]
+  ],
+  "lower_length_revision": {
+    "visible_body_vertical_scale": 0.75,
+    "waist_socket_dimensions_preserved": true,
+    "width_and_depth_unchanged": true
+  }
 }

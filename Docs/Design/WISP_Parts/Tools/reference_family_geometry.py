@@ -214,6 +214,38 @@ def ref_skylift():
         box('Lift_Cyan_Upper_Strip',(s*.114,-.065,.370),(.005,.003,.030),CYAN,.0005)
         ref_duct('Hover_Lift_Mouth',(s*.091,0,.111),.043,.047,.056,(0,0,-1),True)
 
+def ref_shorten_lower_body(part,api):
+    """PD revision: shorten only the requested lower modules, keeping socket sizes."""
+    bpy.context.view_layer.update()
+    socket_height=.505
+    revision=None
+    if part=='L-02_BASTION_TRACK':
+        delta=(.416-.259)*.30
+        for obj in [o for o in COL.objects if o.type=='MESH']:
+            transform=None
+            if obj.name.startswith('Short_Track_Leg_Core'):
+                transform=Matrix.Translation((0,0,.259)) @ Matrix.Diagonal((1,1,.70,1)) @ Matrix.Translation((0,0,-.259))
+            elif obj.name.startswith(('Waist_Socket_','Compact_Pelvis_Core','Dark_Pelvis_Front_Plate','Pelvis_Cyan_Window','Track_Hip_Skirt')):
+                transform=Matrix.Translation((0,0,-delta))
+            if transform is not None:
+                local=obj.matrix_world.inverted() @ transform @ obj.matrix_world
+                for v in obj.data.vertices:v.co=local @ v.co
+        socket_height-=delta
+        revision={'thigh_vertical_scale':.70,'pelvis_and_hip_drop_m':delta,'tracks_and_cowlings_unchanged':True}
+    elif part=='L-05_SKYLIFT':
+        anchor=.110;socket_height=anchor+(.505-anchor)*.75
+        shape=Matrix.Translation((0,0,anchor)) @ Matrix.Diagonal((1,1,.75,1)) @ Matrix.Translation((0,0,-anchor))
+        for obj in [o for o in COL.objects if o.type=='MESH']:
+            transform=Matrix.Translation((0,0,socket_height-.505)) if obj.name.startswith('Waist_Socket_') else shape
+            local=obj.matrix_world.inverted() @ transform @ obj.matrix_world
+            for v in obj.data.vertices:v.co=local @ v.co
+        for nozzle in nozzle_specs:
+            nozzle['mouth'][2]=anchor+(nozzle['mouth'][2]-anchor)*.75
+            nozzle['depth']*=.75
+        revision={'visible_body_vertical_scale':.75,'waist_socket_dimensions_preserved':True,'width_and_depth_unchanged':True}
+    api['socket_height']=socket_height
+    api['lower_length_revision']=revision
+
 def build_reference(part,api):
     globals().update({k:v for k,v in api.items() if not k.startswith('__')})
     global nozzle_specs
@@ -225,5 +257,6 @@ def build_reference(part,api):
         if part=='B-05_RAMJET':ref_color(ORANGE,(.48,.045,.055))
     factories={'B-01_SKYWING':ref_skywing,'B-02_CROSSLANCE':ref_crosslance,'B-03_OVERTHRUST':ref_overthrust,'B-04_LONGTANK':ref_longtank,'B-05_RAMJET':ref_ramjet,'L-01_STRIDER':ref_strider,'L-02_BASTION_TRACK':ref_tracks,'L-03_TARANTULAN':ref_tarantulan,'L-05_SKYLIFT':ref_skylift}
     factories[part]()
+    ref_shorten_lower_body(part,api)
     api['reference_nozzle_specs']=nozzle_specs
     return []

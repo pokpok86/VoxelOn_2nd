@@ -27,7 +27,7 @@ for part in parts:
         assert d.type=='ORTHO' and abs(d.ortho_scale-m['four_plus_top_same_ortho_scale'])<.00001
     if part.startswith('L-'):
         floor=bpy.data.objects[part+'_Waist_Socket_Floor']
-        assert abs(max((floor.matrix_world @ Vector(v)).z for v in floor.bound_box)-.505)<.00001
+        assert abs(max((floor.matrix_world @ Vector(v)).z for v in floor.bound_box)-m['mating_center'][2])<.00001
     else:
         pins=[o for o in meshes if 'Common_Back_Mount_Pin' in o.name]
         assert len(pins)==4
@@ -51,7 +51,7 @@ for part in parts:
     # Verify actual saved mating centers and both forearm sockets.
     module=bpy.data.objects[part+'_ROOT'];mount=bpy.data.objects[part+'_MATING_INTERFACE']
     if part.startswith('B-'):assert (module.location-Vector(m['mounted_location'])).length<.00001
-    else:assert abs(mount.matrix_world.translation.z-.505)<.00001
+    else:assert abs(mount.matrix_world.translation.z-m['mating_center'][2])<.00001
     for side,name in [('R','W-01_LUMEN_ROOT'),('L','W-01_LUMEN_LEFT_ROOT')]:
         assert (bpy.data.objects[name].matrix_world.translation-bpy.data.objects[side+'_UpperArm_Connector_Pin'].matrix_world.translation).length<.00001
     report[part]={'standalone_and_mounted_reopened':True,'open_nozzle_rays':nozzle_checks,'module_meshes':len(meshes),

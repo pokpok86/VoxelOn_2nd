@@ -7,7 +7,7 @@ PD가 사진 속 백팩 5종 제작을 명시적으로 선택했고, 이어 하�
 - 백팩: B-01 SKYWING, B-02 CROSSLANCE, B-03 OVERTHRUST, B-04 LONGTANK, B-05 RAMJET.
 - 하체: L-01 STRIDER, L-02 BASTION TRACK, L-03 TARANTULAN, L-05 SKYLIFT.
 
-승인한 소체 기준은 163cfa5입니다. 몸통 .63배, 상박 길이 .1008 m, 좁힌 머리와 원래 크기의 카메라, 하박 본체 배율 1.404 및 원통 직결을 유지합니다. `../APPROVED_BASELINE.json`에서 원본 9개 .blend SHA-256을 고정합니다. 하체도 공통 허리 연결 높이 .505 m를 유지해 상반신 비례를 바꾸지 않습니다.
+승인한 소체 기준은 163cfa5입니다. 몸통 .63배, 상박 길이 .1008 m, 좁힌 머리와 원래 크기의 카메라, 하박 본체 배율 1.404 및 원통 직결을 유지합니다. `../APPROVED_BASELINE.json`에서 원본 9개 .blend SHA-256을 고정합니다. 초기 하체 연결 높이는 .505 m입니다. 이후 PD 요청으로 궤도형과 호버형 길이를 줄여 두 모듈의 허리 연결 높이를 낮췄습니다. 접속부 규격과 상반신 크기는 유지합니다. 최신 값은 각 manifest와 Length-Revision.md를 따릅니다.
 
 ## 덕트와 형태
 

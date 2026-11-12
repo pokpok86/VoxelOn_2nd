@@ -197,6 +197,9 @@ joint_notes=[]
 if REF:
     from reference_family_geometry import build_reference
     joint_notes=build_reference(PART,globals())
+    if not BACK:
+        socket_center=Vector((0,0,globals().get('socket_height',.505)))
+        layout=load_layout(BASE,waist_height=socket_center.z)
 elif PART=='B-02_SKYWING':skywing()
 elif PART=='B-03_CARGO_PACK':cargo()
 elif PART=='L-02_BASTION_TRACK':tracks()
@@ -227,6 +230,8 @@ for name,loc,power,color in [('Key',(-1,-1.3,1.2),85,(1,.89,.78)),('Fill',(1.2,-
 def camera(name,loc,target,scale):
     d=bpy.data.cameras.new(name);d.type='ORTHO';d.ortho_scale=scale;o=bpy.data.objects.new(name,d);studio.objects.link(o);o.location=loc;o.rotation_euler=(Vector(target)-o.location).to_track_quat('-Z','Y').to_euler();return o
 view_scale=max(hi-lo)*1.4
+if REF and globals().get('lower_length_revision') and os.path.exists(os.path.join(OUT,'manifest.json')):
+    with open(os.path.join(OUT,'manifest.json'),encoding='utf-8') as f:view_scale=json.load(f)['four_plus_top_same_ortho_scale']
 views=[('01-Front',center+Vector((0,-2,0))),('02-Right',center+Vector((2,0,0))),('03-Rear',center+Vector((0,2,0))),('04-45deg',center+Vector((1.5,1.8,.65) if BACK else (1.5,-1.8,1.0))),('05-Top',center+Vector((0,0,2)))]
 for name,loc in views:
     scene.camera=camera('Camera_'+name,loc,center,view_scale);scene.render.filepath=os.path.join(OUT,PART+'-'+name+'.png');bpy.ops.render.render(write_still=True)
@@ -266,5 +271,9 @@ if REF:
     manifest['assumptions']=[x for x in manifest['assumptions'] if 'No individual' not in x]
     manifest['assumptions']+=['Supplied front and 45-degree silhouette control the design; concealed structure is a modeling assumption.','Supplied labels may conflict with the legacy catalog; this reference set is separately namespaced.']
     manifest['reference_nozzles']=globals().get('reference_nozzle_specs',[])
+    manifest['lower_length_revision']=globals().get('lower_length_revision')
+    if manifest['lower_length_revision']:
+        manifest['assumptions']=[x for x in manifest['assumptions'] if 'waist mating plane is held' not in x]
+        manifest['assumptions'].append('PD requested a shorter lower body; its socket height is module-specific and the upper assembly translates without scaling.')
 with open(os.path.join(OUT,'manifest.json'),'w',encoding='utf-8') as f:json.dump(manifest,f,indent=2)
 print('EXPANSION_PART_PASS',PART,len(meshes),manifest['bounds_m'],waist_error,neck_error)
