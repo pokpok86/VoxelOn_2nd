@@ -27,11 +27,13 @@
   "static_clearance_checks": {
     "idle": {
       "major_shell_vs_torso_thigh_bounds_clear": true,
-      "overlaps": []
+      "overlaps": [],
+      "elbow_angle_degrees": 50
     },
     "aimed": {
       "major_shell_vs_torso_thigh_bounds_clear": true,
-      "overlaps": []
+      "overlaps": [],
+      "elbow_angle_degrees": 0
     }
   },
   "thruster_lens_visibility_rays": [],
@@ -56,14 +58,14 @@
       0.7844999963641167
     ],
     "right_elbow": [
-      0.22906050086021423,
+      0.24227358400821686,
       0.0,
-      0.5937443375587463
+      0.6058295369148254
     ],
     "left_elbow": [
-      -0.22906050086021423,
+      -0.24227358400821686,
       0.0,
-      0.5937443375587463
+      0.6058295369148254
     ],
     "back_mount": [
       0,
@@ -74,7 +76,7 @@
     "neck_contact_world_z": 0.7384999963641167,
     "body_size_factor": 0.7,
     "mating_pin_dimensions_preserved": true,
-    "review_shoulder_spread_degrees": 20,
+    "review_shoulder_spread_degrees": 30,
     "review_idle_elbow_degrees": 50
   },
   "standalone_part_sha256_preserved": "a5417ad4c9ecd36f7d2b2c5c4786a748f16148cf476fa99f1de2497bc9c0a47b",
@@ -94,5 +96,11 @@
     "root_position_follows_resized_body": true,
     "right_local_body_roll_degrees": -90,
     "left_roll_mirrored": true
+  },
+  "direct_mount_revision": {
+    "offset_bars_removed": true,
+    "housing_seated_at_drum": true,
+    "weapon_size_and_roll_retained": true,
+    "review_only": true
   }
 }

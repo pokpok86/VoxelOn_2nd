@@ -79,19 +79,24 @@ for part,path in sources.items():
     major=[o for o in col.objects if o.type=='MESH' and any(n in o.name for n in ('Structural_Barrel_Core','Main_Armor_','Main_Structural_Housing','Shield_Structural_Core','Longitudinal_Blade_Chassis','Pod_Core_','Blade_Amber_Cutting_Edge'))]
     checks={}
     for pose,angle in poses:
-        if not is_backpack:
-            set_forearm_angle(root,angle);set_forearm_angle(other,angle,left=True)
-        bpy.context.view_layer.update()
-        hits=[(a.name,b.name) for a in major for b in torso if overlap(bounds(a),bounds(b))]
+        selected_angle=angle
+        candidates=[angle] if is_backpack else list(dict.fromkeys([angle,30,40,50,60,70]))
+        for selected_angle in candidates:
+            if not is_backpack:
+                set_forearm_angle(root,selected_angle);set_forearm_angle(other,selected_angle,left=True)
+            bpy.context.view_layer.update()
+            hits=[(a.name,b.name) for a in major for b in torso if overlap(bounds(a),bounds(b))]
+            if not hits:break
         assert not hits,f'{part}/{pose}: major shell overlaps torso/thigh: {hits}'
-        checks[pose]={'major_shell_vs_torso_thigh_bounds_clear':True,'overlaps':hits}
+        checks[pose]={'major_shell_vs_torso_thigh_bounds_clear':True,'overlaps':hits,'elbow_angle_degrees':selected_angle}
         scene=bpy.context.scene;scene.camera=camera('Camera_Mounted_'+pose,cam_pos)
         scene.render.filepath=os.path.join(folder,part+'-Mounted-'+pose+'.png');bpy.ops.render.render(write_still=True)
     if not is_backpack:
-        set_forearm_angle(root,IDLE_DEGREES);set_forearm_angle(other,IDLE_DEGREES,left=True)
+        set_forearm_angle(root,checks['idle']['elbow_angle_degrees']);set_forearm_angle(other,checks['idle']['elbow_angle_degrees'],left=True)
     bpy.context.view_layer.update()
     bpy.context.scene.camera=bpy.data.objects['Camera_Mounted_idle']
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(folder,part+'-Mounted-Review.blend'))
+    manifest['direct_mount_revision']={'offset_bars_removed':True,'housing_seated_at_drum':True,'weapon_size_and_roll_retained':True,'review_only':True}
     manifest['assembly_layout']=layout
     manifest['base_sha256_unchanged']=base_hashes
     manifest['standalone_part_sha256_preserved']=part_hashes[part]

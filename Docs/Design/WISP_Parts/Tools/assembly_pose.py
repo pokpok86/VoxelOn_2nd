@@ -1,7 +1,7 @@
 """Use existing shoulder pivots to clear the larger forearms for review."""
 import bpy,math
 from mathutils import Matrix
-SPREAD_DEGREES=20
+SPREAD_DEGREES=30
 IDLE_DEGREES=50
 
 def pose_shoulders(layout):

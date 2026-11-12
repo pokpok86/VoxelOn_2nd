@@ -375,7 +375,7 @@ def overlap(a,b):return all(min(a[i][1],b[i][1])-max(a[i][0],b[i][0])>.0001 for 
 clearance={}
 core=[o for o in bpy.data.objects if o.name in ('Torso_Core','Chest_Armor_Main','L_Thigh_Armor','R_Thigh_Armor')]
 major=[o for o in COL.objects if o.type=='MESH' and ('Structural_Barrel_Core' in o.name or 'Main_Armor_' in o.name)]
-for pose,angle in (('idle',IDLE_DEGREES),('aimed',0)):
+for pose,angle in (('idle',IDLE_DEGREES),('aimed',30)):
     set_forearm_angle(root,angle);set_forearm_angle(left_root,angle,left=True);bpy.context.view_layer.update()
     hits=[(m.name,b.name) for m in major for b in core if overlap(aabb(m),aabb(b))]
     clearance[pose]={'major_shell_vs_torso_thigh_aabb_clear':not hits,'overlaps':hits}

@@ -268,7 +268,7 @@ else:
         cp=obj.copy();cp.data=obj.data.copy();COL.objects.link(cp);cp.parent=left
     style_weapon(root,COL,PART)
     style_weapon(left,COL,PART,left=True)
-    pose_angles=[('idle',IDLE_DEGREES),('guard' if PART=='W-05_AEGIS' else 'aimed',90 if PART=='W-05_AEGIS' else 0)]
+    pose_angles=[('idle',IDLE_DEGREES),('guard' if PART=='W-05_AEGIS' else 'aimed',90 if PART=='W-05_AEGIS' else (0 if PART=='W-04_EDGE' else 30))]
     preview_cam=(1.6,-2,.95)
 
 def aabb(obj):

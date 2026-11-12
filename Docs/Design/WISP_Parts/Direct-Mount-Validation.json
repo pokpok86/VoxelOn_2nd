@@ -1,0 +1,152 @@
+{
+  "W-01_LUMEN": {
+    "offset_bars_removed": [
+      "W-01_LUMEN_Elbow_Offset_Bridge",
+      "W-01_LUMEN_Elbow_Offset_Bridge.001",
+      "W-01_LUMEN_Elbow_Offset_Bridge.002",
+      "W-01_LUMEN_Elbow_Offset_Bridge.003"
+    ],
+    "collar_local_transforms_preserved": 16,
+    "weapon_size_and_roll_preserved": true,
+    "direct_contacts": [
+      {
+        "side": "L",
+        "rear_plane_distance_m": 0.014699984416365624,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      },
+      {
+        "side": "R",
+        "rear_plane_distance_m": 0.014699984416365624,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      }
+    ],
+    "PASS": true
+  },
+  "W-02_BREAKER": {
+    "offset_bars_removed": [
+      "W-02_BREAKER_Common_Offset_Link",
+      "W-02_BREAKER_Common_Offset_Link.001",
+      "W-02_BREAKER_Common_Offset_Link.002",
+      "W-02_BREAKER_Common_Offset_Link.003"
+    ],
+    "collar_local_transforms_preserved": 16,
+    "weapon_size_and_roll_preserved": true,
+    "direct_contacts": [
+      {
+        "side": "L",
+        "rear_plane_distance_m": 0.0146999953687191,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      },
+      {
+        "side": "R",
+        "rear_plane_distance_m": 0.0146999953687191,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      }
+    ],
+    "PASS": true
+  },
+  "W-03_RATTLE": {
+    "offset_bars_removed": [
+      "W-03_RATTLE_Common_Offset_Link",
+      "W-03_RATTLE_Common_Offset_Link.001",
+      "W-03_RATTLE_Common_Offset_Link.002",
+      "W-03_RATTLE_Common_Offset_Link.003"
+    ],
+    "collar_local_transforms_preserved": 16,
+    "weapon_size_and_roll_preserved": true,
+    "direct_contacts": [
+      {
+        "side": "L",
+        "rear_plane_distance_m": 0.0146999953687191,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      },
+      {
+        "side": "R",
+        "rear_plane_distance_m": 0.0146999953687191,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      }
+    ],
+    "PASS": true
+  },
+  "W-04_EDGE": {
+    "offset_bars_removed": [
+      "W-04_EDGE_Common_Offset_Link",
+      "W-04_EDGE_Common_Offset_Link.001",
+      "W-04_EDGE_Common_Offset_Link.002",
+      "W-04_EDGE_Common_Offset_Link.003"
+    ],
+    "collar_local_transforms_preserved": 16,
+    "weapon_size_and_roll_preserved": true,
+    "direct_contacts": [
+      {
+        "side": "L",
+        "rear_plane_distance_m": 0.014700007885694503,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      },
+      {
+        "side": "R",
+        "rear_plane_distance_m": 0.014700009450316428,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      }
+    ],
+    "PASS": true
+  },
+  "W-05_AEGIS": {
+    "offset_bars_removed": [
+      "W-05_AEGIS_Common_Offset_Link",
+      "W-05_AEGIS_Common_Offset_Link.001",
+      "W-05_AEGIS_Common_Offset_Link.002",
+      "W-05_AEGIS_Common_Offset_Link.003"
+    ],
+    "collar_local_transforms_preserved": 16,
+    "weapon_size_and_roll_preserved": true,
+    "direct_contacts": [
+      {
+        "side": "L",
+        "rear_plane_distance_m": 0.014699992239475249,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      },
+      {
+        "side": "R",
+        "rear_plane_distance_m": 0.0146999953687191,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      }
+    ],
+    "PASS": true
+  },
+  "B-01_TWIN_DRIVE": {
+    "offset_bars_removed": [
+      "W-01_LUMEN_Elbow_Offset_Bridge",
+      "W-01_LUMEN_Elbow_Offset_Bridge.001",
+      "W-01_LUMEN_Elbow_Offset_Bridge.002",
+      "W-01_LUMEN_Elbow_Offset_Bridge.003"
+    ],
+    "collar_local_transforms_preserved": 16,
+    "weapon_size_and_roll_preserved": true,
+    "direct_contacts": [
+      {
+        "side": "L",
+        "rear_plane_distance_m": 0.014699984416365624,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      },
+      {
+        "side": "R",
+        "rear_plane_distance_m": 0.014699984416365624,
+        "drum_radius_m": 0.026039999999999997,
+        "root_matches_upper_arm_pin": true
+      }
+    ],
+    "PASS": true
+  }
+}
