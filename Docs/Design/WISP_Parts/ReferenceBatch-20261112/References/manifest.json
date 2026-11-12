@@ -1,0 +1,38 @@
+{
+  "B-05_RAMJET": {
+    "file": "B-05_RAMJET.jpg",
+    "sha256": "885b3851f025a2a6091d1ce4eebd1b87e2cf1c82b2b4fcece797bfc7f65a61f8"
+  },
+  "B-02_CROSSLANCE": {
+    "file": "B-02_CROSSLANCE.jpg",
+    "sha256": "dfdf3fa2882881cc8864f04beaeb1f036d580f9d892a3fc6f00c13c180839316"
+  },
+  "B-04_LONGTANK": {
+    "file": "B-04_LONGTANK.jpg",
+    "sha256": "9b0bb54458d623aa3f1c0d4611c898dcdb2a5cdf86fa7af6607386f44f272e23"
+  },
+  "B-03_OVERTHRUST": {
+    "file": "B-03_OVERTHRUST.jpg",
+    "sha256": "2b43219688624fd495008a814e7e37fd388264f46391ca3d89dab72c3778de91"
+  },
+  "B-01_SKYWING": {
+    "file": "B-01_SKYWING.jpg",
+    "sha256": "acc4af71ff5a845d6bbce6797931131503e6920e5c71b5158e157c5d04b40f41"
+  },
+  "L-03_TARANTULAN": {
+    "file": "L-03_TARANTULAN.jpg",
+    "sha256": "71ad68611cd318bf6197a9b2b9ca70f1c4b2d40277ed1f4a098376a29e69d13e"
+  },
+  "L-01_STRIDER": {
+    "file": "L-01_STRIDER.jpg",
+    "sha256": "c430fef42ad745233f9f9e5933bb9023d6097e803b048751168e6e166eade5d5"
+  },
+  "L-02_BASTION_TRACK": {
+    "file": "L-02_BASTION_TRACK.jpg",
+    "sha256": "776a505259966af9dd145048a9e0d631c8ed108a74d24bade976d8b401f401c9"
+  },
+  "L-05_SKYLIFT": {
+    "file": "L-05_SKYLIFT.jpg",
+    "sha256": "156f7c41716bb12cc8b197277901486655fcb60fa7a7206ed1eaec82315654af"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "asset": "L-03_TARANTULAN",
+  "kind": "complete pelvis-down replacement",
+  "blender": "5.2.3 LTS",
+  "source_reference": "../References/L-03_TARANTULAN.jpg",
+  "approved_base_commit": "163cfa5",
+  "base_geometry_sha256": {
+    "WISP_Base_v1/BD01/BD01.blend": "2b918ef14c6f0ee5475131e568c8c99561f7141d4d1a57c8d7bbcb1a611750b4",
+    "WISP_Base_v1/HD01/HD01.blend": "d659c782ffdc4ed386d477fedfda29ff05a9a9186031f995e8607a672d17e5e8",
+    "WISP_Base_v1/LG01/LG01.blend": "581d189b09217e04285577ea7adf8686ab9e1f64d2fd1a0905fe6ac4b6c11160",
+    "WISP_Parts/W-01_LUMEN/W-01_LUMEN.blend": "a3c872e8474490fa3e911f161459a5f19458398178de8c9efa11b6995822c8e5",
+    "WISP_Parts/W-02_BREAKER/W-02_BREAKER.blend": "45a49d53b0ac156790e4a39fa3fb365ed1acf062ef4deb586783a6b74f560ca4",
+    "WISP_Parts/W-03_RATTLE/W-03_RATTLE.blend": "eef04d78487c3e11295f4621d5669c95c2d0d962ddf82337b45e935aefdf7708",
+    "WISP_Parts/W-04_EDGE/W-04_EDGE.blend": "a5417ad4c9ecd36f7d2b2c5c4786a748f16148cf476fa99f1de2497bc9c0a47b",
+    "WISP_Parts/W-05_AEGIS/W-05_AEGIS.blend": "cbf784196872a6be9ebeb3541a9754bb1c3abad5c49e34012cfee0b4e855e691",
+    "WISP_Parts/B-01_TWIN_DRIVE/B-01_TWIN_DRIVE.blend": "a29b8991c3313e87fba6101aa8d76203beb0a6da56cb8905b91c16d8d98c6f6c"
+  },
+  "bounds_m": {
+    "width": 0.5991004109382629,
+    "depth": 0.44236037135124207,
+    "height": 0.5005825674161315
+  },
+  "module_mesh_count": 40,
+  "mating_center": [
+    0.0,
+    0.0,
+    0.5049999952316284
+  ],
+  "mounted_location": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "four_plus_top_same_ortho_scale": 0.838740575313568,
+  "waist_contact_error_m": 5.960464477539063e-08,
+  "neck_contact_error_m": 5.960464477539063e-08,
+  "joint_stance_notes": [],
+  "automation": "PASS",
+  "design_review": "PENDING_PD",
+  "unity_integration": "NOT_PERFORMED",
+  "assumptions": [
+    "Backpack interface retention and wing articulation are provisional; wings have a static deployed stance.",
+    "Lower-body waist mating plane is held at 0.505 m to preserve the approved upper-body proportions.",
+    "Tracks, four-leg stance and hover fans are visual blockouts with separated parts; no movement or gait animation is claimed.",
+    "Low-profile vents are inset; no protruding radiator fins are added.",
+    "Contact checks are static interface checks, not exhaustive collision or game validation.",
+    "Supplied front and 45-degree silhouette control the design; concealed structure is a modeling assumption.",
+    "Supplied labels may conflict with the legacy catalog; this reference set is separately namespaced."
+  ],
+  "renders": [
+    "L-03_TARANTULAN-01-Front.png",
+    "L-03_TARANTULAN-02-Right.png",
+    "L-03_TARANTULAN-03-Rear.png",
+    "L-03_TARANTULAN-04-45deg.png",
+    "L-03_TARANTULAN-05-Top.png",
+    "L-03_TARANTULAN-06-Mount-Closeup.png",
+    "L-03_TARANTULAN-Mounted-Front.png",
+    "L-03_TARANTULAN-Mounted-Rear.png"
+  ],
+  "reference_sha256": "71ad68611cd318bf6197a9b2b9ca70f1c4b2d40277ed1f4a098376a29e69d13e",
+  "reference_nozzles": []
+}

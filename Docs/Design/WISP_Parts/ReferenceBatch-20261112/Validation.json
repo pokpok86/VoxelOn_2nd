@@ -1,0 +1,190 @@
+{
+  "parts": {
+    "B-01_SKYWING": {
+      "standalone_and_mounted_reopened": true,
+      "open_nozzle_rays": [
+        {
+          "name": "Main_Nozzle",
+          "ray_hits_recessed_emitter": true
+        },
+        {
+          "name": "Main_Nozzle",
+          "ray_hits_recessed_emitter": true
+        }
+      ],
+      "module_meshes": 36,
+      "same_five_view_scale": true,
+      "common_interface_verified": true,
+      "approved_torso_scale_preserved": true,
+      "forearm_connections_verified": true,
+      "design_review": "PENDING_PD",
+      "unity": "NOT_PERFORMED"
+    },
+    "B-02_CROSSLANCE": {
+      "standalone_and_mounted_reopened": true,
+      "open_nozzle_rays": [
+        {
+          "name": "Cross_Thruster",
+          "ray_hits_recessed_emitter": true
+        },
+        {
+          "name": "Cross_Thruster",
+          "ray_hits_recessed_emitter": true
+        },
+        {
+          "name": "Cross_Thruster",
+          "ray_hits_recessed_emitter": true
+        },
+        {
+          "name": "Cross_Thruster",
+          "ray_hits_recessed_emitter": true
+        }
+      ],
+      "module_meshes": 54,
+      "same_five_view_scale": true,
+      "common_interface_verified": true,
+      "approved_torso_scale_preserved": true,
+      "forearm_connections_verified": true,
+      "design_review": "PENDING_PD",
+      "unity": "NOT_PERFORMED"
+    },
+    "B-03_OVERTHRUST": {
+      "standalone_and_mounted_reopened": true,
+      "open_nozzle_rays": [
+        {
+          "name": "Heavy_Main_Bell",
+          "ray_hits_recessed_emitter": true
+        },
+        {
+          "name": "Small_Outer_Vernier",
+          "ray_hits_recessed_emitter": true
+        },
+        {
+          "name": "Small_Lower_Vernier",
+          "ray_hits_recessed_emitter": true
+        },
+        {
+          "name": "Heavy_Main_Bell",
+          "ray_hits_recessed_emitter": true
+        },
+        {
+          "name": "Small_Outer_Vernier",
+          "ray_hits_recessed_emitter": true
+        },
+        {
+          "name": "Small_Lower_Vernier",
+          "ray_hits_recessed_emitter": true
+        }
+      ],
+      "module_meshes": 60,
+      "same_five_view_scale": true,
+      "common_interface_verified": true,
+      "approved_torso_scale_preserved": true,
+      "forearm_connections_verified": true,
+      "design_review": "PENDING_PD",
+      "unity": "NOT_PERFORMED"
+    },
+    "B-04_LONGTANK": {
+      "standalone_and_mounted_reopened": true,
+      "open_nozzle_rays": [
+        {
+          "name": "Upper_Sustained_Nozzle",
+          "ray_hits_recessed_emitter": true
+        },
+        {
+          "name": "Tank_End_Port",
+          "ray_hits_recessed_emitter": true
+        },
+        {
+          "name": "Upper_Sustained_Nozzle",
+          "ray_hits_recessed_emitter": true
+        },
+        {
+          "name": "Tank_End_Port",
+          "ray_hits_recessed_emitter": true
+        }
+      ],
+      "module_meshes": 50,
+      "same_five_view_scale": true,
+      "common_interface_verified": true,
+      "approved_torso_scale_preserved": true,
+      "forearm_connections_verified": true,
+      "design_review": "PENDING_PD",
+      "unity": "NOT_PERFORMED"
+    },
+    "B-05_RAMJET": {
+      "standalone_and_mounted_reopened": true,
+      "open_nozzle_rays": [
+        {
+          "name": "Straight_Main_Afterburner",
+          "ray_hits_recessed_emitter": true
+        },
+        {
+          "name": "Straight_Main_Afterburner",
+          "ray_hits_recessed_emitter": true
+        }
+      ],
+      "module_meshes": 36,
+      "same_five_view_scale": true,
+      "common_interface_verified": true,
+      "approved_torso_scale_preserved": true,
+      "forearm_connections_verified": true,
+      "design_review": "PENDING_PD",
+      "unity": "NOT_PERFORMED"
+    },
+    "L-01_STRIDER": {
+      "standalone_and_mounted_reopened": true,
+      "open_nozzle_rays": [],
+      "module_meshes": 40,
+      "same_five_view_scale": true,
+      "common_interface_verified": true,
+      "approved_torso_scale_preserved": true,
+      "forearm_connections_verified": true,
+      "design_review": "PENDING_PD",
+      "unity": "NOT_PERFORMED"
+    },
+    "L-02_BASTION_TRACK": {
+      "standalone_and_mounted_reopened": true,
+      "open_nozzle_rays": [],
+      "module_meshes": 106,
+      "same_five_view_scale": true,
+      "common_interface_verified": true,
+      "approved_torso_scale_preserved": true,
+      "forearm_connections_verified": true,
+      "design_review": "PENDING_PD",
+      "unity": "NOT_PERFORMED"
+    },
+    "L-03_TARANTULAN": {
+      "standalone_and_mounted_reopened": true,
+      "open_nozzle_rays": [],
+      "module_meshes": 40,
+      "same_five_view_scale": true,
+      "common_interface_verified": true,
+      "approved_torso_scale_preserved": true,
+      "forearm_connections_verified": true,
+      "design_review": "PENDING_PD",
+      "unity": "NOT_PERFORMED"
+    },
+    "L-05_SKYLIFT": {
+      "standalone_and_mounted_reopened": true,
+      "open_nozzle_rays": [
+        {
+          "name": "Hover_Lift_Mouth",
+          "ray_hits_recessed_emitter": true
+        },
+        {
+          "name": "Hover_Lift_Mouth",
+          "ray_hits_recessed_emitter": true
+        }
+      ],
+      "module_meshes": 32,
+      "same_five_view_scale": true,
+      "common_interface_verified": true,
+      "approved_torso_scale_preserved": true,
+      "forearm_connections_verified": true,
+      "design_review": "PENDING_PD",
+      "unity": "NOT_PERFORMED"
+    }
+  },
+  "all_nine_original_blends_sha256_unchanged": true
+}

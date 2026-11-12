@@ -1,0 +1,107 @@
+{
+  "namespace": "ReferenceBatch-20261112",
+  "approved_base_commit": "163cfa5",
+  "legacy_namespace_unchanged": true,
+  "scope": "Blender design assets; not a runtime catalog",
+  "parts": [
+    {
+      "id": "B-01",
+      "name": "B-01_SKYWING",
+      "title": "접이식 날개형 고기동 백팩",
+      "category": "backpack",
+      "reference": "References/B-01_SKYWING.jpg",
+      "standalone": "B-01_SKYWING/B-01_SKYWING.blend",
+      "mounted": "B-01_SKYWING/B-01_SKYWING-Mounted-Review.blend",
+      "manifest": "B-01_SKYWING/manifest.json",
+      "design_status": "PENDING_PD"
+    },
+    {
+      "id": "B-02",
+      "name": "B-02_CROSSLANCE",
+      "title": "X자 4노즐 백팩",
+      "category": "backpack",
+      "reference": "References/B-02_CROSSLANCE.jpg",
+      "standalone": "B-02_CROSSLANCE/B-02_CROSSLANCE.blend",
+      "mounted": "B-02_CROSSLANCE/B-02_CROSSLANCE-Mounted-Review.blend",
+      "manifest": "B-02_CROSSLANCE/manifest.json",
+      "design_status": "PENDING_PD"
+    },
+    {
+      "id": "B-03",
+      "name": "B-03_OVERTHRUST",
+      "title": "대형 쌍추진기 백팩",
+      "category": "backpack",
+      "reference": "References/B-03_OVERTHRUST.jpg",
+      "standalone": "B-03_OVERTHRUST/B-03_OVERTHRUST.blend",
+      "mounted": "B-03_OVERTHRUST/B-03_OVERTHRUST-Mounted-Review.blend",
+      "manifest": "B-03_OVERTHRUST/manifest.json",
+      "design_status": "PENDING_PD"
+    },
+    {
+      "id": "B-04",
+      "name": "B-04_LONGTANK",
+      "title": "장거리 탱크 백팩",
+      "category": "backpack",
+      "reference": "References/B-04_LONGTANK.jpg",
+      "standalone": "B-04_LONGTANK/B-04_LONGTANK.blend",
+      "mounted": "B-04_LONGTANK/B-04_LONGTANK-Mounted-Review.blend",
+      "manifest": "B-04_LONGTANK/manifest.json",
+      "design_status": "PENDING_PD"
+    },
+    {
+      "id": "B-05",
+      "name": "B-05_RAMJET",
+      "title": "직선 가속형 백팩",
+      "category": "backpack",
+      "reference": "References/B-05_RAMJET.jpg",
+      "standalone": "B-05_RAMJET/B-05_RAMJET.blend",
+      "mounted": "B-05_RAMJET/B-05_RAMJET-Mounted-Review.blend",
+      "manifest": "B-05_RAMJET/manifest.json",
+      "design_status": "PENDING_PD"
+    },
+    {
+      "id": "L-01",
+      "name": "L-01_STRIDER",
+      "title": "일반 이족 하체",
+      "category": "lower_body",
+      "reference": "References/L-01_STRIDER.jpg",
+      "standalone": "L-01_STRIDER/L-01_STRIDER.blend",
+      "mounted": "L-01_STRIDER/L-01_STRIDER-Mounted-Review.blend",
+      "manifest": "L-01_STRIDER/manifest.json",
+      "design_status": "PENDING_PD"
+    },
+    {
+      "id": "L-02",
+      "name": "L-02_BASTION_TRACK",
+      "title": "짧은 다리와 개별 궤도 하체",
+      "category": "lower_body",
+      "reference": "References/L-02_BASTION_TRACK.jpg",
+      "standalone": "L-02_BASTION_TRACK/L-02_BASTION_TRACK.blend",
+      "mounted": "L-02_BASTION_TRACK/L-02_BASTION_TRACK-Mounted-Review.blend",
+      "manifest": "L-02_BASTION_TRACK/manifest.json",
+      "design_status": "PENDING_PD"
+    },
+    {
+      "id": "L-03",
+      "name": "L-03_TARANTULAN",
+      "title": "뾰족한 4족 거미형 하체",
+      "category": "lower_body",
+      "reference": "References/L-03_TARANTULAN.jpg",
+      "standalone": "L-03_TARANTULAN/L-03_TARANTULAN.blend",
+      "mounted": "L-03_TARANTULAN/L-03_TARANTULAN-Mounted-Review.blend",
+      "manifest": "L-03_TARANTULAN/manifest.json",
+      "design_status": "PENDING_PD"
+    },
+    {
+      "id": "L-05",
+      "name": "L-05_SKYLIFT",
+      "title": "쌍 호버 포드 하체",
+      "category": "lower_body",
+      "reference": "References/L-05_SKYLIFT.jpg",
+      "standalone": "L-05_SKYLIFT/L-05_SKYLIFT.blend",
+      "mounted": "L-05_SKYLIFT/L-05_SKYLIFT-Mounted-Review.blend",
+      "manifest": "L-05_SKYLIFT/manifest.json",
+      "design_status": "PENDING_PD"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "approved_proportion_commit": "163cfa5",
+  "approval_source": "PD chat: keep current size, proportions and design concept; create other parts",
+  "geometry_sha256": {
+    "WISP_Base_v1/BD01/BD01.blend": "2b918ef14c6f0ee5475131e568c8c99561f7141d4d1a57c8d7bbcb1a611750b4",
+    "WISP_Base_v1/HD01/HD01.blend": "d659c782ffdc4ed386d477fedfda29ff05a9a9186031f995e8607a672d17e5e8",
+    "WISP_Base_v1/LG01/LG01.blend": "581d189b09217e04285577ea7adf8686ab9e1f64d2fd1a0905fe6ac4b6c11160",
+    "WISP_Parts/W-01_LUMEN/W-01_LUMEN.blend": "a3c872e8474490fa3e911f161459a5f19458398178de8c9efa11b6995822c8e5",
+    "WISP_Parts/W-02_BREAKER/W-02_BREAKER.blend": "45a49d53b0ac156790e4a39fa3fb365ed1acf062ef4deb586783a6b74f560ca4",
+    "WISP_Parts/W-03_RATTLE/W-03_RATTLE.blend": "eef04d78487c3e11295f4621d5669c95c2d0d962ddf82337b45e935aefdf7708",
+    "WISP_Parts/W-04_EDGE/W-04_EDGE.blend": "a5417ad4c9ecd36f7d2b2c5c4786a748f16148cf476fa99f1de2497bc9c0a47b",
+    "WISP_Parts/W-05_AEGIS/W-05_AEGIS.blend": "cbf784196872a6be9ebeb3541a9754bb1c3abad5c49e34012cfee0b4e855e691",
+    "WISP_Parts/B-01_TWIN_DRIVE/B-01_TWIN_DRIVE.blend": "a29b8991c3313e87fba6101aa8d76203beb0a6da56cb8905b91c16d8d98c6f6c"
+  },
+  "body_root_scale": 0.63,
+  "upper_arm_height_m": 0.1008,
+  "helmet_xyz_relative_to_prior": [
+    0.81,
+    0.9,
+    0.9
+  ],
+  "weapon_body_scale": 1.404,
+  "weapon_root_scale": 0.42,
+  "waist_mating_height_m": 0.505,
+  "back_mount": "existing assembly_layout metadata",
+  "new_candidate_design_approval": "PENDING_PD",
+  "new_reference_images": "9 PD-supplied JPGs in ReferenceBatch-20261112/References/; hashes recorded",
+  "legacy_exploratory_candidate_ids": [
+    "B-02_SKYWING",
+    "B-03_CARGO_PACK",
+    "L-02_BASTION_TRACK",
+    "L-03_TARANTULAN",
+    "L-04_DRAFT_HOVER"
+  ],
+  "reference_candidate_namespace": "ReferenceBatch-20261112",
+  "reference_candidate_ids": [
+    "B-01_SKYWING",
+    "B-02_CROSSLANCE",
+    "B-03_OVERTHRUST",
+    "B-04_LONGTANK",
+    "B-05_RAMJET",
+    "L-01_STRIDER",
+    "L-02_BASTION_TRACK",
+    "L-03_TARANTULAN",
+    "L-05_SKYLIFT"
+  ]
+}

@@ -1,0 +1,171 @@
+{
+  "asset": "B-03_OVERTHRUST",
+  "kind": "backpack",
+  "blender": "5.2.3 LTS",
+  "source_reference": "../References/B-03_OVERTHRUST.jpg",
+  "approved_base_commit": "163cfa5",
+  "base_geometry_sha256": {
+    "WISP_Base_v1/BD01/BD01.blend": "2b918ef14c6f0ee5475131e568c8c99561f7141d4d1a57c8d7bbcb1a611750b4",
+    "WISP_Base_v1/HD01/HD01.blend": "d659c782ffdc4ed386d477fedfda29ff05a9a9186031f995e8607a672d17e5e8",
+    "WISP_Base_v1/LG01/LG01.blend": "581d189b09217e04285577ea7adf8686ab9e1f64d2fd1a0905fe6ac4b6c11160",
+    "WISP_Parts/W-01_LUMEN/W-01_LUMEN.blend": "a3c872e8474490fa3e911f161459a5f19458398178de8c9efa11b6995822c8e5",
+    "WISP_Parts/W-02_BREAKER/W-02_BREAKER.blend": "45a49d53b0ac156790e4a39fa3fb365ed1acf062ef4deb586783a6b74f560ca4",
+    "WISP_Parts/W-03_RATTLE/W-03_RATTLE.blend": "eef04d78487c3e11295f4621d5669c95c2d0d962ddf82337b45e935aefdf7708",
+    "WISP_Parts/W-04_EDGE/W-04_EDGE.blend": "a5417ad4c9ecd36f7d2b2c5c4786a748f16148cf476fa99f1de2497bc9c0a47b",
+    "WISP_Parts/W-05_AEGIS/W-05_AEGIS.blend": "cbf784196872a6be9ebeb3541a9754bb1c3abad5c49e34012cfee0b4e855e691",
+    "WISP_Parts/B-01_TWIN_DRIVE/B-01_TWIN_DRIVE.blend": "a29b8991c3313e87fba6101aa8d76203beb0a6da56cb8905b91c16d8d98c6f6c"
+  },
+  "bounds_m": {
+    "width": 0.3678404986858368,
+    "depth": 0.21935177687555552,
+    "height": 0.3281564861536026
+  },
+  "module_mesh_count": 60,
+  "mating_center": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "mounted_location": [
+    0.0,
+    0.08756999671459198,
+    0.6359599828720093
+  ],
+  "four_plus_top_same_ortho_scale": 0.5149766981601714,
+  "waist_contact_error_m": 5.960464477539063e-08,
+  "neck_contact_error_m": 5.960464477539063e-08,
+  "joint_stance_notes": [],
+  "automation": "PASS",
+  "design_review": "PENDING_PD",
+  "unity_integration": "NOT_PERFORMED",
+  "assumptions": [
+    "Backpack interface retention and wing articulation are provisional; wings have a static deployed stance.",
+    "Lower-body waist mating plane is held at 0.505 m to preserve the approved upper-body proportions.",
+    "Tracks, four-leg stance and hover fans are visual blockouts with separated parts; no movement or gait animation is claimed.",
+    "Low-profile vents are inset; no protruding radiator fins are added.",
+    "Contact checks are static interface checks, not exhaustive collision or game validation.",
+    "Supplied front and 45-degree silhouette control the design; concealed structure is a modeling assumption.",
+    "Supplied labels may conflict with the legacy catalog; this reference set is separately namespaced."
+  ],
+  "renders": [
+    "B-03_OVERTHRUST-01-Front.png",
+    "B-03_OVERTHRUST-02-Right.png",
+    "B-03_OVERTHRUST-03-Rear.png",
+    "B-03_OVERTHRUST-04-45deg.png",
+    "B-03_OVERTHRUST-05-Top.png",
+    "B-03_OVERTHRUST-06-Mount-Closeup.png",
+    "B-03_OVERTHRUST-Mounted-Front.png",
+    "B-03_OVERTHRUST-Mounted-Rear.png"
+  ],
+  "reference_sha256": "2b43219688624fd495008a814e7e37fd388264f46391ca3d89dab72c3778de91",
+  "reference_nozzles": [
+    {
+      "name": "Heavy_Main_Bell",
+      "mouth": [
+        -0.07500000298023224,
+        0.18299999833106995,
+        -0.07500000298023224
+      ],
+      "axis": [
+        0.0,
+        0.9284767508506775,
+        -0.371390700340271
+      ],
+      "depth": 0.112,
+      "width": 0.134,
+      "height": 0.14,
+      "shape": "round",
+      "recessed_emitter": true
+    },
+    {
+      "name": "Small_Outer_Vernier",
+      "mouth": [
+        -0.164000004529953,
+        0.13899999856948853,
+        -0.04100000113248825
+      ],
+      "axis": [
+        0.0,
+        0.9438583254814148,
+        -0.330350399017334
+      ],
+      "depth": 0.045,
+      "width": 0.04,
+      "height": 0.042,
+      "shape": "round",
+      "recessed_emitter": true
+    },
+    {
+      "name": "Small_Lower_Vernier",
+      "mouth": [
+        -0.10999999940395355,
+        0.10400000214576721,
+        -0.13699999451637268
+      ],
+      "axis": [
+        0.0,
+        0.8944271802902222,
+        -0.4472135901451111
+      ],
+      "depth": 0.032,
+      "width": 0.028,
+      "height": 0.038,
+      "shape": "chamfered rectangular",
+      "recessed_emitter": true
+    },
+    {
+      "name": "Heavy_Main_Bell",
+      "mouth": [
+        0.07500000298023224,
+        0.18299999833106995,
+        -0.07500000298023224
+      ],
+      "axis": [
+        0.0,
+        0.9284767508506775,
+        -0.371390700340271
+      ],
+      "depth": 0.112,
+      "width": 0.134,
+      "height": 0.14,
+      "shape": "round",
+      "recessed_emitter": true
+    },
+    {
+      "name": "Small_Outer_Vernier",
+      "mouth": [
+        0.164000004529953,
+        0.13899999856948853,
+        -0.04100000113248825
+      ],
+      "axis": [
+        0.0,
+        0.9438583254814148,
+        -0.330350399017334
+      ],
+      "depth": 0.045,
+      "width": 0.04,
+      "height": 0.042,
+      "shape": "round",
+      "recessed_emitter": true
+    },
+    {
+      "name": "Small_Lower_Vernier",
+      "mouth": [
+        0.10999999940395355,
+        0.10400000214576721,
+        -0.13699999451637268
+      ],
+      "axis": [
+        0.0,
+        0.8944271802902222,
+        -0.4472135901451111
+      ],
+      "depth": 0.032,
+      "width": 0.028,
+      "height": 0.038,
+      "shape": "chamfered rectangular",
+      "recessed_emitter": true
+    }
+  ]
+}

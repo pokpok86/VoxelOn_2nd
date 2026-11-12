@@ -1,0 +1,135 @@
+{
+  "asset": "B-02_CROSSLANCE",
+  "kind": "backpack",
+  "blender": "5.2.3 LTS",
+  "source_reference": "../References/B-02_CROSSLANCE.jpg",
+  "approved_base_commit": "163cfa5",
+  "base_geometry_sha256": {
+    "WISP_Base_v1/BD01/BD01.blend": "2b918ef14c6f0ee5475131e568c8c99561f7141d4d1a57c8d7bbcb1a611750b4",
+    "WISP_Base_v1/HD01/HD01.blend": "d659c782ffdc4ed386d477fedfda29ff05a9a9186031f995e8607a672d17e5e8",
+    "WISP_Base_v1/LG01/LG01.blend": "581d189b09217e04285577ea7adf8686ab9e1f64d2fd1a0905fe6ac4b6c11160",
+    "WISP_Parts/W-01_LUMEN/W-01_LUMEN.blend": "a3c872e8474490fa3e911f161459a5f19458398178de8c9efa11b6995822c8e5",
+    "WISP_Parts/W-02_BREAKER/W-02_BREAKER.blend": "45a49d53b0ac156790e4a39fa3fb365ed1acf062ef4deb586783a6b74f560ca4",
+    "WISP_Parts/W-03_RATTLE/W-03_RATTLE.blend": "eef04d78487c3e11295f4621d5669c95c2d0d962ddf82337b45e935aefdf7708",
+    "WISP_Parts/W-04_EDGE/W-04_EDGE.blend": "a5417ad4c9ecd36f7d2b2c5c4786a748f16148cf476fa99f1de2497bc9c0a47b",
+    "WISP_Parts/W-05_AEGIS/W-05_AEGIS.blend": "cbf784196872a6be9ebeb3541a9754bb1c3abad5c49e34012cfee0b4e855e691",
+    "WISP_Parts/B-01_TWIN_DRIVE/B-01_TWIN_DRIVE.blend": "a29b8991c3313e87fba6101aa8d76203beb0a6da56cb8905b91c16d8d98c6f6c"
+  },
+  "bounds_m": {
+    "width": 0.4619556665420532,
+    "depth": 0.15651046577841043,
+    "height": 0.47596752643585205
+  },
+  "module_mesh_count": 54,
+  "mating_center": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "mounted_location": [
+    0.0,
+    0.08756999671459198,
+    0.6359599828720093
+  ],
+  "four_plus_top_same_ortho_scale": 0.6663545370101929,
+  "waist_contact_error_m": 5.960464477539063e-08,
+  "neck_contact_error_m": 5.960464477539063e-08,
+  "joint_stance_notes": [],
+  "automation": "PASS",
+  "design_review": "PENDING_PD",
+  "unity_integration": "NOT_PERFORMED",
+  "assumptions": [
+    "Backpack interface retention and wing articulation are provisional; wings have a static deployed stance.",
+    "Lower-body waist mating plane is held at 0.505 m to preserve the approved upper-body proportions.",
+    "Tracks, four-leg stance and hover fans are visual blockouts with separated parts; no movement or gait animation is claimed.",
+    "Low-profile vents are inset; no protruding radiator fins are added.",
+    "Contact checks are static interface checks, not exhaustive collision or game validation.",
+    "Supplied front and 45-degree silhouette control the design; concealed structure is a modeling assumption.",
+    "Supplied labels may conflict with the legacy catalog; this reference set is separately namespaced."
+  ],
+  "renders": [
+    "B-02_CROSSLANCE-01-Front.png",
+    "B-02_CROSSLANCE-02-Right.png",
+    "B-02_CROSSLANCE-03-Rear.png",
+    "B-02_CROSSLANCE-04-45deg.png",
+    "B-02_CROSSLANCE-05-Top.png",
+    "B-02_CROSSLANCE-06-Mount-Closeup.png",
+    "B-02_CROSSLANCE-Mounted-Front.png",
+    "B-02_CROSSLANCE-Mounted-Rear.png"
+  ],
+  "reference_sha256": "dfdf3fa2882881cc8864f04beaeb1f036d580f9d892a3fc6f00c13c180839316",
+  "reference_nozzles": [
+    {
+      "name": "Cross_Thruster",
+      "mouth": [
+        -0.1850000023841858,
+        0.1459999978542328,
+        -0.1770000010728836
+      ],
+      "axis": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "depth": 0.055,
+      "width": 0.064,
+      "height": 0.074,
+      "shape": "chamfered rectangular",
+      "recessed_emitter": true
+    },
+    {
+      "name": "Cross_Thruster",
+      "mouth": [
+        -0.1850000023841858,
+        0.1459999978542328,
+        0.1770000010728836
+      ],
+      "axis": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "depth": 0.055,
+      "width": 0.064,
+      "height": 0.074,
+      "shape": "chamfered rectangular",
+      "recessed_emitter": true
+    },
+    {
+      "name": "Cross_Thruster",
+      "mouth": [
+        0.1850000023841858,
+        0.1459999978542328,
+        -0.1770000010728836
+      ],
+      "axis": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "depth": 0.055,
+      "width": 0.064,
+      "height": 0.074,
+      "shape": "chamfered rectangular",
+      "recessed_emitter": true
+    },
+    {
+      "name": "Cross_Thruster",
+      "mouth": [
+        0.1850000023841858,
+        0.1459999978542328,
+        0.1770000010728836
+      ],
+      "axis": [
+        0.0,
+        1.0,
+        0.0
+      ],
+      "depth": 0.055,
+      "width": 0.064,
+      "height": 0.074,
+      "shape": "chamfered rectangular",
+      "recessed_emitter": true
+    }
+  ]
+}
