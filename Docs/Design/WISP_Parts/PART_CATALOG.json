@@ -1,0 +1,124 @@
+{
+  "baseline": "APPROVED_BASELINE.json",
+  "purpose": "Blender design review asset catalog; not a Unity runtime integration",
+  "parts": [
+    {
+      "id": "W-01",
+      "name": "W-01_LUMEN",
+      "category": "forearm",
+      "standalone": "W-01_LUMEN/W-01_LUMEN.blend",
+      "mounted": "W-01_LUMEN/W-01_LUMEN-Mounted-Review.blend",
+      "design_status": "EXISTING_REVIEW_BASE",
+      "interface": "elbow"
+    },
+    {
+      "id": "W-02",
+      "name": "W-02_BREAKER",
+      "category": "forearm",
+      "standalone": "W-02_BREAKER/W-02_BREAKER.blend",
+      "mounted": "W-02_BREAKER/W-02_BREAKER-Mounted-Review.blend",
+      "design_status": "EXISTING_REVIEW_BASE",
+      "interface": "elbow"
+    },
+    {
+      "id": "W-03",
+      "name": "W-03_RATTLE",
+      "category": "forearm",
+      "standalone": "W-03_RATTLE/W-03_RATTLE.blend",
+      "mounted": "W-03_RATTLE/W-03_RATTLE-Mounted-Review.blend",
+      "design_status": "EXISTING_REVIEW_BASE",
+      "interface": "elbow"
+    },
+    {
+      "id": "W-04",
+      "name": "W-04_EDGE",
+      "category": "forearm",
+      "standalone": "W-04_EDGE/W-04_EDGE.blend",
+      "mounted": "W-04_EDGE/W-04_EDGE-Mounted-Review.blend",
+      "design_status": "EXISTING_REVIEW_BASE",
+      "interface": "elbow"
+    },
+    {
+      "id": "W-05",
+      "name": "W-05_AEGIS",
+      "category": "forearm",
+      "standalone": "W-05_AEGIS/W-05_AEGIS.blend",
+      "mounted": "W-05_AEGIS/W-05_AEGIS-Mounted-Review.blend",
+      "design_status": "EXISTING_REVIEW_BASE",
+      "interface": "elbow"
+    },
+    {
+      "id": "B-01",
+      "name": "B-01_TWIN_DRIVE",
+      "category": "backpack",
+      "standalone": "B-01_TWIN_DRIVE/B-01_TWIN_DRIVE.blend",
+      "mounted": "B-01_TWIN_DRIVE/B-01_TWIN_DRIVE-Mounted-Review.blend",
+      "design_status": "EXISTING_REVIEW_BASE",
+      "interface": "back"
+    },
+    {
+      "id": "L-01",
+      "name": "STRIDER",
+      "category": "lower_body",
+      "standalone": "../WISP_Base_v1/LG01/LG01.blend",
+      "design_status": "EXISTING_BIPED_BASE",
+      "interface": "waist_0.505m",
+      "note": "Reuse the existing LG01 pelvis and biped legs; no duplicate redesign."
+    },
+    {
+      "id": "B-02",
+      "name": "B-02_SKYWING",
+      "category": "backpack",
+      "standalone": "B-02_SKYWING/B-02_SKYWING.blend",
+      "mounted": "B-02_SKYWING/B-02_SKYWING-Mounted-Review.blend",
+      "manifest": "B-02_SKYWING/manifest.json",
+      "design_status": "PENDING_PD",
+      "interface": "back",
+      "individual_reference": "NOT_SUPPLIED"
+    },
+    {
+      "id": "B-03",
+      "name": "B-03_CARGO_PACK",
+      "category": "backpack",
+      "standalone": "B-03_CARGO_PACK/B-03_CARGO_PACK.blend",
+      "mounted": "B-03_CARGO_PACK/B-03_CARGO_PACK-Mounted-Review.blend",
+      "manifest": "B-03_CARGO_PACK/manifest.json",
+      "design_status": "PENDING_PD",
+      "interface": "back",
+      "individual_reference": "NOT_SUPPLIED"
+    },
+    {
+      "id": "L-02",
+      "name": "L-02_BASTION_TRACK",
+      "category": "lower_body",
+      "standalone": "L-02_BASTION_TRACK/L-02_BASTION_TRACK.blend",
+      "mounted": "L-02_BASTION_TRACK/L-02_BASTION_TRACK-Mounted-Review.blend",
+      "manifest": "L-02_BASTION_TRACK/manifest.json",
+      "design_status": "PENDING_PD",
+      "interface": "waist_0.505m",
+      "individual_reference": "NOT_SUPPLIED"
+    },
+    {
+      "id": "L-03",
+      "name": "L-03_TARANTULAN",
+      "category": "lower_body",
+      "standalone": "L-03_TARANTULAN/L-03_TARANTULAN.blend",
+      "mounted": "L-03_TARANTULAN/L-03_TARANTULAN-Mounted-Review.blend",
+      "manifest": "L-03_TARANTULAN/manifest.json",
+      "design_status": "PENDING_PD",
+      "interface": "waist_0.505m",
+      "individual_reference": "NOT_SUPPLIED"
+    },
+    {
+      "id": "L-04",
+      "name": "L-04_DRAFT_HOVER",
+      "category": "lower_body",
+      "standalone": "L-04_DRAFT_HOVER/L-04_DRAFT_HOVER.blend",
+      "mounted": "L-04_DRAFT_HOVER/L-04_DRAFT_HOVER-Mounted-Review.blend",
+      "manifest": "L-04_DRAFT_HOVER/manifest.json",
+      "design_status": "PENDING_PD",
+      "interface": "waist_0.505m",
+      "individual_reference": "NOT_SUPPLIED"
+    }
+  ]
+}

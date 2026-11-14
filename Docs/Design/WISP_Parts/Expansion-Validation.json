@@ -1,0 +1,55 @@
+{
+  "parts": {
+    "B-02_SKYWING": {
+      "standalone_and_mounted_reopened": true,
+      "module_meshes": 31,
+      "same_five_view_scale": true,
+      "common_interface_verified": true,
+      "approved_torso_scale_preserved": true,
+      "forearm_connections_verified": true,
+      "design_review": "PENDING_PD",
+      "unity": "NOT_PERFORMED"
+    },
+    "B-03_CARGO_PACK": {
+      "standalone_and_mounted_reopened": true,
+      "module_meshes": 19,
+      "same_five_view_scale": true,
+      "common_interface_verified": true,
+      "approved_torso_scale_preserved": true,
+      "forearm_connections_verified": true,
+      "design_review": "PENDING_PD",
+      "unity": "NOT_PERFORMED"
+    },
+    "L-02_BASTION_TRACK": {
+      "standalone_and_mounted_reopened": true,
+      "module_meshes": 103,
+      "same_five_view_scale": true,
+      "common_interface_verified": true,
+      "approved_torso_scale_preserved": true,
+      "forearm_connections_verified": true,
+      "design_review": "PENDING_PD",
+      "unity": "NOT_PERFORMED"
+    },
+    "L-03_TARANTULAN": {
+      "standalone_and_mounted_reopened": true,
+      "module_meshes": 57,
+      "same_five_view_scale": true,
+      "common_interface_verified": true,
+      "approved_torso_scale_preserved": true,
+      "forearm_connections_verified": true,
+      "design_review": "PENDING_PD",
+      "unity": "NOT_PERFORMED"
+    },
+    "L-04_DRAFT_HOVER": {
+      "standalone_and_mounted_reopened": true,
+      "module_meshes": 37,
+      "same_five_view_scale": true,
+      "common_interface_verified": true,
+      "approved_torso_scale_preserved": true,
+      "forearm_connections_verified": true,
+      "design_review": "PENDING_PD",
+      "unity": "NOT_PERFORMED"
+    }
+  },
+  "all_nine_original_blends_sha256_unchanged": true
+}
