@@ -8,7 +8,7 @@ public sealed partial class VoxArena
     sealed class WeaponState { public int ammo; public float reload,idle,cooldown,readyFlash; }
     sealed class WeaponProfile
     {
-        public bool isShield,isBeamShield,isUnarmed,blocksShoulderWeapons,shoulderBlocked,allowsShoulderDuplicate=true;public float partialReload=2.5f,emptyReload=4f,idleReload=2.2f,spread,blast,weight,ammoWeight;
+        public bool isShield,isBeamShield,isUnarmed,blocksShoulderWeapons,shoulderBlocked,allowsShoulderDuplicate=true;public float partialReload=2.5f,emptyReload=4f,reloadTime,idleReload=2.2f,spread,blast,weight,ammoWeight,recoil;
         public string trait="DAMAGE";public string[] additionalTraits;public float lockStrength,lockPenalty,guardReduction;
         public string name,mount;public int capacity;public float damage,interval,speed,radius,range;
         public WeaponProfile(string n,string m,int c,float d,float i,float s,float r,float distance){name=n;mount=m;blast=n=="ROCKET"?2:0;capacity=c;damage=d;interval=i;speed=s;radius=r;range=distance;}
@@ -21,7 +21,7 @@ public sealed partial class VoxArena
     };
     static WeaponProfile[] NewWeaponProfiles()
     {
-        WeaponProfile[] profiles=new WeaponProfile[Loadout.Length];for(int i=0;i<profiles.Length;i++){WeaponProfile p=Loadout[i];profiles[i]=new WeaponProfile(p.name,p.mount,p.capacity,p.damage,p.interval,p.speed,p.radius,p.range){weight=p.weight,ammoWeight=p.ammoWeight};}return profiles;
+        WeaponProfile[] profiles=new WeaponProfile[Loadout.Length];for(int i=0;i<profiles.Length;i++){WeaponProfile p=Loadout[i];profiles[i]=new WeaponProfile(p.name,p.mount,p.capacity,p.damage,p.interval,p.speed,p.radius,p.range){weight=p.weight,ammoWeight=p.ammoWeight,recoil=p.recoil};}return profiles;
     }
     WeaponProfile EquippedProfile(Fighter f)=>f.weaponProfiles[WeaponIndex(f)];
     static WeaponState[] NewWeaponStates(WeaponProfile[] profiles=null)
@@ -59,7 +59,14 @@ public sealed partial class VoxArena
     {
         for(int i=0,count=0;i<4;i++)if(!f.weaponProfiles[i].isShield&&!f.weaponProfiles[i].shoulderBlocked){if(count++==ordinal){f.weaponSlot=i+1;return;}}
     }
-    float ReloadSeconds(Fighter f)=>f.magazine<=0?EquippedProfile(f).emptyReload:EquippedProfile(f).partialReload;
+    static float ReloadSeconds(WeaponProfile profile,int remainingAmmo)
+    {
+        // New balance files use one reload duration. Keep the legacy split only for
+        // profiles created outside BalanceData, such as older isolated test fixtures.
+        if(profile.reloadTime>0)return profile.reloadTime;
+        return remainingAmmo<=0?profile.emptyReload:profile.partialReload;
+    }
+    float ReloadSeconds(Fighter f)=>ReloadSeconds(EquippedProfile(f),f.magazine);
     bool StartWeaponReload(Fighter f)
     {
         if(EquippedProfile(f).isShield||EquippedProfile(f).isUnarmed||f.reloadTime>0||f.magazine>=EquippedProfile(f).capacity)return false;
@@ -75,7 +82,7 @@ public sealed partial class VoxArena
             if(f.weaponProfiles[i].isShield||f.weaponProfiles[i].isUnarmed)continue;
             WeaponState w=f.weapons[i];w.cooldown=Mathf.Max(0,w.cooldown-dt);w.readyFlash=Mathf.Max(0,w.readyFlash-dt);w.idle+=dt;
             if(w.reload>0){w.reload=Mathf.Max(0,w.reload-dt);if(w.reload==0){w.ammo=f.weaponProfiles[i].capacity;w.readyFlash=.8f;w.idle=0;}}
-            else if(!smoke&&w.ammo<f.weaponProfiles[i].capacity&&w.idle>=f.weaponProfiles[i].idleReload)w.reload=w.ammo<=0?f.weaponProfiles[i].emptyReload:f.weaponProfiles[i].partialReload;
+            else if(!smoke&&w.ammo<f.weaponProfiles[i].capacity&&w.idle>=f.weaponProfiles[i].idleReload)w.reload=ReloadSeconds(f.weaponProfiles[i],w.ammo);
         }
     }
     void FireEquippedWeapon(Fighter f,Fighter target,Vector3 direction)
@@ -91,6 +98,11 @@ public sealed partial class VoxArena
         fired=Quaternion.Euler(0,UnityEngine.Random.Range(-spread,spread),0)*fired;
         bool guided=p.lockStrength>0&&(!HasWeaponTrait(p,"LOCK")||f!=player||targetLock);
         Shot shot=Fire(f,fired,p.damage,p.speed,p.radius,p.range,guided?p.lockStrength*p.range/Mathf.Max(1,p.speed):0,p.blast,loadoutVisual:true);
+        if(shot!=null&&f==player&&p.recoil>0)
+        {
+            cameraShakeTime=Mathf.Max(cameraShakeTime,.3f);
+            cameraShakeStrength=Mathf.Max(cameraShakeStrength,Mathf.Clamp(p.recoil,0,100)*.0012f);
+        }
         if(shot!=null)shot.visual.localScale*=1.15f; // Cosmetic size is independent of collision radius.
         PlaySound(SoundKind.Fire,f.root.position,.32f,f.weaponSlot==1?1.25f:.85f);
         if(f.magazine<=0)StartWeaponReload(f);
@@ -120,7 +132,7 @@ public sealed partial class VoxArena
             float x=x0+i*(cardW+gap);bool active=player.weaponSlot==i+1;bool unavailable=p.shoulderBlocked;
             float fraction=p.isShield?0f:p.isUnarmed?1f:p.capacity>0?Mathf.Clamp01((float)w.ammo/p.capacity):0f;
             bool reloading=w.reload>0&&!p.isShield&&!p.isUnarmed;
-            float reloadDuration=w.ammo<=0?p.emptyReload:p.partialReload;
+            float reloadDuration=ReloadSeconds(p,w.ammo);
             if(reloading)fraction=1-Mathf.Clamp01(w.reload/Mathf.Max(.01f,reloadDuration));
             Panel(new Rect(x,y,cardW,cardH),active?new Color(.035f,.18f,.23f,.98f):new Color(.035f,.065f,.09f,.88f));
             if(active)
@@ -146,6 +158,15 @@ public sealed partial class VoxArena
             player.weaponTimer=0;player.magazine=1;FireEquippedWeapon(player,enemy,Vector3.forward);
             check(player.magazine==0&&Mathf.Abs(player.reloadTime-4f)<.01f,"four-slot empty reload uses 4 seconds "+i);
         }
+        player.weaponSlot=1;player.magazine=10;player.reloadTime=0;player.weaponTimer=0;player.weaponProfiles[0].recoil=100;cameraShakeTime=cameraShakeStrength=0;
+        FireEquippedWeapon(player,enemy,Vector3.forward);
+        check(Mathf.Abs(cameraShakeTime-.3f)<.001f&&Mathf.Abs(cameraShakeStrength-.12f)<.001f,"maximum weapon recoil creates a bounded visual response after a successful shot");
+        player.weaponProfiles[0].recoil=0;player.magazine=0;player.reloadTime=0;cameraShakeTime=cameraShakeStrength=0;
+        float[] savedWeaponWeights=new float[player.weaponProfiles.Length],savedAmmoWeights=new float[player.weaponProfiles.Length];
+        for(int i=0;i<player.weaponProfiles.Length;i++){savedWeaponWeights[i]=player.weaponProfiles[i].weight;savedAmmoWeights[i]=player.weaponProfiles[i].ammoWeight;player.weaponProfiles[i].weight=player.weaponProfiles[i].ammoWeight=0;}
+        float unladenFallWeight=FallWeightFactor(player);player.weaponProfiles[0].weight=25;
+        check(Mathf.Abs(FallWeightFactor(player)-unladenFallWeight-.25f)<.001f,"weapon weight adds kilograms to the existing fall-weight factor without a loadout cap");
+        for(int i=0;i<player.weaponProfiles.Length;i++){player.weaponProfiles[i].weight=savedWeaponWeights[i];player.weaponProfiles[i].ammoWeight=savedAmmoWeights[i];}
         player.weaponSlot=1;TickWeapons(player,2.6f);check(player.weapons[0].ammo==0&&player.weapons[3].ammo==0,"all empty weapons remain unavailable before 4 seconds");
         TickWeapons(player,1.5f);check(player.weapons[0].ammo==30&&player.weapons[1].ammo==8&&player.weapons[2].ammo==12&&player.weapons[3].ammo==4,"inactive slots reload independently to their capacities");
         player.magazine=15;StartWeaponReload(player);check(Mathf.Abs(player.reloadTime-2.5f)<.01f,"partial reload uses 2.5 seconds");int n=shots.Count;FireEquippedWeapon(player,enemy,Vector3.forward);check(shots.Count==n,"reloading weapon cannot fire");

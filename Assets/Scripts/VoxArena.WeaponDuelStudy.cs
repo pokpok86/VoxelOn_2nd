@@ -102,7 +102,7 @@ public sealed partial class VoxArena
         for(int i=0;i<4;i++)
         {
             WeaponProfile profile=new WeaponProfile(source.name,Loadout[i].mount,Mathf.RoundToInt(source.Get("capacity")),source.Get("damage"),source.Get("interval"),source.Get("speed")*2f,source.Get("radius"),source.Get("range"));
-            profile.spread=source.Get("spread");profile.blast=source.Get("blast");profile.weight=source.Get("weight");profile.ammoWeight=source.Get("ammoWeight");profile.partialReload=source.Get("partialReload");profile.emptyReload=source.Get("emptyReload");profile.idleReload=source.Get("idleReload");fighter.weaponProfiles[i]=profile;fighter.weaponArtIds[i]=source.id;
+            profile.spread=source.Get("spread");profile.blast=source.Get("blast");profile.weight=source.Get("weight");profile.ammoWeight=source.Get("ammoWeight");profile.recoil=source.Get("recoil");profile.partialReload=source.Get("partialReload");profile.emptyReload=source.Get("emptyReload");profile.reloadTime=source.Get("reloadTime");profile.idleReload=source.Get("idleReload");fighter.weaponProfiles[i]=profile;fighter.weaponArtIds[i]=source.id;
         }
         fighter.weapons=NewWeaponStates(fighter.weaponProfiles);fighter.weaponSlot=1;fighter.magazine=fighter.weaponProfiles[0].capacity;fighter.reloadTime=0;fighter.weaponTimer=0;fighter.aiWeaponReadyAt=0;fighter.aiClock=0;
     }

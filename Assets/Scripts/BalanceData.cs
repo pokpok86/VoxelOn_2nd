@@ -20,7 +20,7 @@ using UnityEngine;
 [Serializable] public sealed class BalanceDesign {public string id,name,chassisId,skillId="",description="",paintColorHex="";public bool isEmpty;public string[] slots;public BalancePart[] parts;}
 [Serializable] public sealed class BalanceDocument
 {
-    public int formatVersion=5;public bool handMountDefaultsApplied;public string name="PD Balance 01",notes="",activeDesignId="DESIGN_01";public BalanceWeapon[] weapons;public BalancePart[] parts;public BalanceFrame[] frames;public BalanceDesign[] designs;
+    public int formatVersion=6;public bool handMountDefaultsApplied;public string name="PD Balance 01",notes="",activeDesignId="DESIGN_01";public BalanceWeapon[] weapons;public BalancePart[] parts;public BalanceFrame[] frames;public BalanceDesign[] designs;
 }
 [Serializable] public sealed class BalanceDeveloperPreset {public string id,name;public bool populated;public BalanceDocument snapshot;}
 [Serializable] public sealed class BalanceDeveloperPresetBank {public int formatVersion=1;public BalanceDeveloperPreset[] slots;}
@@ -116,10 +116,10 @@ public static class BalanceData
                 new BalanceNumber("capacity","탄창",capacity,1,999,"발",gun,true),new BalanceNumber("damage","공격력",damage,0,1000,"",gun),
                 new BalanceNumber("interval","발사 간격",interval,.05f,10,"초",gun),new BalanceNumber("speed","탄속도",speed,1,600,"m/s",gun),
                 new BalanceNumber("radius","탄환 크기 / 판정 반경",radius,.02f,.8f,"m",gun),new BalanceNumber("range","사거리",range,1,300,"m",gun),
-                new BalanceNumber("partialReload","잔탄 장전",partialReload,.1f,30,"초",gun),new BalanceNumber("emptyReload","빈 탄창 장전",emptyReload,.1f,30,"초",gun),
+                new BalanceNumber("partialReload","잔탄 장전 (호환)",partialReload,.1f,30,"초",false),new BalanceNumber("emptyReload","빈 탄창 장전 (호환)",emptyReload,.1f,30,"초",false),new BalanceNumber("reloadTime","재장전 시간",Mathf.Max(partialReload,emptyReload),.1f,30,"초",gun),
                 new BalanceNumber("idleReload","자동 장전 대기",2.2f,.1f,60,"초",gun),new BalanceNumber("spread","추가 탄퍼짐",0,0,20,"도",gun),new BalanceNumber("blast","피격 폭발 반경 (0=없음)",blast,0,15,"m",gun),
-                new BalanceNumber("guardReduction","정면 가드 방어율",.5f,0,1,"비율",true),new BalanceNumber("weight","무기 무게",5,0,1000,"kg",false),new BalanceNumber("ammoWeight","탄약 1발 무게",.05f,0,100,"kg",false),
-                new BalanceNumber("recoil","반동",0,0,100,"",false),new BalanceNumber("lockStrength","유도 지속 비율 (0=직진)",0,0,1,"",gun),new BalanceNumber("lockPenalty","락온 이동 페널티",0,0,1,"",gun),
+                new BalanceNumber("guardReduction","정면 가드 방어율",.5f,0,1,"비율",true),new BalanceNumber("weight","무기 무게",5,0,1000,"kg",gun||e.kind=="shield"),new BalanceNumber("ammoWeight","탄약 1발 무게",.05f,0,100,"kg",false),
+                new BalanceNumber("recoil","발사 반동",0,0,100,"%",gun),new BalanceNumber("lockStrength","유도 지속 비율 (0=직진)",0,0,1,"",gun),new BalanceNumber("lockPenalty","락온 이동 페널티",0,0,1,"",gun),
                 new BalanceNumber("energyPerShot","발사 에너지",0,0,1000,"",false),new BalanceNumber("heatPerShot","발사 발열",0,0,1000,"",false),new BalanceNumber("cooling","초당 냉각",10,0,1000,"",false),new BalanceNumber("maxHeat","과열 한계",100,1,10000,"",false)
             };
             var weapon=new BalanceWeapon{id=e.id,name=e.id.Replace('_',' '),family=e.family,kind=e.kind,icon=e.title,hands=gun,shoulders=gun&&e.id!="Military_HG"&&e.id!="Military_SMG",allowsShoulderDuplicate=true,numbers=n.ToArray()};weapon.traitIconId=DefaultWeaponTraitIcon(weapon);weapon.additionalTraitIconIds=Array.Empty<string>();
@@ -155,7 +155,7 @@ public static class BalanceData
         BalanceFrame[] frameData=frames.ToArray();
         BalancePart[] partData=parts.ToArray();BalanceDesign[] designs=DefaultDesigns(frameData);
         foreach(BalanceDesign design in designs)design.parts=CopyParts(partData);
-        return new BalanceDocument{formatVersion=5,activeDesignId="DESIGN_01",weapons=weapons.ToArray(),parts=partData,frames=frameData,designs=designs};
+        return new BalanceDocument{formatVersion=6,activeDesignId="DESIGN_01",weapons=weapons.ToArray(),parts=partData,frames=frameData,designs=designs};
     }
     public static BalancePart[] CopyParts(BalancePart[] parts)=>parts==null?null:JsonUtility.FromJson<PartArray>(JsonUtility.ToJson(new PartArray{items=parts})).items;
     [Serializable] sealed class PartArray {public BalancePart[] items;}
@@ -197,7 +197,7 @@ public static class BalanceData
     }
     public static BalanceDocument ValidateAndNormalize(BalanceDocument raw)
     {
-        if(raw==null||raw.formatVersion<1||raw.formatVersion>5)throw new InvalidDataException("지원하지 않는 설계 파일 버전입니다.");
+        if(raw==null||raw.formatVersion<1||raw.formatVersion>6)throw new InvalidDataException("지원하지 않는 설계 파일 버전입니다.");
         int sourceVersion=raw.formatVersion;
         BalanceDocument result=Defaults();
         if(raw.weapons==null||raw.parts==null||raw.frames==null||raw.weapons.Length<result.weapons.Length||raw.weapons.Length>result.weapons.Length+32||raw.parts.Length<result.parts.Length||raw.parts.Length>result.parts.Length+32||raw.frames.Length!=result.frames.Length)throw new InvalidDataException("무기·파츠·기체 목록이 누락되었거나 확장 한도를 벗어났습니다.");
@@ -289,7 +289,7 @@ public static class BalanceData
             result.activeDesignId=raw.activeDesignId;
         }
         else result.activeDesignId="DESIGN_01";
-        result.formatVersion=5;
+        result.formatVersion=6;
         return result;
     }
     static void CopyValidatedParts(BalanceDesign design,BalancePart[] input,BalancePart[] expected,HashSet<string> seen)
@@ -317,8 +317,28 @@ public static class BalanceData
     static string Text(string value,int max){if(value==null)return "";if(value.Length>max)throw new InvalidDataException("이름 또는 메모가 너무 깁니다.");return value;}
     static void Numbers(BalanceNumber[] expected,BalanceNumber[] input,string owner)
     {
-        if(input!=null&&input.Length==expected.Length-1&&expected.Any(n=>n.key=="guardReduction")&&!input.Any(n=>n!=null&&n.key=="guardReduction"))input=input.Concat(new[]{expected.First(n=>n.key=="guardReduction")}).ToArray();
-        if(input!=null&&input.Length==expected.Length-1&&expected.Any(n=>n.key=="shieldRecoverySeconds")&&!input.Any(n=>n!=null&&n.key=="shieldRecoverySeconds"))input=input.Concat(new[]{expected.First(n=>n.key=="shieldRecoverySeconds")}).ToArray();
+        if(input!=null)
+        {
+            var migrated=input.ToList();
+            AddLegacyDefault("guardReduction");
+            AddLegacyDefault("shieldRecoverySeconds");
+            if(expected.Any(n=>n.key=="reloadTime")&&!migrated.Any(n=>n!=null&&n.key=="reloadTime"))
+            {
+                BalanceNumber reload=expected.First(n=>n.key=="reloadTime");
+                BalanceNumber partial=migrated.FirstOrDefault(n=>n!=null&&n.key=="partialReload");
+                BalanceNumber empty=migrated.FirstOrDefault(n=>n!=null&&n.key=="emptyReload");
+                reload=JsonUtility.FromJson<BalanceNumber>(JsonUtility.ToJson(reload));
+                reload.value=Mathf.Max(partial?.value??reload.value,empty?.value??reload.value);
+                migrated.Add(reload);
+            }
+            input=migrated.ToArray();
+
+            void AddLegacyDefault(string key)
+            {
+                BalanceNumber fallback=expected.FirstOrDefault(n=>n.key==key);
+                if(fallback!=null&&!migrated.Any(n=>n!=null&&n.key==key))migrated.Add(JsonUtility.FromJson<BalanceNumber>(JsonUtility.ToJson(fallback)));
+            }
+        }
         if(input==null||input.Length!=expected.Length)throw new InvalidDataException(owner+": 수치 항목이 누락되었습니다.");var seen=new HashSet<string>();
         foreach(BalanceNumber n in input)
         {

@@ -181,7 +181,7 @@ public sealed partial class VoxArena
         for(int i=0;i<4;i++)
         {
             BalanceWeapon w=Array.Find(activeBalance.weapons,x=>x.id==slots[i]);WeaponProfile p=new WeaponProfile(w.name,Loadout[i].mount,(int)w.Get("capacity"),w.Get("damage"),w.Get("interval"),w.Get("speed")*2f,w.Get("radius"),w.Get("range"));
-            p.guardReduction=w.Get("guardReduction");p.weight=w.Get("weight");p.ammoWeight=w.Get("ammoWeight");p.trait=w.traitIconId;p.additionalTraits=w.additionalTraitIconIds;p.lockStrength=w.Get("lockStrength");p.lockPenalty=w.Get("lockPenalty");p.blocksShoulderWeapons=w.blocksShoulderWeapons;p.allowsShoulderDuplicate=w.allowsShoulderDuplicate;p.isShield=w.kind=="shield"||BalanceData.HasWeaponTrait(w,"SHIELD");p.isBeamShield=p.isShield&&(w.id.Contains("Holo")||w.id.Contains("BeamShield"));p.isUnarmed=w.kind=="unarmed";p.partialReload=w.Get("partialReload");p.emptyReload=w.Get("emptyReload");p.idleReload=w.Get("idleReload");p.spread=w.Get("spread");p.blast=w.Get("blast");profiles[i]=p;
+            p.guardReduction=w.Get("guardReduction");p.weight=w.Get("weight");p.ammoWeight=w.Get("ammoWeight");p.recoil=w.Get("recoil");p.trait=w.traitIconId;p.additionalTraits=w.additionalTraitIconIds;p.lockStrength=w.Get("lockStrength");p.lockPenalty=w.Get("lockPenalty");p.blocksShoulderWeapons=w.blocksShoulderWeapons;p.allowsShoulderDuplicate=w.allowsShoulderDuplicate;p.isShield=w.kind=="shield"||BalanceData.HasWeaponTrait(w,"SHIELD");p.isBeamShield=p.isShield&&(w.id.Contains("Holo")||w.id.Contains("BeamShield"));p.isUnarmed=w.kind=="unarmed";p.partialReload=w.Get("partialReload");p.emptyReload=w.Get("emptyReload");p.reloadTime=w.Get("reloadTime");p.idleReload=w.Get("idleReload");p.spread=w.Get("spread");p.blast=w.Get("blast");profiles[i]=p;
         }
         bool shoulderBlocked=profiles.Take(2).Any(p=>p.blocksShoulderWeapons&&!p.isShield&&!p.isUnarmed);
         for(int i=2;i<4;i++)profiles[i].shoulderBlocked=shoulderBlocked;
@@ -419,7 +419,8 @@ public sealed partial class VoxArena
         DrawWeaponTraitIconPicker(w);
         GUI.Label(new Rect(330,310,60,24),"메모");BalanceText(ref w.notes,new Rect(395,307,555,28),2000);
         if(balancePreviewUnavailable)GUI.Label(new Rect(980,168,270,80),"장착물 없음\n손 슬롯: 주먹 공격");else if(weaponPreviewTexture!=null)GUI.DrawTexture(new Rect(960,118,300,162),weaponPreviewTexture,ScaleMode.ScaleToFit);
-        DrawBalanceNumbers(w.id,(BalanceData.HasWeaponTrait(w,"SHIELD")||w.kind=="shield")?w.numbers.Where(n=>n.key=="guardReduction").ToArray():w.numbers.Where(n=>n.key!="guardReduction").ToArray(),new Rect(330,343,924,251));
+        BalanceNumber[] visibleWeaponNumbers=w.numbers.Where(n=>n.key!="partialReload"&&n.key!="emptyReload").ToArray();
+        DrawBalanceNumbers(w.id,(BalanceData.HasWeaponTrait(w,"SHIELD")||w.kind=="shield")?visibleWeaponNumbers.Where(n=>n.key=="guardReduction").ToArray():visibleWeaponNumbers.Where(n=>n.key!="guardReduction").ToArray(),new Rect(330,343,924,251));
         if(GUI.Button(new Rect(24,600,285,38),"+ 새 사용자 화기"))BalanceAction(CreateCustomFirearmFromEditor);
     }
     static readonly string[] balanceWeaponTraitIds={"DAMAGE","LOCK","RADAR","AREA","RAPID","RELOAD","SHIELD"};
@@ -840,7 +841,7 @@ public sealed partial class VoxArena
                 DrawLoadoutStatBar(975,432,"DAMAGE",current.Get("damage"),Mathf.Max(50,current.Get("damage")),Color.cyan);
                 DrawLoadoutStatBar(975,466,"AMMO",current.Get("capacity"),Mathf.Max(60,current.Get("capacity")),new Color(.98f,.54f,.20f));
                 DrawLoadoutStatBar(975,500,"RANGE",current.Get("range"),Mathf.Max(120,current.Get("range")),new Color(.42f,.76f,1f));
-                GUI.Label(new Rect(975,534,205,23),"RELOAD  "+current.Get("emptyReload").ToString("0.0")+" s",small);
+                    GUI.Label(new Rect(975,534,205,23),"RELOAD  "+current.Get("reloadTime").ToString("0.0")+" s",small);
             }
             else GUI.Label(new Rect(975,474,220,30),current.kind=="shield"||BalanceData.HasWeaponTrait(current,"SHIELD")?"GUARD / 우클릭 방어":"UNARMED / 주먹 공격",small);
             if(GUI.Button(new Rect(575,579,260,34),"선택 장비 옵션 편집")){balanceWeaponIndex=Mathf.Max(0,Array.FindIndex(balanceDraft.weapons,w=>w.id==current.id));balanceTab=1;balanceValueScroll=Vector2.zero;BalanceSelectPreview();}
