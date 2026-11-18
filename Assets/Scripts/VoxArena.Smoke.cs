@@ -300,7 +300,7 @@ public sealed partial class VoxArena
         {
             TestSetupSelectable(chassis,(chassis+1)%CraftCatalog.Selectable.Length);
             Check(!CanStartLockOn(player),"lock-on is not granted by chassis alone "+player.spec.name);
-            player.weaponProfiles[0].trait="LOCK";player.weaponProfiles[0].lockStrength=.6f;
+            player.weaponProfiles[0].trait="LOCK";player.weaponProfiles[0].secondaryActionId="LOCK_ON";player.weaponProfiles[0].lockStrength=.6f;
             Check(CanStartLockOn(player)&&TryAcquireTargetLock(player,enemy),"LOCK weapon can acquire on chassis "+player.spec.name);
             player.weaponProfiles[0].isShield=true;
             Check(!CanStartLockOn(player),"equipped shield suppresses manual lock on "+player.spec.name);
@@ -309,7 +309,17 @@ public sealed partial class VoxArena
         Check(CanFireSpecialWithCurrentLock(enemy),
             "HOUND special remains usable without a lock-on sensor");
         TestSetupSelectable(0,1);
-        if(wispModelSource!=null)
+        if(wispModelSource!=null&&familyRigs.TryGetValue(player,out FamilyRig activeFamilyRig))
+        {
+            bool modulesReady=activeFamilyRig.root!=null&&activeFamilyRig.body.root!=null&&activeFamilyRig.head.root!=null&&
+                activeFamilyRig.legs.root!=null&&activeFamilyRig.backpack.root!=null&&
+                activeFamilyRig.root.IsChildOf(player.body)&&player.headPart==activeFamilyRig.head.root&&
+                activeFamilyRig.head.root.IsChildOf(activeFamilyRig.upper)&&activeFamilyRig.body.root.IsChildOf(activeFamilyRig.upper)&&
+                activeFamilyRig.legs.root.IsChildOf(activeFamilyRig.root)&&activeFamilyRig.backpack.root.IsChildOf(activeFamilyRig.upper);
+            int visibleSurfaces=0;foreach(MeshRenderer surface in activeFamilyRig.root.GetComponentsInChildren<MeshRenderer>(true))if(surface.enabled&&surface.sharedMaterial!=null)visibleSurfaces++;
+            Check(modulesReady&&visibleSurfaces>0,"current modular Blender family has connected body, head, legs and backpack surfaces");
+        }
+        else if(wispModelSource!=null)
             Check(player.headPart.name=="Head"&&(IsArticulatedWisp?player.body.GetComponentInChildren<SkinnedMeshRenderer>(true)!=null:player.headPart.GetComponentInChildren<Renderer>(true)!=null)&&
                 player.legsPart.Find("Left_thigh/Left_knee/Left_ankle")!=null&&
                 player.headPart.parent==player.corePart.parent&&player.headPart.IsChildOf(player.body),
@@ -733,19 +743,46 @@ public sealed partial class VoxArena
         {
             TestSetup(i);
             if(player.spec.ShieldMax>0) { protectedFrames++; Check(player.spec.health<=300,"shield reserved for fragile frame"); }
-            Transform expectedParent=player.spec.name=="WISP"&&wispModelSource!=null&&IsArticulatedWisp?player.body.Find("WISP artist model v003/WISP_Rig_v003/Root"):player.body;
-            Check(player.headPart.parent==expectedParent&&player.corePart.parent==expectedParent&&player.armsPart.parent==expectedParent&&player.legsPart.parent==expectedParent&&player.weaponPart.IsChildOf(player.spec.name=="WISP"&&wispModelSource!=null?player.leftArm:player.rightArm),"detachable module hierarchy "+i);
+            bool hierarchyReady;
+            if(familyRigs.TryGetValue(player,out FamilyRig familyHierarchy))
+                hierarchyReady=familyHierarchy.root!=null&&familyHierarchy.root.IsChildOf(player.body)&&familyHierarchy.upper.IsChildOf(familyHierarchy.root)&&
+                    familyHierarchy.body.root.IsChildOf(familyHierarchy.upper)&&familyHierarchy.head.root.IsChildOf(familyHierarchy.upper)&&
+                    familyHierarchy.legs.root.IsChildOf(familyHierarchy.root)&&familyHierarchy.backpack.root.IsChildOf(familyHierarchy.upper)&&
+                    player.weaponPart!=null;
+            else
+            {
+                Transform expectedParent=player.spec.name=="WISP"&&wispModelSource!=null&&IsArticulatedWisp?player.body.Find("WISP artist model v003/WISP_Rig_v003/Root"):player.body;
+                hierarchyReady=player.headPart.parent==expectedParent&&player.corePart.parent==expectedParent&&player.armsPart.parent==expectedParent&&player.legsPart.parent==expectedParent&&player.weaponPart.IsChildOf(player.spec.name=="WISP"&&wispModelSource!=null?player.leftArm:player.rightArm);
+            }
+            Check(hierarchyReady,"detachable module hierarchy "+i);
             if(i==0)
             {
-                Transform head=player.headPart.Find("Helmet"),chest=player.corePart.Find("Armor chest");
-                Transform shoulder=player.rightArm.Find("Armor shoulder"),foot=null;
-                foreach(Transform part in player.leftLeg.GetComponentsInChildren<Transform>())
-                    if(part.name=="Foot") { foot=part; break; }
-                Check(head!=null&&head.localScale.x>=.75f&&head.localScale.y>=.63f&&
-                    chest!=null&&chest.localScale.x>=1.35f&&
-                    shoulder!=null&&shoulder.localScale.x>=.77f&&
-                    foot!=null&&foot.localScale.x>=.63f&&foot.localScale.z>=.91f,
-                    "Kestrel SD silhouette enlarges head, torso, shoulders and feet (head="+(head!=null?head.localScale.ToString():"missing")+" chest="+(chest!=null?chest.localScale.ToString():"missing")+" shoulder="+(shoulder!=null?shoulder.localScale.ToString():"missing")+" foot="+(foot!=null?foot.localScale.ToString():"missing")+")");
+                if(familyRigs.TryGetValue(player,out FamilyRig newFamily))
+                {
+                    Bounds Measure(Transform root)
+                    {
+                        Renderer[] renderers=root.GetComponentsInChildren<Renderer>(true);Bounds bounds=new Bounds(root.position,Vector3.zero);bool found=false;
+                        foreach(Renderer renderer in renderers)if(renderer.enabled){if(!found){bounds=renderer.bounds;found=true;}else bounds.Encapsulate(renderer.bounds);}
+                        return found?bounds:new Bounds(root.position,Vector3.zero);
+                    }
+                    Bounds head=Measure(newFamily.head.root),chest=Measure(newFamily.body.root),shoulder=Measure(newFamily.body.nodes["LeftShoulder"]);
+                    Bounds feet=new Bounds();bool hasFeet=false;
+                    foreach(FamilySupportMesh support in newFamily.supports)
+                    {
+                        Renderer renderer=support.transform.GetComponent<Renderer>();if(renderer==null||!renderer.enabled)continue;
+                        if(!hasFeet){feet=renderer.bounds;hasFeet=true;}else feet.Encapsulate(renderer.bounds);
+                    }
+                    Check(head.size.x>.15f&&head.size.y>.15f&&chest.size.x>.5f&&shoulder.size.x>.2f&&hasFeet&&feet.size.x>.2f&&feet.size.z>.2f,
+                        "Kestrel SD silhouette exposes head, torso, shoulder and foot mass in the new Blender family (head="+head.size+" chest="+chest.size+" shoulder="+shoulder.size+" feet="+feet.size+")");
+                }
+                else
+                {
+                    Transform head=player.headPart.Find("Helmet"),chest=player.corePart.Find("Armor chest");
+                    Transform shoulder=player.rightArm.Find("Armor shoulder"),foot=null;
+                    foreach(Transform part in player.leftLeg.GetComponentsInChildren<Transform>())if(part.name=="Foot"){foot=part;break;}
+                    Check(head!=null&&head.localScale.x>=.75f&&head.localScale.y>=.63f&&chest!=null&&chest.localScale.x>=1.35f&&shoulder!=null&&shoulder.localScale.x>=.77f&&foot!=null&&foot.localScale.x>=.63f&&foot.localScale.z>=.91f,
+                        "Kestrel SD silhouette enlarges head, torso, shoulders and feet (head="+(head!=null?head.localScale.ToString():"missing")+" chest="+(chest!=null?chest.localScale.ToString():"missing")+" shoulder="+(shoulder!=null?shoulder.localScale.ToString():"missing")+" foot="+(foot!=null?foot.localScale.ToString():"missing")+")");
+                }
             }
         }
         Check(protectedFrames==2,"only two light frames retain shield");
@@ -755,7 +792,20 @@ public sealed partial class VoxArena
             Check(player.spec.name==CraftCatalog.Selectable[i].name && player.selectableIndex==i,
                 "playable prototype selection "+CraftCatalog.Selectable[i].name);
             Check(framePortraits[i]!=null && framePortraits[i].IsCreated(),"prototype portrait rendered "+i);
-            if(i==0 && wispModelSource!=null)
+            if(i==0&&familyRigs.TryGetValue(player,out FamilyRig familyVisual))
+            {
+                bool connected=familyVisual.weapons[0]!=null&&familyVisual.muzzles[0]!=null&&familyVisual.weapons[0].root.IsChildOf(familyVisual.root)&&familyVisual.muzzles[0].IsChildOf(familyVisual.weapons[0].root);
+                Bounds familyBounds=new Bounds();bool hasFamilyBounds=false;
+                foreach(Renderer renderer in familyVisual.root.GetComponentsInChildren<Renderer>(true))if(renderer.enabled&&renderer.gameObject.activeInHierarchy)
+                {if(!hasFamilyBounds){familyBounds=renderer.bounds;hasFamilyBounds=true;}else familyBounds.Encapsulate(renderer.bounds);}
+                float supportBottom=float.PositiveInfinity;
+                foreach(FamilySupportMesh support in familyVisual.supports)
+                    foreach(Vector3 vertex in support.vertices)supportBottom=Mathf.Min(supportBottom,support.transform.localToWorldMatrix.MultiplyPoint3x4(vertex).y);
+                Check(connected,"current family weapon and authored muzzle remain connected to the real assembly");
+                Check(hasFamilyBounds&&familyBounds.size.y>2.7f&&familyBounds.size.y<3f,"current family assembly keeps its measured 2.81m authored scale (height="+familyBounds.size.y.ToString("F3")+")");
+                Check(!float.IsInfinity(supportBottom)&&Mathf.Abs(supportBottom-GroundSurfaceY)<.04f,"current family support vertices seat on the arena floor (minY="+supportBottom.ToString("F3")+")");
+            }
+            if(i==0 && wispModelSource!=null&&!familyRigs.ContainsKey(player))
             {
                 Transform hand=player.leftArm.Find("Left_elbow/Left_hand");
                 Transform rightHand=player.rightArm.Find("Right_elbow/Right_hand");
@@ -1089,7 +1139,7 @@ public sealed partial class VoxArena
         TestStep(4.1f);
         Check(player.magazine==30&&player.reloadTime==0,"automatic reload refills the 30-round magazine");
         ChassisChecks(Check);CombatRevisionChecks(Check);LiveWeaponLabChecks(Check);AimRevisionChecks(Check);ClimateChecks(Check);VisualEffectChecks(Check);AIRevisionChecks(Check);
-        WispOvernightChecks(Check);
+        WispOvernightChecks(Check);HandGunChecks(Check);DroneChecks(Check);AuxiliaryChecks(Check);AuthoredFxChecks(Check);DroneCombatIntegrationChecks(Check);PortraitFrameChecks(Check);CollisionBroadphaseChecks(Check);
         bool priorGalleryState=weaponGalleryOpen;weaponGalleryOpen=true;CloseWeaponGallery();Check(!weaponGalleryOpen,"weapon library BACK closes to the hangar");weaponGalleryOpen=priorGalleryState;
         bool priorTimedMode=timedFragMode;timedFragMode=true;TestSetup(0,1);StartMatchRules();
         float savedPilotHp=player.hp;player.hp=0;Check(!Finished,"timed frag continues through a pilot knockout");player.hp=savedPilotHp;

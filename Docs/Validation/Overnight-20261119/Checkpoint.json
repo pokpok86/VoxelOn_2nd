@@ -1,0 +1,18 @@
+{
+  "generatedUtc": "2026-11-18T20:50:45.023403+00:00",
+  "branch": "codex/pd-review-fixes-20261114",
+  "baseCommit": "cf7ad13b709d8591c3a4312f291a67d3d81885e0",
+  "newWorkCommitted": false,
+  "executable": "D:\\Codex\\VoxSky\\UserSettings\\CodexTaskRunner\\State\\worktrees\\PD-REVIEW-FIXES-20261114\\Builds\\Windows\\Voxel-On.exe",
+  "buildLog": "Logs/UIReview-Iter14-Build3.log",
+  "buildPassBytes": 281071450,
+  "smokeLog": "Logs/UIReview-Iter14-Smoke3.log",
+  "smokeChecks": 693,
+  "pdBalanceSha256": "affe89d0acd63be681b56c20c10e0567c9b98e9659a33d147210216c62682e80",
+  "uiEvidence": "Docs/Validation/Overnight-20261119/Iteration14",
+  "manualScope": "1280x720 customization arrows, rotation, backpack-dependent tabs, auxiliary equip, weapon editor/close; brief debug-fixture attack-drone deployment. Not complete balance or normal-camera play approval.",
+  "completedUtc": "2026-11-18T21:00:35.318030+00:00",
+  "automationDeleted": true,
+  "finalIntegrityFiles": 246,
+  "finalIntegrityMismatches": 0
+}

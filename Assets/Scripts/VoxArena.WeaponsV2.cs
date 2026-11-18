@@ -9,8 +9,8 @@ public sealed partial class VoxArena
     sealed class WeaponProfile
     {
         public bool isShield,isBeamShield,isUnarmed,blocksShoulderWeapons,shoulderBlocked,allowsShoulderDuplicate=true;public float partialReload=2.5f,emptyReload=4f,reloadTime,idleReload=2.2f,spread,blast,weight,ammoWeight,recoil;
-        public string trait="DAMAGE";public string[] additionalTraits;public float lockStrength,lockPenalty,guardReduction;
-        public string name,mount;public int capacity;public float damage,interval,speed,radius,range;
+        public string trait="DAMAGE",secondaryActionId="NONE";public string[] additionalTraits;public float lockStrength,lockPenalty,guardReduction;
+        public string weaponId="",name,mount;public int capacity;public float damage,interval,speed,radius,range;
         public WeaponProfile(string n,string m,int c,float d,float i,float s,float r,float distance){name=n;mount=m;blast=n=="ROCKET"?2:0;capacity=c;damage=d;interval=i;speed=s;radius=r;range=distance;}
     }
     static readonly WeaponProfile[] Loadout={
@@ -95,14 +95,26 @@ public sealed partial class VoxArena
         f.magazine--;f.shotIdleTime=0;
         Vector3 fired=AssistAim(f,target,direction);
         float spread=(f.spec.aimSpreadDegrees+p.spread)/Mathf.Max(.2f,f.weaponSlot%2==1?f.spec.leftArmStability:f.spec.rightArmStability);
-        fired=Quaternion.Euler(0,UnityEngine.Random.Range(-spread,spread),0)*fired;
-        bool guided=p.lockStrength>0&&(!HasWeaponTrait(p,"LOCK")||f!=player||targetLock);
-        Shot shot=Fire(f,fired,p.damage,p.speed,p.radius,p.range,guided?p.lockStrength*p.range/Mathf.Max(1,p.speed):0,p.blast,loadoutVisual:true);
-        if(shot!=null&&f==player&&p.recoil>0)
+        bool stable=GunSteady(f);if(stable)spread*=.35f;
+        fired=Quaternion.Euler(UnityEngine.Random.Range(-spread,spread),UnityEngine.Random.Range(-spread,spread),0)*fired;
+        Shot shot=null;string id=p.weaponId;
+        if(id=="Future_Beam")
         {
-            cameraShakeTime=Mathf.Max(cameraShakeTime,.3f);
-            cameraShakeStrength=Mathf.Max(cameraShakeStrength,Mathf.Clamp(p.recoil,0,100)*.0012f);
+            Shot pulse=Fire(f,fired,p.damage,p.speed,Mathf.Min(.10f,p.radius),p.range,loadoutVisual:true,projectileSource:auxiliaryProjectileSources[1],projectileVisualScale:2.5f);
+            if(pulse!=null){pulse.weaponId=id;ApplyGunRecoil(f,p,fired,stable);}PlaySound(SoundKind.Laser,f.root.position,.4f);if(f.magazine<=0)StartWeaponReload(f);return;
         }
+        int pellets=id=="Military_SG"||id=="Future_Shotgun"?7:id=="Military_FL"?3:1;
+        float range=id=="Military_FL"?Mathf.Min(p.range,14):p.range;
+        float blast=p.blast;if(id=="Military_GL"&&blast<=0)blast=2;
+        bool guided=p.lockStrength>0&&(p.secondaryActionId!="LOCK_ON"||f!=player||targetLock);
+        for(int pellet=0;pellet<pellets;pellet++)
+        {
+            Vector3 directionPart=pellet==0?fired:Quaternion.AngleAxis((pellet-1)*60, fired)*Quaternion.AngleAxis(stable?3:6,Vector3.Cross(fired,Vector3.up).sqrMagnitude>.001f?Vector3.Cross(fired,Vector3.up):Vector3.right)*fired;
+            bool missile=id=="Military_RL"||id=="Future_Launcher";int art=id=="Military_SR"||id=="Future_Sniper"?3:id=="Military_GL"?1:0;
+            Shot emitted=Fire(f,directionPart,p.damage/pellets,p.speed,p.radius,range,guided?p.lockStrength*p.range/Mathf.Max(1,p.speed):0,blast,loadoutVisual:true,projectileSource:missile?auxiliaryProjectileSources[0]:null,projectileVisualScale:missile?Mathf.Clamp(p.radius/.12f,.75f,2.3f):1,projectileArtSlot:string.IsNullOrEmpty(id)?-1:art,muzzleEffect:pellet==0,missile:missile);
+            if(emitted!=null){emitted.gravity=id=="Military_GL"?9.81f:0;emitted.weaponId=id;emitted.isMissile=id=="Military_RL"||id=="Future_Launcher";AttachMissileExhaust(emitted);if(shot==null)shot=emitted;}
+        }
+        if(shot!=null)ApplyGunRecoil(f,p,fired,stable);
         if(shot!=null)shot.visual.localScale*=1.15f; // Cosmetic size is independent of collision radius.
         PlaySound(SoundKind.Fire,f.root.position,.32f,f.weaponSlot==1?1.25f:.85f);
         if(f.magazine<=0)StartWeaponReload(f);
@@ -128,8 +140,10 @@ public sealed partial class VoxArena
         const float x0=18,y=644,cardW=88,cardH=66,gap=4;
         for(int i=0;i<4;i++)
         {
+            if(i>=2&&DrawAuxiliaryHud(i,new Rect(x0+i*(cardW+gap),y,cardW,cardH)))continue;
+            if(i==2&&droneRuntime.ContainsKey(player)){DrawDroneHud(i,new Rect(x0+i*(cardW+gap),y,cardW,cardH));continue;}
             WeaponState w=player.weapons[i];WeaponProfile p=player.weaponProfiles[i];
-            float x=x0+i*(cardW+gap);bool active=player.weaponSlot==i+1;bool unavailable=p.shoulderBlocked;
+            float x=x0+i*(cardW+gap);bool active=player.weaponSlot==i+1&&!AuxSelected(player);bool unavailable=p.shoulderBlocked;
             float fraction=p.isShield?0f:p.isUnarmed?1f:p.capacity>0?Mathf.Clamp01((float)w.ammo/p.capacity):0f;
             bool reloading=w.reload>0&&!p.isShield&&!p.isUnarmed;
             float reloadDuration=ReloadSeconds(p,w.ammo);
@@ -154,9 +168,20 @@ public sealed partial class VoxArena
         for(int i=0;i<4;i++)
         {
             player.weaponSlot=i+1;int count=shots.Count,ammo=player.magazine;FireEquippedWeapon(player,enemy,Vector3.forward);
-            check(player.magazine==ammo-1&&shots.Count==count+1,"four-slot live shot spends independent ammo "+i);
-            player.weaponTimer=0;player.magazine=1;FireEquippedWeapon(player,enemy,Vector3.forward);
-            check(player.magazine==0&&Mathf.Abs(player.reloadTime-4f)<.01f,"four-slot empty reload uses 4 seconds "+i);
+            if(i>=2&&BackpackWeaponMountsPending)
+            {
+                check(player.weaponProfiles[i].isUnarmed&&player.weaponProfiles[i].shoulderBlocked&&player.magazine==0&&shots.Count==count,
+                    "pending shoulder slot remains explicitly empty and cannot fire "+i);
+                player.weaponTimer=0;
+                check(player.weapons[i].ammo==0&&player.weaponProfiles[i].capacity==0,
+                    "pending shoulder slot has no ammunition or reloadable capacity "+i);
+            }
+            else
+            {
+                check(player.magazine==ammo-1&&shots.Count==count+1,"four-slot live shot spends independent ammo "+i);
+                player.weaponTimer=0;player.magazine=1;FireEquippedWeapon(player,enemy,Vector3.forward);
+                check(player.magazine==0&&Mathf.Abs(player.reloadTime-4f)<.01f,"four-slot empty reload uses 4 seconds "+i);
+            }
         }
         player.weaponSlot=1;player.magazine=10;player.reloadTime=0;player.weaponTimer=0;player.weaponProfiles[0].recoil=100;cameraShakeTime=cameraShakeStrength=0;
         FireEquippedWeapon(player,enemy,Vector3.forward);
@@ -167,8 +192,18 @@ public sealed partial class VoxArena
         float unladenFallWeight=FallWeightFactor(player);player.weaponProfiles[0].weight=25;
         check(Mathf.Abs(FallWeightFactor(player)-unladenFallWeight-.25f)<.001f,"weapon weight adds kilograms to the existing fall-weight factor without a loadout cap");
         for(int i=0;i<player.weaponProfiles.Length;i++){player.weaponProfiles[i].weight=savedWeaponWeights[i];player.weaponProfiles[i].ammoWeight=savedAmmoWeights[i];}
-        player.weaponSlot=1;TickWeapons(player,2.6f);check(player.weapons[0].ammo==0&&player.weapons[3].ammo==0,"all empty weapons remain unavailable before 4 seconds");
-        TickWeapons(player,1.5f);check(player.weapons[0].ammo==30&&player.weapons[1].ammo==8&&player.weapons[2].ammo==12&&player.weapons[3].ammo==4,"inactive slots reload independently to their capacities");
+        for(int i=0;i<2;i++)
+        {
+            player.weaponSlot=i+1;player.magazine=0;player.reloadTime=0;player.weaponTimer=0;
+            check(StartWeaponReload(player)&&Mathf.Abs(player.reloadTime-4f)<.01f,"active hand slot starts its own 4-second empty reload "+i);
+        }
+        player.weaponSlot=1;TickWeapons(player,2.6f);check(player.weapons[0].ammo==0&&player.weapons[1].ammo==0&&player.weapons[2].ammo==0&&player.weapons[3].ammo==0,"all live empty weapons remain unavailable before 4 seconds");
+        TickWeapons(player,1.5f);
+        if(BackpackWeaponMountsPending)
+            check(player.weapons[0].ammo==30&&player.weapons[1].ammo==8&&player.weapons[2].ammo==0&&player.weapons[3].ammo==0&&player.weaponProfiles[2].shoulderBlocked&&player.weaponProfiles[3].shoulderBlocked,
+                "active hand slots reload independently while pending shoulders stay empty (ammo="+player.weapons[0].ammo+","+player.weapons[1].ammo+" timers="+player.weapons[0].reload.ToString("F2")+","+player.weapons[1].reload.ToString("F2")+")");
+        else
+            check(player.weapons[0].ammo==30&&player.weapons[1].ammo==8&&player.weapons[2].ammo==12&&player.weapons[3].ammo==4,"inactive slots reload independently to their capacities");
         player.magazine=15;StartWeaponReload(player);check(Mathf.Abs(player.reloadTime-2.5f)<.01f,"partial reload uses 2.5 seconds");int n=shots.Count;FireEquippedWeapon(player,enemy,Vector3.forward);check(shots.Count==n,"reloading weapon cannot fire");
         player.weaponSlot=2;FireEquippedWeapon(player,enemy,Vector3.forward);check(shots.Count==n+1&&player.weapons[0].reload>0,"another weapon can fire while first weapon reloads");
         float health=player.hp;player.hp=1;float d=Loadout[0].damage;check(Mathf.Abs(d-16.1f)<.001f&&Loadout[0].interval>.27f,"trial weapon damage/frequency are explicit and do not depend on low HP");player.hp=health;

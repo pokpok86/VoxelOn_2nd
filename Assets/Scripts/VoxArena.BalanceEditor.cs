@@ -50,7 +50,7 @@ public sealed partial class VoxArena
         int index=Array.FindIndex(balanceDraft.designs,d=>d.id==balanceDraft.activeDesignId&&!d.isEmpty&&d.chassisId==chassis);
         if(index<0)index=Array.FindIndex(balanceDraft.designs,d=>!d.isEmpty&&d.chassisId==chassis);
         balanceEditorOpen=true;showTuning=weaponGalleryOpen=false;
-        if(balanceTab==3||balanceTab==4)balanceTab=0;
+        balanceTab=6;
         if(index>=0)SelectCustomizationDesign(index);
         BalanceSelectPreview();if(!balanceIconsRequested){balanceIconsRequested=true;StartCoroutine(CacheBalanceWeaponIcons());}
     }
@@ -113,6 +113,7 @@ public sealed partial class VoxArena
     void BalanceSelectPreview()
     {
         if(balanceDraft==null)return;
+        RenderPortraitFrame(balanceFrameIndex,true,balanceTab!=6);
         if(balanceTab==0){BalanceMountPreview();return;}
         if(balanceTab!=1||balanceWeaponIndex<0||balanceWeaponIndex>=balanceDraft.weapons.Length)return;
         BalanceWeaponPreview(balanceDraft.weapons[balanceWeaponIndex]);
@@ -137,7 +138,9 @@ public sealed partial class VoxArena
     void ApplyBalanceParts(Fighter f)
     {
         f.headVisualId="HEAD_STANDARD";f.coreVisualId="CORE_STANDARD";f.leftArmVisualId=f.rightArmVisualId="ARM_STANDARD";f.legsVisualId="LEGS_STANDARD";f.boosterVisualId="BOOSTER_TWIN";
-        if(activeBalance==null||f.selectableIndex<0)return;
+        if(f.selectableIndex<0)return;
+        f.spec.armor=0f;
+        if(activeBalance==null)return;
         BalancePart[] parts=activeBalance.parts;
         bool designPreview=f.root!=null&&f.root.name=="Portrait studio robot";
         if(f==player||designPreview){BalanceDesign selected=Array.Find(activeBalance.designs,x=>x.id==activeBalance.activeDesignId&&x.chassisId==f.spec.name);if(selected!=null)parts=selected.parts;}
@@ -155,6 +158,8 @@ public sealed partial class VoxArena
         if(booster!=null)f.boosterVisualId=BalanceData.NormalizePartVisualId(booster,booster.visualId);
         foreach(BalancePart part in parts)if(part.frame==f.spec.name)foreach(BalanceNumber n in part.numbers)if(n.implemented)
             typeof(CraftSpec).GetField(n.key).SetValue(f.spec,n.value);
+        // Keep legacy armor values serialized, but don't apply damage reduction to current selectable frames.
+        f.spec.armor=0f;
     }
     void ApplyBalanceDesignPaint(Fighter f)
     {
@@ -180,8 +185,8 @@ public sealed partial class VoxArena
         f.weaponArtIds=(string[])slots.Clone();
         for(int i=0;i<4;i++)
         {
-            BalanceWeapon w=Array.Find(activeBalance.weapons,x=>x.id==slots[i]);WeaponProfile p=new WeaponProfile(w.name,Loadout[i].mount,(int)w.Get("capacity"),w.Get("damage"),w.Get("interval"),w.Get("speed")*2f,w.Get("radius"),w.Get("range"));
-            p.guardReduction=w.Get("guardReduction");p.weight=w.Get("weight");p.ammoWeight=w.Get("ammoWeight");p.recoil=w.Get("recoil");p.trait=w.traitIconId;p.additionalTraits=w.additionalTraitIconIds;p.lockStrength=w.Get("lockStrength");p.lockPenalty=w.Get("lockPenalty");p.blocksShoulderWeapons=w.blocksShoulderWeapons;p.allowsShoulderDuplicate=w.allowsShoulderDuplicate;p.isShield=w.kind=="shield"||BalanceData.HasWeaponTrait(w,"SHIELD");p.isBeamShield=p.isShield&&(w.id.Contains("Holo")||w.id.Contains("BeamShield"));p.isUnarmed=w.kind=="unarmed";p.partialReload=w.Get("partialReload");p.emptyReload=w.Get("emptyReload");p.reloadTime=w.Get("reloadTime");p.idleReload=w.Get("idleReload");p.spread=w.Get("spread");p.blast=w.Get("blast");profiles[i]=p;
+            BalanceWeapon w=Array.Find(activeBalance.weapons,x=>x.id==slots[i]);if(RetiredShieldId(w.id)){w=Array.Find(activeBalance.weapons,x=>x.id=="UNARMED");f.weaponArtIds[i]="UNARMED";}WeaponProfile p=new WeaponProfile(w.name,Loadout[i].mount,(int)w.Get("capacity"),w.Get("damage"),w.Get("interval"),w.Get("speed")*2f,w.Get("radius"),w.Get("range"));
+            p.weaponId=w.id;p.guardReduction=w.Get("guardReduction");p.weight=w.Get("weight");p.ammoWeight=w.Get("ammoWeight");p.recoil=w.Get("recoil");p.trait=w.traitIconId;p.additionalTraits=w.additionalTraitIconIds;p.secondaryActionId=GunSecondaryAction(w);p.lockStrength=w.Get("lockStrength");p.lockPenalty=w.Get("lockPenalty");p.blocksShoulderWeapons=w.blocksShoulderWeapons;p.allowsShoulderDuplicate=w.allowsShoulderDuplicate;p.isShield=w.kind=="shield";p.isBeamShield=p.isShield&&(w.id.Contains("Holo")||w.id.Contains("BeamShield"));p.isUnarmed=w.kind=="unarmed";p.partialReload=w.Get("partialReload");p.emptyReload=w.Get("emptyReload");p.reloadTime=w.Get("reloadTime");p.idleReload=w.Get("idleReload");p.spread=w.Get("spread");p.blast=w.Get("blast");profiles[i]=p;
         }
         bool shoulderBlocked=profiles.Take(2).Any(p=>p.blocksShoulderWeapons&&!p.isShield&&!p.isUnarmed);
         for(int i=2;i<4;i++)profiles[i].shoulderBlocked=shoulderBlocked;
@@ -238,7 +243,7 @@ public sealed partial class VoxArena
             Text(28,17,700,"VOXEL-ON  /  HANGAR CUSTOMIZATION",new GUIStyle(GUI.skin.label){fontSize=27,fontStyle=FontStyle.Bold});
             Text(30,55,720,"FRAME  /  WEAPON & PARTS WORKSHOP",small);
             if(GUI.Button(new Rect(1144,20,112,36),"닫기 / ESC")){balanceEditorOpen=false;return;}
-            string[] tabs={"장착","무기 옵션","파츠 수치","스킬 선택","신형 외형"};
+            string[] tabs={"장착","무기 옵션","파츠 수치","스킬 선택","파츠 외형"};
             int[] tabIds={0,1,2,5,6};
             for(int i=0;i<tabs.Length;i++)
             {
@@ -246,38 +251,39 @@ public sealed partial class VoxArena
                 if(GUI.Button(new Rect(365+i*142,58,134,34),tabs[i])){balanceTab=tabIds[i];balanceListScroll=balanceValueScroll=Vector2.zero;BalanceSelectPreview();}
             }
             GUI.backgroundColor=Color.white;
-            Panel(new Rect(20,104,328,550),new Color(.035f,.055f,.080f));
+            Panel(new Rect(20,104,balanceTab==6?650:328,550),new Color(.035f,.055f,.080f));
             Panel(new Rect(20,104,4,550),new Color(1f,.40f,.09f));
             string frameName=balanceFrameIndex>=0&&balanceFrameIndex<balanceDraft.frames.Length?balanceDraft.frames[balanceFrameIndex].id:"WISP";
             int designIndex=Array.FindIndex(balanceDraft.designs,x=>x.id==balanceDraft.activeDesignId);if(designIndex<0)designIndex=0;
             BalanceDesign activeDesign=EditingDesign();Text(40,112,286,(designIndex+1).ToString("00")+" / "+(activeDesign!=null&&activeDesign.isEmpty?"빈 슬롯":frameName),label);
-            Rect previewRect=new Rect(36,145,296,420);
+            Rect previewRect=balanceTab==6?new Rect(36,145,618,456):new Rect(36,145,296,420);
             if(activeDesign!=null&&activeDesign.isEmpty)
             {
                 Panel(previewRect,new Color(.045f,.075f,.10f));GUI.Label(new Rect(63,319,242,70),"비어 있는 설계\n기체를 선택해 구성하세요.",new GUIStyle(GUI.skin.label){fontSize=18,alignment=TextAnchor.MiddleCenter,wordWrap=true});
             }
             else
             {
-                if(customizationPortraits!=null&&balanceFrameIndex>=0&&balanceFrameIndex<customizationPortraits.Length&&customizationPortraits[balanceFrameIndex]!=null)GUI.DrawTexture(previewRect,customizationPortraits[balanceFrameIndex],ScaleMode.ScaleToFit,true);
-                DrawBalanceSelectionHighlight(previewRect);Text(42,570,270,"기체를 클릭한 채 좌우로 움직여 회전",small);
+                RenderTexture[] previewTextures=balanceTab==6?customizationPortraits:compactCustomizationPortraits;
+                if(previewTextures!=null&&balanceFrameIndex>=0&&balanceFrameIndex<previewTextures.Length&&previewTextures[balanceFrameIndex]!=null)GUI.DrawTexture(previewRect,previewTextures[balanceFrameIndex],ScaleMode.ScaleToFit,true);
+                DrawBalanceSelectionHighlight(previewRect);Text(42,balanceTab==6?613:570,balanceTab==6?580:270,"기체를 클릭한 채 좌우로 움직여 회전",small);
                 Event ev=Event.current;
                 if(ev.type==EventType.MouseDown&&previewRect.Contains(ev.mousePosition)){balancePreviewDragging=true;ev.Use();}
-                else if(ev.type==EventType.MouseDrag&&balancePreviewDragging){balancePreviewYaw+=ev.delta.x*.65f;if(Time.unscaledTime-balancePreviewLastRenderTime>=.02f){portraitYaw=balancePreviewYaw;RenderPortraitFrame(balanceFrameIndex);RenderPortraitFrame(balanceFrameIndex,true);balancePreviewLastRenderTime=Time.unscaledTime;}ev.Use();}
-                else if(ev.type==EventType.MouseUp&&balancePreviewDragging){balancePreviewDragging=false;portraitYaw=balancePreviewYaw;RenderPortraitFrame(balanceFrameIndex);RenderPortraitFrame(balanceFrameIndex,true);ev.Use();}
+                else if(ev.type==EventType.MouseDrag&&balancePreviewDragging){balancePreviewYaw+=ev.delta.x*.65f;if(Time.unscaledTime-balancePreviewLastRenderTime>=.02f){portraitYaw=balancePreviewYaw;RenderPortraitFrame(balanceFrameIndex);RenderPortraitFrame(balanceFrameIndex,true,balanceTab!=6);balancePreviewLastRenderTime=Time.unscaledTime;}ev.Use();}
+                else if(ev.type==EventType.MouseUp&&balancePreviewDragging){balancePreviewDragging=false;portraitYaw=balancePreviewYaw;RenderPortraitFrame(balanceFrameIndex);RenderPortraitFrame(balanceFrameIndex,true,balanceTab!=6);ev.Use();}
             }
             GUI.backgroundColor=Color.white;
-            Panel(new Rect(360,106,896,488),new Color(.035f,.055f,.080f));
-            GUI.Label(new Rect(383,101,160,28),"설정 이름");BalanceText(ref balanceDraft.name,new Rect(476,99,245,28),80);
-            GUI.Label(new Rect(760,101,475,28),balanceTab==4?"개발 전용 · 10개 실험 슬롯":"양손 · 양어깨 장착 / 개별 수치 조정",new GUIStyle(GUI.skin.label){fontSize=14});
+            Panel(new Rect(balanceTab==6?684:360,106,balanceTab==6?572:896,balanceTab==6?550:488),new Color(.035f,.055f,.080f));
+            if(balanceTab!=6){GUI.Label(new Rect(383,101,160,28),"설정 이름");BalanceText(ref balanceDraft.name,new Rect(476,99,245,28),80);}
+            if(balanceTab!=6)GUI.Label(new Rect(760,101,475,28),balanceTab==4?"개발 전용 · 10개 실험 슬롯":"무기·파츠 / 개별 수치 조정",new GUIStyle(GUI.skin.label){fontSize=14});
             bool activeDesignEmpty=EditingDesign()?.isEmpty==true;
             Matrix4x4 oldMatrix=GUI.matrix;
-            if(balanceTab!=6)GUI.matrix=Matrix4x4.TRS(new Vector3(684,120,0),Quaternion.identity,new Vector3(.70f,.70f,1f))*oldMatrix;
+            if(balanceTab!=6)GUI.matrix=oldMatrix*Matrix4x4.TRS(new Vector3(360,120,0),Quaternion.identity,new Vector3(.70f,.70f,1f));
             if(activeDesignEmpty&&balanceTab!=0)GUI.Label(new Rect(382,146,820,70),"현재 슬롯은 비어 있습니다. [장착]에서 WISP, BASTION, TARANTULA 중 기체를 골라 설계를 만드세요.",new GUIStyle(GUI.skin.label){fontSize=17,wordWrap=true});
             else if(balanceTab==0)DrawUnifiedCustomization();else if(balanceTab==1)DrawBalanceWeapons();else if(balanceTab==2)DrawBalanceParts();else if(balanceTab==4)DrawDeveloperPresets();else if(balanceTab==5)DrawBalanceSkills();else if(balanceTab==6)DrawFamilyArtOptions();else DrawBalanceFiles();
             GUI.matrix=oldMatrix;
-            Text(372,602,875,balanceMessage,new GUIStyle(small){wordWrap=true});
-            Text(372,630,875,balanceTab==4?"실험 프리셋 파일: "+DeveloperPresetsPath():"파일: "+BalanceDirectory+Path.DirectorySeparatorChar+balanceFileName+".json",small);
-            Text(372,670,875,"변경사항 즉시 적용 · 자동 저장",small);
+            Text(balanceTab==6?32:372,balanceTab==6?663:602,balanceTab==6?620:875,balanceMessage,new GUIStyle(small){wordWrap=true});
+            if(balanceTab!=6)Text(372,630,875,balanceTab==4?"실험 프리셋 파일: "+DeveloperPresetsPath():"파일: "+BalanceDirectory+Path.DirectorySeparatorChar+balanceFileName+".json",small);
+            if(balanceTab!=6)Text(372,670,875,"변경사항 즉시 적용 · 자동 저장",small);
         }
         finally{GUI.skin.font=previous;GUI.backgroundColor=Color.white;}
     }
@@ -390,9 +396,11 @@ public sealed partial class VoxArena
     }    void DrawBalanceWeapons()
     {
         balanceListScroll=GUI.BeginScrollView(new Rect(24,118,285,475),balanceListScroll,new Rect(0,0,258,balanceDraft.weapons.Length*35));
+        int visibleRow=0;
+        if(balanceWeaponIndex<0||balanceWeaponIndex>=balanceDraft.weapons.Length||!HandWeaponAvailable(balanceDraft.weapons[balanceWeaponIndex]))balanceWeaponIndex=Array.FindIndex(balanceDraft.weapons,HandWeaponAvailable);
         for(int i=0;i<balanceDraft.weapons.Length;i++)
         {
-            BalanceWeapon item=balanceDraft.weapons[i];Rect row=new Rect(0,i*35,255,31);
+            BalanceWeapon item=balanceDraft.weapons[i];if(!HandWeaponAvailable(item))continue;Rect row=new Rect(0,visibleRow++*35,255,31);
             if(GUI.Button(row,GUIContent.none)){balanceWeaponIndex=i;balanceValueScroll=Vector2.zero;BalanceSelectPreview();}
             Texture2D icon=balanceWeaponIcons.TryGetValue(item.id,out Texture2D cached)?cached:item.id.StartsWith("CUSTOM_",StringComparison.Ordinal)&&balanceWeaponIcons.TryGetValue("Military_AR",out Texture2D rifleIcon)?rifleIcon:null;
             if(icon!=null)GUI.DrawTexture(new Rect(row.x+4,row.y+1,45,29),icon,ScaleMode.ScaleToFit,true);
@@ -401,34 +409,37 @@ public sealed partial class VoxArena
             GUI.Label(new Rect(row.x+75,row.y+3,row.width-79,25),(i==balanceWeaponIndex?"> ":"")+item.name,new GUIStyle(GUI.skin.label){fontSize=16,alignment=TextAnchor.MiddleLeft});
         }
         GUI.EndScrollView();BalanceWeapon w=balanceDraft.weapons[balanceWeaponIndex];
-        GUI.Label(new Rect(330,118,650,25),w.id+" / "+w.family+(BalanceData.HasWeaponTrait(w,"SHIELD")||w.kind=="shield"?" / 방패·우클릭 가드":w.kind=="firearm"?" / 사격 무기":w.kind=="unarmed"?" / 빈 손은 주먹 공격":" / 외형·수치 보관 (장착 준비 전)"));
+        GUI.Label(new Rect(330,118,650,25),w.id+" / "+w.family+(w.kind=="shield"?" / 방패·우클릭 가드":w.kind=="firearm"?" / 사격 무기":w.kind=="unarmed"?" / 빈 손은 주먹 공격":" / 외형·수치 보관 (장착 준비 전)"));
         GUI.Label(new Rect(330,151,90,25),"이름");BalanceText(ref w.name,new Rect(420,148,530,29),80);
         GUI.Label(new Rect(330,186,90,25),"특성 이름");BalanceText(ref w.icon,new Rect(420,183,530,29),40);
         GUI.Label(new Rect(330,222,90,26),"장착 위치");
-        if(w.kind=="firearm"&&!BalanceData.HasWeaponTrait(w,"SHIELD"))
+        if(w.kind=="firearm")
         {
-            int mount=w.shoulders?1:0;
-            int next=GUI.SelectionGrid(new Rect(420,222,320,28),mount,new[]{"손 전용","어깨 전용"},2);
-            if(next!=mount){w.hands=next==0;w.shoulders=next==1;w.left=w.right=true;balanceDirty=true;}
+            GUI.Label(new Rect(420,222,530,26),"양손 총기 · 어깨 무장 준비 중");
         }
-        else GUI.Label(new Rect(420,222,400,26),w.kind=="unarmed"?"미장착":"손 전용");
-        bool mayDuplicate=GUI.Toggle(new Rect(754,222,240,24),w.allowsShoulderDuplicate,"양쪽 어깨 중복 착용");
-        if(mayDuplicate!=w.allowsShoulderDuplicate){w.allowsShoulderDuplicate=mayDuplicate;balanceDirty=true;}
-        bool blocksShoulder=w.kind=="firearm"&&GUI.Toggle(new Rect(754,246,300,24),w.blocksShoulderWeapons,"장착 중 어깨 무장 사용 불가");
-        if(w.kind=="firearm"&&blocksShoulder!=w.blocksShoulderWeapons){w.blocksShoulderWeapons=blocksShoulder;balanceDirty=true;}
+        else GUI.Label(new Rect(420,222,400,26),"미장착");
         DrawWeaponTraitIconPicker(w);
+        if(w.kind=="firearm")
+        {
+            string[] actions={"정밀 사격","락온","고정 포격"};string[] ids={"FOCUS","LOCK_ON","BRACE"};
+            int action=Array.IndexOf(ids,GunSecondaryAction(w));int nextAction=GUI.SelectionGrid(new Rect(962,286,280,25),Mathf.Max(0,action),actions,3);
+            if(nextAction!=action){w.secondaryActionId=ids[nextAction];balanceDirty=true;}
+
+        }
+        else GUI.Label(new Rect(962,286,280,22),w.kind=="shield"?"우클릭 동작: 가드":"우클릭 동작: 없음",small);
         GUI.Label(new Rect(330,310,60,24),"메모");BalanceText(ref w.notes,new Rect(395,307,555,28),2000);
+        string[] weaponFunctions=w.specialFunctionIds??Array.Empty<string>();GUI.Label(new Rect(330,286,620,20),"고유 기능 ID · 미지정 수치는 원본 보존 / 새 효과 미적용: "+(weaponFunctions.Length==0?"없음":string.Join(", ",weaponFunctions)),small);
         if(balancePreviewUnavailable)GUI.Label(new Rect(980,168,270,80),"장착물 없음\n손 슬롯: 주먹 공격");else if(weaponPreviewTexture!=null)GUI.DrawTexture(new Rect(960,118,300,162),weaponPreviewTexture,ScaleMode.ScaleToFit);
-        BalanceNumber[] visibleWeaponNumbers=w.numbers.Where(n=>n.key!="partialReload"&&n.key!="emptyReload").ToArray();
-        DrawBalanceNumbers(w.id,(BalanceData.HasWeaponTrait(w,"SHIELD")||w.kind=="shield")?visibleWeaponNumbers.Where(n=>n.key=="guardReduction").ToArray():visibleWeaponNumbers.Where(n=>n.key!="guardReduction").ToArray(),new Rect(330,343,924,251));
+        GUI.Label(new Rect(330,330,920,20),"기본 수치 · 우클릭 동작과 고유 기능 값은 별도 데이터로 보존",small);
+        DrawBalanceNumbers(w.id,BalanceData.EditableWeaponBaseStats(w),new Rect(330,351,924,243));
         if(GUI.Button(new Rect(24,600,285,38),"+ 새 사용자 화기"))BalanceAction(CreateCustomFirearmFromEditor);
     }
     static readonly string[] balanceWeaponTraitIds={"DAMAGE","LOCK","RADAR","AREA","RAPID","RELOAD","SHIELD"};
     static string WeaponTraitLabel(string id)=>id=="DAMAGE"?"DMG":id=="LOCK"?"LOCK":id=="RADAR"?"RADAR":id=="AREA"?"AREA":id=="RAPID"?"RATE":id=="RELOAD"?"LOAD":id=="JUMP"?"JUMP":"GUARD";
-    static string BalanceTraitMeaning(string id)=>id=="DAMAGE"?"공격 피해 관련":id=="LOCK"?"우클릭 락온 · 유도 지속 비율 0이면 직진":id=="RADAR"?"탐지·레이더 관련":id=="AREA"?"범위 공격 관련":id=="RAPID"?"연사 속도 관련":id=="RELOAD"?"재장전 관련":id=="JUMP"?"점프·부스터 기동 관련":id=="SHIELD"?"방패 · 우클릭 정면 피해 감소 · 무기 선택 제외":"등록되지 않은 특성";
+    static string BalanceTraitMeaning(string id)=>id=="DAMAGE"?"공격 아이콘":id=="LOCK"?"락온 아이콘":id=="RADAR"?"탐지 아이콘":id=="AREA"?"범위 아이콘":id=="RAPID"?"연사 아이콘":id=="RELOAD"?"재장전 아이콘":id=="JUMP"?"기동 아이콘":id=="SHIELD"?"방패 아이콘":"등록되지 않은 표시 아이콘";
     static string BalancePartPerformanceSummary(BalancePart part)
     {
-        BalanceNumber[] values=(part?.numbers??new BalanceNumber[0]).Where(n=>n!=null&&n.implemented).Take(3).ToArray();
+        BalanceNumber[] values=BalanceData.EditablePartBaseStats(part).Take(3).ToArray();
         if(values.Length==0)return "전투에 적용되는 수치 없음";
         return string.Join("  ·  ",values.Select(n=>n.label+" "+n.value.ToString("0.##",CultureInfo.InvariantCulture)+(string.IsNullOrEmpty(n.unit)?"":" "+n.unit)));
     }
@@ -455,13 +466,13 @@ public sealed partial class VoxArena
         BalanceDesign design=EditingDesign();if(design==null||design.isEmpty)return;
         GUI.Label(new Rect(16,136,550,24),"무기",new GUIStyle(GUI.skin.label){fontSize=15,fontStyle=FontStyle.Bold});
         GUI.Label(new Rect(604,136,600,24),"파츠",new GUIStyle(GUI.skin.label){fontSize=15,fontStyle=FontStyle.Bold});
-        string[] mountLabels={"왼손","오른손","왼어깨","오른어깨"};
+        string[] mountLabels={"왼손","오른손","보조 1","보조 2"};
         for(int mount=0;mount<mountLabels.Length;mount++)
         {
             Rect card=new Rect(12,164+mount*99,560,88);Panel(card,new Color(.045f,.075f,.10f));
             GUI.Label(new Rect(card.x+8,card.y+31,72,26),mountLabels[mount],new GUIStyle(GUI.skin.label){fontSize=13,alignment=TextAnchor.MiddleCenter});
-            if(mount>=2&&BackpackWeaponMountsPending){GUI.Label(new Rect(card.x+94,card.y+27,card.width-110,32),"미장착 · 백팩 장착 준비 중",small);continue;}
-            BalanceWeapon[] allowed=Array.FindAll(balanceDraft.weapons,w=>BalanceData.CanEquip(w,mount,design.chassisId)&&!(mount>=2&&design.slots[mount==2?3:2]==w.id&&!BalanceData.CanDuplicateShoulderWeapon(w)));
+            if(mount>=2&&BackpackWeaponMountsPending){DrawAuxiliaryMountRow(mount,card);continue;}
+            BalanceWeapon[] allowed=Array.FindAll(balanceDraft.weapons,w=>HandWeaponAvailable(w)&&BalanceData.CanEquip(w,mount,design.chassisId)&&!(mount>=2&&design.slots[mount==2?3:2]==w.id&&!BalanceData.CanDuplicateShoulderWeapon(w)));
             if(allowed.Length==0){GUI.Label(new Rect(card.x+84,card.y+27,card.width-100,32),"선택 가능한 장비 없음",small);continue;}
             int selected=Array.FindIndex(allowed,w=>w.id==design.slots[mount]);
             if(selected<0){selected=0;design.slots[mount]=allowed[0].id;balanceMountIndex=mount;balanceDirty=true;BalanceWeaponPreview(allowed[0]);RefreshBalanceDraftPreview();}
@@ -516,12 +527,11 @@ public sealed partial class VoxArena
     void SetBalanceWeaponTrait(BalanceWeapon weapon,string id)
     {
         weapon.traitIconId=id;weapon.additionalTraitIconIds=Array.Empty<string>();
-        if(id=="SHIELD"){weapon.hands=true;weapon.shoulders=false;weapon.left=weapon.right=true;}
         balanceDirty=true;
     }
     void ToggleBalanceWeaponTrait(BalanceWeapon weapon,string id)
     {
-        if(id=="SHIELD"){SetBalanceWeaponTrait(weapon,id);return;}
+        if(id=="SHIELD"){SetBalanceWeaponTrait(weapon,weapon.traitIconId=="SHIELD"?"DAMAGE":"SHIELD");return;}
         if(weapon.traitIconId=="SHIELD")weapon.traitIconId=id;
         else if(weapon.traitIconId==id)
         {
@@ -687,8 +697,11 @@ public sealed partial class VoxArena
         if(p.category=="HEAD"||p.category=="CORE"||p.category=="LEFT_ARM"||p.category=="RIGHT_ARM"||p.category=="LEGS"||p.category=="BOOSTER")DrawPartVisualPicker(p);
         CraftSpec selectedLegFrame=p.category=="LEGS"?CraftCatalog.Selectable.FirstOrDefault(c=>c.name==p.frame):null;bool expandedBipedLegPicker=selectedLegFrame!=null&&(selectedLegFrame.mobility==MobilityKind.StandardBiped||selectedLegFrame.mobility==MobilityKind.Runner);bool expandedArmPicker=p.category=="LEFT_ARM"||p.category=="RIGHT_ARM";
         float traitPickerY=expandedArmPicker||expandedBipedLegPicker?320:266;DrawPartTraitIconPicker(p,traitPickerY);float statsY=traitPickerY+90;
-        GUI.Label(new Rect(330,traitPickerY+48,900,37),"아이콘 "+WeaponTraitLabel(p.partTraitIconId)+" · "+BalanceTraitMeaning(p.partTraitIconId)+"\n적용 수치  "+BalancePartPerformanceSummary(p),new GUIStyle(small){fontSize=12,wordWrap=true});
-        DrawBalanceNumbers(design.id+"/"+p.id,p.numbers,new Rect(330,statsY,924,594-statsY));
+        GUI.Label(new Rect(330,traitPickerY+48,900,37),"표시 아이콘 "+WeaponTraitLabel(p.partTraitIconId)+" · "+BalanceTraitMeaning(p.partTraitIconId)+"\n기본 수치  "+BalancePartPerformanceSummary(p),new GUIStyle(small){fontSize=12,wordWrap=true});
+        string[] partFunctions=p.specialFunctionIds??Array.Empty<string>();GUI.Label(new Rect(330,statsY,920,20),"기본 수치 · 고유 기능(미적용): "+(partFunctions.Length==0?"없음":string.Join(", ",partFunctions)),small);
+        BalanceNumber[] editablePartStats=BalanceData.EditablePartBaseStats(p);
+        if(editablePartStats.Length>0)DrawBalanceNumbers(design.id+"/"+p.id,editablePartStats,new Rect(330,statsY+22,924,572-statsY));
+        else GUI.Label(new Rect(330,statsY+28,900,50),p.category=="LEFT_ARM"||p.category=="RIGHT_ARM"?"팔은 몸통과 통합된 설계로 별도 전투 수치를 편집하지 않습니다. 기존 좌우 조작·안정성 값은 저장 파일과 전투 내부에 보존됩니다.":"이 분류에는 현재 승인된 편집용 기본 수치가 없습니다. 기존 내부 수치는 저장 파일에 보존됩니다.",new GUIStyle(small){wordWrap=true});
         if(p.category=="CORE"&&GUI.Button(new Rect(24,600,285,38),"+ 몸통 파츠 변형 추가"))BalanceAction(CreateCustomPartFromEditor);
     }
     static readonly string[] balancePartPaintHex={"","E8E5DA","F2782B","40B7C8","82964C","687887","8B68B7"};
@@ -808,7 +821,7 @@ public sealed partial class VoxArena
         string description=GUI.TextArea(new Rect(78,210,476,54),design.description??"",GUI.skin.textArea);GUI.backgroundColor=priorBackground;
         if(description.Length>1000)description=description.Substring(0,1000);if(description!=design.description){design.description=description;balanceDirty=true;}
         DrawDesignPaintPalette(design);
-        BalanceWeapon[] allowed=Array.FindAll(balanceDraft.weapons,w=>BalanceData.CanEquip(w,balanceMountIndex,design.chassisId)&&!(balanceMountIndex>=2&&design.slots[balanceMountIndex==2?3:2]==w.id&&!BalanceData.CanDuplicateShoulderWeapon(w)));
+        BalanceWeapon[] allowed=Array.FindAll(balanceDraft.weapons,w=>HandWeaponAvailable(w)&&BalanceData.CanEquip(w,balanceMountIndex,design.chassisId)&&!(balanceMountIndex>=2&&design.slots[balanceMountIndex==2?3:2]==w.id&&!BalanceData.CanDuplicateShoulderWeapon(w)));
         if(allowed.Length>0)
         {
             int selectedIndex=Array.FindIndex(allowed,w=>w.id==design.slots[balanceMountIndex]);
@@ -833,7 +846,7 @@ public sealed partial class VoxArena
             Panel(new Rect(575,420,5,152),new Color(.10f,.78f,.82f));
             GUI.Label(new Rect(596,426,365,28),current.name,new GUIStyle(GUI.skin.label){fontSize=19,fontStyle=FontStyle.Bold});
             string traits=string.Join("+",new[]{current.traitIconId}.Concat(current.additionalTraitIconIds??Array.Empty<string>()));
-            GUI.Label(new Rect(596,454,365,22),"특성 "+traits+" · "+BalanceTraitMeaning(current.traitIconId),small);
+            GUI.Label(new Rect(596,454,365,22),"표시 아이콘 "+traits+" · "+BalanceTraitMeaning(current.traitIconId),small);
             GUI.Label(new Rect(596,480,365,48),current.notes??"",new GUIStyle(GUI.skin.label){wordWrap=true});
             if(balanceMountIndex>=2&&design.slots.Take(2).Select(id=>Array.Find(balanceDraft.weapons,w=>w.id==id)).Any(w=>w!=null&&w.blocksShoulderWeapons))GUI.Label(new Rect(575,395,620,22),"손에 든 중화기 때문에 어깨 무기는 전투 중 비활성화됩니다.",new GUIStyle(small){normal={textColor=Orange}});
             if(current.kind=="firearm")
@@ -843,14 +856,14 @@ public sealed partial class VoxArena
                 DrawLoadoutStatBar(975,500,"RANGE",current.Get("range"),Mathf.Max(120,current.Get("range")),new Color(.42f,.76f,1f));
                     GUI.Label(new Rect(975,534,205,23),"RELOAD  "+current.Get("reloadTime").ToString("0.0")+" s",small);
             }
-            else GUI.Label(new Rect(975,474,220,30),current.kind=="shield"||BalanceData.HasWeaponTrait(current,"SHIELD")?"GUARD / 우클릭 방어":"UNARMED / 주먹 공격",small);
+        else GUI.Label(new Rect(975,474,220,30),current.kind=="shield"?"GUARD / 우클릭 방어":"UNARMED / 주먹 공격",small);
             if(GUI.Button(new Rect(575,579,260,34),"선택 장비 옵션 편집")){balanceWeaponIndex=Mathf.Max(0,Array.FindIndex(balanceDraft.weapons,w=>w.id==current.id));balanceTab=1;balanceValueScroll=Vector2.zero;BalanceSelectPreview();}
         }
     }
     void CycleLoadoutWeapon(BalanceDesign design,BalanceWeapon[] allowed,int index)
     {
         if(design==null||allowed==null||allowed.Length<2||balanceMountIndex<0||balanceMountIndex>=design.slots.Length)return;
-        BalanceWeapon weapon=allowed[Mathf.Clamp(index,0,allowed.Length-1)];design.slots[balanceMountIndex]=weapon.id;balanceDirty=true;BalanceWeaponPreview(weapon);RefreshBalanceDraftPreview();
+        BalanceWeapon weapon=allowed[Mathf.Clamp(index,0,allowed.Length-1)];if(weapon.kind=="firearm"&&balanceMountIndex<2){weapon.hands=true;weapon.left=weapon.right=true;weapon.shoulders=false;}design.slots[balanceMountIndex]=weapon.id;balanceDirty=true;BalanceWeaponPreview(weapon);RefreshBalanceDraftPreview();
     }
     void DrawLoadoutStatBar(float x,float y,string title,float value,float max,Color accent)
     {

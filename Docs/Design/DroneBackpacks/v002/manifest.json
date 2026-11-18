@@ -1,0 +1,183 @@
+{
+  "revision": "concept-blockout-v002",
+  "units": "meter",
+  "runtimeIntegrated": false,
+  "assets": [
+    {
+      "id": "VXDR_ATTACK_v002_BACKPACK",
+      "file": "Assets\\Art\\DroneBackpacks\\Concept_v002\\VXDR_ATTACK_v002_BACKPACK.fbx",
+      "objects": 28,
+      "sockets": [
+        "VXDR_ATTACK_v002_BACKPACK__ROOT",
+        "BODY_MOUNT",
+        "DRONE_DOCK",
+        "LAUNCH_EXIT"
+      ]
+    },
+    {
+      "id": "VXDR_ATTACK_v002_DRONE",
+      "file": "Assets\\Art\\DroneBackpacks\\Concept_v002\\VXDR_ATTACK_v002_DRONE.fbx",
+      "objects": 35,
+      "sockets": [
+        "VXDR_ATTACK_v002_DRONE__ROOT",
+        "MUZZLE_L",
+        "FIN_PIVOT_-1_-1",
+        "FIN_PIVOT_-1_1",
+        "MUZZLE_R",
+        "FIN_PIVOT_1_-1",
+        "FIN_PIVOT_1_1",
+        "DOCK_CONTACT",
+        "DRONE_CENTER"
+      ]
+    },
+    {
+      "id": "VXDR_ATTACK_v002_FX",
+      "file": "Assets\\Art\\DroneBackpacks\\Concept_v002\\VXDR_ATTACK_v002_FX.fbx",
+      "objects": 9,
+      "sockets": [
+        "VXDR_ATTACK_v002_FX__ROOT",
+        "FX_ORIGIN",
+        "FX_END"
+      ]
+    },
+    {
+      "id": "VXDR_ATTACK_v002_DOCKED",
+      "file": "Assets\\Art\\DroneBackpacks\\Concept_v002\\VXDR_ATTACK_v002_DOCKED.fbx",
+      "objects": 64,
+      "sockets": [
+        "VXDR_ATTACK_v002_DOCKED__ROOT",
+        "Docked_VXDR_ATTACK_v002_BACKPACK__ROOT",
+        "Docked_BODY_MOUNT",
+        "Docked_DRONE_DOCK",
+        "Docked_LAUNCH_EXIT",
+        "Docked_VXDR_ATTACK_v002_DRONE__ROOT",
+        "Docked_MUZZLE_L",
+        "Docked_FIN_PIVOT_-1_-1",
+        "Docked_FIN_PIVOT_-1_1",
+        "Docked_MUZZLE_R",
+        "Docked_FIN_PIVOT_1_-1",
+        "Docked_FIN_PIVOT_1_1",
+        "Docked_DOCK_CONTACT",
+        "Docked_DRONE_CENTER"
+      ]
+    },
+    {
+      "id": "VXDR_INTERCEPT_v002_BACKPACK",
+      "file": "Assets\\Art\\DroneBackpacks\\Concept_v002\\VXDR_INTERCEPT_v002_BACKPACK.fbx",
+      "objects": 28,
+      "sockets": [
+        "VXDR_INTERCEPT_v002_BACKPACK__ROOT",
+        "BODY_MOUNT",
+        "DRONE_DOCK",
+        "LAUNCH_EXIT"
+      ]
+    },
+    {
+      "id": "VXDR_INTERCEPT_v002_DRONE",
+      "file": "Assets\\Art\\DroneBackpacks\\Concept_v002\\VXDR_INTERCEPT_v002_DRONE.fbx",
+      "objects": 34,
+      "sockets": [
+        "VXDR_INTERCEPT_v002_DRONE__ROOT",
+        "FIN_PIVOT_-1_-1",
+        "FIN_PIVOT_-1_1",
+        "INTERCEPT_MUZZLE",
+        "FIN_PIVOT_1_-1",
+        "FIN_PIVOT_1_1",
+        "DOCK_CONTACT",
+        "DRONE_CENTER"
+      ]
+    },
+    {
+      "id": "VXDR_INTERCEPT_v002_FX",
+      "file": "Assets\\Art\\DroneBackpacks\\Concept_v002\\VXDR_INTERCEPT_v002_FX.fbx",
+      "objects": 15,
+      "sockets": [
+        "VXDR_INTERCEPT_v002_FX__ROOT",
+        "FX_ORIGIN",
+        "FX_END"
+      ]
+    },
+    {
+      "id": "VXDR_INTERCEPT_v002_DOCKED",
+      "file": "Assets\\Art\\DroneBackpacks\\Concept_v002\\VXDR_INTERCEPT_v002_DOCKED.fbx",
+      "objects": 63,
+      "sockets": [
+        "VXDR_INTERCEPT_v002_DOCKED__ROOT",
+        "Docked_VXDR_INTERCEPT_v002_BACKPACK__ROOT",
+        "Docked_BODY_MOUNT",
+        "Docked_DRONE_DOCK",
+        "Docked_LAUNCH_EXIT",
+        "Docked_VXDR_INTERCEPT_v002_DRONE__ROOT",
+        "Docked_FIN_PIVOT_-1_-1",
+        "Docked_FIN_PIVOT_-1_1",
+        "Docked_INTERCEPT_MUZZLE",
+        "Docked_FIN_PIVOT_1_-1",
+        "Docked_FIN_PIVOT_1_1",
+        "Docked_DOCK_CONTACT",
+        "Docked_DRONE_CENTER"
+      ]
+    },
+    {
+      "id": "VXDR_JAMMER_v002_BACKPACK",
+      "file": "Assets\\Art\\DroneBackpacks\\Concept_v002\\VXDR_JAMMER_v002_BACKPACK.fbx",
+      "objects": 28,
+      "sockets": [
+        "VXDR_JAMMER_v002_BACKPACK__ROOT",
+        "BODY_MOUNT",
+        "DRONE_DOCK",
+        "LAUNCH_EXIT"
+      ]
+    },
+    {
+      "id": "VXDR_JAMMER_v002_DRONE",
+      "file": "Assets\\Art\\DroneBackpacks\\Concept_v002\\VXDR_JAMMER_v002_DRONE.fbx",
+      "objects": 37,
+      "sockets": [
+        "VXDR_JAMMER_v002_DRONE__ROOT",
+        "FIN_PIVOT_-1_-1",
+        "EMITTER_-1_-1",
+        "FIN_PIVOT_-1_1",
+        "EMITTER_-1_1",
+        "FIN_PIVOT_1_-1",
+        "EMITTER_1_-1",
+        "FIN_PIVOT_1_1",
+        "EMITTER_1_1",
+        "DOCK_CONTACT",
+        "DRONE_CENTER"
+      ]
+    },
+    {
+      "id": "VXDR_JAMMER_v002_FX",
+      "file": "Assets\\Art\\DroneBackpacks\\Concept_v002\\VXDR_JAMMER_v002_FX.fbx",
+      "objects": 6,
+      "sockets": [
+        "VXDR_JAMMER_v002_FX__ROOT",
+        "FX_ORIGIN",
+        "FX_END"
+      ]
+    },
+    {
+      "id": "VXDR_JAMMER_v002_DOCKED",
+      "file": "Assets\\Art\\DroneBackpacks\\Concept_v002\\VXDR_JAMMER_v002_DOCKED.fbx",
+      "objects": 66,
+      "sockets": [
+        "VXDR_JAMMER_v002_DOCKED__ROOT",
+        "Docked_VXDR_JAMMER_v002_BACKPACK__ROOT",
+        "Docked_BODY_MOUNT",
+        "Docked_DRONE_DOCK",
+        "Docked_LAUNCH_EXIT",
+        "Docked_VXDR_JAMMER_v002_DRONE__ROOT",
+        "Docked_FIN_PIVOT_-1_-1",
+        "Docked_EMITTER_-1_-1",
+        "Docked_FIN_PIVOT_-1_1",
+        "Docked_EMITTER_-1_1",
+        "Docked_FIN_PIVOT_1_-1",
+        "Docked_EMITTER_1_-1",
+        "Docked_FIN_PIVOT_1_1",
+        "Docked_EMITTER_1_1",
+        "Docked_DOCK_CONTACT",
+        "Docked_DRONE_CENTER"
+      ]
+    }
+  ]
+}

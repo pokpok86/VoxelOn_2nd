@@ -1,2 +1,5 @@
-PASS / 41 actual runtime checks
-2026-11-12T11:22:52.0929824+09:00
+PASS / 294 actual runtime checks
+2026-11-18T20:33:00+09:00
+Legacy appearance IDs, saved weapon slot, and default values preserved.
+Windows build: VOXSKY_BUILD_PASS 260554574 bytes (Legacy-Loadout-Compatibility-Build-20261118.log).
+Player smoke: VOXSKY_SMOKE_PASS 377 checks; exit 0.

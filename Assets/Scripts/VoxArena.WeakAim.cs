@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 public sealed partial class VoxArena
 {
@@ -19,7 +19,7 @@ public sealed partial class VoxArena
         Vector3 delta=target.root.position-(!smoke&&shooter.weaponVisuals!=null?WeaponMuzzle(shooter):shooter.root.position);
         // Head radar provides soft-assist awareness without granting or requiring RMB lock-on.
         float sensorRange=Mathf.Max(0,shooter.spec.radarRange*RadarWeatherFactor());
-        float assistCone=(retained?2.3f:1.8f)*TargetingWeatherFactor();
+        float assistCone=(retained?2.3f:1.8f)*TargetingWeatherFactor()*DroneJammingFactor(shooter);
         if(delta.magnitude>Mathf.Min(EquippedProfile(shooter).range,sensorRange)||Vector3.Angle(requested,delta)>assistCone)return Reject();
         if(ObstacleOnSegment(shooter.root.position,target.root.position,.08f,out _))return Reject();
         if(shooter==player&&!spectatorMode)
@@ -34,7 +34,7 @@ public sealed partial class VoxArena
     {
         if(!CanWeakAssist(shooter,target,requested))return requested;
         return Vector3.RotateTowards(requested.normalized,(target.root.position-(!smoke&&shooter.weaponVisuals!=null?WeaponMuzzle(shooter):shooter.root.position)).normalized,
-            weakAssistDegrees*TargetingWeatherFactor()*Mathf.Deg2Rad*WeakAimStrength(shooter),0);
+            weakAssistDegrees*TargetingWeatherFactor()*DroneJammingFactor(shooter)*Mathf.Deg2Rad*WeakAimStrength(shooter),0);
     }
     void UpdateAssistFeedback(float dt)
     {

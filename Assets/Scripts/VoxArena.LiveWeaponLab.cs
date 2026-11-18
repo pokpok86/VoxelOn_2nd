@@ -21,7 +21,17 @@ public sealed partial class VoxArena
         bool prior=smoke;TestSetupSelectable(0,1);smoke=false;player.root.position=new Vector3(100,FighterGroundY,100);enemy.root.position=player.root.position+Vector3.forward*30;player.facing=Vector3.forward;
         for(int i=0;i<4;i++)
         {
-            player.weaponSlot=i+1;WeaponProfile p=EquippedProfile(player);float rivalDamage=enemy.weaponProfiles[i].damage;
+            player.weaponSlot=i+1;WeaponProfile p=EquippedProfile(player);float rivalDamage=enemy.weaponProfiles[i].damage,savedTrialDamage=Loadout[i].damage;
+            if(i>=2&&BackpackWeaponMountsPending)
+            {
+                p.damage=11+i;p.interval=.5f+i*.1f;p.speed=150+i*10;p.radius=.15f+i*.02f;p.range=55+i*5;player.weaponTimer=player.reloadTime=0;player.magazine=0;int before=shots.Count;
+                FireEquippedWeapon(player,enemy,Vector3.forward);
+                check(p.isUnarmed&&p.shoulderBlocked&&p.capacity==0&&player.magazine==0,"pending shoulder slot is unavailable to the live weapon editor "+i);
+                check(shots.Count==before,"editing an unmounted shoulder cannot create a projectile "+i);
+                check(!StartWeaponReload(player)&&player.reloadTime==0,"unmounted shoulder cannot start an ammunition reload "+i);
+                check(enemy.weaponProfiles[i].damage==rivalDamage&&Loadout[i].damage==savedTrialDamage,"pending shoulder edit leaves rival and saved trial profile unchanged "+i);
+                continue;
+            }
             p.damage=11+i;p.interval=.5f+i*.1f;p.speed=150+i*10;p.radius=.15f+i*.02f;p.range=55+i*5;player.weaponTimer=player.reloadTime=0;player.magazine=p.capacity;int n=shots.Count;
             FireEquippedWeapon(player,enemy,Vector3.forward);Shot actual=shots.Count>n?shots[shots.Count-1]:null;
             check(actual!=null&&Mathf.Abs(actual.damage-p.damage)<.001f&&Mathf.Abs(actual.velocity.magnitude-p.speed*bulletSpeedScale)<.01f,"runtime profile changes actual damage and velocity slot "+i);

@@ -13,6 +13,14 @@ public static class VoxBuild
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         var arena = new GameObject("VoxSky Arena").AddComponent<VoxArena>();
         arena.hullShader = Shader.Find("Standard");
+        string[] droneKinds={"ATTACK","INTERCEPT","JAMMER"};arena.droneBackpackSources=new GameObject[3];arena.droneModelSources=new GameObject[3];arena.droneDockedPreviewSources=new GameObject[3];
+        for(int i=0;i<3;i++){string stem="Assets/Art/DroneBackpacks/Concept_v003/VXDR_"+droneKinds[i]+"_v003";arena.droneBackpackSources[i]=AssetDatabase.LoadAssetAtPath<GameObject>(stem+"_BACKPACK.fbx");arena.droneModelSources[i]=AssetDatabase.LoadAssetAtPath<GameObject>(stem+"_DRONE.fbx");arena.droneDockedPreviewSources[i]=AssetDatabase.LoadAssetAtPath<GameObject>(stem+"_DOCKED.fbx");if(arena.droneBackpackSources[i]==null||arena.droneModelSources[i]==null||arena.droneDockedPreviewSources[i]==null)throw new Exception("Drone art missing "+stem);}
+
+        arena.auxiliaryModelSources=new[]{AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/AuxiliaryWeapons/v002/VXAUX_MISSILE_POD_v002.fbx"),AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/AuxiliaryWeapons/v002/VXAUX_PULSE_GUN_v002.fbx")};
+        arena.auxiliaryProjectileSources=new[]{AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/AuxiliaryWeapons/v002/VXAUX_HOMING_MISSILE_v002.fbx"),AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/AuxiliaryWeapons/v002/VXAUX_PULSE_BOLT_v002.fbx")};
+        arena.auxiliaryBracketSource=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/AuxiliaryWeapons/v002/VXAUX_MOUNT_BRACKET_v002.fbx");if(arena.auxiliaryBracketSource==null)throw new Exception("Auxiliary bracket missing");
+        foreach(GameObject asset in arena.auxiliaryModelSources)if(asset==null)throw new Exception("Auxiliary model missing");foreach(GameObject asset in arena.auxiliaryProjectileSources)if(asset==null)throw new Exception("Auxiliary projectile missing");
+        string[] effectIds={"MUZZLE","MISSILE_BURST","INTERCEPT","JAM_FIELD","THRUSTER"};arena.combatEffectSources=new GameObject[effectIds.Length];for(int i=0;i<effectIds.Length;i++){arena.combatEffectSources[i]=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/CombatEffects/v002/VXFX_"+effectIds[i]+"_v002.fbx");if(arena.combatEffectSources[i]==null)throw new Exception("Combat FX missing "+effectIds[i]);}
         arena.skyTextureShader=Shader.Find("VoxelOn/SkyTint");if(arena.skyTextureShader==null)throw new Exception("Sky shader unavailable");
         arena.shallowWaterShader=Shader.Find("VoxelOn/ShallowWater");if(arena.shallowWaterShader==null)throw new Exception("Shallow water shader unavailable");
         arena.cameraFadeShader=Shader.Find("VoxelOn/CameraHeadFade");

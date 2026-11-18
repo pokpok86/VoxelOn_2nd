@@ -7,7 +7,7 @@ public sealed partial class VoxArena
     const float PrimaryFireInterval=.18f/.65f,PrimaryReloadSeconds=2.5f;
     sealed class Shot
     {
-        public Transform visual; public Fighter owner; public Vector3 velocity,heading;
+        public Transform exhaust;public Vector3 exhaustScale;public Fighter seekTarget;public float turnRate=3.2f;public bool isMissile;public float gravity;public string weaponId;public Transform visual; public Fighter owner; public Vector3 velocity,heading;
         public float life,damage,radius,age,tracking,blast,fuse=-1,arm,wave;
         public bool stopAndExplode,mine,loadoutVisual;public int artSlot;
         public LineRenderer warning;
@@ -16,7 +16,7 @@ public sealed partial class VoxArena
     sealed class Beam
     {
         public Fighter owner; public Vector3 direction; public float age,charge,duration,width,length,dps,sweep;
-        public LineRenderer visual; public bool sounded;
+        public LineRenderer visual; public bool sounded,gunMuzzle;
     }
     sealed class RingEffect { public LineRenderer line; public Vector3 center; public float radius,age,life; }
     readonly List<Shot> shots=new List<Shot>();
@@ -27,6 +27,7 @@ public sealed partial class VoxArena
 
     void ClearCombat()
     {
+        ResetDrones();ResetAuxiliaries();RemoveAuthoredEffects();
         foreach(Shot s in shots) { Destroy(s.visual.gameObject); if(s.warning!=null) Destroy(s.warning.gameObject); }
         foreach(Beam b in beams) Destroy(b.visual.gameObject);
         foreach(RingEffect r in rings) Destroy(r.line.gameObject);
@@ -37,20 +38,21 @@ public sealed partial class VoxArena
     {
         if(delay<=0) action(); else pending.Add(new Pending{owner=owner,delay=delay,action=action});
     }
-    Shot Fire(Fighter owner,Vector3 direction,float damage,float speed,float radius,float range,float tracking=0,float blast=0,bool stop=false,float wave=0,bool loadoutVisual=false)
+    Shot Fire(Fighter owner,Vector3 direction,float damage,float speed,float radius,float range,float tracking=0,float blast=0,bool stop=false,float wave=0,bool loadoutVisual=false,Vector3? origin=null,GameObject projectileSource=null,float projectileVisualScale=1,int projectileArtSlot=-1,bool muzzleEffect=true,bool missile=false)
     {
         direction=direction.normalized;
-        Vector3 muzzle=!smoke&&owner.weaponVisuals!=null?WeaponMuzzle(owner):owner.root.position+direction*(owner.Radius+.25f);
+        Vector3 muzzle=origin??(!smoke&&owner.weaponVisuals!=null?WeaponMuzzle(owner):owner.root.position+direction*(owner.Radius+.25f));
         float physicalRadius=radius*bulletSizeScale;
-        if(ObstacleOnSegment(owner.root.position,muzzle,physicalRadius,out float mountHit))
+        if(!origin.HasValue&&ObstacleOnSegment(owner.root.position,muzzle,physicalRadius,out float mountHit))
         {
             if(Array.IndexOf(Environment.GetCommandLineArgs(),"--prototype-soak")>=0)Debug.Log("SHOT_MOUNT_BLOCKED "+owner.spec.name+" slot="+owner.weaponSlot+" root="+owner.root.position.ToString("F3")+" muzzle="+muzzle.ToString("F3")+" radius="+owner.Radius+" hit="+mountHit);
             return null;
         }
         speed*=bulletSpeedScale;
-        Shot s=new Shot{owner=owner,loadoutVisual=loadoutVisual,artSlot=Mathf.Clamp(owner.weaponSlot-1,0,3),velocity=direction*speed,heading=direction,damage=damage,
+        Shot s=new Shot{owner=owner,isMissile=missile,loadoutVisual=loadoutVisual,artSlot=projectileArtSlot>=0?projectileArtSlot:Mathf.Clamp(owner.weaponSlot-1,0,3),velocity=direction*speed,heading=direction,damage=damage,
             radius=physicalRadius,life=range/speed,tracking=tracking,blast=blast,stopAndExplode=stop,wave=wave};
-        s.visual=BuildProjectileVisual(s,muzzle);
+        if(projectileSource!=null){s.visual=Module("Blender projectile",null,muzzle);Transform model=Instantiate(projectileSource,s.visual,false).transform;model.localScale*=projectileVisualScale;PrepareWeaponMaterials(model);}
+        else s.visual=BuildProjectileVisual(s,muzzle);
         s.visual.rotation=Quaternion.LookRotation(direction);
         if(!stop)
         {
@@ -59,7 +61,8 @@ public sealed partial class VoxArena
             trail.time=tracking>0?.18f:owner.spec.primary==PrimaryKind.Rail?.11f:.065f;
             trail.startWidth=physicalRadius*.8f; trail.endWidth=.015f; trail.minVertexDistance=.15f;
         }
-        Flash(muzzle,TeamColor(owner),.45f,.08f);
+        if(muzzleEffect){if(loadoutVisual||projectileSource!=null||origin.HasValue)SpawnAuthoredEffect(0,muzzle,direction,.35f,.08f,owner);
+        else Flash(muzzle,TeamColor(owner),.45f,.08f);}
         shots.Add(s); projectilesCreated++; return s;
     }
     void Attack(Fighter owner,Fighter target,Vector3 direction)
@@ -92,7 +95,7 @@ public sealed partial class VoxArena
                 }
                 break;
             case PrimaryKind.Missiles:
-                foreach(float a in new[]{-14f,14f}) Fire(owner,Quaternion.Euler(0,a,0)*direction,spec.damage,spec.projectileSpeed,spec.projectileRadius,spec.range,1.1f,2.3f);
+                foreach(float a in new[]{-14f,14f}) Fire(owner,Quaternion.Euler(0,a,0)*direction,spec.damage,spec.projectileSpeed,spec.projectileRadius,spec.range,1.1f,2.3f,missile:true);
                 break;
             case PrimaryKind.Scatter:
                 for(int i=0;i<7;i++) Fire(owner,Quaternion.Euler(0,-15+i*5,0)*direction,spec.damage,spec.projectileSpeed,spec.projectileRadius,spec.range);
@@ -129,7 +132,7 @@ public sealed partial class VoxArena
                 for(int i=0;i<9;i++)
                 {
                     Vector3 dir=Quaternion.Euler(0,-52+i*13,0)*d;
-                    Schedule(owner,i*.04f,()=>Fire(owner,dir,13,40,.4f,72,1.2f,3));
+                    Schedule(owner,i*.04f,()=>Fire(owner,dir,13,40,.4f,72,1.2f,3,missile:true));
                 }
                 break;
             case SpecialKind.Nova:
@@ -150,10 +153,10 @@ public sealed partial class VoxArena
                 break;
         }
     }
-    void AddBeam(Fighter owner,Vector3 d,float charge,float duration,float width,float length,float dps,float sweep,bool anchored)
+    void AddBeam(Fighter owner,Vector3 d,float charge,float duration,float width,float length,float dps,float sweep,bool anchored,bool gunMuzzle=false)
     {
         beams.Add(new Beam{owner=owner,direction=d,charge=charge,duration=duration,width=width,length=length,dps=dps,sweep=sweep,
-            visual=Line("Beam telegraph",TeamColor(owner),.07f)});
+            visual=Line("Beam telegraph",TeamColor(owner),.07f),gunMuzzle=gunMuzzle});
         if(anchored) { owner.lockTime=charge+duration; owner.pulseTime=0; owner.velocity=Vector3.zero; }
     }
     void CheckSaber(Fighter f,Vector3 from,Vector3 to)
@@ -187,6 +190,7 @@ public sealed partial class VoxArena
         Fighter target=Opponent(s.owner);
         if(Vector3.Distance(position,target.root.position)<=s.blast+target.Radius &&
             !ObstacleOnSegment(position,target.root.position,.02f,out _)) Hit(target,position,s.damage,null,s.owner);
+        if(s.isMissile)SpawnAuthoredEffect(1,position,Vector3.up,Mathf.Clamp(s.blast,.8f,3),.4f,s.owner);
         var ring=new RingEffect{line=Line("Explosion",TeamColor(s.owner),.22f),center=position,radius=s.blast,life=.42f};
         rings.Add(ring); Flash(position,TeamColor(s.owner),s.blast*.6f,.22f); Burst(position,TeamColor(s.owner),8); PlaySound(SoundKind.Explosion,position,.6f);
     }
@@ -198,7 +202,12 @@ public sealed partial class VoxArena
             Pending p=pending[i]; p.delay-=dt;
             if(p.delay<=0) { pending.RemoveAt(i); p.action(); }
         }
-        UpdateShots(dt); UpdateBeams(dt); UpdateFlashes(dt);
+        long profileTick=profileDroneSoak?System.Diagnostics.Stopwatch.GetTimestamp():0;
+        TickAuthoredEffects(dt);if(profileDroneSoak){profileFxMs=ProfileElapsed(profileTick);profileTick=System.Diagnostics.Stopwatch.GetTimestamp();}
+        UpdateDrones(dt);if(profileDroneSoak){profileDroneMs=ProfileElapsed(profileTick);profileTick=System.Diagnostics.Stopwatch.GetTimestamp();}
+        UpdateAuxiliaries(dt);if(profileDroneSoak){profileAuxMs=ProfileElapsed(profileTick);profileTick=System.Diagnostics.Stopwatch.GetTimestamp();}
+        UpdateShots(dt);if(profileDroneSoak)profileShotMs=ProfileElapsed(profileTick);
+        UpdateBeams(dt); UpdateFlashes(dt);
         for(int i=rings.Count-1;i>=0;i--)
         {
             RingEffect r=rings[i]; r.age+=dt;
@@ -211,7 +220,7 @@ public sealed partial class VoxArena
     {
         for(int i=shots.Count-1;i>=0;i--)
         {
-            Shot s=shots[i]; Fighter target=Opponent(s.owner); Vector3 from=s.visual.position;
+            Shot s=shots[i];if(s.exhaust!=null)s.exhaust.localScale=s.exhaustScale*(1+.1f*Mathf.Sin(s.age*50)); Fighter target=s.seekTarget!=null&&s.seekTarget.root!=null&&s.seekTarget.root.gameObject.activeInHierarchy&&s.seekTarget.hp>0&&IsHostile(s.owner,s.seekTarget)?s.seekTarget:Opponent(s.owner); Vector3 from=s.visual.position;
             s.age+=dt; s.arm=Mathf.Max(0,s.arm-dt);
             if(s.fuse>=0)
             {
@@ -238,7 +247,7 @@ public sealed partial class VoxArena
                 else
                 {
                     Vector3 toward=(target.root.position-from).normalized;
-                    s.velocity=Vector3.RotateTowards(s.velocity.normalized,toward,3.2f*dt,0)*s.velocity.magnitude;
+                    s.velocity=Vector3.RotateTowards(s.velocity.normalized,toward,s.turnRate*dt*DroneJammingFactor(s.owner),0)*s.velocity.magnitude;
                     s.tracking=Mathf.Max(0,s.tracking-dt);
                     if(s.tracking<=0 && s.stopAndExplode)
                     {
@@ -251,6 +260,7 @@ public sealed partial class VoxArena
                     }
                 }
             }
+            if(s.gravity>0)s.velocity+=Vector3.down*(s.gravity*dt);
             Vector3 velocity=s.velocity;
             if(s.wave>0) velocity+=Vector3.Cross(s.heading,Vector3.up)*Mathf.Sin(s.age*10)*s.wave;
             Vector3 to=from+ProjectileStep(from,velocity,dt,s.life);
@@ -268,7 +278,7 @@ public sealed partial class VoxArena
             if(hit)
             {
                 Vector3 impact=from+(to-from).normalized*targetDistance;
-                if(s.blast>0) Explode(s,impact); else Hit(target,from,s.damage,impact,s.owner);
+                if(s.blast>0) Explode(s,impact); else {Hit(target,from,s.damage,impact,s.owner);if(s.weaponId=="AUX_PULSE_GUN"||s.weaponId=="Future_Beam")SpawnAuthoredEffect(2,impact,s.heading,.45f,.18f,s.owner);}
                 RemoveShot(i); continue;
             }
             s.visual.position=to;
@@ -289,7 +299,7 @@ public sealed partial class VoxArena
             Beam b=beams[i]; float oldAge=b.age; b.age+=dt;
             float progress=Mathf.Clamp01((b.age-b.charge)/b.duration);
             Vector3 d=Quaternion.Euler(0,Mathf.Lerp(-b.sweep/2,b.sweep/2,progress),0)*b.direction;
-            Vector3 from=b.owner.root.position+d*(b.owner.Radius+.2f),to=from+d*b.length;
+            Vector3 from=b.gunMuzzle?WeaponMuzzle(b.owner):b.owner.root.position+d*(b.owner.Radius+.2f),to=from+d*b.length;
             float width=b.age<b.charge?.04f:b.width;
             // A local muzzle charge replaces the full-length advance aiming line.
             if(b.age<b.charge) to=from+d*1.1f;

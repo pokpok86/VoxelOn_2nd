@@ -1,0 +1,55 @@
+{
+  "revision": "v001",
+  "assets": [
+    {
+      "id": "VXFX_MUZZLE_v001",
+      "file": "Assets\\Art\\CombatEffects\\v001\\VXFX_MUZZLE_v001.fbx",
+      "objects": 5,
+      "sockets": [
+        "VXFX_MUZZLE_v001__ROOT",
+        "FX_ORIGIN",
+        "FX_FORWARD"
+      ]
+    },
+    {
+      "id": "VXFX_MISSILE_BURST_v001",
+      "file": "Assets\\Art\\CombatEffects\\v001\\VXFX_MISSILE_BURST_v001.fbx",
+      "objects": 17,
+      "sockets": [
+        "VXFX_MISSILE_BURST_v001__ROOT",
+        "FX_ORIGIN",
+        "FX_FORWARD"
+      ]
+    },
+    {
+      "id": "VXFX_INTERCEPT_v001",
+      "file": "Assets\\Art\\CombatEffects\\v001\\VXFX_INTERCEPT_v001.fbx",
+      "objects": 15,
+      "sockets": [
+        "VXFX_INTERCEPT_v001__ROOT",
+        "FX_ORIGIN",
+        "FX_FORWARD"
+      ]
+    },
+    {
+      "id": "VXFX_JAM_FIELD_v001",
+      "file": "Assets\\Art\\CombatEffects\\v001\\VXFX_JAM_FIELD_v001.fbx",
+      "objects": 22,
+      "sockets": [
+        "VXFX_JAM_FIELD_v001__ROOT",
+        "FX_ORIGIN",
+        "FX_FORWARD"
+      ]
+    },
+    {
+      "id": "VXFX_THRUSTER_v001",
+      "file": "Assets\\Art\\CombatEffects\\v001\\VXFX_THRUSTER_v001.fbx",
+      "objects": 5,
+      "sockets": [
+        "VXFX_THRUSTER_v001__ROOT",
+        "FX_ORIGIN",
+        "FX_FORWARD"
+      ]
+    }
+  ]
+}

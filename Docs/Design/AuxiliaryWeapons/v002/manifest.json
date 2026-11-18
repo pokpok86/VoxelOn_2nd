@@ -1,0 +1,59 @@
+{
+  "revision": "v002",
+  "units": "meter",
+  "assets": [
+    {
+      "id": "VXAUX_MISSILE_POD_v002",
+      "file": "Assets\\Art\\AuxiliaryWeapons\\v002\\VXAUX_MISSILE_POD_v002.fbx",
+      "objects": 35,
+      "sockets": [
+        "VXAUX_MISSILE_POD_v002__ROOT",
+        "MUZZLE_-0.06_-0.065",
+        "MUZZLE_-0.06_0.065",
+        "MUZZLE_0.06_-0.065",
+        "MUZZLE_0.06_0.065",
+        "MUZZLE",
+        "BACKPACK_MOUNT"
+      ]
+    },
+    {
+      "id": "VXAUX_PULSE_GUN_v002",
+      "file": "Assets\\Art\\AuxiliaryWeapons\\v002\\VXAUX_PULSE_GUN_v002.fbx",
+      "objects": 25,
+      "sockets": [
+        "VXAUX_PULSE_GUN_v002__ROOT",
+        "MUZZLE",
+        "BACKPACK_MOUNT"
+      ]
+    },
+    {
+      "id": "VXAUX_HOMING_MISSILE_v002",
+      "file": "Assets\\Art\\AuxiliaryWeapons\\v002\\VXAUX_HOMING_MISSILE_v002.fbx",
+      "objects": 11,
+      "sockets": [
+        "VXAUX_HOMING_MISSILE_v002__ROOT",
+        "EXHAUST"
+      ]
+    },
+    {
+      "id": "VXAUX_PULSE_BOLT_v002",
+      "file": "Assets\\Art\\AuxiliaryWeapons\\v002\\VXAUX_PULSE_BOLT_v002.fbx",
+      "objects": 3,
+      "sockets": [
+        "VXAUX_PULSE_BOLT_v002__ROOT",
+        "TRAIL_ORIGIN"
+      ]
+    },
+    {
+      "id": "VXAUX_MOUNT_BRACKET_v002",
+      "file": "Assets\\Art\\AuxiliaryWeapons\\v002\\VXAUX_MOUNT_BRACKET_v002.fbx",
+      "objects": 9,
+      "sockets": [
+        "VXAUX_MOUNT_BRACKET_v002__ROOT",
+        "TIP_PIVOT",
+        "BACKPACK_CONTACT",
+        "WEAPON_CONTACT"
+      ]
+    }
+  ]
+}

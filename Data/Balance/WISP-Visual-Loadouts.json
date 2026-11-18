@@ -1,0 +1,275 @@
+{
+    "version": 1,
+    "designs": [
+        {
+            "key": "DESIGN_01/WISP",
+            "head": "VIS_H05_NEEDLE",
+            "body": "VIS_C02_LIGHTFRAME",
+            "legs": "L-01_STRIDER",
+            "backpack": "B-04_LONGTANK",
+            "enabled": true,
+            "auxiliary": [
+                "AUX_MISSILE_POD",
+                "AUX_MISSILE_POD"
+            ],
+            "weapons": [
+                "W-01_LUMEN",
+                "W-02_BREAKER",
+                "AUTO",
+                "AUTO"
+            ]
+        },
+        {
+            "key": "AI/WISP",
+            "head": "HD01",
+            "body": "BD01",
+            "legs": "L-01_STRIDER",
+            "backpack": "B-01_SKYWING",
+            "enabled": true,
+            "auxiliary": [
+                "NONE",
+                "NONE"
+            ],
+            "weapons": [
+                "AUTO",
+                "AUTO",
+                "AUTO",
+                "AUTO"
+            ]
+        },
+        {
+            "key": "DESIGN_01/BASTION",
+            "head": "HD01",
+            "body": "BD01",
+            "legs": "L-02_BASTION_TRACK",
+            "backpack": "B-01_SKYWING",
+            "enabled": true,
+            "auxiliary": [
+                "NONE",
+                "NONE"
+            ],
+            "weapons": [
+                "AUTO",
+                "AUTO",
+                "AUTO",
+                "AUTO"
+            ]
+        },
+        {
+            "key": "DESIGN_01/TARANTULA",
+            "head": "HD01",
+            "body": "BD01",
+            "legs": "L-03_TARANTULAN",
+            "backpack": "B-01_SKYWING",
+            "enabled": true,
+            "auxiliary": [
+                "NONE",
+                "NONE"
+            ],
+            "weapons": [
+                "AUTO",
+                "AUTO",
+                "AUTO",
+                "AUTO"
+            ]
+        },
+        {
+            "key": "DESIGN_01/HOUND",
+            "head": "HD01",
+            "body": "BD01",
+            "legs": "L-03_TARANTULAN",
+            "backpack": "B-01_SKYWING",
+            "enabled": false,
+            "auxiliary": [
+                "NONE",
+                "NONE"
+            ],
+            "weapons": [
+                "AUTO",
+                "AUTO",
+                "AUTO",
+                "AUTO"
+            ]
+        },
+        {
+            "key": "AI/BASTION",
+            "head": "HD01",
+            "body": "BD01",
+            "legs": "L-02_BASTION_TRACK",
+            "backpack": "B-01_SKYWING",
+            "enabled": true,
+            "auxiliary": [
+                "NONE",
+                "NONE"
+            ],
+            "weapons": [
+                "AUTO",
+                "AUTO",
+                "AUTO",
+                "AUTO"
+            ]
+        },
+        {
+            "key": "DESIGN_02/BASTION",
+            "head": "HD01",
+            "body": "BD01",
+            "legs": "L-02_BASTION_TRACK",
+            "backpack": "B-01_SKYWING",
+            "enabled": true,
+            "auxiliary": [
+                "NONE",
+                "NONE"
+            ],
+            "weapons": [
+                "AUTO",
+                "AUTO",
+                "AUTO",
+                "AUTO"
+            ]
+        },
+        {
+            "key": "DESIGN_02/WISP",
+            "head": "HD01",
+            "body": "BD01",
+            "legs": "L-01_STRIDER",
+            "backpack": "B-01_SKYWING",
+            "enabled": true,
+            "auxiliary": [
+                "NONE",
+                "NONE"
+            ],
+            "weapons": [
+                "AUTO",
+                "AUTO",
+                "AUTO",
+                "AUTO"
+            ]
+        },
+        {
+            "key": "DESIGN_02/TARANTULA",
+            "head": "HD01",
+            "body": "BD01",
+            "legs": "L-03_TARANTULAN",
+            "backpack": "B-01_SKYWING",
+            "enabled": true,
+            "auxiliary": [
+                "NONE",
+                "NONE"
+            ],
+            "weapons": [
+                "AUTO",
+                "AUTO",
+                "AUTO",
+                "AUTO"
+            ]
+        },
+        {
+            "key": "DESIGN_02/HOUND",
+            "head": "HD01",
+            "body": "BD01",
+            "legs": "L-03_TARANTULAN",
+            "backpack": "B-01_SKYWING",
+            "enabled": false,
+            "auxiliary": [
+                "NONE",
+                "NONE"
+            ],
+            "weapons": [
+                "AUTO",
+                "AUTO",
+                "AUTO",
+                "AUTO"
+            ]
+        },
+        {
+            "key": "DESIGN_03/TARANTULA",
+            "head": "HD01",
+            "body": "BD01",
+            "legs": "L-03_TARANTULAN",
+            "backpack": "B-01_SKYWING",
+            "enabled": true,
+            "auxiliary": [
+                "NONE",
+                "NONE"
+            ],
+            "weapons": [
+                "AUTO",
+                "AUTO",
+                "AUTO",
+                "AUTO"
+            ]
+        },
+        {
+            "key": "AI/TARANTULA",
+            "head": "HD01",
+            "body": "BD01",
+            "legs": "L-03_TARANTULAN",
+            "backpack": "B-01_SKYWING",
+            "enabled": true,
+            "auxiliary": [
+                "NONE",
+                "NONE"
+            ],
+            "weapons": [
+                "AUTO",
+                "AUTO",
+                "AUTO",
+                "AUTO"
+            ]
+        },
+        {
+            "key": "DESIGN_03/WISP",
+            "head": "HD01",
+            "body": "BD01",
+            "legs": "L-01_STRIDER",
+            "backpack": "B-01_SKYWING",
+            "enabled": true,
+            "auxiliary": [
+                "NONE",
+                "NONE"
+            ],
+            "weapons": [
+                "AUTO",
+                "AUTO",
+                "AUTO",
+                "AUTO"
+            ]
+        },
+        {
+            "key": "DESIGN_03/BASTION",
+            "head": "HD01",
+            "body": "BD01",
+            "legs": "L-02_BASTION_TRACK",
+            "backpack": "B-01_SKYWING",
+            "enabled": true,
+            "auxiliary": [
+                "NONE",
+                "NONE"
+            ],
+            "weapons": [
+                "AUTO",
+                "AUTO",
+                "AUTO",
+                "AUTO"
+            ]
+        },
+        {
+            "key": "DESIGN_03/HOUND",
+            "head": "HD01",
+            "body": "BD01",
+            "legs": "L-03_TARANTULAN",
+            "backpack": "B-01_SKYWING",
+            "enabled": false,
+            "auxiliary": [
+                "NONE",
+                "NONE"
+            ],
+            "weapons": [
+                "AUTO",
+                "AUTO",
+                "AUTO",
+                "AUTO"
+            ]
+        }
+    ]
+}

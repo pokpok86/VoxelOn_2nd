@@ -1,0 +1,3 @@
+actors,simulatedSeconds,cpuTickMeanMs,cpuTickP95Ms,peakShots,peakAuthoredEffects,deployments,weaponMaterials
+8,30,3.185,6.007,7,11,12,74
+16,30,5.991,14.251,17,20,23,74

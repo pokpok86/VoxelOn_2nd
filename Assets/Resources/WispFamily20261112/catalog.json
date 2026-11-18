@@ -127,6 +127,126 @@
       "waistHeight": 0.40625,
       "vertices": 7440,
       "groups": 5
+    },
+    {
+      "id": "VIS_B02_SKYWING",
+      "category": "backpack",
+      "resource": "WispFamily20261112/VIS_B02_SKYWING",
+      "waistHeight": 0.505,
+      "vertices": 9924,
+      "groups": 7
+    },
+    {
+      "id": "VIS_B03_CARGO_PACK",
+      "category": "backpack",
+      "resource": "WispFamily20261112/VIS_B03_CARGO_PACK",
+      "waistHeight": 0.505,
+      "vertices": 5196,
+      "groups": 6
+    },
+    {
+      "id": "VIS_L02_BASTION_TRACK",
+      "category": "lower_body",
+      "resource": "WispFamily20261112/VIS_L02_BASTION_TRACK",
+      "waistHeight": 0.505,
+      "vertices": 24204,
+      "groups": 4
+    },
+    {
+      "id": "VIS_L03_TARANTULAN",
+      "category": "lower_body",
+      "resource": "WispFamily20261112/VIS_L03_TARANTULAN",
+      "waistHeight": 0.505,
+      "vertices": 25404,
+      "groups": 40
+    },
+    {
+      "id": "VIS_L04_DRAFT_HOVER",
+      "category": "lower_body",
+      "resource": "WispFamily20261112/VIS_L04_DRAFT_HOVER",
+      "waistHeight": 0.505,
+      "vertices": 14556,
+      "groups": 6
+    },
+    {
+      "id": "VIS_H01_RADOME",
+      "category": "head",
+      "resource": "WispFamily20261112/VIS_H01_RADOME",
+      "waistHeight": 0.505,
+      "vertices": 7932,
+      "groups": 5
+    },
+    {
+      "id": "VIS_H02_LONGSIGHT",
+      "category": "head",
+      "resource": "WispFamily20261112/VIS_H02_LONGSIGHT",
+      "waistHeight": 0.505,
+      "vertices": 9348,
+      "groups": 6
+    },
+    {
+      "id": "VIS_H03_SWIFTFIN",
+      "category": "head",
+      "resource": "WispFamily20261112/VIS_H03_SWIFTFIN",
+      "waistHeight": 0.505,
+      "vertices": 5052,
+      "groups": 5
+    },
+    {
+      "id": "VIS_H04_BULWARK",
+      "category": "head",
+      "resource": "WispFamily20261112/VIS_H04_BULWARK",
+      "waistHeight": 0.505,
+      "vertices": 4908,
+      "groups": 6
+    },
+    {
+      "id": "VIS_H05_NEEDLE",
+      "category": "head",
+      "resource": "WispFamily20261112/VIS_H05_NEEDLE",
+      "waistHeight": 0.505,
+      "vertices": 3804,
+      "groups": 5
+    },
+    {
+      "id": "VIS_H06_LANCET",
+      "category": "head",
+      "resource": "WispFamily20261112/VIS_H06_LANCET",
+      "waistHeight": 0.505,
+      "vertices": 3696,
+      "groups": 6
+    },
+    {
+      "id": "VIS_C01_STANDARD",
+      "category": "body",
+      "resource": "WispFamily20261112/VIS_C01_STANDARD",
+      "waistHeight": 0.505,
+      "vertices": 14760,
+      "groups": 19
+    },
+    {
+      "id": "VIS_C02_LIGHTFRAME",
+      "category": "body",
+      "resource": "WispFamily20261112/VIS_C02_LIGHTFRAME",
+      "waistHeight": 0.505,
+      "vertices": 14184,
+      "groups": 19
+    },
+    {
+      "id": "VIS_C03_BULWARK_CORE",
+      "category": "body",
+      "resource": "WispFamily20261112/VIS_C03_BULWARK_CORE",
+      "waistHeight": 0.505,
+      "vertices": 15600,
+      "groups": 19
+    },
+    {
+      "id": "VIS_C04_ARC_CORE",
+      "category": "body",
+      "resource": "WispFamily20261112/VIS_C04_ARC_CORE",
+      "waistHeight": 0.505,
+      "vertices": 18264,
+      "groups": 24
     }
   ]
 }

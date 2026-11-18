@@ -1,0 +1,242 @@
+{
+  "pass": true,
+  "files": [
+    {
+      "file": "VXDR_ATTACK_v002_BACKPACK.fbx",
+      "meshCount": 24,
+      "sockets": [
+        "BODY_MOUNT",
+        "DRONE_DOCK",
+        "LAUNCH_EXIT",
+        "VXDR_ATTACK_v002_BACKPACK__ROOT"
+      ],
+      "worldBoundsMeters": [
+        0.4109267592430115,
+        0.21050004661083221,
+        0.3500000238418579
+      ],
+      "finite": true
+    },
+    {
+      "file": "VXDR_ATTACK_v002_DOCKED.fbx",
+      "meshCount": 50,
+      "sockets": [
+        "Docked_BODY_MOUNT",
+        "Docked_DRONE_DOCK",
+        "Docked_LAUNCH_EXIT",
+        "Docked_VXDR_ATTACK_v002_BACKPACK__ROOT",
+        "Docked_DOCK_CONTACT",
+        "Docked_DRONE_CENTER",
+        "Docked_FIN_PIVOT_-1_-1",
+        "Docked_FIN_PIVOT_-1_1",
+        "Docked_FIN_PIVOT_1_-1",
+        "Docked_FIN_PIVOT_1_1",
+        "Docked_MUZZLE_L",
+        "Docked_MUZZLE_R",
+        "Docked_VXDR_ATTACK_v002_DRONE__ROOT",
+        "VXDR_ATTACK_v002_DOCKED__ROOT"
+      ],
+      "worldBoundsMeters": [
+        0.4109267592430115,
+        0.33400002121925354,
+        0.3500000238418579
+      ],
+      "finite": true
+    },
+    {
+      "file": "VXDR_ATTACK_v002_DRONE.fbx",
+      "meshCount": 26,
+      "sockets": [
+        "DOCK_CONTACT",
+        "DRONE_CENTER",
+        "FIN_PIVOT_-1_-1",
+        "FIN_PIVOT_-1_1",
+        "FIN_PIVOT_1_-1",
+        "FIN_PIVOT_1_1",
+        "MUZZLE_L",
+        "MUZZLE_R",
+        "VXDR_ATTACK_v002_DRONE__ROOT"
+      ],
+      "worldBoundsMeters": [
+        0.343999981880188,
+        0.29499999433755875,
+        0.1029617004096508
+      ],
+      "finite": true
+    },
+    {
+      "file": "VXDR_ATTACK_v002_FX.fbx",
+      "meshCount": 6,
+      "sockets": [
+        "FX_END",
+        "FX_ORIGIN",
+        "VXDR_ATTACK_v002_FX__ROOT"
+      ],
+      "worldBoundsMeters": [
+        0.1159880980849266,
+        0.005000019446015358,
+        0.11483701691031456
+      ],
+      "finite": true
+    },
+    {
+      "file": "VXDR_INTERCEPT_v002_BACKPACK.fbx",
+      "meshCount": 24,
+      "sockets": [
+        "BODY_MOUNT",
+        "DRONE_DOCK",
+        "LAUNCH_EXIT",
+        "VXDR_INTERCEPT_v002_BACKPACK__ROOT"
+      ],
+      "worldBoundsMeters": [
+        0.4109267592430115,
+        0.21050004661083221,
+        0.3500000238418579
+      ],
+      "finite": true
+    },
+    {
+      "file": "VXDR_INTERCEPT_v002_DOCKED.fbx",
+      "meshCount": 50,
+      "sockets": [
+        "Docked_BODY_MOUNT",
+        "Docked_DRONE_DOCK",
+        "Docked_LAUNCH_EXIT",
+        "Docked_VXDR_INTERCEPT_v002_BACKPACK__ROOT",
+        "Docked_DOCK_CONTACT",
+        "Docked_DRONE_CENTER",
+        "Docked_FIN_PIVOT_-1_-1",
+        "Docked_FIN_PIVOT_-1_1",
+        "Docked_FIN_PIVOT_1_-1",
+        "Docked_FIN_PIVOT_1_1",
+        "Docked_INTERCEPT_MUZZLE",
+        "Docked_VXDR_INTERCEPT_v002_DRONE__ROOT",
+        "VXDR_INTERCEPT_v002_DOCKED__ROOT"
+      ],
+      "worldBoundsMeters": [
+        0.4109267592430115,
+        0.36250002682209015,
+        0.3500000238418579
+      ],
+      "finite": true
+    },
+    {
+      "file": "VXDR_INTERCEPT_v002_DRONE.fbx",
+      "meshCount": 26,
+      "sockets": [
+        "DOCK_CONTACT",
+        "DRONE_CENTER",
+        "FIN_PIVOT_-1_-1",
+        "FIN_PIVOT_-1_1",
+        "FIN_PIVOT_1_-1",
+        "FIN_PIVOT_1_1",
+        "INTERCEPT_MUZZLE",
+        "VXDR_INTERCEPT_v002_DRONE__ROOT"
+      ],
+      "worldBoundsMeters": [
+        0.343999981880188,
+        0.32349999994039536,
+        0.10046170651912689
+      ],
+      "finite": true
+    },
+    {
+      "file": "VXDR_INTERCEPT_v002_FX.fbx",
+      "meshCount": 12,
+      "sockets": [
+        "FX_END",
+        "FX_ORIGIN",
+        "VXDR_INTERCEPT_v002_FX__ROOT"
+      ],
+      "worldBoundsMeters": [
+        0.20045270770788193,
+        0.005000032484531403,
+        0.19868293404579163
+      ],
+      "finite": true
+    },
+    {
+      "file": "VXDR_JAMMER_v002_BACKPACK.fbx",
+      "meshCount": 24,
+      "sockets": [
+        "BODY_MOUNT",
+        "DRONE_DOCK",
+        "LAUNCH_EXIT",
+        "VXDR_JAMMER_v002_BACKPACK__ROOT"
+      ],
+      "worldBoundsMeters": [
+        0.4109267592430115,
+        0.21050004661083221,
+        0.3500000238418579
+      ],
+      "finite": true
+    },
+    {
+      "file": "VXDR_JAMMER_v002_DOCKED.fbx",
+      "meshCount": 50,
+      "sockets": [
+        "Docked_BODY_MOUNT",
+        "Docked_DRONE_DOCK",
+        "Docked_LAUNCH_EXIT",
+        "Docked_VXDR_JAMMER_v002_BACKPACK__ROOT",
+        "Docked_DOCK_CONTACT",
+        "Docked_DRONE_CENTER",
+        "Docked_EMITTER_-1_-1",
+        "Docked_EMITTER_-1_1",
+        "Docked_EMITTER_1_-1",
+        "Docked_EMITTER_1_1",
+        "Docked_FIN_PIVOT_-1_-1",
+        "Docked_FIN_PIVOT_-1_1",
+        "Docked_FIN_PIVOT_1_-1",
+        "Docked_FIN_PIVOT_1_1",
+        "Docked_VXDR_JAMMER_v002_DRONE__ROOT",
+        "VXDR_JAMMER_v002_DOCKED__ROOT"
+      ],
+      "worldBoundsMeters": [
+        0.4109267592430115,
+        0.3499999940395355,
+        0.3500000238418579
+      ],
+      "finite": true
+    },
+    {
+      "file": "VXDR_JAMMER_v002_DRONE.fbx",
+      "meshCount": 26,
+      "sockets": [
+        "DOCK_CONTACT",
+        "DRONE_CENTER",
+        "EMITTER_-1_-1",
+        "EMITTER_-1_1",
+        "EMITTER_1_-1",
+        "EMITTER_1_1",
+        "FIN_PIVOT_-1_-1",
+        "FIN_PIVOT_-1_1",
+        "FIN_PIVOT_1_-1",
+        "FIN_PIVOT_1_1",
+        "VXDR_JAMMER_v002_DRONE__ROOT"
+      ],
+      "worldBoundsMeters": [
+        0.343999981880188,
+        0.3499999940395355,
+        0.12150001898407936
+      ],
+      "finite": true
+    },
+    {
+      "file": "VXDR_JAMMER_v002_FX.fbx",
+      "meshCount": 3,
+      "sockets": [
+        "FX_END",
+        "FX_ORIGIN",
+        "VXDR_JAMMER_v002_FX__ROOT"
+      ],
+      "worldBoundsMeters": [
+        0.6236813068389893,
+        0.6236813068389893,
+        0.03346418577712029
+      ],
+      "finite": true
+    }
+  ],
+  "limits": "Blender FBX reimport only; no Unity import/runtime behavior or physical docking clearance certification"
+}

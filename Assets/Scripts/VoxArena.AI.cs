@@ -135,6 +135,7 @@ public sealed partial class VoxArena
         bool jumpWindow=(f.aiClock+personality*2f)%jumpCycle<(.38f+personality*.25f);
         bool reloadJump=reloadEvasion&&AIReloadJumpWindow(f,personality*2f,jumpCycle);
         bool jumpRequest=(!testRival || aiJumpEnabled) && (obstacleAhead || (threatened && jumpWindow)||reloadJump) && f.boostEnergy>f.spec.boostCapacity*.18f;
+        if(IsGroundDronePack(f)){jumpRequest=false;f.jumpHoldElapsed=0;}
         if(f.spec.chargedReleaseJump)
         {
             bool grounded=f.jumpHeight<=.02f && f.jumpVelocity<=0f;
@@ -159,7 +160,7 @@ public sealed partial class VoxArena
             if(f.jumpHeld && f.jumpHeight<=.02f && f.jumpVelocity<=0)
             { f.jumpOriginY=f.root.position.y; f.jumpVelocity=JumpLaunchSpeed(f,f.spec.jumpImpulseScale); }
         }
-        if(!smoke)UpdateCoverRoute(f,target);
+        if(!smoke){long coverTick=profileDroneSoak?System.Diagnostics.Stopwatch.GetTimestamp():0;UpdateCoverRoute(f,target);if(profileDroneSoak)profileCoverMs+=ProfileElapsed(coverTick);}
         if(reloadEvasion)
         {
             f.aiMove=EscapeHeading(f,f.root.position-target.root.position);f.aiState="RELOAD / DODGE";

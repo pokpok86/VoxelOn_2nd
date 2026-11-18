@@ -1,0 +1,215 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Keep candidate Blender identities collision-free while allowing approved cosmetic runtime selection.",
+  "namespaces": {
+    "runtime": "Assets/Resources/WispFamily20261112/catalog.json",
+    "designReview": "Docs/Design/WISP_Parts/PART_CATALOG.json"
+  },
+  "identityRule": "An ID is unique only inside its namespace. Never replace a runtime asset by matching its B-/L- number or display name.",
+  "entries": [
+    {
+      "stableKey": "runtime:B-01_SKYWING",
+      "namespace": "runtime",
+      "catalogId": "B-01_SKYWING",
+      "status": "selectable runtime part",
+      "source": "Assets/Resources/WispFamily20261112/B-01_SKYWING.json"
+    },
+    {
+      "stableKey": "designReview:B-01_TWIN_DRIVE",
+      "namespace": "designReview",
+      "catalogId": "B-01",
+      "partName": "B-01_TWIN_DRIVE",
+      "status": "legacy review baseline; not the runtime B-01"
+    },
+    {
+      "stableKey": "runtime:B-02_CROSSLANCE",
+      "namespace": "runtime",
+      "catalogId": "B-02_CROSSLANCE",
+      "status": "selectable runtime part",
+      "source": "Assets/Resources/WispFamily20261112/B-02_CROSSLANCE.json"
+    },
+    {
+      "stableKey": "designReview:B-02_SKYWING",
+      "namespace": "designReview",
+      "catalogId": "B-02",
+      "partName": "B-02_SKYWING",
+      "status": "Blender candidate; not mapped to runtime B-02"
+    },
+    {
+      "stableKey": "runtime:B-03_OVERTHRUST",
+      "namespace": "runtime",
+      "catalogId": "B-03_OVERTHRUST",
+      "status": "selectable runtime part",
+      "source": "Assets/Resources/WispFamily20261112/B-03_OVERTHRUST.json"
+    },
+    {
+      "stableKey": "runtime:VIS_B02_SKYWING",
+      "namespace": "runtime",
+      "catalogId": "VIS_B02_SKYWING",
+      "status": "selectable cosmetic candidate; unique visual ID",
+      "source": "Assets/Resources/WispFamily20261112/VIS_B02_SKYWING.json",
+      "blenderSource": "Docs/Design/WISP_Parts/B-02_SKYWING/B-02_SKYWING.blend"
+    },
+    {
+      "stableKey": "runtime:VIS_B03_CARGO_PACK",
+      "namespace": "runtime",
+      "catalogId": "VIS_B03_CARGO_PACK",
+      "status": "selectable cosmetic candidate; unique visual ID",
+      "source": "Assets/Resources/WispFamily20261112/VIS_B03_CARGO_PACK.json",
+      "blenderSource": "Docs/Design/WISP_Parts/B-03_CARGO_PACK/B-03_CARGO_PACK.blend"
+    },
+    {
+      "stableKey": "designReview:B-03_CARGO_PACK",
+      "namespace": "designReview",
+      "catalogId": "B-03",
+      "partName": "B-03_CARGO_PACK",
+      "status": "Blender candidate; not mapped to runtime B-03"
+    },
+    {
+      "stableKey": "runtime:L-02_BASTION_TRACK",
+      "namespace": "runtime",
+      "catalogId": "L-02_BASTION_TRACK",
+      "status": "selectable runtime part",
+      "source": "Assets/Resources/WispFamily20261112/L-02_BASTION_TRACK.json"
+    },
+    {
+      "stableKey": "designReview:L-02_BASTION_TRACK",
+      "namespace": "designReview",
+      "catalogId": "L-02",
+      "partName": "L-02_BASTION_TRACK",
+      "status": "Blender candidate; naming corresponds, integration remains unverified"
+    },
+    {
+      "stableKey": "runtime:L-03_TARANTULAN",
+      "namespace": "runtime",
+      "catalogId": "L-03_TARANTULAN",
+      "status": "selectable runtime part",
+      "source": "Assets/Resources/WispFamily20261112/L-03_TARANTULAN.json"
+    },
+    {
+      "stableKey": "runtime:VIS_H01_RADOME",
+      "namespace": "runtime",
+      "catalogId": "VIS_H01_RADOME",
+      "status": "selectable cosmetic head; unique visual ID",
+      "source": "Assets/Resources/WispFamily20261112/VIS_H01_RADOME.json",
+      "blenderSource": "Docs/Design/WISP_Parts/HeadCore-20261112/H-01_RADOME/H-01_RADOME.blend"
+    },
+    {
+      "stableKey": "runtime:VIS_H02_LONGSIGHT",
+      "namespace": "runtime",
+      "catalogId": "VIS_H02_LONGSIGHT",
+      "status": "selectable cosmetic head; unique visual ID",
+      "source": "Assets/Resources/WispFamily20261112/VIS_H02_LONGSIGHT.json",
+      "blenderSource": "Docs/Design/WISP_Parts/HeadCore-20261112/H-02_LONGSIGHT/H-02_LONGSIGHT.blend"
+    },
+    {
+      "stableKey": "runtime:VIS_H03_SWIFTFIN",
+      "namespace": "runtime",
+      "catalogId": "VIS_H03_SWIFTFIN",
+      "status": "selectable cosmetic head; unique visual ID",
+      "source": "Assets/Resources/WispFamily20261112/VIS_H03_SWIFTFIN.json",
+      "blenderSource": "Docs/Design/WISP_Parts/HeadCore-20261112/H-03_SWIFTFIN/H-03_SWIFTFIN.blend"
+    },
+    {
+      "stableKey": "runtime:VIS_H04_BULWARK",
+      "namespace": "runtime",
+      "catalogId": "VIS_H04_BULWARK",
+      "status": "selectable cosmetic head; unique visual ID",
+      "source": "Assets/Resources/WispFamily20261112/VIS_H04_BULWARK.json",
+      "blenderSource": "Docs/Design/WISP_Parts/HeadCore-20261112/H-04_BULWARK/H-04_BULWARK.blend"
+    },
+    {
+      "stableKey": "runtime:VIS_H05_NEEDLE",
+      "namespace": "runtime",
+      "catalogId": "VIS_H05_NEEDLE",
+      "status": "selectable cosmetic head; unique visual ID",
+      "source": "Assets/Resources/WispFamily20261112/VIS_H05_NEEDLE.json",
+      "blenderSource": "Docs/Design/WISP_Parts/SlimHeads-20261112/H-05_NEEDLE/H-05_NEEDLE.blend"
+    },
+    {
+      "stableKey": "runtime:VIS_H06_LANCET",
+      "namespace": "runtime",
+      "catalogId": "VIS_H06_LANCET",
+      "status": "selectable cosmetic head; unique visual ID",
+      "source": "Assets/Resources/WispFamily20261112/VIS_H06_LANCET.json",
+      "blenderSource": "Docs/Design/WISP_Parts/SlimHeads-20261112/H-06_LANCET/H-06_LANCET.blend"
+    },
+    {
+      "stableKey": "runtime:VIS_C01_STANDARD",
+      "namespace": "runtime",
+      "catalogId": "VIS_C01_STANDARD",
+      "status": "selectable cosmetic core; shared waist, neck and arm interfaces",
+      "source": "Assets/Resources/WispFamily20261112/VIS_C01_STANDARD.json",
+      "blenderSource": "Docs/Design/WISP_Parts/HeadCore-20261112/C-01_STANDARD/C-01_STANDARD.blend"
+    },
+    {
+      "stableKey": "runtime:VIS_C02_LIGHTFRAME",
+      "namespace": "runtime",
+      "catalogId": "VIS_C02_LIGHTFRAME",
+      "status": "selectable cosmetic core; shared waist, neck and arm interfaces",
+      "source": "Assets/Resources/WispFamily20261112/VIS_C02_LIGHTFRAME.json",
+      "blenderSource": "Docs/Design/WISP_Parts/HeadCore-20261112/C-02_LIGHTFRAME/C-02_LIGHTFRAME.blend"
+    },
+    {
+      "stableKey": "runtime:VIS_C03_BULWARK_CORE",
+      "namespace": "runtime",
+      "catalogId": "VIS_C03_BULWARK_CORE",
+      "status": "selectable cosmetic core; shared waist, neck and arm interfaces",
+      "source": "Assets/Resources/WispFamily20261112/VIS_C03_BULWARK_CORE.json",
+      "blenderSource": "Docs/Design/WISP_Parts/HeadCore-20261112/C-03_BULWARK_CORE/C-03_BULWARK_CORE.blend"
+    },
+    {
+      "stableKey": "runtime:VIS_C04_ARC_CORE",
+      "namespace": "runtime",
+      "catalogId": "VIS_C04_ARC_CORE",
+      "status": "selectable cosmetic core; shared waist, neck and arm interfaces",
+      "source": "Assets/Resources/WispFamily20261112/VIS_C04_ARC_CORE.json",
+      "blenderSource": "Docs/Design/WISP_Parts/HeadCore-20261112/C-04_ARC_CORE/C-04_ARC_CORE.blend"
+    },
+    {
+      "stableKey": "runtime:VIS_L02_BASTION_TRACK",
+      "namespace": "runtime",
+      "catalogId": "VIS_L02_BASTION_TRACK",
+      "status": "selectable cosmetic candidate; unique visual ID",
+      "source": "Assets/Resources/WispFamily20261112/VIS_L02_BASTION_TRACK.json",
+      "blenderSource": "Docs/Design/WISP_Parts/L-02_BASTION_TRACK/L-02_BASTION_TRACK.blend"
+    },
+    {
+      "stableKey": "runtime:VIS_L03_TARANTULAN",
+      "namespace": "runtime",
+      "catalogId": "VIS_L03_TARANTULAN",
+      "status": "selectable cosmetic candidate; four articulated leg chains",
+      "source": "Assets/Resources/WispFamily20261112/VIS_L03_TARANTULAN.json",
+      "blenderSource": "Docs/Design/WISP_Parts/L-03_TARANTULAN/L-03_TARANTULAN.blend"
+    },
+    {
+      "stableKey": "runtime:VIS_L04_DRAFT_HOVER",
+      "namespace": "runtime",
+      "catalogId": "VIS_L04_DRAFT_HOVER",
+      "status": "selectable cosmetic candidate; static hover appearance",
+      "source": "Assets/Resources/WispFamily20261112/VIS_L04_DRAFT_HOVER.json",
+      "blenderSource": "Docs/Design/WISP_Parts/L-04_DRAFT_HOVER/L-04_DRAFT_HOVER.blend"
+    },
+    {
+      "stableKey": "designReview:L-03_TARANTULAN",
+      "namespace": "designReview",
+      "catalogId": "L-03",
+      "partName": "L-03_TARANTULAN",
+      "status": "Blender candidate; naming corresponds, integration remains unverified"
+    },
+    {
+      "stableKey": "designReview:L-04_DRAFT_HOVER",
+      "namespace": "designReview",
+      "catalogId": "L-04",
+      "partName": "L-04_DRAFT_HOVER",
+      "status": "Blender candidate; no corresponding runtime catalog part"
+    }
+  ],
+  "pendingVisualApproval": [
+    "designReview:B-02_SKYWING",
+    "designReview:B-03_CARGO_PACK",
+    "designReview:L-02_BASTION_TRACK",
+    "designReview:L-03_TARANTULAN",
+    "designReview:L-04_DRAFT_HOVER"
+  ]
+}

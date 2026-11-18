@@ -621,13 +621,16 @@ public sealed partial class VoxArena
         }
         return ground;
     }
-    bool ObstacleOnSegment(Vector3 from,Vector3 to,float radius,out float nearest)
+    bool ObstacleOnSegment(Vector3 from,Vector3 to,float radius,out float nearest)=>ObstacleOnSegmentCore(from,to,radius,out nearest,true);
+    bool ObstacleOnSegmentCore(Vector3 from,Vector3 to,float radius,out float nearest,bool broadPhase)
     {
         Vector3 delta=to-from; float length=delta.magnitude; nearest=float.PositiveInfinity;
         if(length<.0001f) { if(Occupied(from,radius)) nearest=0; return nearest==0; }
         Ray ray=new Ray(from,delta/length);
+        Vector3 segmentMin=Vector3.Min(from,to)-new Vector3(radius+.0001f,.0001f,radius+.0001f),segmentMax=Vector3.Max(from,to)+new Vector3(radius+.0001f,.0001f,radius+.0001f);
         foreach(Bounds b in obstacles)
         {
+            if(broadPhase&&(b.min.x>segmentMax.x||b.max.x<segmentMin.x||b.min.y>segmentMax.y||b.max.y<segmentMin.y||b.min.z>segmentMax.z||b.max.z<segmentMin.z))continue;
             Bounds e=b; e.Expand(new Vector3(radius*2,0,radius*2));
             if(InsideObstacle(b,from,radius)) nearest=0;
             else

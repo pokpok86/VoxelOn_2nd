@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 // All geometry below is local to a detachable module. Gameplay stats stay in CraftSpec
 // until the assembly system is introduced; visual changes never silently change balance.
@@ -1293,18 +1293,24 @@ public sealed partial class VoxArena
             }
         }
         AddFrameIdentity(f,armor,hull,dark,edge);
-        ApplyImportedWisp(f);BuildSelectableHeadVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableCoreVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableArmVisualVariant(f,true,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableArmVisualVariant(f,false,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableLegVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));BuildBoosterVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));PreparePendingBackpackWeapons(f);SetupWeaponVisuals(f);SetupBoostVisual(f);InstallFamilyArt(f);if(f==player)RegisterCameraFadeRenderers(f);
+        ApplyImportedWisp(f);BuildSelectableCoreVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableArmVisualVariant(f,true,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableArmVisualVariant(f,false,armor,dark,edge,new Color(.22f,.86f,1f));BuildSelectableLegVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));BuildBoosterVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));PreparePendingBackpackWeapons(f);SetupWeaponVisuals(f);SetupBoostVisual(f);InstallFamilyArt(f);
+        // Family art replaces the legacy head transform. Attach the selected
+        // sensor assembly afterward so it remains visible on the active rig.
+        BuildSelectableHeadVisualVariant(f,armor,dark,edge,new Color(.22f,.86f,1f));
+        if(f==player)RegisterCameraFadeRenderers(f);
     }
-    RenderTexture[] framePortraits,customizationPortraits;float portraitYaw;
+    RenderTexture[] framePortraits,customizationPortraits,compactCustomizationPortraits;float portraitYaw;
     void BuildPortraits()
     {
-        if(framePortraits==null||framePortraits.Length!=CraftCatalog.Selectable.Length||customizationPortraits==null||customizationPortraits.Length!=CraftCatalog.Selectable.Length)
+        if(framePortraits==null||framePortraits.Length!=CraftCatalog.Selectable.Length||customizationPortraits==null||customizationPortraits.Length!=CraftCatalog.Selectable.Length||compactCustomizationPortraits==null||compactCustomizationPortraits.Length!=CraftCatalog.Selectable.Length)
         {
             if(framePortraits!=null)foreach(RenderTexture old in framePortraits)if(old!=null){old.Release();Destroy(old);}
             if(customizationPortraits!=null)foreach(RenderTexture old in customizationPortraits)if(old!=null){old.Release();Destroy(old);}
+            if(compactCustomizationPortraits!=null)foreach(RenderTexture old in compactCustomizationPortraits)if(old!=null){old.Release();Destroy(old);}
+            compactCustomizationPortraits=new RenderTexture[CraftCatalog.Selectable.Length];
             framePortraits=new RenderTexture[CraftCatalog.Selectable.Length];
             customizationPortraits=new RenderTexture[CraftCatalog.Selectable.Length];
-            for(int i=0;i<framePortraits.Length;i++){framePortraits[i]=new RenderTexture(384,512,16);customizationPortraits[i]=new RenderTexture(384,512,16);}
+            for(int i=0;i<framePortraits.Length;i++){framePortraits[i]=new RenderTexture(384,512,16);customizationPortraits[i]=new RenderTexture(824,608,24);compactCustomizationPortraits[i]=new RenderTexture(592,840,24);}
         }
         if(portraitModel==null)
         {
@@ -1316,10 +1322,10 @@ public sealed partial class VoxArena
         }
         for(int i=0;i<CraftCatalog.Selectable.Length;i++)
         {
-            ApplySelectableCharacter(portraitModel,i);PreparePortraitModel();RenderPortraitFrame(i);RenderPortraitFrame(i,true);
+            ApplySelectableCharacter(portraitModel,i);PreparePortraitModel();RenderPortraitFrame(i);RenderPortraitFrame(i,true);RenderPortraitFrame(i,true,true);
         }
         int selected=Mathf.Clamp(balanceFrameIndex,0,CraftCatalog.Selectable.Length-1);
-        ApplySelectableCharacter(portraitModel,selected);PreparePortraitModel();RenderPortraitFrame(selected);RenderPortraitFrame(selected,true);
+        ApplySelectableCharacter(portraitModel,selected);PreparePortraitModel();RenderPortraitFrame(selected);RenderPortraitFrame(selected,true);RenderPortraitFrame(selected,true,true);
     }
     void PreparePortraitModel()
     {
@@ -1330,36 +1336,43 @@ public sealed partial class VoxArena
         // feet below the raised floor. Lift the complete model until its
         // lowest visible chassis renderer clears the floor surface.
         float floorTop=portraitHangar!=null?portraitHangar.position.y-.035f:59.965f;
-        bool found=false;float lowest=float.PositiveInfinity;
-        foreach(Renderer renderer in portraitModel.body.GetComponentsInChildren<Renderer>(true))
-        {
-            if(renderer==null||!renderer.enabled||!renderer.gameObject.activeInHierarchy)continue;
-            bool weapon=false;
-            if(portraitModel.weaponVisuals!=null)foreach(Transform visual in portraitModel.weaponVisuals)if(visual!=null&&(renderer.transform==visual||renderer.transform.IsChildOf(visual))){weapon=true;break;}
-            if(weapon)continue;
-            found=true;lowest=Mathf.Min(lowest,renderer.bounds.min.y);
-        }
+        Bounds chassis=PortraitBounds(false,out bool found);float lowest=chassis.min.y;
         if(found&&lowest<floorTop+.06f)portraitModel.root.position+=Vector3.up*(floorTop+.06f-lowest);
         foreach(Transform t in portraitModel.root.GetComponentsInChildren<Transform>(true))t.gameObject.layer=8;
     }
-    void RenderPortraitFrame(int index,bool customization=false)
+    System.Collections.Generic.IEnumerable<Vector3> PortraitMeshCorners(bool includeWeapons)
     {
-        RenderTexture[] destination=customization?customizationPortraits:framePortraits;
+        foreach(MeshFilter filter in portraitModel.body.GetComponentsInChildren<MeshFilter>())
+        {
+            Renderer renderer=filter.GetComponent<Renderer>();if(filter.sharedMesh==null||renderer==null||!renderer.enabled)continue;
+            if(!includeWeapons&&portraitModel.weaponVisuals!=null)
+            {
+                bool weapon=false;foreach(Transform visual in portraitModel.weaponVisuals)if(visual!=null&&filter.transform.IsChildOf(visual)){weapon=true;break;}
+                if(weapon)continue;
+            }
+            Bounds local=filter.sharedMesh.bounds;
+            for(int x=-1;x<=1;x+=2)for(int y=-1;y<=1;y+=2)for(int z=-1;z<=1;z+=2)
+                yield return filter.transform.TransformPoint(local.center+Vector3.Scale(local.extents,new Vector3(x,y,z)));
+        }
+    }
+    Bounds PortraitBounds(bool includeWeapons,out bool found)
+    {
+        Bounds bounds=new Bounds(portraitModel.root.position,Vector3.zero);found=false;
+        foreach(Vector3 point in PortraitMeshCorners(includeWeapons))
+        {if(!found){bounds=new Bounds(point,Vector3.zero);found=true;}else bounds.Encapsulate(point);}
+        return bounds;
+    }
+    void RenderPortraitFrame(int index,bool customization=false,bool compact=false)
+    {
+        RenderTexture[] destination=customization?(compact?compactCustomizationPortraits:customizationPortraits):framePortraits;
         if(portraitModel==null||portraitCamera==null||destination==null||index<0||index>=destination.Length)return;
         // Keep the hangar wall behind the robot as the preview orbits. The
         // backdrop shares the preview yaw so it cannot slide between camera
         // and chassis during a full turn.
         if(portraitHangar!=null)portraitHangar.rotation=Quaternion.Euler(0,portraitYaw,0);
         UpdateFamilyArt(portraitModel);
-        Bounds bounds=new Bounds(portraitModel.root.position+Vector3.up*.6f,Vector3.zero);bool found=false;
-        foreach(Renderer renderer in portraitModel.body.GetComponentsInChildren<Renderer>(true))
-        {
-            if(renderer==null||!renderer.enabled||!renderer.gameObject.activeInHierarchy)continue;
-            bool weapon=false;
-            if(portraitModel.weaponVisuals!=null)foreach(Transform visual in portraitModel.weaponVisuals)if(visual!=null&&(renderer.transform==visual||renderer.transform.IsChildOf(visual))){weapon=true;break;}
-            if(weapon)continue;
-            if(!found){bounds=renderer.bounds;found=true;}else bounds.Encapsulate(renderer.bounds);
-        }
+        Bounds bounds=PortraitBounds(customization,out bool found);
+        portraitCamera.aspect=destination[index].width/(float)destination[index].height;
         Vector3 target=found?bounds.center:portraitModel.root.position+Vector3.up*.6f;
         Vector3 cameraPosition=portraitModel.root.position+Quaternion.Euler(0,portraitYaw,0)*new Vector3(2.5f,4.1f,9f);
         portraitCamera.transform.position=cameraPosition;portraitCamera.transform.rotation=Quaternion.LookRotation(target-cameraPosition,Vector3.up);
@@ -1367,7 +1380,15 @@ public sealed partial class VoxArena
         {
             Vector3 extents=bounds.extents,screenUp=portraitCamera.transform.up;
             float verticalExtent=Mathf.Abs(Vector3.Dot(Vector3.right,screenUp))*extents.x+Mathf.Abs(Vector3.Dot(Vector3.up,screenUp))*extents.y+Mathf.Abs(Vector3.Dot(Vector3.forward,screenUp))*extents.z;
-            portraitCamera.orthographicSize=Mathf.Max(2.6f,verticalExtent*(customization?1.12f:1.30f)+.08f);
+            Vector3 screenRight=portraitCamera.transform.right;
+            float horizontalExtent=Mathf.Abs(screenRight.x)*extents.x+Mathf.Abs(screenRight.y)*extents.y+Mathf.Abs(screenRight.z)*extents.z;
+            if(customization)
+            {
+                verticalExtent=horizontalExtent=0;
+                foreach(Vector3 point in PortraitMeshCorners(true))
+                {Vector3 delta=point-target;verticalExtent=Mathf.Max(verticalExtent,Mathf.Abs(Vector3.Dot(delta,screenUp)));horizontalExtent=Mathf.Max(horizontalExtent,Mathf.Abs(Vector3.Dot(delta,screenRight)));}
+            }
+            portraitCamera.orthographicSize=customization?Mathf.Max(.6f,Mathf.Max(verticalExtent,horizontalExtent/portraitCamera.aspect)*1.10f+.08f):Mathf.Max(2.6f,verticalExtent*1.30f+.08f);
         }
         portraitCamera.targetTexture=destination[index];portraitCamera.Render();portraitCamera.targetTexture=null;
     }

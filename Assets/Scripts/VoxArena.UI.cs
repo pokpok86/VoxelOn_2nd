@@ -184,7 +184,7 @@ public sealed partial class VoxArena
         Bar(422, 643, 220, player.boostEnergy / player.spec.boostCapacity, Cyan);
         Text(420,652,300,"SHIFT BOOST / SPACE JUMP",small);
         Bar(422, 675, 220, 1-player.weaponTimer/(EquippedProfile(player).interval*weaponCooldownScale/Mathf.Max(.2f,player.spec.rightArmHandling)), new Color(1,.70f,.30f));
-        Text(420,687,300,spectatorMode?"AI SPECTATOR / 360 ORBIT":CanStartLockOn(player)?"RMB LOCK-ON / F1 HELP":HasEquippedGuard(player)?"RMB GUARD / F1 HELP":"MANUAL AIM / F1 HELP",small);
+        Text(420,687,300,spectatorMode?"AI SPECTATOR / 360 ORBIT":GunActionHint(player),small);
         if (!Finished && !paused)
             Text(405, 574, 650, player.lockTime>0?"SPECIAL FIRING / MOVEMENT LOCKED":player.rushTime>0?"SABER RUSH":player.boostLocked ? "BOOST EMPTY / RELEASE SHIFT TO REARM" : AimStatus(), small);
         DrawCombatFeedback();
@@ -250,7 +250,7 @@ public sealed partial class VoxArena
         Text(50, 492, 1100, chosen.name + "  /  " + chosen.role, label);
         GUI.color = Color.white;
         Text(50, 567, 1150,"현재 기체 외형과 무장 구성을 비교한 뒤 커스터마이징을 여세요.",small);
-        Text(50, 531, 1150, $"ARMOR {chosen.armor*100:0}%   SHIELD {chosen.ShieldMax:0}   MOVE {chosen.speed:0.#} / BOOST {chosen.boostSpeed:0.#}   STORED CONCEPT: {chosen.description}", small);
+        Text(50, 531, 1150, $"HULL {player.spec.health:0}   ENERGY {player.spec.boostCapacity:0}   MOVE {player.spec.speed:0.#} / BOOST {player.spec.boostSpeed:0.#}   왼손·오른손 독립 무장 / 백팩별 보조 기능", small);
         Text(34, 618, 850, "WASD / mouse look / 1-4 weapons / RMB "+
             (CanStartLockOn(player)?"lock-on":HasEquippedGuard(player)?"guard":"manual aim")+" / LMB fire", label);
         string mobilityHelp=chosen.name=="WISP"?"Shift: forward run / side-back slide. Space: jump / hold for lift.":chosen.name=="TARANTULA"?"Shift: frame booster. Hold and release Space: charged jump.":"Shift: frame booster. Space: low jump.";

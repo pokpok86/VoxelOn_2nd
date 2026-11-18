@@ -8,8 +8,8 @@ public sealed partial class VoxArena
 {
     [Serializable] sealed class FamilyLoadout
     {
-        public string key,legs,backpack="B-01_SKYWING";public bool enabled=true;
-        public string[] weapons={"AUTO","AUTO","AUTO","AUTO"};
+        public string key,head="HD01",body="BD01",legs,backpack="B-01_SKYWING";public bool enabled=true;
+        public string[] auxiliary={"NONE","NONE"};public string[] weapons={"AUTO","AUTO","AUTO","AUTO"};
     }
     [Serializable] sealed class FamilyLoadoutFile {public int version=1;public List<FamilyLoadout> designs=new List<FamilyLoadout>();}
     sealed class FamilyRig
@@ -23,8 +23,11 @@ public sealed partial class VoxArena
     sealed class FamilySupportMesh {public Transform transform;public Vector3[] vertices;}
     readonly Dictionary<Fighter,FamilyRig> familyRigs=new Dictionary<Fighter,FamilyRig>();
     FamilyLoadoutFile familyLoadouts;
-    static readonly string[] FamilyLegs={"L-01_STRIDER","L-02_BASTION_TRACK","L-03_TARANTULAN","L-05_SKYLIFT"};
-    static readonly string[] FamilyBackpacks={"B-01_SKYWING","B-02_CROSSLANCE","B-03_OVERTHRUST","B-04_LONGTANK","B-05_RAMJET"};
+    int familyArtCategory;Vector2 familyArtScroll;
+    static readonly string[] FamilyHeads={"HD01","VIS_H01_RADOME","VIS_H02_LONGSIGHT","VIS_H03_SWIFTFIN","VIS_H04_BULWARK","VIS_H05_NEEDLE","VIS_H06_LANCET"};
+    static readonly string[] FamilyBodies={"BD01","VIS_C01_STANDARD","VIS_C02_LIGHTFRAME","VIS_C03_BULWARK_CORE","VIS_C04_ARC_CORE"};
+    static readonly string[] FamilyLegs={"L-01_STRIDER","L-02_BASTION_TRACK","L-03_TARANTULAN","L-05_SKYLIFT","VIS_L02_BASTION_TRACK","VIS_L03_TARANTULAN","VIS_L04_DRAFT_HOVER"};
+    static readonly string[] FamilyBackpacks={"B-01_SKYWING","B-02_CROSSLANCE","B-03_OVERTHRUST","B-04_LONGTANK","B-05_RAMJET","VIS_B02_SKYWING","VIS_B03_CARGO_PACK","DRONE_ATTACK_V002","DRONE_INTERCEPT_V002","DRONE_JAMMER_V002"};
     static readonly string[] FamilyWeapons={"AUTO","W-01_LUMEN","W-02_BREAKER","W-03_RATTLE","W-04_EDGE"};
     static bool FamilyJointReviewRequested=>Array.IndexOf(Environment.GetCommandLineArgs(),"--wisp-joint-review")>=0;
     static bool FamilyReviewRequested=>FamilyJointReviewRequested||Array.IndexOf(Environment.GetCommandLineArgs(),"--wisp-family-review")>=0;
@@ -50,12 +53,18 @@ public sealed partial class VoxArena
             if(familyLoadouts==null)familyLoadouts=new FamilyLoadoutFile();if(familyLoadouts.designs==null)familyLoadouts.designs=new List<FamilyLoadout>();
         }
         bool design=f==player||f.root.name=="Portrait studio robot";
-        string key=(design?(activeBalance?.activeDesignId??"DESIGN_01"):"AI")+"/"+f.spec.name;
+        string key=(design?((balanceEditorOpen?balanceDraft?.activeDesignId:null)??activeBalance?.activeDesignId??"DESIGN_01"):"AI")+"/"+f.spec.name;
         FamilyLoadout c=familyLoadouts.designs.Find(x=>x!=null&&x.key==key);
-        if(c==null){c=new FamilyLoadout{key=key,enabled=f.spec.name=="WISP"||f.spec.name=="BASTION"||f.spec.name=="TARANTULA",legs=f.spec.mobility==MobilityKind.Tank?FamilyLegs[1]:f.spec.mobility==MobilityKind.Quadruped?FamilyLegs[2]:FamilyLegs[0]};familyLoadouts.designs.Add(c);}
+        if(c==null){c=new FamilyLoadout{key=key,enabled=f.spec.name=="WISP"||f.spec.name=="BASTION"||f.spec.name=="TARANTULA",head=FamilyHeads[0],body=FamilyBodies[0],legs=f.spec.mobility==MobilityKind.Tank?FamilyLegs[1]:f.spec.mobility==MobilityKind.Quadruped?FamilyLegs[2]:FamilyLegs[0]};familyLoadouts.designs.Add(c);}
+        // New authored family art replaces the previous selectable looks for these three frames.
+        // HOUND has no replacement family body yet, so retain its dedicated canine model.
+        if(f.spec.name=="WISP"||f.spec.name=="BASTION"||f.spec.name=="TARANTULA")c.enabled=true;
+        if(Array.IndexOf(FamilyHeads,c.head)<0)c.head=FamilyHeads[0];if(Array.IndexOf(FamilyBodies,c.body)<0)c.body=FamilyBodies[0];
         if(Array.IndexOf(FamilyLegs,c.legs)<0)c.legs=FamilyLegs[0];if(Array.IndexOf(FamilyBackpacks,c.backpack)<0)c.backpack=FamilyBackpacks[0];
         if(c.weapons==null||c.weapons.Length!=4)c.weapons=new[]{"AUTO","AUTO","AUTO","AUTO"};
         for(int i=0;i<4;i++)if(Array.IndexOf(FamilyWeapons,c.weapons[i])<0)c.weapons[i]="AUTO";
+        if(c.auxiliary==null||c.auxiliary.Length!=2)c.auxiliary=new[]{"NONE","NONE"};
+        for(int i=0;i<2;i++)if(Array.IndexOf(AuxiliaryIds,c.auxiliary[i])<0)c.auxiliary[i]="NONE";
         return c;
     }
     void SaveFamilyConfig()
@@ -70,6 +79,7 @@ public sealed partial class VoxArena
         if(slot>=2&&BackpackWeaponMountsPending)return null;
         if(f.weaponProfiles[slot].isUnarmed||f.weaponProfiles[slot].shoulderBlocked)return null;
         if(f.weaponProfiles[slot].isShield)return "W-05_AEGIS";
+        string equipped=f.weaponArtIds?[slot];if(!string.IsNullOrEmpty(equipped)&&WeaponCatalog().models.Any(x=>x.id==equipped&&x.kind=="firearm"))return equipped;
         string picked=c.weapons[slot];if(picked!="AUTO")return picked;
         string id=(f.weaponArtIds?[slot]??"").ToUpperInvariant();
         if(id.Contains("SWORD")||id.Contains("BLADE")||id.Contains("SABER"))return "W-04_EDGE";
@@ -79,7 +89,7 @@ public sealed partial class VoxArena
     }
     void InstallFamilyArt(Fighter f)
     {
-        familyRigs.Remove(f);if(!WispFamilyAssets.Available||Array.IndexOf(Environment.GetCommandLineArgs(),"--legacy-family-art")>=0)return;
+        RemoveDroneRuntime(f);familyRigs.Remove(f);if(!WispFamilyAssets.Available||Array.IndexOf(Environment.GetCommandLineArgs(),"--legacy-family-art")>=0)return;
         FamilyLoadout c=FamilyConfig(f);if(!c.enabled)return;
         // Retain legacy animation/combat drivers, hide only their surfaces.
         foreach(Renderer renderer in f.body.GetComponentsInChildren<Renderer>(true))
@@ -91,18 +101,29 @@ public sealed partial class VoxArena
         var r=new FamilyRig{root=Module("Approved WISP modular family",f.body,Vector3.zero),config=c};r.root.localScale=Vector3.one*4f;
         r.legs=WispFamilyAssets.Spawn(c.legs,r.root);float waist=r.legs.data.waistHeight;
         r.upper=Module("Upper assembly / fixed proportions",r.root,Vector3.up*waist);
-        r.body=WispFamilyAssets.Spawn("BD01",r.upper);r.body.root.localPosition=Vector3.up*(-r.body.data.waistBottom);
-        r.head=WispFamilyAssets.Spawn("HD01",r.upper);r.head.root.localPosition=new Vector3(0,-r.body.data.waistBottom+r.body.data.neckTop+.046f,.003f);
-        r.backpack=WispFamilyAssets.Spawn(c.backpack,r.upper);r.backpack.root.localPosition=r.body.root.localPosition+WispFamilyAssets.V(r.body.data.backMount);
+        r.body=WispFamilyAssets.Spawn(c.body,r.upper);r.body.root.localPosition=Vector3.up*(-r.body.data.waistBottom);
+        r.head=WispFamilyAssets.Spawn(c.head,r.upper);r.head.root.localPosition=new Vector3(0,-r.body.data.waistBottom+r.body.data.neckTop+.046f,.003f);
+        r.backpack=SpawnDronePack(c.backpack,r.upper);r.backpack.root.localPosition=r.body.root.localPosition+WispFamilyAssets.V(r.body.data.backMount);
         Vector3[] rawElbows={WispFamilyAssets.V(r.body.data.leftElbow),WispFamilyAssets.V(r.body.data.rightElbow)};
         for(int side=0;side<2;side++)r.elbows[side]=rawElbows[side]-r.body.nodes[side==0?"LeftShoulder":"RightShoulder"].localPosition;
         foreach(var n in r.legs.nodes)r.legRest[n.Key]=n.Value.localPosition;
-        var supportNodes=r.legs.data.nodes.Where(n=>n.motion=="ankle"||n.motion=="quadKnee"||n.motion=="tread").Select(n=>n.name).ToArray();
+        var supportNodes=r.legs.data.nodes.Where(n=>n.motion=="ankle"||n.motion=="quadKnee"||n.motion=="quadAnkle"||n.motion=="tread").Select(n=>n.name).ToArray();
         r.supports=r.legs.root.GetComponentsInChildren<MeshFilter>().Where(m=>Array.IndexOf(supportNodes,m.transform.parent.name)>=0)
             .Select(m=>new FamilySupportMesh{transform=m.transform,vertices=m.sharedMesh.vertices.Distinct().ToArray()}).ToArray();
         for(int i=0;i<4;i++)
         {
             string id=FamilyWeapon(f,c,i);r.weaponIds[i]=id;if(id==null)continue;
+            if(WeaponCatalog().models.Any(x=>x.id==id&&x.kind=="firearm"))
+            {
+                Transform holder=Module("Actual equipped gun / "+id,r.root,Vector3.zero);
+                GameObject prefab=Resources.Load<GameObject>(WeaponArtResource(id));if(prefab==null)throw new InvalidOperationException("Missing gun "+id);
+                Transform model=Instantiate(prefab,holder,false).transform;model.localScale*=.2375f;PrepareWeaponMaterials(model);
+                Transform grip=FindArtSocket(model,"GRIP_MAIN"),muzzle=FindArtSocket(model,"MUZZLE");
+                if(grip==null||muzzle==null)throw new InvalidOperationException("Missing gun socket "+id);
+                model.position+=holder.position-grip.position;
+                r.weapons[i]=new WispFamilyAssets.Instance{root=holder,data=new WispFamilyAssets.Asset{id=id}};r.muzzles[i]=muzzle;
+                continue;
+            }
             var art=WispFamilyAssets.Spawn(id,r.root);r.weapons[i]=art;art.root.localScale=Vector3.one*(i<2?.42f:.32f);
             if(i<2&&f.weaponProfiles[i].isBeamShield)f.shieldBeamVisuals[i]=CreateShieldBeamVisual(art.root);
             // The authored right-side blade/shield rolls reverse on the left.
@@ -111,7 +132,7 @@ public sealed partial class VoxArena
             Vector3 min=points[0],max=points[0];foreach(Vector3 p in points){min=Vector3.Min(min,p);max=Vector3.Max(max,p);}
             r.muzzles[i]=Module("Actual authored muzzle",art.root,new Vector3((min.x+max.x)*.5f,(min.y+max.y)*.5f,max.z));
         }
-        familyRigs.Add(f,r);f.headPart=r.head.root;wispHeadBoundsReady=false;CacheWispHeadBounds(f);UpdateFamilyArt(f);
+        familyRigs.Add(f,r);SetupDroneRuntime(f,r);SetupAuxiliary(f,r);f.headPart=r.head.root;wispHeadBoundsReady=false;CacheWispHeadBounds(f);UpdateFamilyArt(f);
         Debug.Log("WISP_FAMILY_APPLIED "+f.spec.name+" legs="+c.legs+" back="+c.backpack);
     }
     void UpdateFamilyArt(Fighter f)
@@ -175,6 +196,7 @@ public sealed partial class VoxArena
             else if(n.motion=="ankle")t.localRotation=Quaternion.Euler(-gait*n.side*18*travel.z-Mathf.Max(0,-gait*n.side)*25,0,-gait*n.side*12*travel.x);
             else if(n.motion=="quadHip")t.localRotation=Quaternion.Euler(Mathf.Sin(phase)*stride*12*travel.z,0,Mathf.Sin(phase)*stride*8*travel.x);
             else if(n.motion=="quadKnee")t.localRotation=Quaternion.Euler(Mathf.Max(0,Mathf.Sin(phase))*stride*19,0,0);
+            else if(n.motion=="quadAnkle")t.localRotation=Quaternion.Euler(-Mathf.Max(0,Mathf.Sin(phase))*stride*12,0,0);
             else if(n.motion=="wheel")t.localRotation=Quaternion.Euler(r.trackTravel*650,0,0);
             else if(n.motion=="tread")AnimateFamilyTread(t,r.legRest[n.name],r.trackTravel);
         }
@@ -205,27 +227,101 @@ public sealed partial class VoxArena
         muzzle=Vector3.zero;if(!familyRigs.TryGetValue(f,out FamilyRig r)||r.root==null)return false;
         Transform t=r.muzzles[WeaponIndex(f)];if(t==null)return false;muzzle=t.position;return true;
     }
+    readonly Dictionary<string,RenderTexture> familyPartPreviews=new Dictionary<string,RenderTexture>();
+    RenderTexture FamilyPartPreview(string id)
+    {
+        if(id=="AUTO")id="W-01_LUMEN";
+        if(familyPartPreviews.TryGetValue(id,out RenderTexture cached))return cached;
+        Transform studio=new GameObject("Isolated part preview").transform;studio.position=new Vector3(5000,5000,5000);
+        try
+        {
+            Transform part;
+            if(AuxArtIndex(id)>=0){part=Instantiate(auxiliaryModelSources[AuxArtIndex(id)],studio,false).transform;PrepareWeaponMaterials(part);}
+            else if(DronePackIndex(id)>=0){part=Instantiate(droneDockedPreviewSources[DronePackIndex(id)],studio,false).transform;part.localRotation=Quaternion.Euler(0,180,0)*part.localRotation;PrepareWeaponMaterials(part);}
+            else if(WeaponCatalog().models.Any(x=>x.id==id&&x.kind=="firearm"))
+            {
+                part=Instantiate(Resources.Load<GameObject>(WeaponArtResource(id)),studio,false).transform;PrepareWeaponMaterials(part);
+            }
+            else part=WispFamilyAssets.Spawn(id,studio).root;
+            foreach(Transform t in studio.GetComponentsInChildren<Transform>())t.gameObject.layer=30;
+            Bounds bounds=AuxiliaryBounds(part,null);
+            Camera camera=new GameObject("Part preview camera").AddComponent<Camera>();camera.transform.SetParent(studio,false);
+            camera.enabled=false;camera.orthographic=true;camera.cullingMask=1<<30;
+            camera.clearFlags=CameraClearFlags.SolidColor;camera.backgroundColor=new Color(.035f,.055f,.075f,1);
+            camera.transform.position=bounds.center+new Vector3(2,1.4f,DronePackIndex(id)>=0?-3:3)*Mathf.Max(.2f,bounds.size.magnitude);
+            camera.transform.LookAt(bounds.center);camera.nearClipPlane=.001f;camera.farClipPlane=100;
+            Vector3 e=bounds.extents,u=camera.transform.up,v=camera.transform.right;
+            float Extent(Vector3 axis)=>Mathf.Abs(axis.x)*e.x+Mathf.Abs(axis.y)*e.y+Mathf.Abs(axis.z)*e.z;
+            camera.orthographicSize=Mathf.Max(.05f,Mathf.Max(Extent(u),Extent(v))*1.18f);
+            Light light=new GameObject("Part preview light").AddComponent<Light>();light.transform.SetParent(studio,false);
+            light.type=LightType.Directional;light.cullingMask=1<<30;light.intensity=1.3f;light.transform.rotation=Quaternion.Euler(35,-35,0);
+            var rt=new RenderTexture(768,768,24);rt.Create();camera.targetTexture=rt;camera.Render();camera.targetTexture=null;
+            familyPartPreviews[id]=rt;return rt;
+        }
+        finally{studio.gameObject.SetActive(false);Destroy(studio.gameObject);}
+    }
+    void SelectFamilyPart(int category,int direction)
+    {
+        if(category>=6){CycleAuxiliary(category-6,direction);return;}
+        if(category>=4){SelectHandGun(category-4,direction);return;}
+        FamilyLoadout c=FamilyConfig(player);string[] ids=FamilyCategoryIds(category);
+        string current=FamilyCategoryValue(c,category);int index=Array.IndexOf(ids,current);
+        string id=ids[(Mathf.Max(0,index)+direction+ids.Length)%ids.Length];
+        if(category==0)c.head=id;else if(category==1)c.body=id;else if(category==2)c.legs=id;else if(category==3)c.backpack=id;else c.weapons[category-4]=id;
+        SaveFamilyConfig();balanceMessage=FamilyPartLabel(id).Replace("신규 · ","")+" 적용 · 외형 저장 완료";
+    }
+    string[] FamilyCategoryIds(int category)=>category==0?FamilyHeads:category==1?FamilyBodies:category==2?FamilyLegs:category==3?FamilyBackpacks:FamilyWeapons;
+    string FamilyCategoryValue(FamilyLoadout c,int category)=>category==0?c.head:category==1?c.body:category==2?c.legs:category==3?c.backpack:c.weapons[category-4];
     void DrawFamilyArtOptions()
     {
         FamilyLoadout c=FamilyConfig(player);
-        GUI.Label(new Rect(370,135,850,30),"새 WISP 파츠 · 외형만 변경 / 이동 방식과 성능 수치는 유지",new GUIStyle(GUI.skin.label){fontSize=17});
-        if(GUI.Button(new Rect(370,177,840,36),c.enabled?"신형 외형 사용 중 · 클릭하면 기존 외형":"기존 외형 사용 중 · 클릭하면 신형 외형")){c.enabled=!c.enabled;SaveFamilyConfig();return;}
-        string Row(float y,string caption,string current,string[] ids)
+        string[] categories=new[]{"머리","몸통","하체","백팩","왼손","오른손"}.Concat(Enumerable.Range(0,BackpackAuxSlots(c.backpack)).Select(i=>"보조 "+(i+1))).ToArray();
+        if(familyArtCategory>=categories.Length)familyArtCategory=3;float categoryWidth=552f/categories.Length;
+        var categoryStyle=new GUIStyle(GUI.skin.button){fontSize=16,padding=new RectOffset(4,4,0,0),alignment=TextAnchor.MiddleCenter};
+        for(int i=0;i<categories.Length;i++)
         {
-            GUI.Label(new Rect(370,y+7,150,30),caption);int i=Array.IndexOf(ids,current);if(i<0)i=0;
-            if(GUI.Button(new Rect(525,y,45,42),"‹"))i=(i+ids.Length-1)%ids.Length;
-            GUI.Label(new Rect(580,y+7,550,30),ids[i].Replace('_',' '));
-            if(GUI.Button(new Rect(1165,y,45,42),"›"))i=(i+1)%ids.Length;return ids[i];
+            GUI.backgroundColor=familyArtCategory==i?Orange:new Color(.12f,.18f,.23f);
+            if(GUI.Button(new Rect(694+i*categoryWidth,139,categoryWidth-4,36),categories[i],categoryStyle))familyArtCategory=i;
         }
-        string back=Row(230,"백팩",c.backpack,FamilyBackpacks),legs=Row(284,"하체",c.legs,FamilyLegs);
-        bool changed=back!=c.backpack||legs!=c.legs;c.backpack=back;c.legs=legs;
-        for(int i=0;i<2;i++)
+        GUI.backgroundColor=Color.white;DrawBackpackMenu();
+        if(familyArtCategory>=6){DrawAuxiliarySelector(familyArtCategory-6);return;}
+        if(familyArtCategory>=4){DrawHandGunSelector(familyArtCategory-4);return;}
+        string[] ids=FamilyCategoryIds(familyArtCategory);string current=FamilyCategoryValue(c,familyArtCategory);
+        int index=Mathf.Max(0,Array.IndexOf(ids,current));
+        Panel(new Rect(700,186,536,340),new Color(.035f,.055f,.075f));
+        RenderTexture image=FamilyPartPreview(current);
+        if(image!=null)GUI.DrawTexture(new Rect(758,190,420,330),image,ScaleMode.ScaleToFit,false);
+        if(GUI.Button(new Rect(704,322,48,66),"◀"))SelectFamilyPart(familyArtCategory,-1);
+        if(GUI.Button(new Rect(1182,322,48,66),"▶"))SelectFamilyPart(familyArtCategory,1);
+        GUI.Label(new Rect(708,536,520,36),FamilyPartLabel(current).Replace("신규 · ",""),new GUIStyle(GUI.skin.label){fontSize=23,fontStyle=FontStyle.Bold,alignment=TextAnchor.MiddleCenter});
+        GUI.Label(new Rect(708,576,520,25),(index+1)+" / "+ids.Length+"  ·  "+categories[familyArtCategory],new GUIStyle(small){alignment=TextAnchor.MiddleCenter});
+        GUI.Label(new Rect(710,614,520,40),"좌우 화살표로 교체 · 왼쪽 기체에 즉시 적용",new GUIStyle(small){alignment=TextAnchor.MiddleCenter});
+    }
+    static string FamilyPartLabel(string id)
+    {
+        switch(id)
         {
-            string current=c.weapons[i];string selected=Row(338+i*54,(i+1)+"번 무기 외형",current,FamilyWeapons);
-            changed|=selected!=current;c.weapons[i]=selected;
+            case "DRONE_ATTACK_V002":return "신규 · 공격 드론 백팩";
+            case "DRONE_INTERCEPT_V002":return "신규 · 요격 드론 백팩";
+            case "DRONE_JAMMER_V002":return "신규 · 교란 드론 백팩";
+            case "HD01":return "공용 센서 헤드";
+            case "BD01":return "공용 기본 코어";
+            case "VIS_H01_RADOME":return "신규 · H-01 레이돔 헤드";
+            case "VIS_H02_LONGSIGHT":return "신규 · H-02 롱사이트 헤드";
+            case "VIS_H03_SWIFTFIN":return "신규 · H-03 스위프트핀 헤드";
+            case "VIS_H04_BULWARK":return "신규 · H-04 불워크 헤드";
+            case "VIS_H05_NEEDLE":return "신규 · H-05 니들 헤드";
+            case "VIS_H06_LANCET":return "신규 · H-06 랜싯 헤드";
+            case "VIS_C01_STANDARD":return "신규 · C-01 스탠더드 코어";
+            case "VIS_C02_LIGHTFRAME":return "신규 · C-02 라이트프레임 코어";
+            case "VIS_C03_BULWARK_CORE":return "신규 · C-03 불워크 코어";
+            case "VIS_C04_ARC_CORE":return "신규 · C-04 아크 코어";
+            case "VIS_B02_SKYWING":return "신규 · B-02 스카이윙 백팩";
+            case "VIS_B03_CARGO_PACK":return "신규 · B-03 카고 백팩";
+            case "VIS_L02_BASTION_TRACK":return "신규 · BASTION 전차 하체";
+            case "VIS_L03_TARANTULAN":return "신규 · TARANTULAN 사족 하체";
+            case "VIS_L04_DRAFT_HOVER":return "신규 · DRAFT 호버 하체";
+            default:return id.Replace('_',' ');
         }
-        GUI.Label(new Rect(370,466,840,50),"3·4번 어깨 무장: 미장착 · 백팩 장착부 준비 중",small);
-        GUI.Label(new Rect(370,570,850,35),"AUTO는 현재 무기에 맞춘 외형 · 방패/빈 슬롯은 실제 장착 상태를 따름",small);
-        if(changed){SaveFamilyConfig();balanceMessage="새 파츠 외형 적용 · 성능 수치 보존";}
     }
 }
